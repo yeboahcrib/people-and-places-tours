@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="An 8-day immersive Ghana adventure. Accra, Cape Coast, Kumasi, Volta Region, Ada Foah — the best of the country with local guides who know it inside out." />
+  <title>Just Go Ghana | People & Places Tours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --yellow: #FFAB00;
+      --black: #0A0A0A;
+      --dark: #1B1B1B;
+      --white: #FFFFFF;
+      --gray: #F5F5F0;
+      --muted: rgba(255,255,255,0.6);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--dark); }
+
+    /* NAV */
+    nav { background: var(--black); display: flex; align-items: center; justify-content: space-between; padding: 1rem 2.5rem; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo img { height: 52px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--yellow); }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-phone { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+    .btn-yellow { background: var(--yellow); color: var(--black); border: none; padding: 0.7rem 1.8rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-yellow:hover { background: #e09900; transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--dark); border: 2px solid var(--dark); padding: 0.7rem 1.8rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-block; }
+    .btn-outline:hover { background: var(--dark); color: var(--white); }
+
+    /* HERO */
+    .trip-hero { background: var(--black); padding: 4rem 2.5rem 3rem; }
+    .trip-hero-inner { max-width: 900px; margin: 0 auto; }
+    .back-link { color: rgba(255,255,255,0.5); font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; transition: color 0.2s; }
+    .back-link:hover { color: var(--yellow); }
+    .tag-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .tag { background: rgba(255,171,0,0.15); color: var(--yellow); border: 1px solid rgba(255,171,0,0.3); padding: 0.3rem 1rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .trip-hero h1 { font-family: 'Archivo Black', sans-serif;  font-size: clamp(3rem, 7vw, 5.5rem); color: var(--white); line-height: 1; margin-bottom: 1rem; }
+    .trip-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .trip-meta-item { color: rgba(255,255,255,0.6); font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; }
+    .trip-meta-item strong { color: var(--white); }
+
+    /* HERO IMAGE */
+    .hero-img { width: 100%; height: 500px; object-fit: cover; border-radius: 0 0 32px 32px; background: linear-gradient(135deg, #1a3a2a, #2d5a3d); display: flex; align-items: center; justify-content: center; }
+    .hero-img-placeholder { width: 100%; height: 500px; background: linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 50%, #1a3a2a 100%); border-radius: 0 0 32px 32px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .hero-img-placeholder::before { content: 'GHANA'; font-family: 'Archivo Black', sans-serif;  font-size: 12rem; color: rgba(255,171,0,0.08); position: absolute; }
+
+    /* CONTENT */
+    .content-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2.5rem; display: grid; grid-template-columns: 1fr 340px; gap: 4rem; align-items: start; }
+    .content-right { position: sticky; top: 100px; }
+
+    /* SECTIONS */
+    .section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem; }
+    .content-left h2 { font-family: 'Archivo Black', sans-serif;  font-size: 2.2rem; color: var(--dark); margin-bottom: 1rem; }
+    .content-left p { color: #555; line-height: 1.8; font-size: 1rem; margin-bottom: 1.5rem; }
+
+    /* HIGHLIGHTS */
+    .highlights { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 3rem; }
+    .highlight-pill { background: var(--gray); color: var(--dark); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500; }
+
+    /* ITINERARY */
+    .itinerary { margin-bottom: 3rem; }
+    .day-item { border-bottom: 1px solid #eee; }
+    .day-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; cursor: pointer; }
+    .day-header h3 { font-size: 0.95rem; font-weight: 600; color: var(--dark); }
+    .day-number { font-family: 'Archivo Black', sans-serif;  font-size: 1.1rem; color: var(--yellow); margin-right: 0.75rem; }
+    .day-arrow { font-size: 1rem; color: #aaa; transition: transform 0.2s; }
+    .day-body { display: none; padding-bottom: 1.25rem; }
+    .day-body p { color: #666; font-size: 0.9rem; line-height: 1.8; }
+    .day-body .meals { margin-top: 0.75rem; font-size: 0.8rem; color: var(--yellow); font-weight: 600; }
+    .day-item.open .day-arrow { transform: rotate(180deg); }
+    .day-item.open .day-body { display: block; }
+
+    /* INCLUDED / EXCLUDED */
+    .inc-exc { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
+    .inc-exc h3 { font-family: 'Archivo Black', sans-serif;  font-size: 1.4rem; margin-bottom: 1rem; }
+    .inc-list, .exc-list { list-style: none; }
+    .inc-list li, .exc-list li { padding: 0.5rem 0; font-size: 0.9rem; color: #555; display: flex; align-items: flex-start; gap: 0.6rem; border-bottom: 1px solid #f0f0f0; }
+    .inc-list li::before { content: '✓'; color: var(--yellow); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .exc-list li::before { content: '✗'; color: #ccc; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* TESTIMONIALS */
+    .testimonials { background: var(--gray); border-radius: 24px; padding: 2rem; margin-bottom: 3rem; }
+    .testimonial { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e8e0; }
+    .testimonial:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .testimonial p { color: #444; font-size: 0.95rem; line-height: 1.8;  margin-bottom: 0.5rem; }
+    .testimonial strong { font-size: 0.85rem; color: var(--dark); font-style: normal; }
+
+    /* FAQ */
+    .faq { margin-bottom: 3rem; }
+    .faq-item { border-bottom: 1px solid #eee; }
+    .faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+    .faq-q .arrow { color: #aaa; transition: transform 0.2s; }
+    .faq-a { display: none; padding-bottom: 1.25rem; color: #666; font-size: 0.9rem; line-height: 1.8; }
+    .faq-item.open .faq-q .arrow { transform: rotate(180deg); }
+    .faq-item.open .faq-a { display: block; }
+
+    /* BOOKING SIDEBAR */
+    .booking-card { background: var(--black); border-radius: 24px; padding: 2rem; color: var(--white); margin-bottom: 1.5rem; }
+    .booking-card .price-label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.25rem; }
+    .booking-card .price { font-family: 'Archivo Black', sans-serif;  font-size: 3.5rem; color: var(--yellow); line-height: 1; }
+    .booking-card .price-sub { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; }
+    .booking-card .deposit-note { background: rgba(255,171,0,0.1); border: 1px solid rgba(255,171,0,0.2); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+    .booking-card .deposit-note p { font-size: 0.8rem; color: rgba(255,255,255,0.7); line-height: 1.6; }
+    .booking-card .deposit-note strong { color: var(--yellow); }
+    .booking-btns { display: flex; flex-direction: column; gap: 0.75rem; }
+    .booking-btns a { text-align: center; }
+    .btn-outline-white { background: transparent; color: var(--white); border: 2px solid rgba(255,255,255,0.3); padding: 0.85rem 1.8rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; display: block; text-align: center; }
+    .btn-outline-white:hover { border-color: var(--white); background: rgba(255,255,255,0.1); }
+
+    /* TRIP HIGHLIGHTS SIDEBAR */
+    .trip-highlights-card { background: var(--gray); border-radius: 24px; padding: 1.5rem; }
+    .trip-highlights-card h4 { font-family: 'Archivo Black', sans-serif;  font-size: 1.2rem; margin-bottom: 1rem; color: var(--dark); }
+    .highlight-row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid #e8e8e0; font-size: 0.85rem; }
+    .highlight-row:last-child { border-bottom: none; }
+    .highlight-row span:first-child { color: #888; }
+    .highlight-row span:last-child { font-weight: 600; color: var(--dark); }
+
+    /* ALSO CHECK OUT */
+    .also-check { background: var(--black); padding: 4rem 2.5rem; border-radius: 40px 40px 0 0; }
+    .also-check h2 { font-family: 'Archivo Black', sans-serif;  font-size: 2.5rem; color: var(--white); margin-bottom: 2rem; text-align: center; }
+    .also-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .also-card { background: #161616; border: 1px solid #222; border-radius: 20px; overflow: hidden; text-decoration: none; transition: all 0.3s; }
+    .also-card:hover { border-color: var(--yellow); transform: translateY(-4px); }
+    .also-card-img { height: 200px; background: linear-gradient(135deg, #1a3a2a, #2d5a3d); display: flex; align-items: center; justify-content: center; }
+    .also-card-img span { font-family: 'Archivo Black', sans-serif;  font-size: 3rem; color: rgba(255,171,0,0.3); }
+    .also-card-body { padding: 1.25rem; }
+    .also-card-body .tag-row { margin-bottom: 0.5rem; }
+    .also-card-body h3 { font-family: 'Archivo Black', sans-serif;  font-size: 1.3rem; color: var(--white); margin-bottom: 0.25rem; }
+    .also-card-body .price { color: var(--yellow); font-size: 0.9rem; font-weight: 600; }
+
+    /* FOOTER */
+    footer { background: #050505; padding: 3rem 2.5rem 2rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 2rem; }
+    .footer-brand .logo { display: block; height: 48px; width: auto; margin-bottom: 0.5rem; }
+    .footer-brand p { color: rgba(255,255,255,0.4); font-size: 0.85rem; line-height: 1.7; }
+    .footer-col h4 { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow); margin-bottom: 1rem; }
+    .footer-col a { display: block; color: rgba(255,255,255,0.5); font-size: 0.85rem; text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom { border-top: 1px solid #1a1a1a; padding-top: 1.5rem; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.8rem; }
+
+    @media (max-width: 900px) {
+      .content-wrap { grid-template-columns: 1fr; }
+      .content-right { position: static; }
+      .inc-exc { grid-template-columns: 1fr; }
+      .also-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .nav-phone { display: none; }
+      .trip-hero { padding: 2rem 1.25rem; }
+      .content-wrap { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo"><img src="assets/logo-footer.svg" alt="People &amp; Places Tours"></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="packages.html">Packages</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <span class="nav-phone">+233 50 367 3473</span>
+    <a href="contact.html" class="btn-yellow">Book A Tour</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="trip-hero">
+  <div class="trip-hero-inner">
+    <a href="packages.html" class="back-link">← Back to All Packages</a>
+    <div class="tag-row">
+      <span class="tag">Culture</span>
+      <span class="tag">Adventure</span>
+      <span class="tag">Nature</span>
+      <span class="tag">Relaxation</span>
+      <span class="tag">Multi-Day</span>
+    </div>
+    <h1>Just Go Ghana</h1>
+    <div class="trip-meta">
+      <span class="trip-meta-item"><strong>8 Days</strong> / 7 Nights</span>
+      <span class="trip-meta-item"><strong>Departure:</strong> Accra, Ghana</span>
+      <span class="trip-meta-item"><strong>Activity Level:</strong> Moderate</span>
+      <span class="trip-meta-item"><strong>Trip Style:</strong> Immersive Cultural Adventure</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO IMAGE -->
+<div class="hero-img-placeholder">
+  <span style="font-family:'Archivo Black',sans-serif;font-size:10rem;color:rgba(255,171,0,0.08);position:absolute;">GHANA</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-wrap">
+  <div class="content-left">
+
+    <!-- OVERVIEW -->
+    <div class="section-label">Tour Overview</div>
+    <h2>The Motherland Is Calling. Just Go.</h2>
+    <p>Get ready to soak up the vibrant spirit of Ghana! It's not just a destination, it's a soulful experience — and honestly, what is life without experiencing the magic of the Motherland?</p>
+    <p>Just Go Ghana is a tour designed for those ready to reconnect and rediscover — from solo travelers and couples to families and groups. Immerse yourself in the warmth and electric energy of this incredible West African nation. Over 8 days and 7 nights, you'll explore the deep-rooted culture, the traditions, the people, and the breathtaking places that make Ghana so unforgettable.</p>
+
+    <!-- HIGHLIGHTS -->
+    <div class="section-label" style="margin-top:2rem;">Trip Highlights</div>
+    <div class="highlights">
+      <span class="highlight-pill">🎭 Culture</span>
+      <span class="highlight-pill">🏕️ Adventure</span>
+      <span class="highlight-pill">🦁 Safari Valley</span>
+      <span class="highlight-pill">🎨 Workshops</span>
+      <span class="highlight-pill">⛵ Boat Cruise</span>
+      <span class="highlight-pill">🏖️ Beach</span>
+      <span class="highlight-pill">🏨 Accommodation</span>
+      <span class="highlight-pill">🍽️ Welcome Dinner</span>
+    </div>
+
+    <!-- ITINERARY -->
+    <div class="section-label">Day by Day Itinerary</div>
+    <h2>Your 8-Day Journey</h2>
+    <div class="itinerary">
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 1</span> Arrival, Airport Pickup & Welcome Dinner</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>Upon arrival at Kotoka International Airport, you will be met by a People & Places representative who will assist with your luggage and transfer you to your hotel. After checking in and freshening up, enjoy a welcome dinner at a fine dining restaurant in Accra — a chance to meet your tour guide and prepare for the exciting days ahead.</p>
+          <div class="meals">🍽 Meals included: Dinner</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 2</span> Batik Workshop, Drum Lessons & Accra City Tour</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>Visit a batik-making center, learn the art of batik and create your own patterns and handmade clothes. Next, head to the Art Center for drum lessons and interaction with local artisans. Afternoon city tour of Accra visiting Kwame Nkrumah Park and Independence Square. Evening free for personal exploration.</p>
+          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 3</span> Aburi Gardens, Cocoa Farm & Waterfalls</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>Journey into the lush Eastern Region for a day filled with nature and history. Visit Aburi Botanical Gardens, then Tetteh Quarshie's Cocoa Farm — the first cocoa farm in Ghana. Learn about Ghana's cocoa history and taste fresh cocoa beans when available. End at Asenema Waterfalls for photos and relaxation.</p>
+          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 4</span> Ancestral Trip to Cape Coast</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>A deeply meaningful journey into history and heritage. Visit Assin Manso Ancestral Slave River — a sacred site where enslaved Africans took their last bath on African soil. Then continue to Cape Coast Castle, a UNESCO World Heritage Site. Optional evening boat cruise in Elmina. A reflective, educational and transformative day.</p>
+          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 5</span> Free Day</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>A flexible day designed for rest and personal exploration. Relax and recharge or explore Accra at your own pace. Optional activities include shea butter making, pottery, candle making, beach visits and other cultural experiences. Our team is on standby with recommendations based on your interests.</p>
+          <div class="meals">🍽 Meals included: Breakfast</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 6</span> Shai Hills & Akosombo Boat Cruise</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>Depart for an exciting day of nature and adventure. Explore Shai Hills Resource Reserve on a guided walk, spotting antelopes, baboons and bird species. Continue to Akosombo for a relaxing boat cruise on the Volta River with optional kayaking for the adventurous.</p>
+          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 7</span> Safari Valley Day Experience</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>Full day at Safari Eco Park — welcomed with freshly squeezed juice, followed by a guided safari tour. Enjoy a farm-to-table meal of your choice. Recreational activities include swimming, horseback riding, animal feeding, golf, cycling, walking trails, indoor and outdoor games, and a children's amusement park.</p>
+          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+        </div>
+      </div>
+
+      <div class="day-item">
+        <div class="day-header" onclick="toggleDay(this)">
+          <h3><span class="day-number">DAY 8</span> Departure — See You Again!</h3>
+          <span class="day-arrow">▼</span>
+        </div>
+        <div class="day-body">
+          <p>Time to say goodbye to Ghana. Last-minute shopping or exploration before your transfer to Kotoka International Airport. We'll miss you and hope to see you again soon!</p>
+          <div class="meals">🍽 Meals included: Breakfast</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- INCLUDED / EXCLUDED -->
+    <div class="section-label">What's Covered</div>
+    <div class="inc-exc">
+      <div>
+        <h3 style="color:#1B1B1B;">What's Included</h3>
+        <ul class="inc-list">
+          <li>Airport pickup (Arrival & Departure)</li>
+          <li>Ground Transportation throughout</li>
+          <li>Dedicated tour host</li>
+          <li>Local tour guides at all sites</li>
+          <li>Daily Tours & Experiences</li>
+          <li>Hotel Accommodation (7 nights)</li>
+          <li>Daily Breakfast & Tour Lunches</li>
+          <li>Welcome Dinner</li>
+          <li>Entry fees to all sites & Taxes</li>
+          <li>Tips for Local Guides</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#1B1B1B;">Not Included</h3>
+        <ul class="exc-list">
+          <li>Round-trip airfare to/from Ghana</li>
+          <li>Travel Medical Insurance</li>
+          <li>Passport & Visa Fees</li>
+          <li>Vaccines (Yellow Fever required)</li>
+          <li>Personal Expenses (shopping, laundry)</li>
+          <li>All items not listed as included</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TESTIMONIALS -->
+    <div class="section-label">Guest Reviews</div>
+    <h2>What Our Travelers Say</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <p>"It was a wonderful experience in Ghana. People and Places took care of everything and planned an excellent itinerary. We laughed and made wonderful memories. They were also willing to work within our budget and make the necessary adjustments. My favorite part was definitely the food."</p>
+        <strong>— Precious Nwokeleme ⭐⭐⭐⭐⭐</strong>
+      </div>
+      <div class="testimonial">
+        <p>"Our best trip in a long time! We discovered P&P through Melanin Travel Magic, and from start to finish, we didn't have to worry about a thing — just enjoy the moment. The P&P crew took care of us like royalty from the moment we landed to the day we flew back home. Genuinely funny, reliable and incredibly resourceful."</p>
+        <strong>— Tamaro Diallo ⭐⭐⭐⭐⭐</strong>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="section-label">Frequently Asked Questions</div>
+    <h2>Got Questions?</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I pay in installments? <span class="arrow">▼</span></div>
+        <div class="faq-a">Yes! We offer flexible payment plans. After your $400 deposit, you can make monthly payments. Final balance must be cleared 30 days before arrival.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is my deposit refundable? <span class="arrow">▼</span></div>
+        <div class="faq-a">The $400 deposit is non-refundable as it immediately reserves accommodations and transport. Any trip cancelled less than 30 days before arrival is 100% non-refundable.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Does the price include flights? <span class="arrow">▼</span></div>
+        <div class="faq-a">No. You book your own flight to Kotoka International Airport (ACC). We recommend booking early to get the best rates.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is this good for solo travelers? <span class="arrow">▼</span></div>
+        <div class="faq-a">Absolutely! Just Go Ghana is designed for solo travelers, couples, families and groups alike. Final price may vary depending on room occupancy selection.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do I need a visa for Ghana? <span class="arrow">▼</span></div>
+        <div class="faq-a">Yes, most international travelers require a visa. Visa fees are not included. We recommend applying well in advance through your nearest Ghanaian Embassy.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What vaccinations are required? <span class="arrow">▼</span></div>
+        <div class="faq-a">A Yellow Fever vaccination card is mandatory for Ghana entry. Consult your doctor regarding Malaria prophylaxis and other standard travel vaccines.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How active is the trip? <span class="arrow">▼</span></div>
+        <div class="faq-a">Moderate level. Expect walking during city tours, the cocoa farm, and Shai Hills hike. There's plenty of downtime including a designated free day on Day 5.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is Ghana safe for tourists? <span class="arrow">▼</span></div>
+        <div class="faq-a">Absolutely. Ghana is widely known as one of the friendliest and safest countries in Africa, especially for the diaspora. Our guides are with you throughout the scheduled itinerary.</div>
+      </div>
+    </div>
+
+  </div><!-- /content-left -->
+
+  <!-- SIDEBAR -->
+  <div class="content-right">
+    <div class="booking-card">
+      <div class="price-label">Starting at</div>
+      <div class="price">$3,000</div>
+      <div class="price-sub">per person · 8 Days / 7 Nights</div>
+      <div class="deposit-note">
+        <p><strong>Secure your spot:</strong> A non-refundable deposit of <strong>$400/person</strong> reserves your dates. Monthly payment plans available. Full balance due 30 days before arrival.</p>
+      </div>
+      <div class="booking-instalment">
+        <div class="instalment-row">
+          <div class="instalment-cell">
+            <span class="instalment-cell-label">Deposit now</span>
+            <span class="instalment-cell-value">30%</span>
+          </div>
+          <span class="instalment-arrow">→</span>
+          <div class="instalment-cell">
+            <span class="instalment-cell-label">Balance due</span>
+            <span class="instalment-cell-value">Before tour</span>
+          </div>
+        </div>
+        <p class="payment-methods-mini">Mobile Money &nbsp;·&nbsp; Bank Transfer &nbsp;·&nbsp; Card</p>
+      </div>
+
+      <div class="booking-btns">
+        <a href="contact.html" class="btn-yellow">Book Now</a>
+        <a href="contact.html" class="btn-outline-white">Ask A Question</a>
+      </div>
+    </div>
+    <div class="trip-highlights-card">
+      <h4>Trip Details</h4>
+      <div class="highlight-row"><span>Duration</span><span>8 Days / 7 Nights</span></div>
+      <div class="highlight-row"><span>Departure</span><span>Accra, Ghana</span></div>
+      <div class="highlight-row"><span>Activity Level</span><span>Moderate</span></div>
+      <div class="highlight-row"><span>Group Size</span><span>Small Groups</span></div>
+      <div class="highlight-row"><span>Meals</span><span>Daily Breakfast + Lunches</span></div>
+      <div class="highlight-row"><span>Accommodation</span><span>Hotel (7 nights)</span></div>
+      <div class="highlight-row"><span>Airport Transfer</span><span>Included</span></div>
+      <div class="highlight-row"><span>Local Guide</span><span>Included</span></div>
+    </div>
+  </div>
+
+</div><!-- /content-wrap -->
+
+<!-- ALSO CHECK OUT -->
+<div class="also-check">
+  <h2>Also Check Out</h2>
+  <div class="also-grid">
+    <a href="cape-coast-tour.html" class="also-card">
+      <div class="also-card-img"><img src="https://images.unsplash.com/photo-1712700853174-f555aeb2c80d?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div>
+      <div class="also-card-body">
+        <div class="tag-row"><span class="tag">Culture</span><span class="tag">Adventure</span></div>
+        <h3>Cape Coast Ancestral Tour</h3>
+        <div class="price">From $160/person · 1 Day</div>
+      </div>
+    </a>
+    <a href="shai-hills-tour.html" class="also-card">
+      <div class="also-card-img"><img src="https://images.unsplash.com/photo-1590409110365-70d93eff6b4c?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div>
+      <div class="also-card-body">
+        <div class="tag-row"><span class="tag">Adventure</span><span class="tag">Nature</span></div>
+        <h3>Shai Hills & Boat Cruise</h3>
+        <div class="price">From $130/person · 1 Day</div>
+      </div>
+    </a>
+    <a href="accra-city-tour.html" class="also-card">
+      <div class="also-card-img"><span>AC</span></div>
+      <div class="also-card-body">
+        <div class="tag-row"><span class="tag">Culture</span></div>
+        <h3>Accra City Tour</h3>
+        <div class="price">From $100/person · 1 Day</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" aria-label="People &amp; Places Tours">
+        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo">
+      </a>
+      <p>Discover Ghana, Worry Less.<br>Real experiences led by real locals, no stress.</p>
+      <div class="footer-social">
+        <a href="https://instagram.com/peopleand.places" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="https://tiktok.com/@peopandplaces" target="_blank" rel="noopener" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.73z"/></svg>
+        </a>
+        <a href="https://wa.me/233503673473" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <a href="index.html">Home</a>
+      <a href="packages.html">Packages</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Packages</h4>
+      <a href="just-go-ghana.html">Just Go Ghana</a>
+      <a href="packages.html#day-tours">Day Tours</a>
+      <a href="contact.html">Private Experiences</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a>
+      <a href="tel:+233503673473">+233 50 367 3473</a>
+      <a href="https://instagram.com/peopleand.places" target="_blank" rel="noopener noreferrer">@peopleand.places</a>
+      <a href="https://tiktok.com/@peopandplaces" target="_blank" rel="noopener noreferrer">@peopandplaces</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 People & Places Tours. All Rights Reserved.</div>
+</footer>
+
+<script>
+  function toggleDay(header) {
+    const item = header.parentElement;
+    item.classList.toggle('open');
+  }
+  function toggleFaq(q) {
+    const item = q.parentElement;
+    item.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>People &amp; Places Tours — Discover Ghana, Worry Less</title>
+  <meta name="description" content="Ghana's premier tour company. Accra, Cape Coast, Kumasi, Volta Region and beyond — real experiences led by real locals. No stress, just Ghana." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="assets/favicon.svg" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="People &amp; Places Tours — Home">
+      <img src="assets/logo-footer.svg" alt="People &amp; Places Tours">
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="packages.html">Packages</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+
+    <div class="nav-cta">
+      <a href="tel:+233503673473" class="nav-phone">+233 50 367 3473</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <nav class="nav-mobile" aria-label="Mobile navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="packages.html">Packages</a>
+    <a href="contact.html">Contact</a>
+    <a href="packages.html" class="btn btn-primary" style="margin-top:8px;align-self:flex-start;">Book a Tour</a>
+  </nav>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="v-hero" aria-label="Hero">
+  <div class="v-hero-video-wrap" aria-hidden="true">
+    <video class="v-hero-video" autoplay muted loop playsinline preload="auto"
+           poster="https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?auto=format&fit=crop&w=1920&q=80">
+      <source src="https://cdn.prod.website-files.com/651d7335c96bc896d80e6981/65403a4d370634439edde7cc_1030%20(1)(1)-transcode.mp4" type="video/mp4" />
+    </video>
+    <div class="v-hero-overlay"></div>
+  </div>
+
+  <div class="v-hero-content">
+    <p class="v-hero-eyebrow">Local guides. Real Ghana. No stress.</p>
+    <p class="v-hero-tagline">Culture&ensp;&middot;&ensp;History&ensp;&middot;&ensp;Nature&ensp;&middot;&ensp;Adventure</p>
+  </div>
+
+  <button class="v-hero-scroll" aria-label="Scroll down">
+    <span class="v-scroll-label">Scroll</span>
+    <div class="v-scroll-chevron">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </button>
+
+  <!-- scrolling headline strip pinned to bottom of hero -->
+  <div class="v-hero-bottom-strip" aria-hidden="true">
+    <div class="v-hero-strip-track">
+      <span>Feel Ghana the way locals do</span>
+      <span class="v-hero-strip-dot">·</span>
+      <span>Feel Ghana the way locals do</span>
+      <span class="v-hero-strip-dot">·</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MARQUEE ═══════════════ -->
+<div class="marquee-strip" aria-label="Destinations we cover">
+  <div class="marquee-track">
+    <span class="marquee-item">ACCRA</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">CAPE COAST</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">KUMASI</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">ADA FOAH</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">VOLTA REGION</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">AKOSOMBO</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">BUSUA</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">ABURI</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">SHAI HILLS</span><span class="marquee-dot">•</span>
+    <!-- duplicate for seamless loop -->
+    <span class="marquee-item">ACCRA</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">CAPE COAST</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">KUMASI</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">ADA FOAH</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">VOLTA REGION</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">AKOSOMBO</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">BUSUA</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">ABURI</span><span class="marquee-dot">•</span>
+    <span class="marquee-item">SHAI HILLS</span><span class="marquee-dot">•</span>
+  </div>
+</div>
+
+<!-- ═══════════════ PAYMENT REASSURANCE STRIP ═══════════════ -->
+<div class="payment-strip" aria-label="Payment options">
+  <div class="container">
+    <div class="payment-strip-inner">
+      <div class="payment-strip-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span><strong>Multi-day &amp; custom tours:</strong> secure your spot with a deposit</span>
+      </div>
+      <span class="payment-strip-sep" aria-hidden="true">·</span>
+      <div class="payment-strip-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Pay the <strong>balance before tour day</strong></span>
+      </div>
+      <span class="payment-strip-sep" aria-hidden="true">·</span>
+      <div class="payment-strip-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <span>Mobile Money &nbsp;·&nbsp; Bank Transfer &nbsp;·&nbsp; Card</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ UPCOMING TRIPS (white-lift) ═══════════════ -->
+<section class="trips-section white-lift section-pad" aria-label="Upcoming tours">
+  <div class="container">
+
+    <div class="trips-header">
+      <div>
+        <div class="eyebrow eyebrow-dark reveal">Pick Your Adventure</div>
+        <h2 class="section-title trips-title reveal reveal-delay-1">Our Tours &amp; Experiences</h2>
+      </div>
+      <a href="packages.html" class="btn btn-outline-dark reveal reveal-delay-2" style="align-self:flex-end;">
+        View All Tours
+        <svg class="doodle doodle-btn-star" aria-hidden="true" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1 L8.85 7.15 L15 8 L8.85 8.85 L8 15 L7.15 8.85 L1 8 L7.15 7.15 Z" fill="var(--yellow-dark)" stroke="none"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Filter Tags -->
+    <div class="trip-filters" role="tablist" aria-label="Filter tours by type">
+      <button class="trip-filter-tag active" data-trip-filter="all" role="tab" aria-selected="true">All</button>
+      <button class="trip-filter-tag" data-trip-filter="multi-day" role="tab" aria-selected="false">Multi-Day</button>
+      <button class="trip-filter-tag" data-trip-filter="adventure" role="tab" aria-selected="false">Adventure</button>
+      <button class="trip-filter-tag" data-trip-filter="culture" role="tab" aria-selected="false">Culture</button>
+      <button class="trip-filter-tag" data-trip-filter="nature" role="tab" aria-selected="false">Nature</button>
+      <button class="trip-filter-tag" data-trip-filter="relaxation" role="tab" aria-selected="false">Relaxation</button>
+    </div>
+
+    <!-- Trip Cards -->
+    <div class="trips-grid" id="trips-grid">
+
+      <article class="trip-card reveal" data-trip-cats="multi-day culture adventure nature">
+        <div class="trip-card-img">
+          <img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=800&q=80&h=560" alt="Just Go Ghana — 8 Day Tour" loading="lazy" />
+          <div class="trip-card-badge">FEATURED</div>
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">
+            <span class="trip-tag">Multi-Day</span>
+            <span class="trip-tag">Culture</span>
+            <span class="trip-tag">Adventure</span>
+          </div>
+          <h3 class="trip-card-title">Just Go Ghana — 8 Days</h3>
+          <p class="trip-card-desc">The ultimate Ghana experience. Accra, Cape Coast castles, Elmina, Kumasi market, Kakum canopy walk, Volta Lake, and more — fully guided.</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>$3,000</strong></span>
+            <a href="just-go-ghana.html" class="trip-card-link">
+              View Tour <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="trip-card reveal reveal-delay-1" data-trip-cats="culture heritage">
+        <div class="trip-card-img">
+          <img src="https://images.unsplash.com/photo-1712700853174-f555aeb2c80d?auto=format&fit=crop&w=800&q=80&h=560" alt="Cape Coast &amp; Elmina Tour" loading="lazy" />
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">
+            <span class="trip-tag">Culture</span>
+            <span class="trip-tag">Adventure</span>
+          </div>
+          <h3 class="trip-card-title">Cape Coast &amp; Elmina Tour</h3>
+          <p class="trip-card-desc">Walk the Door of No Return. Explore Cape Coast Castle, Elmina, and the Kakum National Park canopy walkway.</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>$160</strong></span>
+            <a href="cape-coast-tour.html" class="trip-card-link">
+              Book Now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="trip-card reveal reveal-delay-2" data-trip-cats="culture">
+        <div class="trip-card-img">
+          <img src="https://images.unsplash.com/photo-1763301531293-c8ee26993927?auto=format&fit=crop&w=800&q=80&h=560" alt="Accra City Tour" loading="lazy" />
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">
+            <span class="trip-tag">Culture</span>
+          </div>
+          <h3 class="trip-card-title">Accra City Tour</h3>
+          <p class="trip-card-desc">Independence Square, Kwame Nkrumah Memorial, the vibrant Makola market, Labadi Beach, and the best local chop bars.</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>$100</strong></span>
+            <a href="accra-city-tour.html" class="trip-card-link">
+              Book Now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="trip-card reveal" data-trip-cats="adventure nature">
+        <div class="trip-card-img">
+          <img src="https://images.unsplash.com/photo-1590409110365-70d93eff6b4c?auto=format&fit=crop&w=800&q=80&h=560" alt="Shai Hills Wildlife Reserve" loading="lazy" />
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">
+            <span class="trip-tag">Adventure</span>
+            <span class="trip-tag">Nature</span>
+          </div>
+          <h3 class="trip-card-title">Shai Hills Wildlife Reserve</h3>
+          <p class="trip-card-desc">Trek through Ghana's most accessible game reserve. Spot baboons, antelopes, and ostriches in the wild just outside Accra.</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>$130</strong></span>
+            <a href="shai-hills-tour.html" class="trip-card-link">
+              Book Now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="trip-card reveal reveal-delay-1" data-trip-cats="nature adventure">
+        <div class="trip-card-img">
+          <img src="https://images.unsplash.com/photo-1649519764815-ec68b9e7c52a?auto=format&fit=crop&w=800&q=80&h=560" alt="Volta River &amp; Wli Falls" loading="lazy" />
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">
+            <span class="trip-tag">Nature</span>
+            <span class="trip-tag">Adventure</span>
+          </div>
+          <h3 class="trip-card-title">Volta River &amp; Wli Falls</h3>
+          <p class="trip-card-desc">Cruise along the Volta, hike to Ghana's highest waterfall at Wli, and experience the lush greenery of the Eastern Volta Region.</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>$180</strong></span>
+            <a href="volta-tour.html" class="trip-card-link">
+              Book Now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="trip-card reveal reveal-delay-2" data-trip-cats="relaxation nature">
+        <div class="trip-card-img">
+          <img src="https://images.unsplash.com/photo-1649519764616-bacf4a942730?auto=format&fit=crop&w=800&q=80&h=560" alt="Ada Foah Beach Escape" loading="lazy" />
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">
+            <span class="trip-tag">Relaxation</span>
+            <span class="trip-tag">Nature</span>
+          </div>
+          <h3 class="trip-card-title">Ada Foah Beach Escape</h3>
+          <p class="trip-card-desc">Where the Volta River meets the Atlantic Ocean. Kayak the estuary, relax on pristine beaches, and spot sea turtles.</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>$150</strong></span>
+            <a href="ada-tour.html" class="trip-card-link">
+              Book Now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /trips-grid -->
+  </div>
+</section>
+
+<!-- ═══════════════ WHY US ═══════════════ -->
+<section class="why-section" aria-label="Why choose People and Places Tours">
+
+  <div class="sec-img-head" style="background-image:url('https://images.unsplash.com/photo-1740447342649-8b68b10b42d0?auto=format&fit=crop&w=1920&q=80')">
+    <div class="container">
+      <div class="section-split">
+        <div class="split-headline">
+          <div class="eyebrow reveal">Why Travel With Us</div>
+          <h2 class="section-title reveal reveal-delay-1">Ghana Is Better<br>When Locals Lead</h2>
+        </div>
+        <p class="split-body why-intro reveal reveal-delay-2">We're not a travel agency — we're Ghanaians who love showing the world what this country really is. Every guide is a local. Every route is personal. Every trip leaves a mark.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container why-grid-wrap">
+    <div class="why-grid">
+      <div class="why-box reveal">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        </div>
+        <h3>Expert Local Guides</h3>
+        <p>Every guide is a born-and-raised Ghanaian who knows the backroads, the real spots, and the stories behind the history.</p>
+      </div>
+      <div class="why-box reveal reveal-delay-1">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <h3>Stress-Free Logistics</h3>
+        <p>Transport, accommodation, entrance fees, meals — we handle it all. You just show up and enjoy.</p>
+      </div>
+      <div class="why-box reveal reveal-delay-2">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Small Group Vibes</h3>
+        <p>We keep group sizes small so you get personal attention, real conversations, and zero tourist-factory energy.</p>
+      </div>
+      <div class="why-box reveal reveal-delay-3">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <h3>Photo-Ready Moments</h3>
+        <p>We know exactly where the light hits right and which angle tells the story. Your feed will never look better.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATS ═══════════════ -->
+<div class="stats-bar stats-section" aria-label="Our numbers">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-figure"><span class="stat-num" data-target="300">0</span><span class="stat-suffix">+</span></div>
+        <span class="stat-label">Happy Travellers</span>
+      </div>
+      <div class="stat-item">
+        <div class="stat-figure"><span class="stat-num" data-target="15">0</span><span class="stat-suffix">+</span></div>
+        <span class="stat-label">Tour Experiences</span>
+      </div>
+      <div class="stat-item">
+        <div class="stat-figure"><span class="stat-num" data-target="5">0</span><span class="stat-suffix">.0</span></div>
+        <span class="stat-label">Google Rating</span>
+      </div>
+      <div class="stat-item">
+        <div class="stat-figure"><span class="stat-num" data-target="10">0</span><span class="stat-suffix">+</span></div>
+        <span class="stat-label">Destinations</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
+<section class="process-section white-lift section-pad" aria-label="How it works">
+  <div class="container">
+    <div class="section-split" style="margin-bottom:var(--sp-8)">
+      <div class="split-headline">
+        <div class="eyebrow eyebrow-dark reveal">Simple Process</div>
+        <h2 class="section-title process-title reveal reveal-delay-1">Three Steps to Ghana</h2>
+      </div>
+      <p class="split-body section-sub process-sub reveal reveal-delay-2">From your first browse to the moment your guide meets you at the hotel — we've made the whole thing effortless.</p>
+    </div>
+
+    <div class="process-grid">
+
+      <div class="process-step reveal">
+        <div class="process-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <div class="process-step-num">01</div>
+        <div class="process-content">
+          <h3>Browse &amp; Pick Your Tour</h3>
+          <p>Filter by destination or vibe — half-day city tours, beach escapes, heritage trips, or the full 8-day Ghana adventure.</p>
+        </div>
+        <a href="packages.html" class="process-step-link">View all tours &rarr;</a>
+      </div>
+
+      <div class="process-step reveal reveal-delay-1">
+        <div class="process-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="process-step-num">02</div>
+        <div class="process-content">
+          <h3>Book in Minutes</h3>
+          <p>WhatsApp us or fill the inquiry form. We confirm your spot same day. Multi-day tours secured with a 30% deposit — pay the rest before tour day.</p>
+        </div>
+        <a href="https://wa.me/233503673473?text=Hi%21+I%27d+like+to+book+a+tour." target="_blank" rel="noopener" class="process-step-link">WhatsApp us &rarr;</a>
+      </div>
+
+      <div class="process-step reveal reveal-delay-2">
+        <div class="process-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+          </svg>
+        </div>
+        <div class="process-step-num">03</div>
+        <div class="process-content">
+          <h3>Show Up &amp; We Handle the Rest</h3>
+          <p>Your local guide meets you at your hotel. Transport, entry fees, every detail — sorted. You just experience Ghana.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TESTIMONIALS ═══════════════ -->
+<section class="testimonials-section" aria-label="What travellers say">
+
+  <div class="sec-img-head" style="background-image:url('https://images.unsplash.com/photo-1660675133902-acd1b057f75d?auto=format&fit=crop&w=1920&q=80')">
+    <div class="container">
+      <div class="section-split">
+        <div class="split-headline">
+          <div class="eyebrow reveal">Real Reviews</div>
+          <h2 class="section-title reveal reveal-delay-1">What Our<br>Travellers Say</h2>
+        </div>
+        <p class="split-body reveal reveal-delay-2" style="color:rgba(255,255,255,.7)">Don't take our word for it. Here's what people who've actually done the trip have to say about travelling with People &amp; Places.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:3.5rem;padding-bottom:5rem;">
+    <div class="testimonials-wrap">
+      <div class="testimonials-track">
+
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-quote">"People &amp; Places turned what could have been a stressful trip into the best experience of my life. The guide knew every corner of Accra — we ate at spots I never would have found on my own. Cape Coast was emotional and beautiful. I'm already planning my return trip with them."</p>
+            <div class="testi-author">
+              <img src="https://images.unsplash.com/photo-1725114077889-d38ea6c4487d?auto=format&fit=crop&w=160&q=80&h=160" alt="Precious Nwokeleme" loading="lazy" />
+              <div>
+                <strong>Precious Nwokeleme</strong>
+                <span>Lagos, Nigeria</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-quote">"I came to Ghana not knowing what to expect. People &amp; Places exceeded every expectation. From the moment they picked me up at the hotel to the last sunset at Ada Foah, everything was seamless. The guides are passionate, knowledgeable, and genuinely fun to travel with."</p>
+            <div class="testi-author">
+              <img src="https://images.unsplash.com/photo-1625191824068-e833954d6c70?auto=format&fit=crop&w=160&q=80&h=160" alt="Tamaro Diallo" loading="lazy" />
+              <div>
+                <strong>Tamaro Diallo</strong>
+                <span>Dakar, Senegal</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /track -->
+
+      <div class="testimonials-dots" aria-label="Testimonial navigation">
+        <button class="testimonials-dot active" aria-label="Testimonial 1"></button>
+        <button class="testimonials-dot" aria-label="Testimonial 2"></button>
+      </div>
+    </div>
+  </div><!-- /container -->
+</section>
+
+<!-- ═══════════════ COMMUNITY / WHATSAPP ═══════════════ -->
+<section class="community-section" aria-label="Join our travel community">
+  <div class="container">
+    <div class="community-inner">
+
+      <div class="community-text reveal">
+        <div class="eyebrow">Travel Family</div>
+        <h2 class="community-title">Join the<br>PAP Community</h2>
+        <p class="community-desc">Get first access to new tours, flash deals, and Ghana travel tips — plus connect with fellow travelers. All on WhatsApp.</p>
+        <div class="community-actions">
+          <a href="https://wa.me/233503673473?text=Hi%21+I%27d+like+to+join+the+People+%26+Places+travel+community." target="_blank" rel="noopener" class="btn btn-primary community-wa-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            Join on WhatsApp
+          </a>
+          <span class="community-proof">Connect with travelers from 40+ countries</span>
+        </div>
+      </div>
+
+      <div class="community-visual reveal reveal-delay-1" aria-hidden="true">
+        <div class="chat-window">
+          <div class="chat-header">
+            <div class="chat-header-dot"></div>
+            <div class="chat-header-dot"></div>
+            <div class="chat-header-dot"></div>
+            <span>PAP Travel Community</span>
+          </div>
+          <div class="chat-body">
+            <div class="chat-bubble chat-in">
+              <span class="chat-name">Precious N.</span>
+              Just booked Cape Coast! Anyone been? 🇬🇭
+            </div>
+            <div class="chat-bubble chat-in">
+              <span class="chat-name">Marcus O.</span>
+              Yes! Absolutely life-changing. The guide was incredible 🙌
+            </div>
+            <div class="chat-bubble chat-in">
+              <span class="chat-name">Aisha K.</span>
+              The Volta tour photos are making me so jealous 😭🌊
+            </div>
+            <div class="chat-bubble chat-out">
+              <span class="chat-name">People &amp; Places</span>
+              See you all in Accra! 🌍✨
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ EMAIL SIGNUP ═══════════════ -->
+<section class="email-section" aria-label="Newsletter signup">
+  <div class="sec-img-head email-sec-head" style="background-image:url('https://images.unsplash.com/photo-1740447605600-db4d6e0af5d1?auto=format&fit=crop&w=1920&q=80')">
+    <div class="container">
+      <div class="email-wrap reveal">
+        <div class="eyebrow">Stay in the Loop</div>
+        <h2 class="email-title">Get Ghana Trip Ideas<br>Straight to Your Inbox</h2>
+        <p class="email-sub">New tours, travel tips, seasonal deals, and Ghana travel guides — delivered monthly.</p>
+        <form class="email-form" name="newsletter" netlify netlify-honeypot="bot-field" aria-label="Email signup form">
+          <input type="hidden" name="form-name" value="newsletter">
+          <p hidden><label>Don't fill this out: <input name="bot-field"></label></p>
+          <input class="email-input" type="email" name="email" placeholder="Your email address" aria-label="Email address" required />
+          <button class="email-submit btn btn-primary" type="submit">Subscribe</button>
+          <!-- small sparkle beside the subscribe button -->
+          <svg class="doodle doodle-form-spark" aria-hidden="true" viewBox="0 0 22 22" fill="none" stroke="var(--yellow-dark)" stroke-width="2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+            <line x1="11" y1="2"  x2="11" y2="5.5"/>
+            <line x1="11" y1="16.5" x2="11" y2="20"/>
+            <line x1="2"  y1="11" x2="5.5" y2="11"/>
+            <line x1="16.5" y1="11" x2="20" y2="11"/>
+            <line x1="4.5" y1="4.5" x2="7"   y2="7"/>
+            <line x1="15"  y1="15"  x2="17.5" y2="17.5"/>
+            <line x1="4.5" y1="17.5" x2="7"   y2="15"/>
+            <line x1="15"  y1="7"    x2="17.5" y2="4.5"/>
+          </svg>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ INSTAGRAM STRIP ═══════════════ -->
+<div class="instagram-strip" aria-label="Follow People and Places on Instagram">
+  <div class="ig-photos" aria-hidden="true">
+    <div class="ig-photo" style="background-image:url('https://images.unsplash.com/photo-1712700720456-6027038e9874?auto=format&fit=crop&w=600&q=80&h=600')"></div>
+    <div class="ig-photo" style="background-image:url('https://images.unsplash.com/photo-1720343354398-89c6aa6d12a4?auto=format&fit=crop&w=600&q=80&h=600')"></div>
+    <div class="ig-photo" style="background-image:url('https://images.unsplash.com/photo-1649519764616-bacf4a942730?auto=format&fit=crop&w=600&q=80&h=600')"></div>
+    <div class="ig-photo" style="background-image:url('https://images.unsplash.com/photo-1590409110365-70d93eff6b4c?auto=format&fit=crop&w=600&q=80&h=600')"></div>
+    <div class="ig-photo" style="background-image:url('https://images.unsplash.com/photo-1721011694126-e25f493b91f1?auto=format&fit=crop&w=600&q=80&h=600')"></div>
+    <div class="ig-photo" style="background-image:url('https://images.unsplash.com/photo-1672537627568-3530c83694f6?auto=format&fit=crop&w=600&q=80&h=600')"></div>
+  </div>
+  <div class="ig-overlay">
+    <div class="ig-content">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="ig-icon" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      <p class="ig-handle">@peopleand.places</p>
+      <p class="ig-tagline">Real tours. Real people. Real Ghana.</p>
+      <a href="https://instagram.com/peopleand.places" target="_blank" rel="noopener" class="btn btn-primary ig-follow-btn">Follow on Instagram</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo-link" aria-label="People &amp; Places Tours">
+          <img src="assets/favicon.svg" alt="People &amp; Places Tours">
+        </a>
+        <p>Ghana's premier tour company. Real experiences led by real locals, no stress.</p>
+        <div class="footer-social">
+          <a href="https://instagram.com/peopleand.places" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="https://tiktok.com/@peopandplaces" target="_blank" rel="noopener" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.73z"/></svg>
+          </a>
+          <a href="https://wa.me/233503673473" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="packages.html">All Packages</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="just-go-ghana.html">Just Go Ghana</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Day Tours</h4>
+        <ul>
+          <li><a href="accra-city-tour.html">Accra City Tour</a></li>
+          <li><a href="cape-coast-tour.html">Cape Coast &amp; Elmina</a></li>
+          <li><a href="kumasi-tour.html">Kumasi Cultural Tour</a></li>
+          <li><a href="volta-tour.html">Volta River &amp; Wli Falls</a></li>
+          <li><a href="ada-tour.html">Ada Foah Beach</a></li>
+          <li><a href="shai-hills-tour.html">Shai Hills Wildlife</a></li>
+          <li><a href="aburi-tour.html">Aburi Botanical Gardens</a></li>
+          <li><a href="quad-bike-tour.html">Quad Bike Adventure</a></li>
+          <li><a href="batik-workshop.html">Batik Workshop</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Get in Touch</h4>
+        <ul>
+          <li><a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a></li>
+          <li><a href="tel:+233503673473">+233 50 367 3473</a></li>
+          <li><a href="https://wa.me/233503673473" target="_blank" rel="noopener">WhatsApp Us</a></li>
+          <li>Accra, Ghana</li>
+        </ul>
+      </div>
+
+    </div><!-- /footer-grid -->
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 People &amp; Places Tours. All rights reserved.</p>
+      <p>Made with love in Accra 🇬🇭</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ COMMAND PALETTE ═══════════════ -->
+<div class="cmd-palette" id="cmd-palette" role="dialog" aria-modal="true" aria-label="Search tours" hidden>
+  <div class="cmd-backdrop" id="cmd-backdrop"></div>
+  <div class="cmd-modal">
+    <div class="cmd-input-wrap">
+      <svg class="cmd-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="cmd-input" id="cmd-input" type="text" placeholder="Search tours, destinations…" autocomplete="off" spellcheck="false" />
+      <button class="cmd-esc" id="cmd-close" aria-label="Close search">ESC</button>
+    </div>
+
+    <div class="cmd-section" id="cmd-results-wrap">
+      <div class="cmd-section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Trending Tours in Accra
+      </div>
+      <ul class="cmd-list" id="cmd-list">
+        <li><a class="cmd-item" href="accra-city-tour.html">
+          <span class="cmd-item-icon">🏙️</span>
+          <span class="cmd-item-text">
+            <strong>Accra City Tour</strong>
+            <span>Makola Market · Kwame Nkrumah Mausoleum · Jamestown</span>
+          </span>
+          <span class="cmd-item-meta">$100 · Half Day</span>
+        </a></li>
+        <li><a class="cmd-item" href="jamestown-tour.html">
+          <span class="cmd-item-icon">🏮</span>
+          <span class="cmd-item-text">
+            <strong>Jamestown Heritage Walk</strong>
+            <span>Lighthouse · Bukom · Fishing boats · Murals</span>
+          </span>
+          <span class="cmd-item-meta">$85 · 4 hrs</span>
+        </a></li>
+        <li><a class="cmd-item" href="accra-food-tour.html">
+          <span class="cmd-item-icon">🍢</span>
+          <span class="cmd-item-text">
+            <strong>Accra After Dark Food Tour</strong>
+            <span>Waakye · Kelewele · Chop bars · Night markets</span>
+          </span>
+          <span class="cmd-item-meta">$110 · Evening</span>
+        </a></li>
+        <li><a class="cmd-item" href="aburi-tour.html">
+          <span class="cmd-item-icon">🌿</span>
+          <span class="cmd-item-text">
+            <strong>Aburi Day Tour</strong>
+            <span>Botanical Gardens · Hill views · Cool mountain air</span>
+          </span>
+          <span class="cmd-item-meta">$100 · Full Day</span>
+        </a></li>
+        <li><a class="cmd-item" href="cape-coast-tour.html">
+          <span class="cmd-item-icon">⛵</span>
+          <span class="cmd-item-text">
+            <strong>Cape Coast Ancestral Tour</strong>
+            <span>Castle · Door of No Return · Canopy walkway</span>
+          </span>
+          <span class="cmd-item-meta">$140 · Full Day</span>
+        </a></li>
+      </ul>
+    </div>
+
+    <div class="cmd-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>ESC</kbd> close</span>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
