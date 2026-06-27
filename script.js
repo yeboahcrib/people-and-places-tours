@@ -553,14 +553,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ── SCROLL REVEAL ── */
+  /* ── SCROLL REVEAL ──
+     Above-the-fold elements are revealed synchronously on first paint to avoid
+     the brief "stuck hidden" gap before the observer's first async callback.
+     Below-the-fold elements are observed and fade in as they scroll into view. */
   const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  function initReveals() {
+    const vh = window.innerHeight;
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+      const r = el.getBoundingClientRect();
+      const inViewport = r.top < vh && r.bottom > 0;
+      if (inViewport) {
+        el.classList.add('reveal-no-stagger', 'visible');
+      } else {
+        revealObserver.observe(el);
+      }
+    });
+  }
+  // Wait one frame so layout has computed before measuring positions.
+  requestAnimationFrame(() => requestAnimationFrame(initReveals));
 
   /* ── STATS COUNTER ── */
   function animateCounter(el) {
@@ -647,29 +663,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-/* ── GSAP ANIMATIONS (runs after full page load so layout is complete) ── */
-window.addEventListener('load', () => {
+/* ── GSAP HERO ENTRANCE ──
+   Runs on DOMContentLoaded (not window.load) so the animation isn't blocked
+   waiting for the hero video to finish downloading. Hero markup is rendered
+   by homepage-sections.js's DCL listener which fires first. */
+function runHeroEntrance() {
   if (typeof gsap === 'undefined') return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cta = document.querySelector('.v-hero-cta-link');
+  if (!cta && !document.querySelector('.v-hero-headline')) return;
 
-  /* Hero entrance — headline, CTA, scroll chevron */
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
   if (document.querySelector('.v-hero-headline')) {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.from('.v-hero-headline', { opacity: 0, y: 24, duration: 0.7 }, 0.2)
-      .fromTo('.v-hero-cta', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55, clearProps: 'transform' }, 0.55)
-      .from('.v-hero-scroll', { opacity: 0, y: 12, duration: 0.5 }, 0.85);
+    tl.from('.v-hero-headline', { opacity: 0, y: 26, duration: 0.85 }, 0.2);
   }
-
-  /* Marquee — scrollWidth is accurate after load */
-  const track = document.querySelector('.marquee-track');
-  if (track) {
-    track.style.animation = 'none';
-    gsap.to(track, {
-      x: -(track.scrollWidth / 2),
-      ease: 'none',
-      duration: 48,
-      repeat: -1,
-    });
+  if (document.querySelector('.v-hero-sub')) {
+    tl.from('.v-hero-sub', { opacity: 0, y: 18, duration: 0.65 }, 0.5);
   }
-});
+  if (cta) {
+    tl.fromTo('.v-hero-cta-link',
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 0.55, clearProps: 'transform' },
+      0.7);
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', runHeroEntrance);
+} else {
+  runHeroEntrance();
+}

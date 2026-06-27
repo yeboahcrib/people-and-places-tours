@@ -31,13 +31,6 @@
   const revealClass = index => index % 3 === 1 ? ' reveal-delay-1' : index % 3 === 2 ? ' reveal-delay-2' : index % 3 === 0 && index > 0 ? ' reveal-delay-3' : '';
   const externalAttrs = item => item?.external ? ' target="_blank" rel="noopener"' : '';
 
-  function renderRichParts(parts = []) {
-    return parts.map(part => {
-      const text = escapeHtml(part.text);
-      return part.strong ? `<strong>${text}</strong>` : text;
-    }).join('');
-  }
-
   function renderImage(image, className, extraAttrs = '') {
     if (!image?.src) return '';
     return `<img class="${escapeHtml(className)}" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || '')}" width="${escapeHtml(image.width || '')}" height="${escapeHtml(image.height || '')}" ${extraAttrs} decoding="async" />`;
@@ -45,62 +38,24 @@
 
   function renderHeroSection(data) {
     return `
-<!-- Claude Code focus: Hero visual refinement starts in renderHeroSection + .v-hero CSS. -->
+<!-- Claude Code focus: Hero — editorial bottom-left layout. Keep text out of the video's centre. -->
 <section class="v-hero" aria-label="Hero" data-home-section="hero">
   <div class="v-hero-video-wrap" aria-hidden="true">
-    <video class="v-hero-video" autoplay muted loop playsinline preload="metadata" poster="${escapeHtml(data.video.poster)}">
+    <video class="v-hero-video" autoplay muted loop playsinline preload="auto">
       <source src="${escapeHtml(data.video.src)}" type="video/mp4" />
     </video>
     <div class="v-hero-overlay"></div>
   </div>
 
   <div class="v-hero-content">
-    <h1 class="v-hero-headline">${renderLines(data.headlineLines)}</h1>
-    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-primary v-hero-cta">${escapeHtml(data.cta.label)}<svg class="v-hero-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>` : ''}
-  </div>
-
-  <button class="v-hero-scroll" aria-label="Scroll down">
-    <span class="v-scroll-label">Scroll</span>
-    <div class="v-scroll-chevron">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-  </button>
-
-  <div class="v-hero-bottom-strip" aria-hidden="true">
-    <div class="v-hero-strip-track">
-      <span>${escapeHtml(data.stripText)}</span>
-      <span class="v-hero-strip-dot">·</span>
-      <span>${escapeHtml(data.stripText)}</span>
-      <span class="v-hero-strip-dot">·</span>
-    </div>
+    ${data.headline ? `<h1 class="v-hero-headline">${escapeHtml(data.headline)}</h1>` : ''}
+    ${data.sub ? `<p class="v-hero-sub">${escapeHtml(data.sub)}</p>` : ''}
+    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="v-hero-cta-link">
+      <span>${escapeHtml(data.cta.label)}</span>
+      <svg class="v-hero-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>` : ''}
   </div>
 </section>`;
-  }
-
-  function renderMarqueeStrip(data) {
-    const items = [...(data.items || []), ...(data.items || [])];
-    return `
-<div class="marquee-strip" aria-label="Destinations we cover" data-home-section="marquee">
-  <div class="marquee-track">
-    ${items.map(item => `<span class="marquee-item">${escapeHtml(item)}</span><span class="marquee-dot">•</span>`).join('\n    ')}
-  </div>
-</div>`;
-  }
-
-  function renderPaymentStrip(data) {
-    return `
-<div class="payment-strip" aria-label="Payment options" data-home-section="payment-strip">
-  <div class="container">
-    <div class="payment-strip-inner">
-      ${(data.items || []).map((item, index) => `
-      ${index > 0 ? '<span class="payment-strip-sep" aria-hidden="true">·</span>' : ''}
-      <div class="payment-strip-item">
-        ${renderIcon(item.icon)}
-        <span>${renderRichParts(item.parts)}</span>
-      </div>`).join('')}
-    </div>
-  </div>
-</div>`;
   }
 
   function renderToursSection(data) {
@@ -287,8 +242,6 @@
 
     root.innerHTML = [
       renderHeroSection(content.hero),
-      renderMarqueeStrip(content.marquee),
-      renderPaymentStrip(content.paymentStrip),
       renderToursSection(content.tours),
       renderWhyTravelSection(content.whyTravel),
       renderStatsSection(content.stats),

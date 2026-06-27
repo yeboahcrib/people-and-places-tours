@@ -1,0 +1,12 @@
+{
+  "name": "people-and-places-tours",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check:js": "node --check script.js && node --check tours.js",
+    "test:smoke": "node tests/smoke.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

@@ -3,38 +3,12 @@
   // Keep visual class names in homepage-sections.js unless you are intentionally changing CSS.
   window.PEOPLE_PLACES_HOME = {
     hero: {
-      headlineLines: ['Discover Ghana,', 'Worry Less.'],
       video: {
         src: 'https://cdn.prod.website-files.com/651d7335c96bc896d80e6981/65403a4d370634439edde7cc_1030%20(1)(1)-transcode.mp4',
-        poster: 'https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?auto=format&fit=crop&w=1920&q=80',
       },
-      cta: { label: 'Explore Our Tours', href: 'packages.html' },
-      stripText: 'Feel Ghana the way locals do',
-    },
-    marquee: {
-      items: ['Accra', 'Cape Coast', 'Kumasi', 'Volta Region', 'Ada Foah'],
-    },
-    paymentStrip: {
-      items: [
-        {
-          icon: 'shield',
-          parts: [
-            { text: 'Multi-day & custom tours:', strong: true },
-            { text: ' secure your spot with a deposit' },
-          ],
-        },
-        {
-          icon: 'calendar',
-          parts: [
-            { text: 'Pay the ' },
-            { text: 'balance before tour day', strong: true },
-          ],
-        },
-        {
-          icon: 'card',
-          parts: [{ text: 'Mobile Money  ·  Bank Transfer  ·  Card' }],
-        },
-      ],
+      headline: 'The People Make the Place.',
+      sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets they call home.',
+      cta: { label: 'Explore Experiences', href: 'packages.html' },
     },
     tours: {
       eyebrow: 'Pick Your Adventure',

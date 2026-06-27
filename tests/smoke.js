@@ -33,7 +33,7 @@ async function withPage(browser, path, callback) {
     assert(homepageContentLoaded, 'homepage content data did not load');
 
     const renderedSections = await page.locator('#homepage-root [data-home-section]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-home-section')));
-    const expectedSections = ['hero', 'marquee', 'payment-strip', 'tours', 'why-travel', 'stats', 'booking-steps', 'testimonials', 'newsletter', 'instagram'];
+    const expectedSections = ['hero', 'tours', 'why-travel', 'stats', 'booking-steps', 'testimonials', 'newsletter', 'instagram'];
     assert(renderedSections.join('|') === expectedSections.join('|'), `unexpected homepage section order: ${renderedSections.join(', ')}`);
 
     const cards = await page.locator('.trip-card').count();
