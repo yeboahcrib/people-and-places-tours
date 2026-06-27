@@ -249,28 +249,46 @@ body.page-entering {
   position: fixed;
   top: 1.25rem;
   left: 50%;
-  transform: translateX(-50%);
+  /* translateX(-50%) centers horizontally; translateY is animated by JS
+     for the hide-on-scroll-down / show-on-scroll-up behavior. */
+  transform: translate3d(-50%, 0, 0);
+  opacity: 1;
   width: auto;
   max-width: calc(100% - 2rem);
   z-index: 200;
-  /* The pill itself lives in .nav-inner so the outer element can be a
-     transparent positioning shell; the mobile drawer also hangs off this. */
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.22s ease;
+  will-change: transform, opacity;
+}
+.nav.nav--hidden {
+  transform: translate3d(-50%, -130%, 0);
+  opacity: 0;
+  pointer-events: none;
 }
 .nav-inner {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--sp-3);
-  padding: 0.4rem 0.6rem 0.4rem 1.1rem;
-  height: 60px;
-  background: rgba(15,15,15,0.78);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.08);
+  padding: 0.45rem 0.65rem 0.45rem 1.2rem;
+  height: 68px;
+  /* Frosted-glass capsule — semi-transparent dark + backdrop blur so
+     content behind the pill blurs through it rather than being blocked. */
+  background: rgba(15,15,15,0.6);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 100px;
   box-shadow:
-    0 12px 32px rgba(0,0,0,0.28),
-    0 1px 0 rgba(255,255,255,0.05) inset;
+    0 18px 44px rgba(0,0,0,0.32),
+    0 4px 12px rgba(0,0,0,0.18),
+    0 1px 0 rgba(255,255,255,0.07) inset;
+}
+/* Older browsers (no backdrop-filter): fall back to a slightly more
+   opaque dark so contrast still holds. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-inner { background: rgba(15,15,15,0.92); }
 }
 .nav-cta { justify-self: end; }
 .nav-logo {
@@ -303,20 +321,23 @@ body.page-entering {
   justify-self: center;
 }
 .nav-links a {
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.78);
-  padding: 0.55rem 1rem;
+  color: rgba(255,255,255,.92);
+  padding: 0.65rem 1.15rem;
   border-radius: 100px;
   transition: background 0.25s ease, color 0.25s ease;
   white-space: nowrap;
 }
-.nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+.nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.08); }
 .nav-links a.active {
   background: var(--yellow);
   color: var(--black);
+  box-shadow:
+    0 6px 18px rgba(255,184,28,0.32),
+    0 1px 0 rgba(0,0,0,0.08) inset;
 }
 .nav-links a.active:hover { background: var(--yellow); color: var(--black); }
 .nav-cta {
@@ -325,10 +346,10 @@ body.page-entering {
   gap: 1rem;
 }
 .nav-phone {
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  color: rgba(255,255,255,.6);
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,.65);
   transition: color var(--transition);
   padding-left: 0.5rem;
   white-space: nowrap;
@@ -336,9 +357,19 @@ body.page-entering {
 .nav-phone:hover { color: var(--yellow); }
 .nav .btn-primary,
 .nav .nav-cta .btn {
-  padding: 0.65rem 1.25rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
+  padding: 0.75rem 1.4rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  box-shadow:
+    0 6px 18px rgba(255,184,28,0.32),
+    0 1px 0 rgba(0,0,0,0.08) inset;
+}
+.nav .btn-primary:hover,
+.nav .nav-cta .btn:hover {
+  box-shadow:
+    0 10px 24px rgba(255,184,28,0.4),
+    0 1px 0 rgba(0,0,0,0.08) inset;
 }
 .nav-toggle {
   display: none;
@@ -1670,6 +1701,7 @@ body.page-entering {
 @media (max-width: 1024px) {
   .trips-grid { grid-template-columns: repeat(2, 1fr); }
   .why-grid { grid-template-columns: repeat(2, 1fr); }
+  .why-grid:has(> .why-item) { grid-template-columns: repeat(2, 1fr) !important; }
   .why-section { padding-bottom: 5rem; }
   .why-section .sec-img-head { padding: 5rem 0 3rem; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
@@ -1693,7 +1725,30 @@ body.page-entering {
   .hs-field { padding: 0.65rem 1rem; }
   .hs-btn { width: 100%; border-radius: var(--radius-md); margin-top: 0.25rem; }
   .trips-grid { grid-template-columns: 1fr; }
+  .trip-filter-tag { padding: 0.7rem 1.1rem; font-size: 0.78rem; }
+  .trip-card-link { padding: 0.7rem 0; }
+  .v-hero-cta-link { padding: 0.85rem 0; }
+  /* Breadcrumb links — bigger tap target on touch screens */
+  .breadcrumb { gap: 0.75rem; }
+  .breadcrumb a, .breadcrumb-current { padding: 0.65rem 0.25rem; display: inline-block; min-height: 32px; }
+  /* Tour-page "back to all tours" link — comfortable tap target */
+  .back-link { padding: 0.6rem 0; min-height: 32px; align-items: center; }
+  /* Packages tour-card book button + card link */
+  .tour-card-book-btn { padding: 0.75rem 1.25rem !important; min-height: 40px; }
+  /* Packages "Custom Itinerary" CTA collapses to single column on mobile */
+  .packages-custom-cta {
+    grid-template-columns: 1fr !important;
+    padding: 2rem 1.5rem !important;
+    gap: 1.5rem !important;
+  }
+  .packages-custom-cta h3 { font-size: 1.6rem !important; }
+  .packages-custom-cta .btn-primary { justify-self: start; white-space: normal !important; }
   .why-grid { grid-template-columns: 1fr; }
+  /* Higher-specificity About why-grid (uses :has()) also collapses */
+  .why-grid:has(> .why-item) { grid-template-columns: 1fr !important; gap: 1rem; }
+  /* About "Why" outline watermark must not overflow its section */
+  .why-section-asym { overflow: hidden; }
+  .why-watermark { font-size: clamp(6rem, 28vw, 12rem) !important; right: -1.5rem !important; }
   .why-section { padding-bottom: 4rem; }
   .why-section .sec-img-head { padding: 4rem 0 2.5rem; }
   .process-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -1923,11 +1978,14 @@ body.page-entering {
   gap: 2rem;
   align-items: stretch;
 }
+.team-asym-grid > * { min-width: 0; }
 .team-feature .team-photo {
   aspect-ratio: 4/5;
   height: 100%;
   position: relative;
+  overflow: hidden;
 }
+.team-feature .team-photo img { width: 100%; height: 100%; object-fit: cover; }
 .team-feature .team-name { font-size: 1.6rem; margin-top: 1.25rem; }
 .team-feature .team-role { font-size: 0.84rem; }
 .team-feature-tag {

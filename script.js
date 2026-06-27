@@ -185,12 +185,49 @@ document.addEventListener('DOMContentLoaded', () => {
   renderContactTourOptions();
   hydrateTourDetailFromCatalog();
 
-  /* ── STICKY NAV ── */
+  /* ── NAV: hide on scroll-down, show on scroll-up ──
+     - Always visible near the top of the page.
+     - Hides when scrolling down past a threshold; reappears on scroll-up.
+     - rAF-throttled to avoid running the read/compare on every scroll event;
+     - Small delta threshold (~6px) so trackpad jitter doesn't trigger toggles.
+     - Keeps the legacy .scrolled class in sync for any future scroll-state styling. */
   const nav = document.querySelector('.nav');
   if (nav) {
-    const handleScroll = () => nav.classList.toggle('scrolled', window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    const HIDE_AFTER = 80;       // only start hiding after this many px from top
+    const SCROLL_DELTA = 6;      // ignore micro-movements smaller than this
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const update = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (Math.abs(delta) < SCROLL_DELTA) { ticking = false; return; }
+
+      if (y <= HIDE_AFTER) {
+        // Near the top: always visible
+        nav.classList.remove('nav--hidden');
+      } else if (delta > 0) {
+        // Scrolling down past the threshold
+        nav.classList.add('nav--hidden');
+      } else {
+        // Scrolling up
+        nav.classList.remove('nav--hidden');
+      }
+
+      nav.classList.toggle('scrolled', y > 50);
+      lastY = y;
+      ticking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Initial state
+    nav.classList.toggle('scrolled', window.scrollY > 50);
   }
 
   /* ── MOBILE MENU ── */
