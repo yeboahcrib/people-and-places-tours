@@ -1,0 +1,675 @@
+/* ============================================================
+   PEOPLE & PLACES TOURS — Main JavaScript
+   ============================================================ */
+
+/* ── PAGE TRANSITION (runs before DOMContentLoaded) ── */
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
+
+  /* Fade-in on arrival */
+  document.body.classList.add('page-entering');
+
+  /* Intercept same-site navigation clicks */
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto:') ||
+        href.startsWith('tel:') || href.startsWith('http') ||
+        link.target === '_blank') return;
+
+    e.preventDefault();
+    document.body.classList.add('page-leaving');
+    setTimeout(() => { window.location.href = href; }, 230);
+  }, true);
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const usesExternalFormEndpoint = form => {
+    try {
+      return new URL(form.action).hostname === 'formsubmit.co';
+    } catch {
+      return false;
+    }
+  };
+
+  const tours = Array.isArray(window.PEOPLE_PLACES_TOURS) ? window.PEOPLE_PLACES_TOURS : [];
+  const bySlug = new Map(tours.map(tour => [tour.slug, tour]));
+  const bookingUrl = slug => `contact.html?tour=${encodeURIComponent(slug)}`;
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[char]));
+  const delayClass = index => index % 3 === 1 ? ' reveal-delay-1' : index % 3 === 2 ? ' reveal-delay-2' : '';
+  const tourInitials = title => title.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase();
+  const clockIcon = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+  const peopleIcon = '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>';
+  const pinIcon = '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  const cardImageSizes = '(min-width: 1180px) 360px, (min-width: 760px) 45vw, 100vw';
+
+  function renderHomeTours() {
+    const grid = document.getElementById('trips-grid');
+    if (!grid || tours.length === 0) return;
+
+    const homeTours = tours
+      .filter(tour => tour.homeFeatured)
+      .sort((a, b) => (a.homeOrder ?? 999) - (b.homeOrder ?? 999));
+
+    grid.innerHTML = homeTours.map((tour, index) => {
+      const ctaUrl = tour.slug === 'just-go-ghana' ? tour.detailUrl : bookingUrl(tour.slug);
+      const ctaLabel = tour.slug === 'just-go-ghana' ? 'View Tour' : 'Book Now';
+      const tags = (tour.vibes || []).slice(0, 3).map(tag => `<span class="trip-tag">${escapeHtml(tag)}</span>`).join('');
+      const badge = tour.badge ? `<div class="trip-card-badge">${escapeHtml(tour.badge.toUpperCase())}</div>` : '';
+
+      return `
+      <article class="trip-card reveal${delayClass(index)}" data-trip-cats="${escapeHtml((tour.categories || []).join(' '))}" data-tour-slug="${escapeHtml(tour.slug)}">
+        <div class="trip-card-img">
+          <img src="${escapeHtml(tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="560" loading="lazy" decoding="async" sizes="${cardImageSizes}" />
+          ${badge}
+        </div>
+        <div class="trip-card-body">
+          <div class="trip-card-tags">${tags}</div>
+          <h3 class="trip-card-title">${escapeHtml(tour.homeTitle || tour.title)}</h3>
+          <p class="trip-card-desc">${escapeHtml(tour.description)}</p>
+          <div class="trip-card-footer">
+            <span class="trip-card-price">From <strong>${escapeHtml(tour.price)}</strong></span>
+            <a href="${escapeHtml(ctaUrl)}" class="trip-card-link">
+              ${escapeHtml(ctaLabel)} ${arrowIcon}
+            </a>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  function renderPackageTours() {
+    const grid = document.getElementById('tours-grid');
+    if (!grid || tours.length === 0) return;
+
+    const packageTours = tours
+      .filter(tour => tour.packageOrder !== undefined)
+      .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999));
+
+    grid.innerHTML = packageTours.map((tour, index) => {
+      const tags = (tour.vibes || []).slice(0, 2).map(tag => `<span class="tour-vibe-tag">${escapeHtml(tag)}</span>`).join('');
+      const badge = tour.badge ? `<div class="tour-card-badge">${escapeHtml(tour.badge)}</div>` : '';
+
+      return `
+        <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
+          <div class="tour-card-img">
+            <img src="${escapeHtml(tour.packageImage || tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="550" loading="lazy" decoding="async" sizes="${cardImageSizes}" />
+            ${badge}
+            <div class="tour-card-price">${escapeHtml(tour.price)} <span>${escapeHtml(tour.priceUnit || '')}</span></div>
+          </div>
+          <div class="tour-card-body">
+            <div class="tour-card-meta">
+              <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
+              <span class="tour-meta-item">${peopleIcon}${escapeHtml(tour.groupSize)}</span>
+              <span class="tour-meta-item">${pinIcon}${escapeHtml(tour.location)}</span>
+            </div>
+            <div class="tour-vibe-tags">${tags}</div>
+            <h3 class="tour-card-title"><a href="${escapeHtml(tour.detailUrl)}" class="tour-card-stretched-link">${escapeHtml(tour.title)}</a></h3>
+            <p class="tour-card-desc">${escapeHtml(tour.packageDescription || tour.description)}</p>
+            <div class="tour-card-footer">
+              <div class="tour-stars" aria-label="5 stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+              <a href="${escapeHtml(bookingUrl(tour.slug))}" class="tour-card-book-btn">Book Now</a>
+            </div>
+          </div>
+        </article>`;
+    }).join('');
+  }
+
+  function renderCommandPaletteTours() {
+    const list = document.getElementById('cmd-list');
+    if (!list || tours.length === 0) return;
+
+    list.innerHTML = tours
+      .slice()
+      .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999))
+      .map(tour => `
+        <li><a class="cmd-item" href="${escapeHtml(tour.detailUrl)}">
+          <span class="cmd-item-icon">${escapeHtml(tourInitials(tour.title))}</span>
+          <span class="cmd-item-text">
+            <strong>${escapeHtml(tour.title)}</strong>
+            <span>${escapeHtml(tour.commandSummary || tour.description)}</span>
+          </span>
+          <span class="cmd-item-meta">${escapeHtml(tour.price)} | ${escapeHtml(tour.duration)}</span>
+        </a></li>`).join('');
+  }
+
+  function renderContactTourOptions() {
+    const select = document.getElementById('tour-interest');
+    if (!select || tours.length === 0) return;
+
+    const options = tours
+      .slice()
+      .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999))
+      .map(tour => `<option value="${escapeHtml(tour.slug)}">${escapeHtml(tour.title)} - ${escapeHtml(tour.price)}</option>`)
+      .join('');
+
+    select.innerHTML = `
+      <option value="" disabled selected>Select a tour...</option>
+      ${options}
+      <option value="custom">Custom / Bespoke Tour</option>`;
+  }
+
+  function hydrateTourDetailFromCatalog() {
+    if (tours.length === 0) return;
+    const page = location.pathname.split('/').pop() || 'index.html';
+    const tour = tours.find(item => item.detailUrl === page);
+    if (!tour) return;
+
+    document.querySelectorAll('.booking-card .big-price, .booking-card .price').forEach(el => {
+      el.textContent = tour.price;
+    });
+    document.querySelectorAll('.booking-card .price-sub').forEach(el => {
+      el.textContent = `per person · ${tour.duration}`;
+    });
+    document.querySelectorAll('.booking-card .booking-btns a.btn-outline-white').forEach(link => {
+      link.href = bookingUrl(tour.slug);
+    });
+    document.querySelectorAll('.trip-meta-item').forEach(item => {
+      if (item.textContent.includes('From:')) item.innerHTML = `<strong>From:</strong> ${escapeHtml(tour.price)}/person`;
+    });
+  }
+
+  renderHomeTours();
+  renderPackageTours();
+  renderCommandPaletteTours();
+  renderContactTourOptions();
+  hydrateTourDetailFromCatalog();
+
+  /* ── STICKY NAV ── */
+  const nav = document.querySelector('.nav');
+  if (nav) {
+    const handleScroll = () => nav.classList.toggle('scrolled', window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  /* ── MOBILE MENU ── */
+  const toggle = document.querySelector('.nav-toggle');
+  const mobileMenu = document.querySelector('.nav-mobile');
+  if (toggle && mobileMenu) {
+    toggle.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open);
+      const spans = toggle.querySelectorAll('span');
+      if (open) {
+        spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+      } else {
+        spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+      }
+    });
+    // Close menu when a link is clicked
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        const spans = toggle.querySelectorAll('span');
+        spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+      });
+    });
+  }
+
+  /* ── ACTIVE NAV LINK ── */
+  const currentPage = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(link => {
+    const href = link.getAttribute('href');
+    if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+      link.classList.add('active');
+    }
+  });
+
+  /* ── HERO SLIDER ── */
+  const heroSlides = document.querySelectorAll('.hero-slide');
+  const heroDots   = document.querySelectorAll('.hero-dot');
+  let heroIndex = 0;
+  let heroInterval;
+
+  function showHeroSlide(idx) {
+    heroSlides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    heroDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    heroIndex = idx;
+  }
+  function nextHeroSlide() { showHeroSlide((heroIndex + 1) % heroSlides.length); }
+  function prevHeroSlide() { showHeroSlide((heroIndex - 1 + heroSlides.length) % heroSlides.length); }
+  function startHeroAuto() { heroInterval = setInterval(nextHeroSlide, 5500); }
+  function resetHeroAuto() { clearInterval(heroInterval); startHeroAuto(); }
+
+  if (heroSlides.length > 0) {
+    showHeroSlide(0);
+    startHeroAuto();
+    document.querySelector('.hero-next')?.addEventListener('click', () => { nextHeroSlide(); resetHeroAuto(); });
+    document.querySelector('.hero-prev')?.addEventListener('click', () => { prevHeroSlide(); resetHeroAuto(); });
+    heroDots.forEach((dot, i) => dot.addEventListener('click', () => { showHeroSlide(i); resetHeroAuto(); }));
+  }
+
+  /* ── SCROLL CHEVRON (hero → first section) ── */
+  const scrollChevron = document.querySelector('.v-hero-scroll');
+  if (scrollChevron) {
+    scrollChevron.addEventListener('click', () => {
+      const next = document.querySelector('.marquee-strip, .page-hero + *, .v-hero + *');
+      if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  /* ── TESTIMONIALS SLIDER ── */
+  const testimonialsTrack = document.querySelector('.testimonials-track');
+  const testimonialSlides = document.querySelectorAll('.testimonial-slide');
+  const testimonialDots   = document.querySelectorAll('.testimonials-dot');
+  let testimonialIndex = 0;
+  let testimonialInterval;
+
+  function showTestimonial(idx) {
+    if (!testimonialsTrack) return;
+    testimonialIndex = idx;
+    testimonialsTrack.style.transform = `translateX(-${idx * 100}%)`;
+    testimonialDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+
+  if (testimonialsTrack && testimonialSlides.length > 0) {
+    showTestimonial(0);
+    testimonialInterval = setInterval(() => {
+      showTestimonial((testimonialIndex + 1) % testimonialSlides.length);
+    }, 6000);
+    testimonialDots.forEach((dot, i) => {
+      dot.addEventListener('click', () => { clearInterval(testimonialInterval); showTestimonial(i); });
+    });
+  }
+
+  /* ── TRIP CATEGORY FILTER (home page) ── */
+  const tripFilterTags = document.querySelectorAll('.trip-filter-tag');
+  if (tripFilterTags.length > 0) {
+    tripFilterTags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        tripFilterTags.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        tag.classList.add('active');
+        tag.setAttribute('aria-selected', 'true');
+        const filter = tag.dataset.tripFilter;
+        document.querySelectorAll('.trip-card').forEach(card => {
+          const cats = card.dataset.tripCats || '';
+          card.style.display = (filter === 'all' || cats.includes(filter)) ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  /* ── PACKAGE FILTER TABS (packages page) ── */
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  if (filterTabs.length > 0) {
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterTabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        const filter = tab.dataset.filter;
+        document.querySelectorAll('.tour-card[data-destination]').forEach(card => {
+          card.style.display = (filter === 'all' || card.dataset.destination === filter) ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  /* ── DESTINATION TABS ── */
+  const destTabs   = document.querySelectorAll('.dest-tab');
+  const destPanels = document.querySelectorAll('.dest-panel');
+  if (destTabs.length > 0) {
+    destTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        destTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        destPanels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        const panel = document.querySelector(`.dest-panel[data-panel="${tab.dataset.dest}"]`);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  }
+
+  /* ── ACCORDION (general — .accordion-item) ── */
+  document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item   = header.closest('.accordion-item');
+      const isOpen = item.classList.contains('open');
+      item.closest('.accordion-list')?.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── ITINERARY ACCORDION (.itin-item) ── */
+  document.querySelectorAll('.itin-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const item   = header.closest('.itin-item');
+      const isOpen = item.classList.contains('open');
+      // allow multiple open itinerary days OR close-all-then-open (choose below)
+      item.closest('.itin-list')?.querySelectorAll('.itin-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── TOUR DETAIL ACCORDIONS ── */
+  function bindStandaloneToggle(control, itemSelector) {
+    const item = control.closest(itemSelector);
+    if (!item) return;
+
+    control.setAttribute('role', 'button');
+    control.setAttribute('tabindex', control.getAttribute('tabindex') || '0');
+    control.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+
+    const toggleItem = () => {
+      item.classList.toggle('open');
+      control.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+    };
+
+    control.addEventListener('click', toggleItem);
+    control.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      toggleItem();
+    });
+  }
+
+  document.querySelectorAll('.day-header').forEach(header => {
+    bindStandaloneToggle(header, '.day-item');
+  });
+
+  document.querySelectorAll('.faq-q').forEach(question => {
+    bindStandaloneToggle(question, '.faq-item');
+  });
+
+  /* ── FAQ ── */
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item   = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      item.closest('.faq-list')?.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── EMAIL SIGNUP ── */
+  const emailForm = document.querySelector('.email-form');
+  if (emailForm) {
+    emailForm.addEventListener('submit', async e => {
+      const input = emailForm.querySelector('.email-input');
+      const btn   = emailForm.querySelector('.email-submit');
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+      if (!emailOk) {
+        e.preventDefault();
+        input.style.outline = '2px solid #ef4444';
+        setTimeout(() => { input.style.outline = ''; }, 2000);
+        return;
+      }
+      const orig = btn.textContent;
+      btn.textContent = 'Subscribing…';
+      btn.disabled = true;
+      if (usesExternalFormEndpoint(emailForm)) return;
+      e.preventDefault();
+      try {
+        const body = new URLSearchParams(new FormData(emailForm)).toString();
+        const res  = await fetch(emailForm.action || '/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+        if (res.ok) {
+          btn.textContent = 'Subscribed!';
+          btn.style.background = '#22c55e';
+          input.value = '';
+          setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.disabled = false; }, 3500);
+        } else { throw new Error(); }
+      } catch {
+        btn.textContent = 'Error — try again';
+        btn.disabled = false;
+        setTimeout(() => { btn.textContent = orig; }, 2500);
+      }
+    });
+  }
+
+  /* ── CONTACT FORM ── */
+  const contactForm = document.querySelector('.contact-form');
+  if (contactForm) {
+    const tourSelect = contactForm.querySelector('#tour-interest');
+    const tourNameInput = contactForm.querySelector('#tour-name');
+    if (tourSelect) {
+      const updateTourName = () => {
+        const selected = tourSelect.options[tourSelect.selectedIndex];
+        if (tourNameInput) tourNameInput.value = selected?.value ? selected.textContent.trim() : '';
+      };
+      const requestedTour = new URLSearchParams(window.location.search).get('tour');
+      if (requestedTour && [...tourSelect.options].some(option => option.value === requestedTour)) {
+        tourSelect.value = requestedTour;
+      }
+      tourSelect.addEventListener('change', updateTourName);
+      updateTourName();
+    }
+
+    contactForm.addEventListener('submit', async e => {
+      const btn = contactForm.querySelector('button[type="submit"]');
+
+      // Validate required fields
+      const firstName = contactForm.querySelector('#first-name').value.trim();
+      const lastName  = contactForm.querySelector('#last-name').value.trim();
+      const email     = contactForm.querySelector('#email').value.trim();
+      const emailOk   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      let errEl = contactForm.querySelector('.form-error');
+      if (!errEl) {
+        errEl = document.createElement('p');
+        errEl.className = 'form-error';
+        const actions = contactForm.querySelector('.form-actions');
+        actions.parentNode.insertBefore(errEl, actions);
+      }
+
+      if (!firstName || !lastName || !emailOk) {
+        e.preventDefault();
+        errEl.textContent = 'Please fill in your first name, last name, and a valid email address.';
+        return;
+      }
+      errEl.textContent = '';
+
+      const original = btn.innerHTML;
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+      if (usesExternalFormEndpoint(contactForm)) return;
+      e.preventDefault();
+
+      try {
+        const body = new URLSearchParams(new FormData(contactForm)).toString();
+        const res  = await fetch(contactForm.action || '/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+        if (res.ok) {
+          btn.textContent = 'Inquiry Sent! We\'ll be in touch within 2 hours.';
+          btn.style.background = '#22c55e';
+          contactForm.reset();
+          setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 5000);
+        } else { throw new Error(); }
+      } catch {
+        btn.textContent = 'Couldn\'t send — please try WhatsApp';
+        btn.style.background = '#ef4444';
+        setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 4500);
+      }
+    });
+  }
+
+  /* ── LIGHTBOX ── */
+  const galleryItems = document.querySelectorAll('.gallery-item');
+  if (galleryItems.length > 0) {
+    const lb = document.createElement('div');
+    lb.id = 'lightbox';
+    lb.innerHTML = `
+      <div class="lb-backdrop"></div>
+      <button class="lb-close" aria-label="Close">&times;</button>
+      <button class="lb-prev" aria-label="Previous">&#8592;</button>
+      <button class="lb-next" aria-label="Next">&#8594;</button>
+      <div class="lb-img-wrap"><img class="lb-img" src="" alt="" decoding="async" /></div>
+    `;
+    Object.assign(lb.style, { position:'fixed', inset:'0', zIndex:'10000', display:'none', alignItems:'center', justifyContent:'center' });
+    const lbStyle = document.createElement('style');
+    lbStyle.textContent = `
+      #lightbox{background:rgba(0,0,0,.95);}
+      .lb-backdrop{position:absolute;inset:0;}
+      .lb-img-wrap{position:relative;z-index:1;}
+      .lb-img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:4px;}
+      .lb-close{position:absolute;top:24px;right:32px;z-index:2;background:none;border:none;color:#fff;font-size:40px;cursor:pointer;line-height:1;}
+      .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:rgba(255,171,0,.15);border:1.5px solid rgba(255,171,0,.3);color:#FFAB00;font-size:24px;width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+      .lb-prev{left:24px;}.lb-next{right:24px;}
+      .lb-prev:hover,.lb-next:hover{background:#FFAB00;color:#0A0A0A;}
+    `;
+    document.head.appendChild(lbStyle);
+    document.body.appendChild(lb);
+
+    const imgs = [...galleryItems].map(i => i.querySelector('img')?.src).filter(Boolean);
+    let lbIdx = 0;
+
+    function openLb(idx) { lbIdx = idx; lb.querySelector('.lb-img').src = imgs[idx]; lb.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    function closeLb()   { lb.style.display = 'none'; document.body.style.overflow = ''; }
+
+    galleryItems.forEach((item, i) => item.addEventListener('click', () => openLb(i)));
+    lb.querySelector('.lb-close').addEventListener('click', closeLb);
+    lb.querySelector('.lb-backdrop').addEventListener('click', closeLb);
+    lb.querySelector('.lb-next').addEventListener('click', () => openLb((lbIdx + 1) % imgs.length));
+    lb.querySelector('.lb-prev').addEventListener('click', () => openLb((lbIdx - 1 + imgs.length) % imgs.length));
+    document.addEventListener('keydown', e => {
+      if (lb.style.display !== 'flex') return;
+      if (e.key === 'Escape')     closeLb();
+      if (e.key === 'ArrowRight') openLb((lbIdx + 1) % imgs.length);
+      if (e.key === 'ArrowLeft')  openLb((lbIdx - 1 + imgs.length) % imgs.length);
+    });
+  }
+
+  /* ── SMOOTH ANCHOR LINKS ── */
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', e => {
+      const target = document.querySelector(anchor.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  /* ── SCROLL REVEAL ── */
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ── STATS COUNTER ── */
+  function animateCounter(el) {
+    const target   = parseInt(el.dataset.target, 10);
+    const duration = 2000;
+    const step     = target / (duration / 16);
+    let current    = 0;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = Math.floor(current).toLocaleString();
+    }, 16);
+  }
+
+  const statObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('[data-target]').forEach(animateCounter);
+        statObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.stats-section, .about-stats-row, .stats-bar').forEach(el => statObserver.observe(el));
+
+  /* ── COMMAND PALETTE ── */
+  const cmdPalette  = document.getElementById('cmd-palette');
+  const cmdInput    = document.getElementById('cmd-input');
+  const cmdBackdrop = document.getElementById('cmd-backdrop');
+  const cmdClose    = document.getElementById('cmd-close');
+  const cmdTrigger  = document.getElementById('cmd-bar-trigger');
+
+  if (cmdPalette && cmdTrigger) {
+    const allItems = () => [...cmdPalette.querySelectorAll('.cmd-item')];
+    let focusIdx = -1;
+
+    function openPalette() {
+      cmdPalette.hidden = false;
+      document.body.style.overflow = 'hidden';
+      cmdTrigger.setAttribute('aria-expanded', 'true');
+      focusIdx = -1;
+      setTimeout(() => cmdInput?.focus(), 50);
+    }
+
+    function closePalette() {
+      cmdPalette.hidden = true;
+      document.body.style.overflow = '';
+      cmdTrigger.setAttribute('aria-expanded', 'false');
+      if (cmdInput) cmdInput.value = '';
+      setFocus(-1);
+    }
+
+    function setFocus(idx) {
+      allItems().forEach((el, i) => el.classList.toggle('cmd-focused', i === idx));
+      focusIdx = idx;
+    }
+
+    cmdTrigger.addEventListener('click', openPalette);
+    cmdBackdrop?.addEventListener('click', closePalette);
+    cmdClose?.addEventListener('click', closePalette);
+
+    document.addEventListener('keydown', e => {
+      if (!cmdPalette.hidden) {
+        if (e.key === 'Escape')     { e.preventDefault(); closePalette(); }
+        if (e.key === 'ArrowDown')  { e.preventDefault(); setFocus(Math.min(focusIdx + 1, allItems().length - 1)); }
+        if (e.key === 'ArrowUp')    { e.preventDefault(); setFocus(Math.max(focusIdx - 1, 0)); }
+        if (e.key === 'Enter' && focusIdx >= 0) { allItems()[focusIdx]?.click(); }
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openPalette();
+      }
+    });
+
+    /* Live filter */
+    cmdInput?.addEventListener('input', () => {
+      const q = cmdInput.value.toLowerCase().trim();
+      allItems().forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.closest('li').style.display = (!q || text.includes(q)) ? '' : 'none';
+      });
+      setFocus(-1);
+    });
+  }
+
+});
+
+/* ── GSAP ANIMATIONS (runs after full page load so layout is complete) ── */
+window.addEventListener('load', () => {
+  if (typeof gsap === 'undefined') return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) return;
+
+  /* Hero entrance — headline, CTA, scroll chevron */
+  if (document.querySelector('.v-hero-headline')) {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.v-hero-headline', { opacity: 0, y: 24, duration: 0.7 }, 0.2)
+      .fromTo('.v-hero-cta', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55, clearProps: 'transform' }, 0.55)
+      .from('.v-hero-scroll', { opacity: 0, y: 12, duration: 0.5 }, 0.85);
+  }
+
+  /* Marquee — scrollWidth is accurate after load */
+  const track = document.querySelector('.marquee-track');
+  if (track) {
+    track.style.animation = 'none';
+    gsap.to(track, {
+      x: -(track.scrollWidth / 2),
+      ease: 'none',
+      duration: 48,
+      repeat: -1,
+    });
+  }
+});

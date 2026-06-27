@@ -1,0 +1,307 @@
+(function () {
+  const content = window.PEOPLE_PLACES_HOME;
+
+  const icons = {
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>',
+    instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="ig-icon" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
+  };
+
+  const buttonStar = '<svg class="doodle doodle-btn-star" aria-hidden="true" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1 L8.85 7.15 L15 8 L8.85 8.85 L8 15 L7.15 8.85 L1 8 L7.15 7.15 Z" fill="var(--yellow-dark)" stroke="none"/></svg>';
+
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[char]));
+
+  const renderLines = lines => (lines || []).map(escapeHtml).join('<br>');
+  const renderIcon = name => icons[name] || '';
+  const revealClass = index => index % 3 === 1 ? ' reveal-delay-1' : index % 3 === 2 ? ' reveal-delay-2' : index % 3 === 0 && index > 0 ? ' reveal-delay-3' : '';
+  const externalAttrs = item => item?.external ? ' target="_blank" rel="noopener"' : '';
+
+  function renderRichParts(parts = []) {
+    return parts.map(part => {
+      const text = escapeHtml(part.text);
+      return part.strong ? `<strong>${text}</strong>` : text;
+    }).join('');
+  }
+
+  function renderImage(image, className, extraAttrs = '') {
+    if (!image?.src) return '';
+    return `<img class="${escapeHtml(className)}" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || '')}" width="${escapeHtml(image.width || '')}" height="${escapeHtml(image.height || '')}" ${extraAttrs} decoding="async" />`;
+  }
+
+  function renderHeroSection(data) {
+    return `
+<!-- Claude Code focus: Hero visual refinement starts in renderHeroSection + .v-hero CSS. -->
+<section class="v-hero" aria-label="Hero" data-home-section="hero">
+  <div class="v-hero-video-wrap" aria-hidden="true">
+    <video class="v-hero-video" autoplay muted loop playsinline preload="metadata" poster="${escapeHtml(data.video.poster)}">
+      <source src="${escapeHtml(data.video.src)}" type="video/mp4" />
+    </video>
+    <div class="v-hero-overlay"></div>
+  </div>
+
+  <div class="v-hero-content">
+    <h1 class="v-hero-headline">${renderLines(data.headlineLines)}</h1>
+    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-primary v-hero-cta">${escapeHtml(data.cta.label)}<svg class="v-hero-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>` : ''}
+  </div>
+
+  <button class="v-hero-scroll" aria-label="Scroll down">
+    <span class="v-scroll-label">Scroll</span>
+    <div class="v-scroll-chevron">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </button>
+
+  <div class="v-hero-bottom-strip" aria-hidden="true">
+    <div class="v-hero-strip-track">
+      <span>${escapeHtml(data.stripText)}</span>
+      <span class="v-hero-strip-dot">·</span>
+      <span>${escapeHtml(data.stripText)}</span>
+      <span class="v-hero-strip-dot">·</span>
+    </div>
+  </div>
+</section>`;
+  }
+
+  function renderMarqueeStrip(data) {
+    const items = [...(data.items || []), ...(data.items || [])];
+    return `
+<div class="marquee-strip" aria-label="Destinations we cover" data-home-section="marquee">
+  <div class="marquee-track">
+    ${items.map(item => `<span class="marquee-item">${escapeHtml(item)}</span><span class="marquee-dot">•</span>`).join('\n    ')}
+  </div>
+</div>`;
+  }
+
+  function renderPaymentStrip(data) {
+    return `
+<div class="payment-strip" aria-label="Payment options" data-home-section="payment-strip">
+  <div class="container">
+    <div class="payment-strip-inner">
+      ${(data.items || []).map((item, index) => `
+      ${index > 0 ? '<span class="payment-strip-sep" aria-hidden="true">·</span>' : ''}
+      <div class="payment-strip-item">
+        ${renderIcon(item.icon)}
+        <span>${renderRichParts(item.parts)}</span>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>`;
+  }
+
+  function renderToursSection(data) {
+    return `
+<!-- Claude Code focus: Tour card UI is rendered from tours.js by script.js into #trips-grid. -->
+<section class="trips-section white-lift section-pad" aria-label="Upcoming tours" data-home-section="tours">
+  <div class="container">
+    <div class="trips-header">
+      <div>
+        <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="section-title trips-title reveal reveal-delay-1">${escapeHtml(data.title)}</h2>
+      </div>
+      <a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark reveal reveal-delay-2" style="align-self:flex-end;">
+        ${escapeHtml(data.cta.label)}
+        ${buttonStar}
+      </a>
+    </div>
+
+    <div class="trip-filters" role="tablist" aria-label="Filter tours by type">
+      ${(data.filters || []).map(filter => `<button class="trip-filter-tag${filter.active ? ' active' : ''}" data-trip-filter="${escapeHtml(filter.value)}" role="tab" aria-selected="${filter.active ? 'true' : 'false'}">${escapeHtml(filter.label)}</button>`).join('\n      ')}
+    </div>
+
+    <div class="trips-grid" id="trips-grid" data-tour-source="catalog"></div>
+  </div>
+</section>`;
+  }
+
+  function renderWhyTravelSection(data) {
+    return `
+<!-- Claude Code focus: Why section uses an editorial split + numbered list. -->
+<section class="why-section" aria-label="Why choose People and Places Tours" data-home-section="why-travel">
+  <div class="container">
+    <div class="why-editorial">
+      <div class="why-editorial-head reveal">
+        <div class="eyebrow">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="why-editorial-title">${renderLines(data.titleLines)}</h2>
+        <p class="why-editorial-intro">${escapeHtml(data.intro)}</p>
+      </div>
+      <ol class="why-editorial-list">
+        ${(data.cards || []).map((card, index) => `
+        <li class="why-row reveal${revealClass(index)}">
+          <span class="why-row-num">${String(index + 1).padStart(2, '0')}</span>
+          <div class="why-row-content">
+            <h3>${escapeHtml(card.title)}</h3>
+            <p>${escapeHtml(card.text)}</p>
+          </div>
+        </li>`).join('')}
+      </ol>
+    </div>
+  </div>
+</section>`;
+  }
+
+  function renderStatsSection(stats) {
+    return `
+<div class="stats-bar stats-section" aria-label="Our numbers" data-home-section="stats">
+  <div class="container">
+    <div class="stats-grid">
+      ${(stats || []).map(stat => `
+      <div class="stat-item">
+        <div class="stat-figure"><span class="stat-num" data-target="${escapeHtml(stat.target)}">0</span><span class="stat-suffix">${escapeHtml(stat.suffix)}</span></div>
+        <span class="stat-label">${escapeHtml(stat.label)}</span>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>`;
+  }
+
+  function renderBookingStepsSection(data) {
+    return `
+<!-- Claude Code focus: Booking steps are content-driven and can be redesigned without touching form logic. -->
+<section class="process-section white-lift section-pad" aria-label="How it works" data-home-section="booking-steps">
+  <div class="container">
+    <div class="section-split" style="margin-bottom:var(--sp-8)">
+      <div class="split-headline">
+        <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="section-title process-title reveal reveal-delay-1">${escapeHtml(data.title)}</h2>
+      </div>
+      <p class="split-body section-sub process-sub reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
+    </div>
+
+    <div class="process-grid">
+      ${(data.steps || []).map((step, index) => `
+      <div class="process-step reveal${revealClass(index)}">
+        <div class="process-icon-wrap">${renderIcon(step.icon)}</div>
+        <div class="process-step-num">${escapeHtml(step.number)}</div>
+        <div class="process-content">
+          <h3>${escapeHtml(step.title)}</h3>
+          <p>${escapeHtml(step.text)}</p>
+        </div>
+        ${step.cta ? `<a href="${escapeHtml(step.cta.href)}" class="process-step-link"${externalAttrs(step.cta)}>${escapeHtml(step.cta.label)}</a>` : ''}
+      </div>`).join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  function renderTestimonialsSection(data) {
+    return `
+<!-- Claude Code focus: Review cards and section header image are isolated here. -->
+<section class="testimonials-section" aria-label="What travellers say" data-home-section="testimonials">
+  <div class="sec-img-head">
+    ${renderImage(data.heroImage, 'sec-img-head-media', 'loading="lazy"')}
+    <div class="container">
+      <div class="section-split">
+        <div class="split-headline">
+          <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
+          <h2 class="section-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
+        </div>
+        <p class="split-body reveal reveal-delay-2" style="color:rgba(255,255,255,.7)">${escapeHtml(data.intro)}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:3.5rem;padding-bottom:5rem;">
+    <div class="testimonials-wrap">
+      <div class="testimonials-track">
+        ${(data.items || []).map(item => `
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-quote">"${escapeHtml(item.quote)}"</p>
+            <div class="testi-author">
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.author)}" loading="lazy" width="160" height="160" decoding="async" />
+              <div>
+                <strong>${escapeHtml(item.author)}</strong>
+                <span>${escapeHtml(item.location)}</span>
+              </div>
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+
+      <div class="testimonials-dots" aria-label="Testimonial navigation">
+        ${(data.items || []).map((_, index) => `<button class="testimonials-dot${index === 0 ? ' active' : ''}" aria-label="Testimonial ${index + 1}"></button>`).join('\n        ')}
+      </div>
+    </div>
+  </div>
+</section>`;
+  }
+
+  function renderNewsletterSection(data) {
+    const fields = data.form.hiddenFields || [];
+    return `
+<!-- Claude Code focus: Newsletter uses FormSubmit; preserve input names/action unless changing form provider. -->
+<section class="newsletter-section" aria-label="Newsletter signup" data-home-section="newsletter">
+  <div class="container">
+    <div class="newsletter-inner reveal">
+      <div class="newsletter-text">
+        <div class="eyebrow eyebrow-dark">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="newsletter-title">${escapeHtml(data.title)}</h2>
+        <p class="newsletter-sub">${escapeHtml(data.subtitle)}</p>
+      </div>
+      <form class="newsletter-form" name="${escapeHtml(data.form.name)}" action="${escapeHtml(data.form.action)}" method="POST" aria-label="Email signup form">
+        ${fields.map(field => `<input type="hidden" name="${escapeHtml(field.name)}" value="${escapeHtml(field.value)}">`).join('\n        ')}
+        <input class="newsletter-input" type="email" name="email" placeholder="${escapeHtml(data.form.emailPlaceholder)}" aria-label="Email address" required />
+        <button class="newsletter-submit" type="submit">${escapeHtml(data.form.submitLabel)}</button>
+      </form>
+    </div>
+  </div>
+</section>`;
+  }
+
+  function renderInstagramStrip(data) {
+    return `
+<div class="instagram-strip" aria-label="Follow People and Places on Instagram" data-home-section="instagram">
+  <div class="ig-photos" aria-hidden="true">
+    ${(data.images || []).map(src => `<div class="ig-photo"><img src="${escapeHtml(src)}" alt="" width="600" height="600" loading="lazy" decoding="async" /></div>`).join('\n    ')}
+  </div>
+  <div class="ig-overlay">
+    <div class="ig-content">
+      ${renderIcon('instagram')}
+      <p class="ig-handle">${escapeHtml(data.handle)}</p>
+      <p class="ig-tagline">${escapeHtml(data.tagline)}</p>
+      <a href="${escapeHtml(data.cta.href)}" target="_blank" rel="noopener" class="btn btn-primary ig-follow-btn">${escapeHtml(data.cta.label)}</a>
+    </div>
+  </div>
+</div>`;
+  }
+
+  function renderHomepage() {
+    const root = document.getElementById('homepage-root');
+    if (!root || !content) return;
+
+    root.innerHTML = [
+      renderHeroSection(content.hero),
+      renderMarqueeStrip(content.marquee),
+      renderPaymentStrip(content.paymentStrip),
+      renderToursSection(content.tours),
+      renderWhyTravelSection(content.whyTravel),
+      renderStatsSection(content.stats),
+      renderBookingStepsSection(content.bookingSteps),
+      renderTestimonialsSection(content.testimonials),
+      renderNewsletterSection(content.newsletter),
+      renderInstagramStrip(content.instagram),
+    ].join('\n');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderHomepage);
+  } else {
+    renderHomepage();
+  }
+})();
