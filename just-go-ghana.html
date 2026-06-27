@@ -172,18 +172,33 @@
 <body>
 
 <!-- NAV -->
-<nav>
-  <a href="index.html" class="nav-logo"><img src="assets/logo-footer.svg" alt="People &amp; Places Tours" width="1510" height="640" decoding="async"></a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="packages.html">Packages</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <span class="nav-phone">+233 50 367 3473</span>
-    <a href="contact.html" class="btn-yellow">Book A Tour</a>
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav class="nav scrolled" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="People & Places Tours Home">
+      <img src="assets/logo-footer.svg" alt="People & Places Tours" width="1510" height="640" decoding="async">
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="packages.html" class="active">Packages</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="tel:+233503673473" class="nav-phone">+233 50 367 3473</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
+  <nav class="nav-mobile" aria-label="Mobile navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="packages.html">Packages</a>
+    <a href="contact.html">Contact</a>
+    <a href="packages.html" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">Book a Tour</a>
+  </nav>
 </nav>
 
 <!-- HERO -->

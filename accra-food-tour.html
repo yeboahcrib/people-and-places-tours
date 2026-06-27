@@ -14,17 +14,17 @@
     :root{--yellow:#FFB81C;--black:#1A1A1A;--dark:#1B1B1B;--white:#FFFFFF;--gray:#F5F5F0;}
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Inter',sans-serif;background:var(--white);color:var(--dark);}
-    nav{background:var(--black);display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;position:sticky;top:0;z-index:100;}
-    .nav-logo{display:flex;align-items:center;text-decoration:none;}
-    .nav-logo img{height:52px;width:auto;display:block;}
-    .nav-links{display:flex;gap:2rem;list-style:none;}
-    .nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
-    .nav-links a:hover{color:var(--yellow);}
-    .nav-right{display:flex;align-items:center;gap:1.5rem;}
-    .nav-phone{color:rgba(255,255,255,.6);font-size:.85rem;}
+    
+    
+    
+    
+    
+    
+    
+    
     .btn-yellow{background:var(--yellow);color:var(--black);border:none;padding:.7rem 1.8rem;border-radius:50px;font-family:'Inter',sans-serif;font-weight:600;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;}
     .btn-yellow:hover{background:#e09900;transform:translateY(-1px);}
-    .trip-hero{background:var(--black);padding:4rem 2.5rem 3rem;position:relative;overflow:hidden;}
+    .trip-hero{background:var(--black);padding:7rem 2.5rem 3rem;position:relative;overflow:hidden;}
     .trip-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;}
     .back-link{color:rgba(255,255,255,.5);font-size:.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;margin-bottom:2rem;transition:color .2s;}
     .back-link:hover{color:var(--yellow);}
@@ -98,22 +98,37 @@
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:.875rem;line-height:1.8;}
     .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
-    @media(max-width:600px){.nav-links,.nav-phone{display:none;}.trip-hero,.content-wrap{padding:2rem 1.25rem;}}
+    @media(max-width:600px){.nav-links,.trip-hero,.content-wrap{padding:2rem 1.25rem;}}
   </style>
 </head>
 <body>
-<nav>
-  <a href="index.html" class="nav-logo"><img src="assets/logo-footer.svg" alt="People &amp; Places Tours" width="1510" height="640" decoding="async"></a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="packages.html">Packages</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <span class="nav-phone">+233 50 367 3473</span>
-    <a href="contact.html" class="btn-yellow">Book A Tour</a>
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav class="nav scrolled" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="People & Places Tours Home">
+      <img src="assets/logo-footer.svg" alt="People & Places Tours" width="1510" height="640" decoding="async">
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="packages.html" class="active">Packages</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="tel:+233503673473" class="nav-phone">+233 50 367 3473</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
+  <nav class="nav-mobile" aria-label="Mobile navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="packages.html">Packages</a>
+    <a href="contact.html">Contact</a>
+    <a href="packages.html" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">Book a Tour</a>
+  </nav>
 </nav>
 
 <div class="trip-hero">

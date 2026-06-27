@@ -31,13 +31,16 @@
   --gray-2:        rgba(255,255,255,.55);
   --gray-3:        rgba(255,255,255,.4);
 
-  /* Secondary brand accents — terracotta (badges/hover) + forest (alternate dark sections) */
+  /* Secondary brand accents — terracotta (badges/hover) */
   --terracotta:        #C2553D;
   --terracotta-dark:   #A2422F;
   --terracotta-glow:   rgba(194,85,61,.14);
-  --forest:            #1F3A2E;
-  --forest-2:          #15291F;
-  --forest-card:       #243f33;
+  /* Alternate-dark sections — slightly deeper than --pap-charcoal so they
+     still read as a visually distinct band when next to the main black.
+     (Variable kept named "forest" for backward compatibility; actual hue is off-black.) */
+  --forest:            #0d0d0d;
+  --forest-2:          #080808;
+  --forest-card:       #1e1e1e;
   --forest-border:     rgba(255,255,255,.06);
 
   /* 2. Typography */
