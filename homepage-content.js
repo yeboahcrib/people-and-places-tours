@@ -27,14 +27,21 @@
       eyebrow: 'Why Travel With Us',
       titleLines: ['Ghana Is Better', 'When Locals Lead'],
       intro: "We're not a travel agency — we're Ghanaians who love showing the world what this country really is. Every guide is a local. Every route is personal. Every trip leaves a mark.",
+      quote: {
+        text: 'Show up. We handle the rest. By the end of the trip you’ll know Ghana the way we do.',
+        author: 'Kofi Asante',
+        role: 'Founder & lead guide',
+        avatar: 'https://images.unsplash.com/photo-1625191824068-e833954d6c70?auto=format&fit=crop&w=160&q=80&h=160',
+      },
       cards: [
         {
-          icon: 'pin',
+          icon: 'user-circle',
           title: 'Expert Local Guides',
           text: 'Every guide is a born-and-raised Ghanaian who knows the backroads, the real spots, and the stories behind the history.',
+          feature: true,
         },
         {
-          icon: 'heart',
+          icon: 'briefcase',
           title: 'Stress-Free Logistics',
           text: 'Transport, accommodation, entrance fees, meals — we handle it all. You just show up and enjoy.',
         },
@@ -44,7 +51,7 @@
           text: 'We keep group sizes small so you get personal attention, real conversations, and zero tourist-factory energy.',
         },
         {
-          icon: 'image',
+          icon: 'camera',
           title: 'Photo-Ready Moments',
           text: 'We know exactly where the light hits right and which angle tells the story. Your feed will never look better.',
         },

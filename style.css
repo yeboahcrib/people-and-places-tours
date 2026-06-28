@@ -865,9 +865,9 @@ body.page-entering {
 }
 .why-editorial-title {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  font-size: clamp(1.85rem, 3.1vw, 2.6rem);
   color: var(--black);
-  line-height: 1.02;
+  line-height: 1.04;
   letter-spacing: -0.025em;
   margin-bottom: 1.5rem;
 }
@@ -876,6 +876,57 @@ body.page-entering {
   font-size: 1rem;
   line-height: 1.75;
   max-width: 380px;
+  margin-bottom: 2.25rem;
+}
+
+/* Guide quote — fills the dead space below the intro */
+.why-quote {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem 1.1rem;
+  align-items: start;
+  margin: 0;
+  padding: 1.5rem 1.5rem 1.5rem 1.25rem;
+  background: #FBFAF6;
+  border-left: 3px solid var(--yellow);
+  border-radius: 4px 14px 14px 4px;
+  max-width: 420px;
+}
+.why-quote-avatar {
+  grid-row: span 2;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: 0.15rem;
+}
+.why-quote-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+.why-quote-author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-style: normal;
+  color: #6B7280;
+}
+.why-quote-author strong {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.84rem;
+  color: var(--black);
+  letter-spacing: 0.01em;
+}
+.why-quote-author span {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a8678;
 }
 
 .why-editorial-list {
@@ -886,23 +937,30 @@ body.page-entering {
 .why-row {
   display: grid;
   grid-template-columns: 56px 1fr;
-  gap: 2rem;
-  padding: 2rem 0;
+  gap: 1.75rem;
+  padding: 1.85rem 0;
   border-top: 1px solid #ece8dc;
+  align-items: start;
 }
 .why-row:last-child { border-bottom: 1px solid #ece8dc; }
-.why-row-num {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
+/* Icon chip — gold line icon in a soft tinted square */
+.why-row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #FEF6E0;
+  border-radius: 12px;
   color: var(--yellow-dark);
-  letter-spacing: 0.04em;
-  padding-top: 0.4rem;
+  margin-top: 0.1rem;
 }
+.why-row-icon svg { width: 22px; height: 22px; }
 .why-row-content h3 {
   font-family: var(--font-display);
   font-size: 1.45rem;
   color: var(--black);
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.55rem;
   letter-spacing: -0.015em;
   line-height: 1.2;
 }
@@ -911,14 +969,41 @@ body.page-entering {
   color: #5b6068;
   line-height: 1.7;
   max-width: 540px;
+  margin: 0;
+}
+/* Feature row — first item gets visual weight as the lead point */
+.why-row-feature {
+  padding: 2.5rem 0;
+  border-top: 2px solid var(--black);
+}
+.why-row-feature .why-row-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--yellow);
+  color: var(--black);
+}
+.why-row-feature .why-row-icon svg { width: 26px; height: 26px; }
+.why-row-feature .why-row-content h3 {
+  font-size: 1.85rem;
+  margin-bottom: 0.7rem;
+}
+.why-row-feature .why-row-content p {
+  font-size: 1.02rem;
+  color: #3f4348;
 }
 
 @media (max-width: 900px) {
   .why-editorial { grid-template-columns: 1fr; gap: 3rem; }
   .why-editorial-head { position: static; }
+  .why-editorial-title { max-width: none; }
+  .why-quote { max-width: none; }
 }
 @media (max-width: 600px) {
   .why-row { grid-template-columns: 44px 1fr; gap: 1.25rem; padding: 1.5rem 0; }
+  .why-row-icon { width: 44px; height: 44px; }
+  .why-row-feature { padding: 1.85rem 0; }
+  .why-row-feature .why-row-icon { width: 44px; height: 44px; }
+  .why-row-feature .why-row-content h3 { font-size: 1.45rem; }
 }
 
 /* ────────────────────────────────────────────────────────────── */
@@ -1073,21 +1158,32 @@ body.page-entering {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.25rem;
+  gap: 1rem;
   padding-top: 2rem;
   border-top: 1px solid #ece8dc;
 }
 .process-icon-wrap {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: var(--yellow);
+  border-radius: 14px;
+  color: var(--black);
+  margin-bottom: 0.25rem;
 }
+.process-icon-wrap svg { width: 24px; height: 24px; stroke: currentColor; }
 .process-step-num {
-  font-family: var(--font-display);
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: var(--yellow-dark);
-  opacity: 1;
   margin: 0;
 }
+.process-step-num::before { content: 'Step '; }
 .process-content h3 {
   font-family: var(--font-display);
   font-size: 1.4rem;
@@ -1131,23 +1227,45 @@ body.page-entering {
   gap: 1.5rem;
 }
 .testimonial-card {
+  position: relative;
   background: rgba(255,255,255,0.025);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   padding: 2.5rem 2.25rem;
   transition: border-color var(--transition), background var(--transition);
+  overflow: hidden;
 }
 .testimonial-card:hover {
   border-color: rgba(255,184,28,0.25);
   background: rgba(255,255,255,0.04);
 }
-.testi-stars {
-  color: var(--yellow);
-  font-size: 0.85rem;
-  margin-bottom: 1.25rem;
-  letter-spacing: 0.2em;
+/* Decorative oversized opening quote-mark — lifts the first card as the lead */
+.testi-quote-mark {
+  position: absolute;
+  top: -1.5rem;
+  right: 1rem;
+  font-family: var(--font-display);
+  font-size: 8rem;
+  line-height: 1;
+  color: rgba(255,184,28,0.12);
+  pointer-events: none;
+  user-select: none;
 }
+.testimonial-card-feature {
+  background: rgba(255,184,28,0.04);
+  border-color: rgba(255,184,28,0.18);
+}
+.testimonial-card-feature .testi-quote-mark { color: rgba(255,184,28,0.28); font-size: 10rem; top: -2rem; }
+.testi-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+  color: var(--yellow);
+  margin-bottom: 1.25rem;
+}
+.testi-stars svg { width: 14px; height: 14px; }
 .testi-quote {
+  position: relative;
   font-family: var(--font-display);
   font-size: 1.15rem;
   color: rgba(255,255,255,.92);
@@ -1156,6 +1274,8 @@ body.page-entering {
   margin-bottom: 1.75rem;
   letter-spacing: -0.01em;
 }
+.testi-quote::before { content: '“'; margin-right: 0.05em; color: var(--yellow); }
+.testi-quote::after { content: '”'; margin-left: 0.05em; color: var(--yellow); }
 .testi-author {
   display: flex;
   align-items: center;

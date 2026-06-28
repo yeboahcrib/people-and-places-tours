@@ -9,6 +9,9 @@
     heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
     users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
     image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+    'user-circle': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5.5 19a7 7 0 0 1 13 0"/><circle cx="12" cy="12" r="10"/></svg>',
+    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M2.5 13h19"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13.5" r="3.5"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
     play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
@@ -84,20 +87,31 @@
   }
 
   function renderWhyTravelSection(data) {
+    const q = data.quote;
+    const quoteBlock = q ? `
+      <figure class="why-quote reveal reveal-delay-2">
+        ${q.avatar ? `<img class="why-quote-avatar" src="${escapeHtml(q.avatar)}" alt="${escapeHtml(q.author)}" width="64" height="64" loading="lazy" decoding="async" />` : ''}
+        <blockquote class="why-quote-text">${escapeHtml(q.text)}</blockquote>
+        <figcaption class="why-quote-author">
+          <strong>${escapeHtml(q.author)}</strong>
+          <span>${escapeHtml(q.role)}</span>
+        </figcaption>
+      </figure>` : '';
     return `
-<!-- Claude Code focus: Why section uses an editorial split + numbered list. -->
+<!-- Claude Code focus: Why section uses an editorial split + icon-led list. -->
 <section class="why-section" aria-label="Why choose People and Places Tours" data-home-section="why-travel">
   <div class="container">
     <div class="why-editorial">
-      <div class="why-editorial-head reveal">
-        <div class="eyebrow">${escapeHtml(data.eyebrow)}</div>
-        <h2 class="why-editorial-title">${renderLines(data.titleLines)}</h2>
-        <p class="why-editorial-intro">${escapeHtml(data.intro)}</p>
+      <div class="why-editorial-head">
+        <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="why-editorial-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
+        <p class="why-editorial-intro reveal reveal-delay-1">${escapeHtml(data.intro)}</p>
+        ${quoteBlock}
       </div>
       <ol class="why-editorial-list">
         ${(data.cards || []).map((card, index) => `
-        <li class="why-row reveal${revealClass(index)}">
-          <span class="why-row-num">${String(index + 1).padStart(2, '0')}</span>
+        <li class="why-row${card.feature ? ' why-row-feature' : ''} reveal${revealClass(index)}">
+          <span class="why-row-icon" aria-hidden="true">${renderIcon(card.icon)}</span>
           <div class="why-row-content">
             <h3>${escapeHtml(card.title)}</h3>
             <p>${escapeHtml(card.text)}</p>
@@ -173,11 +187,18 @@
   <div class="container" style="padding-top:3.5rem;padding-bottom:5rem;">
     <div class="testimonials-wrap">
       <div class="testimonials-track">
-        ${(data.items || []).map(item => `
+        ${(data.items || []).map((item, idx) => `
         <div class="testimonial-slide">
-          <div class="testimonial-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-quote">"${escapeHtml(item.quote)}"</p>
+          <div class="testimonial-card${idx === 0 ? ' testimonial-card-feature' : ''}">
+            <span class="testi-quote-mark" aria-hidden="true">&ldquo;</span>
+            <div class="testi-stars" aria-label="5 out of 5 stars">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <p class="testi-quote">${escapeHtml(item.quote)}</p>
             <div class="testi-author">
               <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.author)}" loading="lazy" width="160" height="160" decoding="async" />
               <div>
