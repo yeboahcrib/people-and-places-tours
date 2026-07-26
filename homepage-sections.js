@@ -61,10 +61,60 @@
 </section>`;
   }
 
+  function renderFounderStorySection(data) {
+    return `
+<!-- Claude Code focus: Founder story — editorial split, real founders behind neutral initials placeholders (no stock photos). -->
+<section class="founder-story-section white-lift section-pad" aria-label="Our founders" data-home-section="founderStory">
+  <div class="container">
+    <div class="founder-story-grid">
+      <div class="founder-story-text">
+        <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.headline)}</h2>
+        <p class="founder-story-body reveal reveal-delay-2">${escapeHtml(data.body)}</p>
+        ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark reveal reveal-delay-2">${escapeHtml(data.cta.label)}</a>` : ''}
+      </div>
+      <div class="founder-mini-grid">
+        ${(data.founders || []).map((f, i) => `
+        <div class="founder-mini-card reveal${revealClass(i)}">
+          <div class="founder-mini-avatar" aria-hidden="true">${escapeHtml(f.initials)}</div>
+          <div class="founder-mini-name">${escapeHtml(f.preferredName || f.name)}</div>
+          <div class="founder-mini-role">${escapeHtml(f.role)}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+</section>`;
+  }
+
+  function renderWaysToExperienceSection(data) {
+    return `
+<!-- Claude Code focus: Editorial tour groupings, not a rigid filter — link out to the full catalogue. -->
+<section class="pathways-section white-lift section-pad" aria-label="Ways to experience Ghana" data-home-section="waysToExperience">
+  <div class="container">
+    <div class="section-split" style="margin-bottom:var(--sp-8)">
+      <div class="split-headline">
+        <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
+        <h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.title)}</h2>
+      </div>
+      <p class="split-body section-sub reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
+    </div>
+    <div class="pathways-grid">
+      ${(data.pathways || []).map((p, i) => `
+      <div class="pathway-card reveal${revealClass(i)}">
+        <div class="pathway-count">${escapeHtml(p.tourCount)} ${p.tourCount === 1 ? 'tour' : 'tours'}</div>
+        <h3 class="pathway-title">${escapeHtml(p.title)}</h3>
+        <p class="pathway-text">${escapeHtml(p.text)}</p>
+      </div>`).join('')}
+    </div>
+    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark pathways-cta reveal">${escapeHtml(data.cta.label)}${buttonStar}</a>` : ''}
+  </div>
+</section>`;
+  }
+
   function renderToursSection(data) {
     return `
 <!-- Claude Code focus: Tour card UI is rendered from tours.js by script.js into #trips-grid. -->
-<section class="trips-section white-lift section-pad" aria-label="Upcoming tours" data-home-section="tours">
+<section class="trips-section white-lift section-pad" aria-label="Upcoming tours" data-home-section="availableTours">
   <div class="container">
     <div class="trips-header">
       <div>
@@ -86,35 +136,25 @@
 </section>`;
   }
 
-  function renderWhyTravelSection(data) {
-    const q = data.quote;
-    const quoteBlock = q ? `
-      <figure class="why-quote reveal reveal-delay-2">
-        ${q.avatar ? `<img class="why-quote-avatar" src="${escapeHtml(q.avatar)}" alt="${escapeHtml(q.author)}" width="64" height="64" loading="lazy" decoding="async" />` : ''}
-        <blockquote class="why-quote-text">${escapeHtml(q.text)}</blockquote>
-        <figcaption class="why-quote-author">
-          <strong>${escapeHtml(q.author)}</strong>
-          <span>${escapeHtml(q.role)}</span>
-        </figcaption>
-      </figure>` : '';
+  function renderHowHostedSection(data) {
     return `
-<!-- Claude Code focus: Why section uses an editorial split + icon-led list. -->
-<section class="why-section" aria-label="Why choose People and Places Tours" data-home-section="why-travel">
+<!-- Claude Code focus: Hosting principles, each backed by a real, unedited review excerpt. -->
+<section class="why-section" aria-label="How you're hosted" data-home-section="howHosted">
   <div class="container">
     <div class="why-editorial">
       <div class="why-editorial-head">
         <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
         <h2 class="why-editorial-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
         <p class="why-editorial-intro reveal reveal-delay-1">${escapeHtml(data.intro)}</p>
-        ${quoteBlock}
       </div>
       <ol class="why-editorial-list">
-        ${(data.cards || []).map((card, index) => `
-        <li class="why-row${card.feature ? ' why-row-feature' : ''} reveal${revealClass(index)}">
-          <span class="why-row-icon" aria-hidden="true">${renderIcon(card.icon)}</span>
+        ${(data.principles || []).map((p, index) => `
+        <li class="why-row reveal${revealClass(index)}">
+          <span class="why-row-icon" aria-hidden="true">${renderIcon(p.icon)}</span>
           <div class="why-row-content">
-            <h3>${escapeHtml(card.title)}</h3>
-            <p>${escapeHtml(card.text)}</p>
+            <h3>${escapeHtml(p.title)}</h3>
+            <p>${escapeHtml(p.text)}</p>
+            <blockquote class="principle-proof">&ldquo;${escapeHtml(p.proofQuote)}&rdquo; <cite>— ${escapeHtml(p.proofAuthor)}</cite></blockquote>
           </div>
         </li>`).join('')}
       </ol>
@@ -123,25 +163,26 @@
 </section>`;
   }
 
-  function renderStatsSection(stats) {
+  function renderGuestStorySection(data) {
     return `
-<div class="stats-bar stats-section" aria-label="Our numbers" data-home-section="stats">
+<!-- Claude Code focus: One featured, real guest story — verbatim text, no rewritten quotes. -->
+<section class="guest-story-section section-pad" aria-label="Guest story" data-home-section="guestStory">
   <div class="container">
-    <div class="stats-grid">
-      ${(stats || []).map(stat => `
-      <div class="stat-item">
-        <div class="stat-figure"><span class="stat-num" data-target="${escapeHtml(stat.target)}">0</span><span class="stat-suffix">${escapeHtml(stat.suffix)}</span></div>
-        <span class="stat-label">${escapeHtml(stat.label)}</span>
-      </div>`).join('')}
+    <div class="guest-story-card reveal">
+      <div class="eyebrow">${escapeHtml(data.eyebrow)}</div>
+      <h2 class="section-title">${escapeHtml(data.headline)}</h2>
+      <blockquote class="guest-story-quote">${escapeHtml(data.body)}</blockquote>
+      <div class="guest-story-author">— ${escapeHtml(data.guestName)}</div>
+      ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark">${escapeHtml(data.cta.label)}</a>` : ''}
     </div>
   </div>
-</div>`;
+</section>`;
   }
 
   function renderBookingStepsSection(data) {
     return `
 <!-- Claude Code focus: Booking steps are content-driven and can be redesigned without touching form logic. -->
-<section class="process-section white-lift section-pad" aria-label="How it works" data-home-section="booking-steps">
+<section class="process-section white-lift section-pad" aria-label="How it works" data-home-section="planningProcess">
   <div class="container">
     <div class="section-split" style="margin-bottom:var(--sp-8)">
       <div class="split-headline">
@@ -167,10 +208,10 @@
 </section>`;
   }
 
-  function renderTestimonialsSection(data) {
+  function renderReviewsAndTrustSection(data) {
     return `
 <!-- Claude Code focus: Review cards and section header image are isolated here. -->
-<section class="testimonials-section" aria-label="What travellers say" data-home-section="testimonials">
+<section class="testimonials-section" aria-label="What travellers say" data-home-section="reviewsAndTrust">
   <div class="sec-img-head">
     ${renderImage(data.heroImage, 'sec-img-head-media', 'loading="lazy"')}
     <div class="container">
@@ -185,6 +226,15 @@
   </div>
 
   <div class="container" style="padding-top:3.5rem;padding-bottom:5rem;">
+    ${(data.trustFacts && data.trustFacts.length) ? `
+    <div class="trust-facts-row">
+      ${data.trustFacts.map(f => `
+      <div class="trust-fact">
+        <span class="trust-fact-value">${escapeHtml(f.value)}</span>
+        <span class="trust-fact-label">${escapeHtml(f.label)}</span>
+      </div>`).join('')}
+    </div>` : ''}
+
     <div class="testimonials-wrap">
       <div class="testimonials-track">
         ${(data.items || []).map((item, idx) => `
@@ -200,7 +250,7 @@
             </div>
             <p class="testi-quote">${escapeHtml(item.quote)}</p>
             <div class="testi-author">
-              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.author)}" loading="lazy" width="160" height="160" decoding="async" />
+              ${item.image ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.author)}" loading="lazy" width="160" height="160" decoding="async" />` : ''}
               <div>
                 <strong>${escapeHtml(item.author)}</strong>
                 <span>${escapeHtml(item.location)}</span>
@@ -218,43 +268,38 @@
 </section>`;
   }
 
-  function renderNewsletterSection(data) {
-    const fields = data.form.hiddenFields || [];
+  function renderStoriesStrip(data) {
     return `
-<!-- Claude Code focus: Newsletter uses FormSubmit; preserve input names/action unless changing form provider. -->
-<section class="newsletter-section" aria-label="Newsletter signup" data-home-section="newsletter">
-  <div class="container">
-    <div class="newsletter-inner reveal">
-      <div class="newsletter-text">
-        <div class="eyebrow eyebrow-dark">${escapeHtml(data.eyebrow)}</div>
-        <h2 class="newsletter-title">${escapeHtml(data.title)}</h2>
-        <p class="newsletter-sub">${escapeHtml(data.subtitle)}</p>
-      </div>
-      <form class="newsletter-form" name="${escapeHtml(data.form.name)}" action="${escapeHtml(data.form.action)}" method="POST" aria-label="Email signup form">
-        ${fields.map(field => `<input type="hidden" name="${escapeHtml(field.name)}" value="${escapeHtml(field.value)}">`).join('\n        ')}
-        <input class="newsletter-input" type="email" name="email" placeholder="${escapeHtml(data.form.emailPlaceholder)}" aria-label="Email address" required />
-        <button class="newsletter-submit" type="submit">${escapeHtml(data.form.submitLabel)}</button>
-      </form>
+<!-- Claude Code focus: No simulated Instagram feed — real posts only, once supplied. Clean link-out until then. -->
+<div class="stories-strip" aria-label="Follow People and Places on Instagram" data-home-section="stories">
+  <div class="container stories-inner">
+    ${renderIcon('instagram')}
+    <p class="ig-handle">${escapeHtml(data.handle)}</p>
+    <p class="ig-tagline">${escapeHtml(data.tagline)}</p>
+    <a href="${escapeHtml(data.cta.href)}" target="_blank" rel="noopener" class="btn btn-primary ig-follow-btn">${escapeHtml(data.cta.label)}</a>
+  </div>
+</div>`;
+  }
+
+  function renderFinalInvitationSection(data) {
+    return `
+<!-- Claude Code focus: Closing CTA + contact reassurance. Replaces the premature newsletter signup (see Sprint 7 in the roadmap). -->
+<section class="final-invitation-section section-pad" aria-label="Plan your trip" data-home-section="finalInvitation">
+  <div class="container final-invitation-inner reveal">
+    <div class="eyebrow eyebrow-dark">${escapeHtml(data.eyebrow)}</div>
+    <h2 class="final-invitation-headline">${escapeHtml(data.headline)}</h2>
+    <p class="final-invitation-body">${escapeHtml(data.body)}</p>
+    <div class="final-invitation-ctas">
+      <a href="${escapeHtml(data.cta.href)}" class="btn btn-primary">${escapeHtml(data.cta.label)}</a>
+      ${data.secondaryCta ? `<a href="${escapeHtml(data.secondaryCta.href)}" class="btn btn-ghost"${externalAttrs(data.secondaryCta)}>${escapeHtml(data.secondaryCta.label)}</a>` : ''}
+    </div>
+    <div class="final-invitation-phones">
+      <a href="tel:${escapeHtml(data.phone.replace(/\s+/g, ''))}">${escapeHtml(data.phone)}</a>
+      <span aria-hidden="true">·</span>
+      <a href="tel:${escapeHtml(data.internationalPhone.replace(/\s+/g, ''))}">${escapeHtml(data.internationalPhone)} (US/International)</a>
     </div>
   </div>
 </section>`;
-  }
-
-  function renderInstagramStrip(data) {
-    return `
-<div class="instagram-strip" aria-label="Follow People and Places on Instagram" data-home-section="instagram">
-  <div class="ig-photos" aria-hidden="true">
-    ${(data.images || []).map(src => `<div class="ig-photo"><img src="${escapeHtml(src)}" alt="" width="600" height="600" loading="lazy" decoding="async" /></div>`).join('\n    ')}
-  </div>
-  <div class="ig-overlay">
-    <div class="ig-content">
-      ${renderIcon('instagram')}
-      <p class="ig-handle">${escapeHtml(data.handle)}</p>
-      <p class="ig-tagline">${escapeHtml(data.tagline)}</p>
-      <a href="${escapeHtml(data.cta.href)}" target="_blank" rel="noopener" class="btn btn-primary ig-follow-btn">${escapeHtml(data.cta.label)}</a>
-    </div>
-  </div>
-</div>`;
   }
 
   function renderHomepage() {
@@ -263,13 +308,15 @@
 
     root.innerHTML = [
       renderHeroSection(content.hero),
-      renderToursSection(content.tours),
-      renderWhyTravelSection(content.whyTravel),
-      renderStatsSection(content.stats),
-      renderBookingStepsSection(content.bookingSteps),
-      renderTestimonialsSection(content.testimonials),
-      renderNewsletterSection(content.newsletter),
-      renderInstagramStrip(content.instagram),
+      renderFounderStorySection(content.founderStory),
+      renderWaysToExperienceSection(content.waysToExperience),
+      renderToursSection(content.availableTours),
+      renderHowHostedSection(content.howHosted),
+      renderGuestStorySection(content.guestStory),
+      renderReviewsAndTrustSection(content.reviewsAndTrust),
+      renderBookingStepsSection(content.planningProcess),
+      renderStoriesStrip(content.stories),
+      renderFinalInvitationSection(content.finalInvitation),
     ].join('\n');
   }
 
