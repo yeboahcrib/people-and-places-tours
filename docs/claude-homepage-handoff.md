@@ -1,5 +1,12 @@
 # Claude Code Homepage Handoff
 
+> **Status: Superseded — do not use for implementation.** This document
+> describes an older homepage structure and conversion direction. It is kept
+> only as historical repository context. A new Claude Code handoff must be
+> created after the Sprint 0 strategy is approved and Codex completes the
+> content and CMS architecture defined in
+> `docs/people-and-places-prioritized-roadmap.md`.
+
 ## Current Homepage Architecture
 
 This is a static HTML/CSS/JavaScript site. There is no React/Vue/build step.
