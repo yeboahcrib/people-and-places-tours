@@ -3425,7 +3425,21 @@ body.page-entering {
 }
 .ui-v2 .pathways-section .eyebrow,
 .ui-v2 .pathways-section .pathway-count { color: var(--pap-forest); }
-.ui-v2 .pathways-section .section-sub { color: rgba(26,26,26,0.75); }
+.ui-v2 .pathways-section .section-split {
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
+  gap: clamp(2.5rem, 5vw, 5rem);
+}
+.ui-v2 .pathways-section .section-title {
+  max-width: none;
+  font-size: clamp(2.7rem, 4.15vw, 4rem);
+  white-space: nowrap;
+}
+.ui-v2 .pathways-section .section-sub {
+  max-width: 46ch;
+  color: rgba(26,26,26,0.82);
+  font-size: 1.075rem;
+  line-height: 1.75;
+}
 .ui-v2 .pathways-grid {
   grid-template-columns: repeat(12, 1fr);
   align-items: start;
@@ -3434,20 +3448,35 @@ body.page-entering {
 .ui-v2 .pathway-card {
   grid-column: span 4;
   background: var(--pap-cream);
-  border: 2px solid var(--pap-charcoal);
-  border-radius: 34px 34px 16px 34px;
-  box-shadow: 8px 9px 0 rgba(18, 63, 53, 0.88);
+  border: 1px solid rgba(18,63,53,0.28);
+  border-radius: 22px;
+  box-shadow: 0 16px 34px rgba(18,63,53,0.12);
 }
 .ui-v2 .pathway-card:nth-child(2),
-.ui-v2 .pathway-card:nth-child(4) { transform: translateY(2.5rem) rotate(1deg); }
-.ui-v2 .pathway-card:nth-child(3) { transform: rotate(-1deg); }
+.ui-v2 .pathway-card:nth-child(4) { transform: none; }
+.ui-v2 .pathway-card:nth-child(3) { transform: none; }
 .ui-v2 .pathway-card:nth-child(4),
 .ui-v2 .pathway-card:nth-child(5) { grid-column: span 6; }
-.ui-v2 .pathway-card:hover { transform: translateY(-7px) rotate(0); box-shadow: 12px 14px 0 var(--pap-forest); }
+.ui-v2 .pathway-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(18,63,53,0.48);
+  box-shadow: 0 22px 42px rgba(18,63,53,0.17);
+}
 .ui-v2 .pathway-card:nth-child(2):hover,
-.ui-v2 .pathway-card:nth-child(4):hover { transform: translateY(1.8rem) rotate(0); }
+.ui-v2 .pathway-card:nth-child(4):hover { transform: translateY(-4px); }
 .ui-v2 .pathway-card-img { aspect-ratio: 5 / 3; }
-.ui-v2 .pathways-cta { background: var(--pap-forest); color: var(--white); border-color: var(--pap-forest); }
+.ui-v2 .pathway-card-body { padding: 1.65rem 1.65rem 1.9rem; }
+.ui-v2 .pathway-text {
+  color: #3f4644;
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+.ui-v2 .pathways-cta {
+  margin-top: 4.5rem;
+  background: var(--pap-forest);
+  color: var(--white);
+  border-color: var(--pap-forest);
+}
 
 .ui-v2 .trips-section {
   background-color: var(--pap-cream);
@@ -3502,6 +3531,8 @@ body.page-entering {
 
 @media (max-width: 900px) {
   .ui-v2 .founder-story-grid { grid-template-columns: 1fr; }
+  .ui-v2 .pathways-section .section-split { grid-template-columns: 1fr; }
+  .ui-v2 .pathways-section .section-title { white-space: normal; }
   .ui-v2 .pathways-grid { grid-template-columns: repeat(2, 1fr); }
   .ui-v2 .pathway-card,
   .ui-v2 .pathway-card:nth-child(4),
