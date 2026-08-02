@@ -194,6 +194,7 @@
   <div class="container guest-story-card reveal">
     <div class="eyebrow">${escapeHtml(data.eyebrow)}</div>
     <h2 class="section-title guest-story-headline">${escapeHtml(data.headline)}</h2>
+    ${data.lede ? `<p class="guest-story-lede">${escapeHtml(data.lede)}</p>` : ''}
     <blockquote class="guest-story-quote">${escapeHtml(data.body)}</blockquote>
     <div class="guest-story-author">— ${escapeHtml(data.guestName)}</div>
     ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-white">${escapeHtml(data.cta.label)}</a>` : ''}

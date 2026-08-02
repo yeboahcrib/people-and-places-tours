@@ -3669,11 +3669,11 @@ body.page-entering {
 /* ────────────────────────────────────────────────────────────── */
 .guest-story-section {
   position: relative;
-  min-height: 640px;
+  min-height: 560px;
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding: 6rem 0;
+  padding: 5.5rem 0;
 }
 .guest-story-bg {
   position: absolute;
@@ -3681,28 +3681,44 @@ body.page-entering {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 35%;
+  object-position: center 78%;
 }
+/* Text sits in a left column, so the scrim is weighted left and thins out
+   across the castle. Below 900px the copy spans the full width and the
+   gradient has to go back to vertical or the right-hand words lose contrast. */
 .guest-story-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.72) 55%, rgba(10,10,10,0.85) 100%);
+  background:
+    linear-gradient(90deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.74) 40%, rgba(10,10,10,0.18) 74%, rgba(10,10,10,0.05) 100%),
+    linear-gradient(180deg, rgba(10,10,10,0.28) 0%, rgba(10,10,10,0.34) 100%);
 }
 .guest-story-card {
   position: relative;
   z-index: 1;
-  max-width: 760px;
-  margin: 0 auto;
-  text-align: center;
+  text-align: left;
 }
 .guest-story-section .eyebrow { color: var(--yellow); }
-.guest-story-headline { color: var(--white); }
+.guest-story-headline {
+  color: var(--white);
+  max-width: 19ch;
+}
+.guest-story-lede {
+  max-width: 48ch;
+  margin: 1.25rem 0 0;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.76);
+}
 .guest-story-quote {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
   color: var(--white);
-  line-height: 1.4;
-  margin: 1.5rem 0 1.75rem;
+  line-height: 1.42;
+  max-width: 32ch;
+  margin: 1.75rem 0 1.25rem;
+  padding-left: 1.15rem;
+  border-left: 3px solid var(--yellow);
 }
 .guest-story-author {
   font-size: 0.82rem;
@@ -3711,8 +3727,18 @@ body.page-entering {
   color: var(--yellow);
   margin-bottom: 2rem;
 }
+@media (max-width: 900px) {
+  .guest-story-scrim {
+    background: linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.72) 55%, rgba(10,10,10,0.85) 100%);
+  }
+  .guest-story-bg { object-position: center 72%; }
+  .guest-story-quote { max-width: 34ch; }
+}
 @media (max-width: 600px) {
-  .guest-story-section { min-height: 560px; padding: 4.5rem 0; }
+  .guest-story-section { min-height: 480px; padding: 4rem 0; }
+  .guest-story-headline { max-width: none; }
+  .guest-story-lede { max-width: none; font-size: 0.98rem; }
+  .guest-story-quote { max-width: none; }
 }
 
 /* ────────────────────────────────────────────────────────────── */
