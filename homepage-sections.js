@@ -161,8 +161,10 @@
   <div class="container">
     <div class="why-editorial">
       <div class="why-editorial-head">
-        <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
-        <h2 class="why-editorial-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
+        <div class="why-editorial-heading-group">
+          <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
+          <h2 class="why-editorial-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
+        </div>
         <p class="why-editorial-intro reveal reveal-delay-1">${escapeHtml(data.intro)}</p>
       </div>
       <ol class="why-editorial-list">

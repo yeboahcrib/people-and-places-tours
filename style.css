@@ -3507,6 +3507,51 @@ body.page-entering {
   color: var(--white);
   border: 0;
 }
+.ui-v2 .why-editorial {
+  display: block;
+}
+.ui-v2 .why-editorial-head {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: clamp(3rem, 7vw, 7rem);
+  align-items: end;
+  margin-bottom: 3.5rem;
+}
+.ui-v2 .why-editorial-title {
+  max-width: 10ch;
+  margin-bottom: 0;
+  font-size: clamp(2.7rem, 4.6vw, 4.4rem);
+}
+.ui-v2 .why-editorial-intro {
+  max-width: 46ch;
+  margin: 0;
+  padding-bottom: 0.35rem;
+  font-size: 1.075rem;
+}
+.ui-v2 .why-editorial-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.ui-v2 .why-row,
+.ui-v2 .why-row:last-child {
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 1.35rem;
+  align-content: start;
+  padding: 2rem;
+  min-height: 100%;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 22px;
+  box-shadow: 0 18px 42px rgba(7,31,26,0.2);
+  transition: transform var(--transition), border-color var(--transition), background var(--transition);
+}
+.ui-v2 .why-row:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.075);
+  border-color: rgba(242,210,122,0.48);
+}
 .ui-v2 .why-editorial-title,
 .ui-v2 .why-row-content h3,
 .ui-v2 .principle-proof { color: var(--white); }
@@ -3519,7 +3564,14 @@ body.page-entering {
   color: var(--pap-charcoal);
   border-radius: 18px 18px 8px 18px;
 }
+.ui-v2 .why-row-content h3 { font-size: 1.35rem; }
+.ui-v2 .why-row-content p { max-width: none; }
 .ui-v2 .principle-proof { border-left-color: var(--pap-soft-gold); }
+.ui-v2 .principle-proof {
+  margin-top: 1.35rem;
+  font-size: clamp(1rem, 1.35vw, 1.18rem);
+  line-height: 1.45;
+}
 .ui-v2 .principle-proof cite { color: var(--pap-soft-gold); }
 
 .ui-v2 .process-section { background: var(--pap-cream); }
@@ -3533,12 +3585,20 @@ body.page-entering {
   .ui-v2 .founder-story-grid { grid-template-columns: 1fr; }
   .ui-v2 .pathways-section .section-split { grid-template-columns: 1fr; }
   .ui-v2 .pathways-section .section-title { white-space: normal; }
+  .ui-v2 .why-editorial-head {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
   .ui-v2 .pathways-grid { grid-template-columns: repeat(2, 1fr); }
   .ui-v2 .pathway-card,
   .ui-v2 .pathway-card:nth-child(4),
   .ui-v2 .pathway-card:nth-child(5) { grid-column: auto; }
   .ui-v2 .pathway-card:nth-child(2),
   .ui-v2 .pathway-card:nth-child(4) { transform: none; }
+}
+
+@media (max-width: 760px) {
+  .ui-v2 .why-editorial-list { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
