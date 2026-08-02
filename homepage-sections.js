@@ -100,10 +100,13 @@
     </div>
     <div class="pathways-grid">
       ${(data.pathways || []).map((p, i) => `
-      <div class="pathway-card reveal${revealClass(i)}">
-        <div class="pathway-count">${escapeHtml(p.tourCount)} ${p.tourCount === 1 ? 'tour' : 'tours'}</div>
-        <h3 class="pathway-title">${escapeHtml(p.title)}</h3>
-        <p class="pathway-text">${escapeHtml(p.text)}</p>
+      <div class="pathway-card${p.image ? ' pathway-card-media' : ''} reveal${revealClass(i)}">
+        ${p.image ? `<div class="pathway-card-img">${renderImage(p.image, 'pathway-img', 'loading="lazy"')}</div>` : ''}
+        <div class="pathway-card-body">
+          <div class="pathway-count">${escapeHtml(p.tourCount)} ${p.tourCount === 1 ? 'tour' : 'tours'}</div>
+          <h3 class="pathway-title">${escapeHtml(p.title)}</h3>
+          <p class="pathway-text">${escapeHtml(p.text)}</p>
+        </div>
       </div>`).join('')}
     </div>
     ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark pathways-cta reveal">${escapeHtml(data.cta.label)}${buttonStar}</a>` : ''}
@@ -127,8 +130,8 @@
       </a>
     </div>
 
-    <div class="trip-filters" role="tablist" aria-label="Filter tours by type">
-      ${(data.filters || []).map(filter => `<button class="trip-filter-tag${filter.active ? ' active' : ''}" data-trip-filter="${escapeHtml(filter.value)}" role="tab" aria-selected="${filter.active ? 'true' : 'false'}">${escapeHtml(filter.label)}</button>`).join('\n      ')}
+    <div class="trip-filters" role="group" aria-label="Filter tours by type">
+      ${(data.filters || []).map(filter => `<button type="button" class="trip-filter-tag${filter.active ? ' active' : ''}" data-trip-filter="${escapeHtml(filter.value)}" aria-pressed="${filter.active ? 'true' : 'false'}">${escapeHtml(filter.label)}</button>`).join('\n      ')}
     </div>
 
     <div class="trips-grid" id="trips-grid" data-tour-source="catalog"></div>
@@ -164,17 +167,18 @@
   }
 
   function renderGuestStorySection(data) {
+    const bgImage = data.image ? `<img class="guest-story-bg" src="${escapeHtml(data.image.src)}" alt="${escapeHtml(data.image.alt || '')}" loading="lazy" width="${escapeHtml(data.image.width || '')}" height="${escapeHtml(data.image.height || '')}" decoding="async" />` : '';
     return `
-<!-- Claude Code focus: One featured, real guest story — verbatim text, no rewritten quotes. -->
-<section class="guest-story-section section-pad" aria-label="Guest story" data-home-section="guestStory">
-  <div class="container">
-    <div class="guest-story-card reveal">
-      <div class="eyebrow">${escapeHtml(data.eyebrow)}</div>
-      <h2 class="section-title">${escapeHtml(data.headline)}</h2>
-      <blockquote class="guest-story-quote">${escapeHtml(data.body)}</blockquote>
-      <div class="guest-story-author">— ${escapeHtml(data.guestName)}</div>
-      ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark">${escapeHtml(data.cta.label)}</a>` : ''}
-    </div>
+<!-- Claude Code focus: One featured, real guest story — verbatim text, no rewritten quotes. Full-bleed cinematic treatment; the site's most emotionally significant real content deserves its own visual weight. -->
+<section class="guest-story-section" aria-label="Guest story" data-home-section="guestStory">
+  ${bgImage}
+  <div class="guest-story-scrim" aria-hidden="true"></div>
+  <div class="container guest-story-card reveal">
+    <div class="eyebrow">${escapeHtml(data.eyebrow)}</div>
+    <h2 class="section-title guest-story-headline">${escapeHtml(data.headline)}</h2>
+    <blockquote class="guest-story-quote">${escapeHtml(data.body)}</blockquote>
+    <div class="guest-story-author">— ${escapeHtml(data.guestName)}</div>
+    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-white">${escapeHtml(data.cta.label)}</a>` : ''}
   </div>
 </section>`;
   }
@@ -261,7 +265,7 @@
       </div>
 
       <div class="testimonials-dots" aria-label="Testimonial navigation">
-        ${(data.items || []).map((_, index) => `<button class="testimonials-dot${index === 0 ? ' active' : ''}" aria-label="Testimonial ${index + 1}"></button>`).join('\n        ')}
+        ${(data.items || []).map((_, index) => `<button type="button" class="testimonials-dot${index === 0 ? ' active' : ''}" aria-label="Show testimonial ${index + 1}" aria-pressed="${index === 0 ? 'true' : 'false'}"></button>`).join('\n        ')}
       </div>
     </div>
   </div>
@@ -302,22 +306,33 @@
 </section>`;
   }
 
+  function renderHomepageMarkup(homeContent = content) {
+    if (!homeContent) return '';
+    return [
+      renderHeroSection(homeContent.hero),
+      renderFounderStorySection(homeContent.founderStory),
+      renderWaysToExperienceSection(homeContent.waysToExperience),
+      renderToursSection(homeContent.availableTours),
+      renderHowHostedSection(homeContent.howHosted),
+      renderGuestStorySection(homeContent.guestStory),
+      renderReviewsAndTrustSection(homeContent.reviewsAndTrust),
+      renderBookingStepsSection(homeContent.planningProcess),
+      renderStoriesStrip(homeContent.stories),
+      renderFinalInvitationSection(homeContent.finalInvitation),
+    ].join('\n');
+  }
+
+  // The static build evaluates this renderer in an isolated context so the
+  // deployed homepage contains meaningful HTML before browser JavaScript runs.
+  window.PEOPLE_PLACES_RENDER_HOMEPAGE = renderHomepageMarkup;
+
   function renderHomepage() {
     const root = document.getElementById('homepage-root');
     if (!root || !content) return;
-
-    root.innerHTML = [
-      renderHeroSection(content.hero),
-      renderFounderStorySection(content.founderStory),
-      renderWaysToExperienceSection(content.waysToExperience),
-      renderToursSection(content.availableTours),
-      renderHowHostedSection(content.howHosted),
-      renderGuestStorySection(content.guestStory),
-      renderReviewsAndTrustSection(content.reviewsAndTrust),
-      renderBookingStepsSection(content.planningProcess),
-      renderStoriesStrip(content.stories),
-      renderFinalInvitationSection(content.finalInvitation),
-    ].join('\n');
+    // Cloudflare receives homepage HTML generated at build time (including
+    // Sanity content). Only the legacy GitHub Pages source has an empty root.
+    if (root.children.length) return;
+    root.innerHTML = renderHomepageMarkup(content);
   }
 
   if (document.readyState === 'loading') {

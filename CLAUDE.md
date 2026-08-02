@@ -1,6 +1,19 @@
 # People & Places Tours — Contributor Notes
 
-Static HTML/CSS/JS site. No build step, no framework. 20 HTML pages share `style.css` and `script.js`; the homepage additionally uses `homepage-content.js` + `homepage-sections.js` (data + renderer) and `tours.js` (the tour catalog used across the site).
+Static HTML/CSS/JS site with no frontend framework. A lightweight deployment
+build validates browser JavaScript and copies approved public files into
+`dist/`; it does not bundle or transform the site. 20 HTML pages share
+`style.css` and `script.js`; the homepage additionally uses
+`homepage-content.js` + `homepage-sections.js` (data + renderer) and `tours.js`
+(the tour catalog used across the site).
+
+Hosting is verified as GitHub Pages from the root of `main`; the current
+development branch is not the live source. Cloudflare Pages is the approved
+production target and Sanity is the approved editorial CMS. `npm run build`
+creates the allow-listed `dist/` output that Cloudflare will publish. GitHub
+Pages currently does not run that build or apply `_headers`. See
+`docs/hosting-and-delivery-architecture.md` before changing deployment, forms,
+headers, or CMS integration.
 
 A more detailed architecture handoff lives at `docs/claude-homepage-handoff.md`.
 

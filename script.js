@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     grid.innerHTML = homeTours.map((tour, index) => {
       const ctaUrl = tour.slug === 'just-go-ghana' ? tour.detailUrl : bookingUrl(tour.slug);
-      const ctaLabel = tour.slug === 'just-go-ghana' ? 'View Tour' : 'Book Now';
+      const ctaLabel = tour.slug === 'just-go-ghana' ? 'View Tour' : 'Request Tour';
       const tags = (tour.vibes || []).slice(0, 3).map(tag => `<span class="trip-tag">${escapeHtml(tag)}</span>`).join('');
       const badge = tour.badge ? `<div class="trip-card-badge">${escapeHtml(tour.badge.toUpperCase())}</div>` : '';
 
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="tour-card-desc">${escapeHtml(tour.packageDescription || tour.description)}</p>
             <div class="tour-card-footer">
               <div class="tour-stars" aria-label="5 stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-              <a href="${escapeHtml(bookingUrl(tour.slug))}" class="tour-card-book-btn">Book Now</a>
+              <a href="${escapeHtml(bookingUrl(tour.slug))}" class="tour-card-book-btn">Request Tour</a>
             </div>
           </div>
         </article>`;
@@ -234,6 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.querySelector('.nav-toggle');
   const mobileMenu = document.querySelector('.nav-mobile');
   if (toggle && mobileMenu) {
+    mobileMenu.id ||= 'mobile-navigation';
+    toggle.setAttribute('aria-controls', mobileMenu.id);
     toggle.addEventListener('click', () => {
       const open = mobileMenu.classList.toggle('open');
       toggle.setAttribute('aria-expanded', open);
@@ -259,11 +261,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── ACTIVE NAV LINK ── */
   const currentPage = location.pathname.split('/').pop() || 'index.html';
+  const isTourDetail = tours.some(tour => tour.detailUrl === currentPage);
   document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(link => {
     const href = link.getAttribute('href');
-    if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-      link.classList.add('active');
-    }
+    const active = href === currentPage ||
+      (currentPage === '' && href === 'index.html') ||
+      (isTourDetail && href === 'packages.html');
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
   });
 
   /* ── HERO SLIDER ── */
@@ -310,7 +316,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!testimonialsTrack) return;
     testimonialIndex = idx;
     testimonialsTrack.style.transform = `translateX(-${idx * 100}%)`;
-    testimonialDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    testimonialDots.forEach((d, i) => {
+      const active = i === idx;
+      d.classList.toggle('active', active);
+      d.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
   }
 
   if (testimonialsTrack && testimonialSlides.length > 0) {
@@ -328,9 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tripFilterTags.length > 0) {
     tripFilterTags.forEach(tag => {
       tag.addEventListener('click', () => {
-        tripFilterTags.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        tripFilterTags.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-pressed', 'false'); });
         tag.classList.add('active');
-        tag.setAttribute('aria-selected', 'true');
+        tag.setAttribute('aria-pressed', 'true');
         const filter = tag.dataset.tripFilter;
         document.querySelectorAll('.trip-card').forEach(card => {
           const cats = card.dataset.tripCats || '';
@@ -347,10 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.addEventListener('click', () => {
         filterTabs.forEach(t => {
           t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
+          t.setAttribute('aria-pressed', 'false');
         });
         tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
+        tab.setAttribute('aria-pressed', 'true');
         const filter = tab.dataset.filter;
         document.querySelectorAll('.tour-card[data-destination]').forEach(card => {
           card.style.display = (filter === 'all' || card.dataset.destination === filter) ? '' : 'none';
@@ -431,8 +441,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const item   = btn.closest('.faq-item');
       const isOpen = item.classList.contains('open');
-      item.closest('.faq-list')?.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      item.closest('.faq-list')?.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+      });
       if (!isOpen) item.classList.add('open');
+      btn.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
     });
   });
 
@@ -474,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── CONTACT FORM ── */
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
+    const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
     if (tourSelect) {
@@ -516,20 +531,36 @@ document.addEventListener('DOMContentLoaded', () => {
       const original = btn.innerHTML;
       btn.textContent = 'Sending…';
       btn.disabled = true;
-      if (usesExternalFormEndpoint(contactForm)) return;
+
+      // GitHub Pages cannot execute server code. Until Cloudflare cutover, keep
+      // the form's native FormSubmit action as a working fallback. A pages.dev
+      // preview (or explicit data-inquiry-mode="cloudflare") uses our same-origin
+      // Pages Function instead.
+      if (!useCloudflareInquiry) return;
       e.preventDefault();
 
       try {
-        const body = new URLSearchParams(new FormData(contactForm)).toString();
-        const res  = await fetch(contactForm.action || '/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+        const endpoint = contactForm.dataset.cloudflareEndpoint || '/api/inquiry';
+        const payload = Object.fromEntries(new FormData(contactForm).entries());
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json().catch(() => ({}));
         if (res.ok) {
-          btn.textContent = 'Inquiry Sent! We\'ll be in touch within 2 hours.';
+          btn.textContent = 'Inquiry sent — we\'ll be in touch soon.';
           btn.style.background = '#22c55e';
           contactForm.reset();
           setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 5000);
-        } else { throw new Error(); }
+        } else {
+          throw new Error(result.error || 'Inquiry could not be sent');
+        }
       } catch {
-        btn.textContent = 'Couldn\'t send — please try WhatsApp';
+        // Do not automatically submit to the fallback here. The function may
+        // have delivered the email even if its response was interrupted, and
+        // an automatic retry could create a duplicate inquiry.
+        btn.textContent = 'Couldn\'t confirm delivery — please use WhatsApp';
         btn.style.background = '#ef4444';
         setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 4500);
       }
@@ -543,9 +574,9 @@ document.addEventListener('DOMContentLoaded', () => {
     lb.id = 'lightbox';
     lb.innerHTML = `
       <div class="lb-backdrop"></div>
-      <button class="lb-close" aria-label="Close">&times;</button>
-      <button class="lb-prev" aria-label="Previous">&#8592;</button>
-      <button class="lb-next" aria-label="Next">&#8594;</button>
+      <button type="button" class="lb-close" aria-label="Close image viewer">&times;</button>
+      <button type="button" class="lb-prev" aria-label="Previous image">&#8592;</button>
+      <button type="button" class="lb-next" aria-label="Next image">&#8594;</button>
       <div class="lb-img-wrap"><img class="lb-img" src="" alt="" decoding="async" /></div>
     `;
     Object.assign(lb.style, { position:'fixed', inset:'0', zIndex:'10000', display:'none', alignItems:'center', justifyContent:'center' });
@@ -563,13 +594,34 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(lbStyle);
     document.body.appendChild(lb);
 
-    const imgs = [...galleryItems].map(i => i.querySelector('img')?.src).filter(Boolean);
+    lb.setAttribute('role', 'dialog');
+    lb.setAttribute('aria-modal', 'true');
+    lb.setAttribute('aria-label', 'Image viewer');
+
+    const imgs = [...galleryItems].map(i => {
+      const image = i.querySelector('img');
+      return image ? {src: image.src, alt: image.alt || ''} : null;
+    }).filter(Boolean);
     let lbIdx = 0;
+    let lightboxTrigger = null;
 
-    function openLb(idx) { lbIdx = idx; lb.querySelector('.lb-img').src = imgs[idx]; lb.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-    function closeLb()   { lb.style.display = 'none'; document.body.style.overflow = ''; }
+    function openLb(idx, trigger = lightboxTrigger) {
+      lbIdx = idx;
+      lightboxTrigger = trigger;
+      const image = lb.querySelector('.lb-img');
+      image.src = imgs[idx].src;
+      image.alt = imgs[idx].alt;
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      lb.querySelector('.lb-close').focus();
+    }
+    function closeLb() {
+      lb.style.display = 'none';
+      document.body.style.overflow = '';
+      lightboxTrigger?.focus();
+    }
 
-    galleryItems.forEach((item, i) => item.addEventListener('click', () => openLb(i)));
+    galleryItems.forEach((item, i) => item.addEventListener('click', () => openLb(i, item)));
     lb.querySelector('.lb-close').addEventListener('click', closeLb);
     lb.querySelector('.lb-backdrop').addEventListener('click', closeLb);
     lb.querySelector('.lb-next').addEventListener('click', () => openLb((lbIdx + 1) % imgs.length));
@@ -594,26 +646,33 @@ document.addEventListener('DOMContentLoaded', () => {
      Above-the-fold elements are revealed synchronously on first paint to avoid
      the brief "stuck hidden" gap before the observer's first async callback.
      Below-the-fold elements are observed and fade in as they scroll into view. */
-  const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
 
-  function initReveals() {
-    const vh = window.innerHeight;
-    document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
-      const r = el.getBoundingClientRect();
-      const inViewport = r.top < vh && r.bottom > 0;
-      if (inViewport) {
-        el.classList.add('reveal-no-stagger', 'visible');
-      } else {
-        revealObserver.observe(el);
-      }
-    });
+    // Content is visible by default. Only opt into the hidden animation state
+    // after the observer was created successfully, so a script/API failure can
+    // never strand meaningful content at opacity: 0.
+    document.documentElement.classList.add('reveal-ready');
+
+    function initReveals() {
+      const vh = window.innerHeight;
+      document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+        const r = el.getBoundingClientRect();
+        const inViewport = r.top < vh && r.bottom > 0;
+        if (inViewport) {
+          el.classList.add('reveal-no-stagger', 'visible');
+        } else {
+          revealObserver.observe(el);
+        }
+      });
+    }
+    // Wait one frame so layout has computed before measuring positions.
+    requestAnimationFrame(() => requestAnimationFrame(initReveals));
   }
-  // Wait one frame so layout has computed before measuring positions.
-  requestAnimationFrame(() => requestAnimationFrame(initReveals));
 
   /* ── STATS COUNTER ── */
   function animateCounter(el) {

@@ -1,0 +1,25 @@
+<!-- shared: navigation -->
+<nav class="nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="{{businessName}} — Home">
+      <img src="assets/logo-footer.svg" alt="{{businessName}}" width="1510" height="640" decoding="async">
+    </a>
+
+    <ul class="nav-links" role="list">
+      <!-- shared: desktop-nav-links -->
+    </ul>
+
+    <div class="nav-cta">
+      <a href="{{primaryPhoneHref}}" class="nav-phone">{{primaryPhone}}</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button type="button" class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav-mobile" role="navigation" aria-label="Mobile navigation">
+    <!-- shared: mobile-nav-links -->
+    <a href="packages.html" class="btn btn-primary nav-mobile-cta">Book a Tour</a>
+  </div>
+</nav>

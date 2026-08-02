@@ -135,7 +135,9 @@ We share information only with the services that help us operate:
 - Your bank or Mobile Money provider (MTN, Vodafone Cash, AirtelTigo), when
   you send us a payment directly — we don't route payments through a
   separate third-party processor at this time
-- [Website hosting/CMS provider, once selected]
+- GitHub Pages (current website hosting), Cloudflare Pages (approved production
+  hosting target), and Sanity (approved editorial content management), subject
+  to the final production privacy review and actual cutover state
 - WhatsApp/Meta, if you contact us via WhatsApp — subject to their own
   privacy terms
 - Any local partners directly involved in delivering your specific tour

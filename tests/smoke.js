@@ -52,7 +52,7 @@ async function withPage(browser, path, callback) {
     const inlineSectionBackgrounds = await page.locator('.sec-img-head[style*="background-image"]').count();
     assert(inlineSectionBackgrounds === 0, `expected no inline section background images, got ${inlineSectionBackgrounds}`);
 
-    const lazySectionImages = await page.locator('.sec-img-head-media[loading="lazy"][width="1920"][height="720"]').count();
+    const lazySectionImages = await page.locator('.sec-img-head-media[loading="lazy"][width="1120"][height="1400"]').count();
     assert(lazySectionImages === 1, `expected 1 lazy section header image, got ${lazySectionImages}`);
   });
 

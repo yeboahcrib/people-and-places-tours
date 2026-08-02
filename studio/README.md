@@ -57,12 +57,16 @@ project ID and dataset to point our existing config at:
    the actual "secure CMS backend" login page, with Sanity's own
    authentication (Google login, email, etc.) and role management.
 
-## How the website reads this content
+## How the website will publish this content
 
-Per the hosting decision (GitHub Pages now, Cloudflare Pages at cutover —
-both plain static hosts), the website does **not** need a framework
-rewrite. Sanity's free CDN-cached read API can be queried directly from
-plain JavaScript:
+Per the verified hosting decision (GitHub Pages from the root of `main` now,
+Cloudflare Pages at cutover), the website does **not** need a server-rendered
+framework. The preferred production integration is to query Sanity during the
+Cloudflare build and generate static HTML into `dist/`. This keeps published
+pages available even if Sanity is temporarily unavailable and ensures essential
+content exists before browser JavaScript runs.
+
+Sanity's CDN-cached read API can be queried by the build process:
 
 ```js
 const query = encodeURIComponent(`*[_type == "tour" && active == true]`);
@@ -70,13 +74,19 @@ const url = `https://<project-id>.apicdn.sanity.io/v2024-01-01/data/query/produc
 const tours = await fetch(url).then((r) => r.json()).then((r) => r.result);
 ```
 
-This is a drop-in replacement for the hardcoded arrays in `tours.js` and
-`homepage-content.js` — same shape of data, same static hosting, just
-fetched instead of hardcoded. No build step required. Images use Sanity's
+The returned records replace the hardcoded arrays in `tours.js` and
+`homepage-content.js`, but should be rendered into the generated site rather
+than making every visitor fetch essential content directly. Cloudflare Pages
+will run `npm run build`, publish `dist/`, and later receive rebuild triggers
+from a Sanity publish webhook. Images use Sanity's
 built-in URL-based transforms for responsive/optimized delivery — e.g.
 appending `?w=800&auto=format` to any asset URL — satisfying the "image
 optimization as a first-class requirement" instruction without any
 separate image pipeline.
+
+See `../docs/hosting-and-delivery-architecture.md` for the complete transition
+and responsibility boundaries. Private inquiries, payments, and future booking
+records do not belong in Sanity.
 
 ## What's in this schema
 

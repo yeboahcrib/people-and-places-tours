@@ -110,32 +110,36 @@
           <div class="eyebrow" style="margin-bottom:12px;">Send Inquiry</div>
           <h2 style="font-family:var(--font-display);font-size:clamp(40px,5vw,64px);color:var(--white);margin-bottom:32px;line-height:1;">Plan Your<br>Ghana Journey</h2>
 
-          <form class="contact-form" name="contact" action="https://formsubmit.co/peopandplaces@gmail.com" method="POST" novalidate aria-label="Tour inquiry form">
+          <form class="contact-form" name="contact" action="https://formsubmit.co/peopandplaces@gmail.com" method="POST" novalidate aria-label="Tour inquiry form" data-inquiry-mode="fallback" data-cloudflare-endpoint="/api/inquiry">
             <input type="hidden" name="_subject" value="New tour inquiry from People & Places website">
             <input type="hidden" name="_template" value="table">
             <input type="hidden" name="_next" value="https://yeboahcrib.github.io/people-and-places-tours/thanks.html">
             <input type="hidden" name="source" value="Contact page inquiry">
             <input type="hidden" id="tour-name" name="tour-name" value="">
+            <div class="form-honeypot" aria-hidden="true">
+              <label for="company-website">Leave this field empty</label>
+              <input type="text" id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+            </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="first-name">First Name <span style="color:var(--yellow);">*</span></label>
-                <input class="form-input" type="text" id="first-name" name="first-name" placeholder="John" required autocomplete="given-name" />
+                <input class="form-input" type="text" id="first-name" name="first-name" placeholder="John" required minlength="1" maxlength="80" autocomplete="given-name" />
               </div>
               <div class="form-group">
                 <label class="form-label" for="last-name">Last Name <span style="color:var(--yellow);">*</span></label>
-                <input class="form-input" type="text" id="last-name" name="last-name" placeholder="Doe" required autocomplete="family-name" />
+                <input class="form-input" type="text" id="last-name" name="last-name" placeholder="Doe" required minlength="1" maxlength="80" autocomplete="family-name" />
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="email">Email Address <span style="color:var(--yellow);">*</span></label>
-                <input class="form-input" type="email" id="email" name="email" placeholder="john@example.com" required autocomplete="email" />
+                <input class="form-input" type="email" id="email" name="email" placeholder="john@example.com" required maxlength="254" autocomplete="email" />
               </div>
               <div class="form-group">
                 <label class="form-label" for="phone">Phone / WhatsApp</label>
-                <input class="form-input" type="tel" id="phone" name="phone" placeholder="+1 234 567 8900" autocomplete="tel" />
+                <input class="form-input" type="tel" id="phone" name="phone" placeholder="+1 234 567 8900" maxlength="40" autocomplete="tel" />
               </div>
             </div>
 
@@ -167,14 +171,16 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="country">Your Country</label>
-                <input class="form-input" type="text" id="country" name="country" placeholder="United States" autocomplete="country-name" />
+                <input class="form-input" type="text" id="country" name="country" placeholder="United States" maxlength="100" autocomplete="country-name" />
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="message">Message / Special Requests</label>
-              <textarea class="form-textarea" id="message" name="message" placeholder="Tell us about your ideal Ghana experience, any special occasions, accessibility needs, or questions you have..."></textarea>
+              <textarea class="form-textarea" id="message" name="message" maxlength="5000" placeholder="Tell us about your ideal Ghana experience, any special occasions, accessibility needs, or questions you have..."></textarea>
             </div>
+
+            <p class="form-privacy-note">We use the details you provide only to respond to this inquiry and plan your requested experience. Please do not include passport, payment, medical, or other highly sensitive information.</p>
 
             <div class="form-actions">
               <button type="submit" class="btn btn-primary form-submit-btn" style="padding:18px 48px;font-size:14px;">
@@ -382,8 +388,7 @@
       <div class="footer-bottom">
         <p class="footer-copy">&copy; 2026 <span>People &amp; Places Tours</span>. All rights reserved.</p>
         <div class="footer-legal">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms &amp; Conditions</a>
+          <span>Policies pending final review</span>
         </div>
       </div>
     </div>

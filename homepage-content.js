@@ -31,11 +31,13 @@
           title: 'Heritage & Ancestry',
           text: "Cape Coast, Elmina, Jamestown and Kumasi — the sites and stories that carry Ghana's history and its ties to the diaspora.",
           tourCount: 4,
+          image: { src: 'assets/photos/pathway-heritage-cannons.jpg', width: 900, height: 900, alt: 'Cannons along the fort ramparts overlooking the Atlantic at Cape Coast' },
         },
         {
           title: 'Food & City Life',
           text: 'Accra by day and after dark — markets, monuments, and the food that makes the city what it is.',
           tourCount: 2,
+          image: { src: 'assets/photos/pathway-food-city-jamestown.jpg', width: 675, height: 900, alt: 'Everyday street life near Jamestown, Accra' },
         },
         {
           title: 'Craft & Artisan Traditions',
@@ -46,11 +48,13 @@
           title: 'Nature & Adventure',
           text: 'Waterfalls, wildlife, beaches and lakes across the Volta Region, Shai Hills, Ada Foah and Akosombo.',
           tourCount: 6,
+          image: { src: 'assets/photos/pathway-nature-kakum.jpg', width: 720, height: 900, alt: 'Guests on the Kakum National Park canopy walkway' },
         },
         {
           title: 'Tailored Multi-Day Journeys',
           text: 'The full Ghana story in one guided trip, built around what you actually want to see.',
           tourCount: 1,
+          image: { src: 'assets/photos/pathway-multiday-group.jpg', width: 675, height: 900, alt: 'A guest group celebrating together after a multi-day Ghana trip' },
         },
       ],
       cta: { label: 'Explore all tours', href: 'packages.html' },
@@ -108,6 +112,7 @@
       headline: 'A Family Homecoming At Cape Coast',
       body: 'A family visit to the Assin Manso Slave River Site and Cape Coast Castle, guided by Kojo — a moment of reflection, prayer and remembrance, followed by a family wreath-laying at the castle. "This was not just a tour — it was emotional, educational, spiritual, and incredibly meaningful for all of us... If you are looking for a company who is thoughtful, organized, culturally grounded, and truly invested in your experience, People & Places Tours is the one to book."',
       guestName: 'Cynthia Muldrow',
+      image: { src: 'assets/photos/guest-story-cape-coast-castle.jpg', width: 1050, height: 1400, alt: 'Cape Coast Castle, viewed from the stone steps leading up to its weathered walls' },
       cta: { label: 'View This Tour', href: 'cape-coast-tour.html' },
     },
     reviewsAndTrust: {
@@ -115,9 +120,10 @@
       titleLines: ['What Our', 'Travellers Say'],
       intro: "Don't take our word for it. Here's what people who've actually done the trip have to say about travelling with People & Places.",
       heroImage: {
-        src: 'https://images.unsplash.com/photo-1660675133902-acd1b057f75d?auto=format&fit=crop&w=1920&q=80',
-        width: 1920,
-        height: 720,
+        src: 'assets/photos/reviews-trust-banner.jpg',
+        width: 1120,
+        height: 1400,
+        alt: 'A group of guests celebrating together at a Ghana heritage site',
       },
       trustFacts: [
         { label: 'Founded', value: 'Ghana, 2021' },
