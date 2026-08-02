@@ -158,6 +158,7 @@
 <!-- Claude Code focus: Hosting principles, each backed by a real, unedited review excerpt. -->
 <section class="why-section" aria-label="How you're hosted" data-home-section="howHosted">
   ${renderWeaveMotif('hosted')}
+  ${renderWeaveMotif('hosted-lower')}
   <div class="container">
     <div class="why-editorial">
       <div class="why-editorial-head">

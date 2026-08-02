@@ -3366,6 +3366,14 @@ body.page-entering {
   color: var(--pap-soft-gold);
   transform: rotate(12deg);
 }
+.cultural-motif--hosted-lower {
+  bottom: 1.75rem;
+  left: -3.5rem;
+  width: clamp(130px, 14vw, 210px);
+  color: var(--pap-terracotta);
+  opacity: 0.12;
+  transform: rotate(-10deg);
+}
 
 .ui-v2 .founder-story-section {
   position: relative;
@@ -3503,9 +3511,30 @@ body.page-entering {
 .ui-v2 .trip-filter-tag.active { background: var(--pap-forest); border-color: var(--pap-forest); }
 
 .ui-v2 .why-section {
-  background: var(--pap-forest);
+  background-color: var(--pap-forest);
+  background-image:
+    radial-gradient(circle at 14% 16%, rgba(242,210,122,0.13), transparent 27rem),
+    radial-gradient(circle at 86% 72%, rgba(194,85,61,0.09), transparent 30rem),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.016) 0 1px, transparent 1px 18px);
   color: var(--white);
   border: 0;
+}
+.ui-v2 .why-section::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 9px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pap-yellow) 0 44px,
+    var(--pap-terracotta) 44px 68px,
+    var(--pap-soft-gold) 68px 96px,
+    var(--pap-forest-deep) 96px 124px
+  );
+  opacity: 0.78;
 }
 .ui-v2 .why-editorial {
   display: block;
@@ -3607,6 +3636,17 @@ body.page-entering {
   .ui-v2 .founder-mini-grid { transform: none; }
   .ui-v2 .founder-mini-card:nth-child(even) { transform: none; }
   .ui-v2 .cultural-motif { width: 96px; opacity: 0.16; }
+  /* Tighten the woven colour rhythm so it still reads as a strip, not blocks. */
+  .ui-v2 .why-section::before {
+    height: 7px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--pap-yellow) 0 26px,
+      var(--pap-terracotta) 26px 40px,
+      var(--pap-soft-gold) 40px 56px,
+      var(--pap-forest-deep) 56px 72px
+    );
+  }
   .ui-v2 .nav.scrolled .nav-mobile { background: rgba(255,247,232,0.98); border-color: rgba(18,63,53,0.2); }
   .ui-v2 .nav.scrolled .nav-mobile a { color: var(--pap-forest); }
 }
