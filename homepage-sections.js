@@ -83,6 +83,7 @@
       <div class="founder-story-text">
         <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
         <h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.headline)}</h2>
+        ${data.lede ? `<p class="founder-story-lede reveal reveal-delay-1">${escapeHtml(data.lede)}</p>` : ''}
         <p class="founder-story-body reveal reveal-delay-2">${escapeHtml(data.body)}</p>
         ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark reveal reveal-delay-2">${escapeHtml(data.cta.label)}</a>` : ''}
       </div>

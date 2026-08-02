@@ -14,7 +14,8 @@
     },
     founderStory: {
       eyebrow: "Who You'll Meet",
-      headline: 'Founded By Two Ghanaians Who Kept Hearing The Same Thing',
+      headline: 'Founded By Two Ghanaians',
+      lede: 'A fuller story of home.',
       body: 'People & Places was founded in 2021 by two Ghanaians who kept hearing the same question whenever they shared images from home: "I never knew Ghana looked like this." They created People & Places to tell a fuller story — first through photography and film, and then through hosted experiences that bring guests into Ghana\'s culture, history, food, landscapes and everyday life.',
       founders: [
         { initials: 'IY', name: 'Isaac Yeboah', preferredName: 'Nana Yeboah', role: 'Co-founder & Tech Lead' },
