@@ -3185,14 +3185,6 @@ body.page-entering {
   margin: 1rem 0 1.75rem;
   max-width: 56ch;
 }
-.founder-story-lede {
-  margin-top: 1.35rem;
-  font-family: var(--font-body);
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--pap-forest);
-}
 .founder-mini-grid {
   display: flex;
   gap: 1.25rem;
@@ -3355,11 +3347,11 @@ body.page-entering {
   stroke-linejoin: round;
 }
 .cultural-motif--founder {
-  top: 5rem;
-  right: -2rem;
-  width: clamp(76px, 8vw, 120px);
+  top: 3.5rem;
+  right: -3.5rem;
+  width: clamp(150px, 15vw, 230px);
   color: var(--pap-terracotta);
-  opacity: 0.1;
+  opacity: 0.12;
   transform: none;
 }
 .cultural-motif--pathways {
@@ -3385,13 +3377,13 @@ body.page-entering {
   padding-block: clamp(6rem, 10vw, 9rem);
 }
 .ui-v2 .founder-story-grid {
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
-  gap: clamp(3rem, 7vw, 7rem);
+  grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.75fr);
+  gap: clamp(2.5rem, 5vw, 5rem);
 }
 .ui-v2 .founder-story-text .section-title {
-  max-width: 11ch;
-  font-size: clamp(2.55rem, 5vw, 4.65rem);
-  line-height: 0.98;
+  max-width: 18ch;
+  font-size: clamp(2.45rem, 4.25vw, 4rem);
+  line-height: 1.01;
 }
 .ui-v2 .founder-story-body {
   color: #3f4644;
