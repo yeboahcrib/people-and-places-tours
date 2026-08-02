@@ -34,6 +34,18 @@
   const revealClass = index => index % 3 === 1 ? ' reveal-delay-1' : index % 3 === 2 ? ' reveal-delay-2' : index % 3 === 0 && index > 0 ? ' reveal-delay-3' : '';
   const externalAttrs = item => item?.external ? ' target="_blank" rel="noopener"' : '';
 
+  // Original woven-line accent inspired by the rhythm of Ghanaian textiles.
+  // This is not presented as a named Adinkra symbol; named symbols will only
+  // be added after their form, meaning, and placement have been reviewed.
+  const renderWeaveMotif = modifier => `
+    <span class="cultural-motif cultural-motif--${escapeHtml(modifier)}" aria-hidden="true">
+      <svg viewBox="0 0 160 160" focusable="false">
+        <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z" />
+        <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z" />
+        <path d="M66 66h28v28H66z" />
+      </svg>
+    </span>`;
+
   function renderImage(image, className, extraAttrs = '') {
     if (!image?.src) return '';
     return `<img class="${escapeHtml(className)}" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || '')}" width="${escapeHtml(image.width || '')}" height="${escapeHtml(image.height || '')}" ${extraAttrs} decoding="async" />`;
@@ -65,6 +77,7 @@
     return `
 <!-- Claude Code focus: Founder story — editorial split, real founders behind neutral initials placeholders (no stock photos). -->
 <section class="founder-story-section white-lift section-pad" aria-label="Our founders" data-home-section="founderStory">
+  ${renderWeaveMotif('founder')}
   <div class="container">
     <div class="founder-story-grid">
       <div class="founder-story-text">
@@ -90,6 +103,7 @@
     return `
 <!-- Claude Code focus: Editorial tour groupings, not a rigid filter — link out to the full catalogue. -->
 <section class="pathways-section white-lift section-pad" aria-label="Ways to experience Ghana" data-home-section="waysToExperience">
+  ${renderWeaveMotif('pathways')}
   <div class="container">
     <div class="section-split" style="margin-bottom:var(--sp-8)">
       <div class="split-headline">
@@ -143,6 +157,7 @@
     return `
 <!-- Claude Code focus: Hosting principles, each backed by a real, unedited review excerpt. -->
 <section class="why-section" aria-label="How you're hosted" data-home-section="howHosted">
+  ${renderWeaveMotif('hosted')}
   <div class="container">
     <div class="why-editorial">
       <div class="why-editorial-head">

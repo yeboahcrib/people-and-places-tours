@@ -14,6 +14,13 @@
   --pap-charcoal:     #1A1A1A;
   --pap-grey:         #F5F5F7;
 
+  /* UI v2 complementary palette: extends the brand without replacing it. */
+  --pap-forest:       #123F35;
+  --pap-forest-deep:  #0B2E27;
+  --pap-terracotta:   #C2553D;
+  --pap-cream:        #FFF7E8;
+  --pap-soft-gold:    #F2D27A;
+
   /* Aliases kept for backward compatibility with existing rules */
   --yellow:        var(--pap-yellow);
   --yellow-dark:   #D9960A;
@@ -216,6 +223,7 @@ body.page-entering {
 .reveal.reveal-no-stagger { transition-delay: 0s; }
 
 @media (prefers-reduced-motion: reduce) {
+  .reveal-ready .reveal,
   .reveal { opacity: 1; transform: none; transition: none; }
 }
 
@@ -3293,6 +3301,211 @@ body.page-entering {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--yellow-dark);
+}
+
+/* ============================================================
+   HOMEPAGE UI V2 — isolated visual prototype
+   ============================================================ */
+.ui-v2 {
+  background: var(--pap-cream);
+}
+
+.ui-v2 [data-home-section] {
+  isolation: isolate;
+}
+
+/* Light floating pill appears only after the visitor has left the hero. */
+.ui-v2 .nav.scrolled .nav-inner {
+  background: rgba(255, 247, 232, 0.94);
+  border-color: rgba(18, 63, 53, 0.24);
+  box-shadow: 0 16px 42px rgba(11, 46, 39, 0.18);
+}
+.ui-v2 .nav.scrolled .nav-links a,
+.ui-v2 .nav.scrolled .nav-phone { color: var(--pap-forest); }
+.ui-v2 .nav.scrolled .nav-links a:hover { background: rgba(18, 63, 53, 0.08); }
+.ui-v2 .nav.scrolled .nav-links a.active {
+  color: var(--pap-charcoal);
+  background: var(--pap-yellow);
+}
+.ui-v2 .nav.scrolled .nav-toggle { background: rgba(18, 63, 53, 0.1); }
+.ui-v2 .nav.scrolled .nav-toggle span { background: var(--pap-forest); }
+
+/* A reusable, intentionally sparse woven-line accent. */
+.cultural-motif {
+  position: absolute;
+  z-index: -1;
+  width: clamp(100px, 12vw, 180px);
+  color: currentColor;
+  pointer-events: none;
+  opacity: 0.24;
+}
+.cultural-motif svg { display: block; width: 100%; height: auto; }
+.cultural-motif path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+.cultural-motif--founder {
+  top: 4rem;
+  right: -3rem;
+  color: var(--pap-terracotta);
+  transform: rotate(9deg);
+}
+.cultural-motif--pathways {
+  bottom: 3rem;
+  left: -3.5rem;
+  color: var(--pap-forest);
+  transform: rotate(-10deg);
+}
+.cultural-motif--hosted {
+  top: 5rem;
+  right: -2.5rem;
+  color: var(--pap-soft-gold);
+  transform: rotate(12deg);
+}
+
+.ui-v2 .founder-story-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 20%, rgba(242, 210, 122, 0.26), transparent 24rem),
+    var(--pap-cream);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  padding-block: clamp(6rem, 10vw, 9rem);
+}
+.ui-v2 .founder-story-grid { gap: clamp(3rem, 7vw, 7rem); }
+.ui-v2 .founder-story-text .section-title { max-width: 12ch; }
+.ui-v2 .founder-mini-grid { align-items: stretch; transform: rotate(1deg); }
+.ui-v2 .founder-mini-card {
+  background: rgba(255,255,255,0.86);
+  border: 2px solid var(--pap-charcoal);
+  border-radius: 38px 38px 18px 38px;
+  box-shadow: 10px 12px 0 var(--pap-soft-gold);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.ui-v2 .founder-mini-card:nth-child(even) {
+  transform: translateY(2rem) rotate(-2deg);
+  border-radius: 38px 18px 38px 38px;
+  box-shadow: 10px 12px 0 rgba(194, 85, 61, 0.34);
+}
+.ui-v2 .founder-mini-card:hover { transform: translateY(-6px) rotate(-1deg); }
+.ui-v2 .founder-mini-card:nth-child(even):hover { transform: translateY(1.5rem) rotate(0); }
+
+.ui-v2 .pathways-section {
+  position: relative;
+  overflow: hidden;
+  background: var(--pap-yellow);
+  border: 0;
+  border-radius: var(--radius-xl);
+  margin: 1rem;
+  padding-inline: max(0rem, calc((100vw - var(--container)) / 2 - 1rem));
+}
+.ui-v2 .pathways-section .eyebrow,
+.ui-v2 .pathways-section .pathway-count { color: var(--pap-forest); }
+.ui-v2 .pathways-section .section-sub { color: rgba(26,26,26,0.75); }
+.ui-v2 .pathways-grid {
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+}
+.ui-v2 .pathway-card {
+  grid-column: span 4;
+  background: var(--pap-cream);
+  border: 2px solid var(--pap-charcoal);
+  border-radius: 34px 34px 16px 34px;
+  box-shadow: 8px 9px 0 rgba(18, 63, 53, 0.88);
+}
+.ui-v2 .pathway-card:nth-child(2),
+.ui-v2 .pathway-card:nth-child(4) { transform: translateY(2.5rem) rotate(1deg); }
+.ui-v2 .pathway-card:nth-child(3) { transform: rotate(-1deg); }
+.ui-v2 .pathway-card:nth-child(4),
+.ui-v2 .pathway-card:nth-child(5) { grid-column: span 6; }
+.ui-v2 .pathway-card:hover { transform: translateY(-7px) rotate(0); box-shadow: 12px 14px 0 var(--pap-forest); }
+.ui-v2 .pathway-card:nth-child(2):hover,
+.ui-v2 .pathway-card:nth-child(4):hover { transform: translateY(1.8rem) rotate(0); }
+.ui-v2 .pathway-card-img { aspect-ratio: 5 / 3; }
+.ui-v2 .pathways-cta { background: var(--pap-forest); color: var(--white); border-color: var(--pap-forest); }
+
+.ui-v2 .trips-section {
+  background-color: var(--pap-cream);
+  background-image:
+    radial-gradient(rgba(18,63,53,0.075) 1.2px, transparent 1.2px),
+    radial-gradient(circle at 100% 0%, rgba(194,85,61,0.12), transparent 36%);
+}
+.ui-v2 .trip-card {
+  border: 2px solid var(--pap-charcoal);
+  border-radius: 30px 30px 14px 30px;
+  box-shadow: 7px 8px 0 var(--pap-soft-gold);
+}
+.ui-v2 .trip-card:nth-child(even) {
+  border-radius: 30px 14px 30px 30px;
+  box-shadow: 7px 8px 0 rgba(194,85,61,0.42);
+}
+.ui-v2 .trip-card:hover {
+  transform: translateY(-8px) rotate(-0.35deg);
+  border-color: var(--pap-charcoal);
+  box-shadow: 12px 14px 0 var(--pap-yellow);
+}
+.ui-v2 .trip-card-badge { border-radius: 999px; }
+.ui-v2 .trip-filter-tag { border-width: 2px; border-color: rgba(18,63,53,0.22); }
+.ui-v2 .trip-filter-tag.active { background: var(--pap-forest); border-color: var(--pap-forest); }
+
+.ui-v2 .why-section {
+  background: var(--pap-forest);
+  color: var(--white);
+  border: 0;
+}
+.ui-v2 .why-editorial-title,
+.ui-v2 .why-row-content h3,
+.ui-v2 .principle-proof { color: var(--white); }
+.ui-v2 .why-editorial-intro,
+.ui-v2 .why-row-content p { color: rgba(255,255,255,0.72); }
+.ui-v2 .why-row { border-top-color: rgba(255,255,255,0.16); }
+.ui-v2 .why-row:last-child { border-bottom-color: rgba(255,255,255,0.16); }
+.ui-v2 .why-row-icon {
+  background: var(--pap-yellow);
+  color: var(--pap-charcoal);
+  border-radius: 18px 18px 8px 18px;
+}
+.ui-v2 .principle-proof { border-left-color: var(--pap-soft-gold); }
+.ui-v2 .principle-proof cite { color: var(--pap-soft-gold); }
+
+.ui-v2 .process-section { background: var(--pap-cream); }
+.ui-v2 .final-invitation-section {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+@media (max-width: 900px) {
+  .ui-v2 .pathways-grid { grid-template-columns: repeat(2, 1fr); }
+  .ui-v2 .pathway-card,
+  .ui-v2 .pathway-card:nth-child(4),
+  .ui-v2 .pathway-card:nth-child(5) { grid-column: auto; }
+  .ui-v2 .pathway-card:nth-child(2),
+  .ui-v2 .pathway-card:nth-child(4) { transform: none; }
+}
+
+@media (max-width: 600px) {
+  .ui-v2 .pathways-section { margin: 0.5rem; border-radius: 28px; }
+  .ui-v2 .pathways-grid { grid-template-columns: 1fr; }
+  .ui-v2 .founder-mini-grid { transform: none; }
+  .ui-v2 .founder-mini-card:nth-child(even) { transform: none; }
+  .ui-v2 .cultural-motif { width: 96px; opacity: 0.16; }
+  .ui-v2 .nav.scrolled .nav-mobile { background: rgba(255,247,232,0.98); border-color: rgba(18,63,53,0.2); }
+  .ui-v2 .nav.scrolled .nav-mobile a { color: var(--pap-forest); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-v2 .founder-mini-grid,
+  .ui-v2 .founder-mini-card,
+  .ui-v2 .founder-mini-card:nth-child(even),
+  .ui-v2 .pathway-card,
+  .ui-v2 .pathway-card:nth-child(2),
+  .ui-v2 .pathway-card:nth-child(3),
+  .ui-v2 .pathway-card:nth-child(4),
+  .ui-v2 .trip-card { transform: none; transition: none; }
 }
 
 /* ────────────────────────────────────────────────────────────── */

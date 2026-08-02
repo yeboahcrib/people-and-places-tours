@@ -28,7 +28,9 @@ function assert(condition, message) {
 
     for (const path of pages) {
       const page = await context.newPage();
-      await page.goto(`${BASE_URL}${path}`, {waitUntil: 'domcontentloaded'});
+      // Layout and reduced-motion assertions depend on the final stylesheet,
+      // so wait for page resources rather than measuring unstyled HTML.
+      await page.goto(`${BASE_URL}${path}`, {waitUntil: 'load'});
       await page.waitForTimeout(50);
 
       const audit = await page.evaluate(() => {
@@ -61,12 +63,16 @@ function assert(condition, message) {
           criticalControls,
           h1Count: document.querySelectorAll('h1').length,
           invisibleRevealCount: [...document.querySelectorAll('.reveal')].filter(element => getComputedStyle(element).opacity === '0').length,
+          invisibleReveals: [...document.querySelectorAll('.reveal')]
+            .filter(element => getComputedStyle(element).opacity === '0')
+            .slice(0, 5)
+            .map(element => ({className: element.className, section: element.closest('[data-home-section]')?.getAttribute('data-home-section')})),
         };
       });
 
       assert(audit.documentWidth <= audit.viewportWidth + 1, `${path} overflows horizontally at ${width}px (${audit.documentWidth}px document)`);
       assert(audit.h1Count === 1, `${path} should have exactly one h1 at ${width}px, got ${audit.h1Count}`);
-      assert(audit.invisibleRevealCount === 0, `${path} hides reveal content with reduced motion at ${width}px`);
+      assert(audit.invisibleRevealCount === 0, `${path} hides reveal content with reduced motion at ${width}px: ${JSON.stringify(audit.invisibleReveals)}`);
 
       if (width <= 768) {
         assert(!audit.navLinksVisible, `${path} desktop navigation is visible at ${width}px`);
