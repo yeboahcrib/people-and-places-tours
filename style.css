@@ -1237,42 +1237,49 @@ body.page-entering {
   z-index: 1;
 }
 .testimonials-section .sec-img-head { background-color: var(--forest); }
-.testimonials-wrap { margin-top: 3rem; overflow: hidden; }
+/* Scoped to this section only — .sec-img-head is shared with other pages.
+   The shared scrim is transparent where this section's intro paragraph sits,
+   which put light grey type straight over faces and a white bag. */
+.testimonials-section .sec-img-head::before {
+  background: linear-gradient(
+    to top,
+    rgba(5,5,5,0.94) 0%,
+    rgba(5,5,5,0.82) 40%,
+    rgba(5,5,5,0.62) 70%,
+    rgba(5,5,5,0.42) 100%
+  );
+}
+.testimonials-section .sec-img-head .split-body { color: rgba(255,255,255,0.82); }
+.testimonials-body { padding-top: 3rem; padding-bottom: 4rem; }
+.testimonials-wrap { margin-top: 2.5rem; }
+/* Three reviews, three columns — a 2-up grid orphaned the third card beside
+   a column of dead space. Below 900px this becomes a real swipe rail; the
+   dots only exist there, where they have something to control. */
 .testimonials-track {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
 }
+.testimonial-slide { display: flex; }
 .testimonial-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   background: rgba(255,255,255,0.025);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
-  padding: 2.5rem 2.25rem;
+  padding: 2rem 1.75rem;
   transition: border-color var(--transition), background var(--transition);
-  overflow: hidden;
 }
 .testimonial-card:hover {
   border-color: rgba(255,184,28,0.25);
   background: rgba(255,255,255,0.04);
 }
-/* Decorative oversized opening quote-mark — lifts the first card as the lead */
-.testi-quote-mark {
-  position: absolute;
-  top: -1.5rem;
-  right: 1rem;
-  font-family: var(--font-display);
-  font-size: 8rem;
-  line-height: 1;
-  color: rgba(255,184,28,0.12);
-  pointer-events: none;
-  user-select: none;
-}
 .testimonial-card-feature {
   background: rgba(255,184,28,0.04);
   border-color: rgba(255,184,28,0.18);
 }
-.testimonial-card-feature .testi-quote-mark { color: rgba(255,184,28,0.28); font-size: 10rem; top: -2rem; }
 .testi-stars {
   display: inline-flex;
   align-items: center;
@@ -1283,14 +1290,17 @@ body.page-entering {
 .testi-stars svg { width: 14px; height: 14px; }
 .testi-quote {
   position: relative;
+  flex: 1;
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.06rem;
   color: rgba(255,255,255,.92);
-  line-height: 1.5;
+  line-height: 1.52;
   font-style: normal;
-  margin-bottom: 1.75rem;
+  margin: 0 0 1.5rem;
   letter-spacing: -0.01em;
 }
+/* One set of quote marks only — this replaces the oversized decorative glyph
+   that used to sit clipped in the card's top-right corner. */
 .testi-quote::before { content: '“'; margin-right: 0.05em; color: var(--yellow); }
 .testi-quote::after { content: '”'; margin-left: 0.05em; color: var(--yellow); }
 .testi-author {
@@ -1319,11 +1329,12 @@ body.page-entering {
   color: rgba(255,255,255,0.45);
   letter-spacing: 0.04em;
 }
+/* Hidden at grid widths where every review is already on screen. */
 .testimonials-dots {
-  display: flex;
+  display: none;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 2.5rem;
+  margin-top: 1.5rem;
 }
 .testimonials-dot {
   width: 32px;
@@ -1346,6 +1357,27 @@ body.page-entering {
 .testimonials-dot.active::after {
   background: var(--yellow);
   transform: translate(-50%, -50%) scale(1.5);
+}
+
+@media (max-width: 900px) {
+  .testimonials-track {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    /* Fixed, not minmax(0, …) — a zero min lets the tracks shrink to fit the
+       scrollport instead of overflowing it, and the rail never scrolls. */
+    grid-auto-columns: 84%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .testimonials-track::-webkit-scrollbar { display: none; }
+  .testimonial-slide { scroll-snap-align: start; }
+  .testimonials-dots { display: flex; }
+}
+@media (max-width: 600px) {
+  .testimonials-track { grid-auto-columns: 90%; }
 }
 
 /* ────────────────────────────────────────────────────────────── */
@@ -1926,7 +1958,8 @@ body.page-entering {
   .why-section .sec-img-head { padding: 4rem 0 2.5rem; }
   .process-grid { grid-template-columns: 1fr; gap: 2rem; }
   .process-grid::before { display: none; }
-  .testimonials-track { grid-template-columns: 1fr; }
+  /* .testimonials-track is a swipe rail below 900px — see the testimonials
+     block above. A 1fr override here would collapse it back to a column. */
   .about-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .trip-content-wrap { grid-template-columns: 1fr; }
@@ -3744,19 +3777,52 @@ body.page-entering {
 /* ────────────────────────────────────────────────────────────── */
 /*  HOMEPAGE — REVIEWS & TRUST facts row                          */
 /* ────────────────────────────────────────────────────────────── */
+/* Rating anchors the row; the remaining facts sit to its right so nothing has
+   to share a baseline with a value long enough to wrap. */
 .trust-facts-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-  padding-bottom: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem 3rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.25rem;
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.trust-fact { display: flex; flex-direction: column; gap: 0.3rem; text-align: center; }
+.trust-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-right: auto;
+  padding: 0.35rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+.trust-rating-value {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 4vw, 3.1rem);
+  line-height: 1;
+  color: var(--yellow);
+}
+.trust-rating-meta { display: flex; flex-direction: column; gap: 0.3rem; }
+.trust-rating .testi-stars { margin-bottom: 0; }
+.trust-rating-source {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.62);
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+}
+a.trust-rating:hover .trust-rating-source,
+a.trust-rating:focus-visible .trust-rating-source {
+  color: var(--white);
+  border-bottom-color: rgba(255,184,28,0.6);
+}
+.trust-fact { display: flex; flex-direction: column; gap: 0.3rem; }
 .trust-fact-value {
   font-family: var(--font-display);
   font-size: 1.3rem;
-  color: var(--yellow);
+  line-height: 1.2;
+  color: var(--white);
 }
 .trust-fact-label {
   font-size: 0.68rem;
@@ -3764,6 +3830,10 @@ body.page-entering {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.55);
+}
+@media (max-width: 600px) {
+  .trust-facts-row { gap: 1.5rem 2.25rem; }
+  .trust-rating { margin-right: 0; width: 100%; }
 }
 
 /* ────────────────────────────────────────────────────────────── */

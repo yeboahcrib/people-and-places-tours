@@ -305,32 +305,55 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── TESTIMONIALS SLIDER ── */
+  /* ── TESTIMONIALS RAIL ──
+     The track is a three-up grid on desktop and a scroll-snap rail below
+     900px. The dots mirror scroll position instead of driving a transform:
+     the previous version translated the grid by 100% on a timer, which slid
+     every review out of the overflow-hidden wrapper and left the section
+     blank. There is no auto-advance — the reader controls it. */
   const testimonialsTrack = document.querySelector('.testimonials-track');
-  const testimonialSlides = document.querySelectorAll('.testimonial-slide');
   const testimonialDots   = document.querySelectorAll('.testimonials-dot');
-  let testimonialIndex = 0;
-  let testimonialInterval;
 
-  function showTestimonial(idx) {
-    if (!testimonialsTrack) return;
-    testimonialIndex = idx;
-    testimonialsTrack.style.transform = `translateX(-${idx * 100}%)`;
-    testimonialDots.forEach((d, i) => {
-      const active = i === idx;
-      d.classList.toggle('active', active);
-      d.setAttribute('aria-pressed', active ? 'true' : 'false');
-    });
-  }
+  if (testimonialsTrack && testimonialDots.length > 0) {
+    const testimonialSlides = Array.from(testimonialsTrack.querySelectorAll('.testimonial-slide'));
 
-  if (testimonialsTrack && testimonialSlides.length > 0) {
-    showTestimonial(0);
-    testimonialInterval = setInterval(() => {
-      showTestimonial((testimonialIndex + 1) % testimonialSlides.length);
-    }, 6000);
+    const syncTestimonialDots = () => {
+      // Grid layout: nothing scrolls, so leave the dots (which are hidden) alone.
+      if (testimonialsTrack.scrollWidth - testimonialsTrack.clientWidth <= 1) return;
+      const trackLeft = testimonialsTrack.getBoundingClientRect().left;
+      let nearest = 0;
+      let smallest = Infinity;
+      testimonialSlides.forEach((slide, i) => {
+        const offset = Math.abs(slide.getBoundingClientRect().left - trackLeft);
+        if (offset < smallest) { smallest = offset; nearest = i; }
+      });
+      testimonialDots.forEach((dot, i) => {
+        const active = i === nearest;
+        dot.classList.toggle('active', active);
+        dot.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    };
+
+    let testimonialRaf = 0;
+    testimonialsTrack.addEventListener('scroll', () => {
+      cancelAnimationFrame(testimonialRaf);
+      testimonialRaf = requestAnimationFrame(syncTestimonialDots);
+    }, { passive: true });
+
     testimonialDots.forEach((dot, i) => {
-      dot.addEventListener('click', () => { clearInterval(testimonialInterval); showTestimonial(i); });
+      dot.addEventListener('click', () => {
+        const slide = testimonialSlides[i];
+        if (!slide) return;
+        const delta = slide.getBoundingClientRect().left - testimonialsTrack.getBoundingClientRect().left;
+        testimonialsTrack.scrollTo({
+          left: testimonialsTrack.scrollLeft + delta,
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+      });
     });
+
+    window.addEventListener('resize', syncTestimonialDots);
+    syncTestimonialDots();
   }
 
   /* ── TRIP CATEGORY FILTER (home page) ── */

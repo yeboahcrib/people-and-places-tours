@@ -130,11 +130,20 @@
         height: 1400,
         alt: 'A group of guests celebrating together at a Ghana heritage site',
       },
+      // The Google rating is the strongest signal in this section, so it is
+      // pulled out as its own anchor rather than competing as one cell in a
+      // four-up row. The founders' names moved out: they are an About fact,
+      // not review credibility, and the long value was the reason the row's
+      // labels never sat on a shared baseline.
+      ratingSummary: {
+        value: '5.0',
+        source: 'Google',
+        count: 15,
+        href: 'https://www.google.com/search?q=People+%26+Places+Tours+Ghana+reviews',
+      },
       trustFacts: [
-        { label: 'Founded', value: 'Ghana, 2021' },
-        { label: 'Founders', value: 'Isaac Yeboah & Evans Yirenkyi' },
         { label: 'Guests Hosted', value: '300+' },
-        { label: 'Google Rating', value: '5.0 (15 reviews)' },
+        { label: 'Hosting Since', value: 'Ghana, 2021' },
       ],
       items: [
         {

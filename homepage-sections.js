@@ -46,6 +46,9 @@
       </svg>
     </span>`;
 
+  const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+  const renderStars = label => `<span class="testi-stars" role="img" aria-label="${escapeHtml(label)}">${STAR_SVG.repeat(5)}</span>`;
+
   function renderImage(image, className, extraAttrs = '') {
     if (!image?.src) return '';
     return `<img class="${escapeHtml(className)}" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || '')}" width="${escapeHtml(image.width || '')}" height="${escapeHtml(image.height || '')}" ${extraAttrs} decoding="async" />`;
@@ -243,15 +246,23 @@
           <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
           <h2 class="section-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
         </div>
-        <p class="split-body reveal reveal-delay-2" style="color:rgba(255,255,255,.7)">${escapeHtml(data.intro)}</p>
+        <p class="split-body reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
       </div>
     </div>
   </div>
 
-  <div class="container" style="padding-top:3.5rem;padding-bottom:5rem;">
-    ${(data.trustFacts && data.trustFacts.length) ? `
+  <div class="container testimonials-body">
+    ${(data.ratingSummary || (data.trustFacts && data.trustFacts.length)) ? `
     <div class="trust-facts-row">
-      ${data.trustFacts.map(f => `
+      ${data.ratingSummary ? `
+      <${data.ratingSummary.href ? 'a' : 'div'} class="trust-rating"${data.ratingSummary.href ? ` href="${escapeHtml(data.ratingSummary.href)}" target="_blank" rel="noopener"` : ''}>
+        <span class="trust-rating-value">${escapeHtml(data.ratingSummary.value)}</span>
+        <span class="trust-rating-meta">
+          ${renderStars(`Rated ${data.ratingSummary.value} out of 5`)}
+          <span class="trust-rating-source">${escapeHtml(`${data.ratingSummary.count} ${data.ratingSummary.source} reviews`)}</span>
+        </span>
+      </${data.ratingSummary.href ? 'a' : 'div'}>` : ''}
+      ${(data.trustFacts || []).map(f => `
       <div class="trust-fact">
         <span class="trust-fact-value">${escapeHtml(f.value)}</span>
         <span class="trust-fact-label">${escapeHtml(f.label)}</span>
@@ -263,15 +274,8 @@
         ${(data.items || []).map((item, idx) => `
         <div class="testimonial-slide">
           <div class="testimonial-card${idx === 0 ? ' testimonial-card-feature' : ''}">
-            <span class="testi-quote-mark" aria-hidden="true">&ldquo;</span>
-            <div class="testi-stars" aria-label="5 out of 5 stars">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <p class="testi-quote">${escapeHtml(item.quote)}</p>
+            ${renderStars('Rated 5 out of 5')}
+            <blockquote class="testi-quote">${escapeHtml(item.quote)}</blockquote>
             <div class="testi-author">
               ${item.image ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.author)}" loading="lazy" width="160" height="160" decoding="async" />` : ''}
               <div>
