@@ -1,7 +1,7 @@
 const API_VERSION = '2026-08-02';
 const SECTION_KEYS = [
   'hero', 'founderStory', 'waysToExperience', 'availableTours', 'howHosted',
-  'guestStory', 'reviewsAndTrust', 'planningProcess', 'stories', 'finalInvitation',
+  'reviewsAndTrust', 'planningProcess', 'finalInvitation',
 ];
 
 const clone = value => structuredClone(value);
@@ -20,13 +20,12 @@ function applyPrimaryCopy(target, section) {
   if (eyebrow) target.eyebrow = eyebrow;
   if (headline) {
     if (sectionKey === 'howHosted' || sectionKey === 'reviewsAndTrust') target.titleLines = headline.split(/\s*\n\s*/).filter(Boolean);
-    else if (sectionKey === 'hero' || sectionKey === 'founderStory' || sectionKey === 'guestStory' || sectionKey === 'finalInvitation') target.headline = headline;
+    else if (sectionKey === 'hero' || sectionKey === 'founderStory' || sectionKey === 'finalInvitation') target.headline = headline;
     else target.title = headline;
   }
   if (body) {
     if (sectionKey === 'hero') target.sub = body;
-    else if (sectionKey === 'founderStory' || sectionKey === 'guestStory' || sectionKey === 'finalInvitation') target.body = body;
-    else if (sectionKey === 'stories') target.tagline = body;
+    else if (sectionKey === 'founderStory' || sectionKey === 'finalInvitation') target.body = body;
     else target.intro = body;
   }
   const ctas = (section.ctas || []).map(cta => safeCta(cta, sectionKey));

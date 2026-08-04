@@ -3137,72 +3137,6 @@ body.page-entering {
   .team-grid { grid-template-columns: repeat(2, 1fr); }
 }
 /* ────────────────────────────────────────────────────────────── */
-/*  INSTAGRAM STRIP                                               */
-/* ────────────────────────────────────────────────────────────── */
-.instagram-strip {
-  position: relative;
-  height: 320px;
-  overflow: hidden;
-}
-.ig-photos {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  height: 100%;
-}
-.ig-photo {
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  transition: transform 0.4s ease;
-}
-.ig-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.instagram-strip:hover .ig-photo { transform: scale(1.04); }
-.ig-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.58);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.ig-content {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-.ig-icon {
-  width: 36px; height: 36px;
-  stroke: var(--yellow);
-  margin-bottom: 0.25rem;
-}
-.ig-handle {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  color: var(--white);
-  letter-spacing: -0.01em;
-}
-.ig-tagline {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.55);
-  margin-bottom: 0.75rem;
-}
-.ig-follow-btn { padding: 0.75rem 2rem; }
-
-@media (max-width: 600px) {
-  .ig-photos { grid-template-columns: repeat(3, 1fr); }
-  .instagram-strip { height: 260px; }
-  .ig-handle { font-size: 1.25rem; }
-}
-
-/* ────────────────────────────────────────────────────────────── */
 /*  HOMEPAGE — FOUNDER STORY                                      */
 /* ────────────────────────────────────────────────────────────── */
 .founder-story-grid {
@@ -3696,85 +3630,6 @@ body.page-entering {
 }
 
 /* ────────────────────────────────────────────────────────────── */
-/*  HOMEPAGE — GUEST STORY feature (full-bleed, cinematic)        */
-/*  The site's most emotionally significant real content — given  */
-/*  its own visual weight instead of a card on a cream section.   */
-/* ────────────────────────────────────────────────────────────── */
-.guest-story-section {
-  position: relative;
-  min-height: 560px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  padding: 5.5rem 0;
-}
-.guest-story-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 78%;
-}
-/* Text sits in a left column, so the scrim is weighted left and thins out
-   across the castle. Below 900px the copy spans the full width and the
-   gradient has to go back to vertical or the right-hand words lose contrast. */
-.guest-story-scrim {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.74) 40%, rgba(10,10,10,0.18) 74%, rgba(10,10,10,0.05) 100%),
-    linear-gradient(180deg, rgba(10,10,10,0.28) 0%, rgba(10,10,10,0.34) 100%);
-}
-.guest-story-card {
-  position: relative;
-  z-index: 1;
-  text-align: left;
-}
-.guest-story-section .eyebrow { color: var(--yellow); }
-.guest-story-headline {
-  color: var(--white);
-  max-width: 19ch;
-}
-.guest-story-lede {
-  max-width: 48ch;
-  margin: 1.25rem 0 0;
-  font-size: 1.02rem;
-  line-height: 1.65;
-  color: rgba(255,255,255,0.76);
-}
-.guest-story-quote {
-  font-family: var(--font-display);
-  font-size: clamp(1.3rem, 2vw, 1.7rem);
-  color: var(--white);
-  line-height: 1.42;
-  max-width: 32ch;
-  margin: 1.75rem 0 1.25rem;
-  padding-left: 1.15rem;
-  border-left: 3px solid var(--yellow);
-}
-.guest-story-author {
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--yellow);
-  margin-bottom: 2rem;
-}
-@media (max-width: 900px) {
-  .guest-story-scrim {
-    background: linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.72) 55%, rgba(10,10,10,0.85) 100%);
-  }
-  .guest-story-bg { object-position: center 72%; }
-  .guest-story-quote { max-width: 34ch; }
-}
-@media (max-width: 600px) {
-  .guest-story-section { min-height: 480px; padding: 4rem 0; }
-  .guest-story-headline { max-width: none; }
-  .guest-story-lede { max-width: none; font-size: 0.98rem; }
-  .guest-story-quote { max-width: none; }
-}
-
-/* ────────────────────────────────────────────────────────────── */
 /*  HOMEPAGE — REVIEWS & TRUST facts row                          */
 /* ────────────────────────────────────────────────────────────── */
 /* Rating anchors the row; the remaining facts sit to its right so nothing has
@@ -3834,21 +3689,6 @@ a.trust-rating:focus-visible .trust-rating-source {
 @media (max-width: 600px) {
   .trust-facts-row { gap: 1.5rem 2.25rem; }
   .trust-rating { margin-right: 0; width: 100%; }
-}
-
-/* ────────────────────────────────────────────────────────────── */
-/*  HOMEPAGE — STORIES strip (real posts only; link-out for now)  */
-/* ────────────────────────────────────────────────────────────── */
-.stories-strip {
-  background: var(--pap-charcoal);
-  padding: 4.5rem 0;
-}
-.stories-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
 }
 
 /* ────────────────────────────────────────────────────────────── */

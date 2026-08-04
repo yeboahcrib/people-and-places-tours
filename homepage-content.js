@@ -107,19 +107,6 @@
         },
       ],
     },
-    guestStory: {
-      eyebrow: 'A Guest Story',
-      headline: 'A Family Homecoming At Cape Coast',
-      // The summary is ours; the quote is Cynthia's, verbatim. Keeping them in
-      // separate fields stops the page attributing our own words to her. The
-      // opening line of her review is already the proof quote on the first
-      // "How You're Hosted" card, so this uses the closing half instead.
-      lede: 'A family visit to the Assin Manso Slave River Site and Cape Coast Castle, guided by Kojo — a moment of reflection, prayer and remembrance, followed by a family wreath-laying at the castle.',
-      body: 'If you are looking for a company who is thoughtful, organized, culturally grounded, and truly invested in your experience, People & Places Tours is the one to book.',
-      guestName: 'Cynthia Muldrow',
-      image: { src: 'assets/photos/guest-story-cape-coast-castle.jpg', width: 1050, height: 1400, alt: 'Cape Coast Castle, viewed from the stone steps leading up to its weathered walls' },
-      cta: { label: 'View This Tour', href: 'cape-coast-tour.html' },
-    },
     reviewsAndTrust: {
       eyebrow: 'Real Reviews',
       titleLines: ['What Our', 'Travellers Say'],
@@ -193,11 +180,6 @@
           text: 'Your local guide meets you at your hotel. Transport, entry fees, every detail — sorted. You just experience Ghana.',
         },
       ],
-    },
-    stories: {
-      handle: '@peopleand.places',
-      tagline: 'Follow along for the everyday moments between the stops.',
-      cta: { label: 'Follow on Instagram', href: 'https://instagram.com/peopleand.places' },
     },
     finalInvitation: {
       eyebrow: 'Ready When You Are',

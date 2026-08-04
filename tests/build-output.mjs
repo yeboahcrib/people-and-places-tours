@@ -43,7 +43,7 @@ assert(['local', 'sanity'].includes(health.homepageContentSource));
 assert(!Number.isNaN(Date.parse(health.builtAt)), 'health.json has an invalid build time');
 
 const generatedHome = await readFile(join(outputPath, 'index.html'), 'utf8');
-assert.equal((generatedHome.match(/data-home-section=/g) || []).length, 10, 'Homepage was not statically rendered with 10 sections');
+assert.equal((generatedHome.match(/data-home-section=/g) || []).length, 8, 'Homepage was not statically rendered with 8 sections');
 assert.equal((generatedHome.match(/<article class="trip-card/g) || []).length, 4, 'Homepage was not built with 4 featured tour cards');
 const generatedPackages = await readFile(join(outputPath, 'packages.html'), 'utf8');
 assert.equal((generatedPackages.match(/<article class="tour-card/g) || []).length, 15, 'Packages page was not built with 15 tour cards');

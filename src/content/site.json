@@ -25,7 +25,8 @@
           {"label": "About Us", "href": "about.html"},
           {"label": "All Packages", "href": "packages.html"},
           {"label": "Contact Us", "href": "contact.html"},
-          {"label": "Just Go Ghana", "href": "just-go-ghana.html"}
+          {"label": "Just Go Ghana", "href": "just-go-ghana.html"},
+          {"label": "Instagram", "href": "https://instagram.com/peopleand.places"}
         ]
       },
       {

@@ -33,7 +33,7 @@ async function withPage(browser, path, callback) {
     assert(homepageContentLoaded, 'homepage content data did not load');
 
     const renderedSections = await page.locator('#homepage-root [data-home-section]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-home-section')));
-    const expectedSections = ['hero', 'founderStory', 'waysToExperience', 'availableTours', 'howHosted', 'guestStory', 'reviewsAndTrust', 'planningProcess', 'stories', 'finalInvitation'];
+    const expectedSections = ['hero', 'founderStory', 'waysToExperience', 'availableTours', 'howHosted', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
     assert(renderedSections.join('|') === expectedSections.join('|'), `unexpected homepage section order: ${renderedSections.join(', ')}`);
 
     const cards = await page.locator('.trip-card').count();
@@ -46,8 +46,8 @@ async function withPage(browser, path, callback) {
     assert(await firstCardImage.getAttribute('height') === '560', 'homepage tour card image is missing height');
     assert(await firstCardImage.getAttribute('decoding') === 'async', 'homepage tour card image is missing async decoding');
 
-    const storiesLink = await page.locator('.stories-strip .ig-follow-btn').count();
-    assert(storiesLink === 1, `expected the Instagram follow-out link in the stories strip, got ${storiesLink}`);
+    const instagramFooterLink = await page.locator('footer a[href="https://instagram.com/peopleand.places"]').count();
+    assert(instagramFooterLink >= 1, `expected an Instagram link in the footer, got ${instagramFooterLink}`);
 
     const inlineSectionBackgrounds = await page.locator('.sec-img-head[style*="background-image"]').count();
     assert(inlineSectionBackgrounds === 0, `expected no inline section background images, got ${inlineSectionBackgrounds}`);
