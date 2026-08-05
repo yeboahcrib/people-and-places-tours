@@ -27,6 +27,31 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* Keep the cinematic hero efficient and respectful of motion preferences.
+     The background video stops whenever it is offscreen or the tab is hidden. */
+  const homepageHeroVideo = document.querySelector('.v-hero-video');
+  if (homepageHeroVideo) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let heroVideoInView = true;
+    const syncHeroVideo = () => {
+      if (prefersReducedMotion || document.hidden || !heroVideoInView) {
+        homepageHeroVideo.pause();
+      } else {
+        homepageHeroVideo.play().catch(() => {});
+      }
+    };
+    if (prefersReducedMotion) homepageHeroVideo.removeAttribute('autoplay');
+    if ('IntersectionObserver' in window) {
+      const heroVideoObserver = new IntersectionObserver(entries => {
+        heroVideoInView = entries.some(entry => entry.isIntersecting);
+        syncHeroVideo();
+      }, {threshold: 0.05});
+      heroVideoObserver.observe(homepageHeroVideo);
+    }
+    document.addEventListener('visibilitychange', syncHeroVideo);
+    syncHeroVideo();
+  }
+
   const usesExternalFormEndpoint = form => {
     try {
       return new URL(form.action).hostname === 'formsubmit.co';
@@ -149,37 +174,22 @@ document.addEventListener('DOMContentLoaded', () => {
   renderContactTourOptions();
   hydrateTourDetailFromCatalog();
 
-  /* ── NAV: hide on scroll-down, show on scroll-up ──
-     - Always visible near the top of the page.
-     - Hides when scrolling down past a threshold; reappears on scroll-up.
-     - rAF-throttled to avoid running the read/compare on every scroll event;
-     - Small delta threshold (~6px) so trackpad jitter doesn't trigger toggles.
-     - Keeps the legacy .scrolled class in sync for any future scroll-state styling. */
+  /* ── NAV: light, compact state after the hero ──
+     One passive, rAF-throttled listener updates only when the threshold state
+     changes. The nav stays visible so its glass-to-white transition can read. */
   const nav = document.querySelector('.nav');
   if (nav) {
-    const HIDE_AFTER = 80;       // only start hiding after this many px from top
-    const SCROLL_DELTA = 6;      // ignore micro-movements smaller than this
-    let lastY = window.scrollY;
+    const SCROLL_THRESHOLD = 90;
     let ticking = false;
+    let compact = window.scrollY >= SCROLL_THRESHOLD;
 
     const update = () => {
-      const y = window.scrollY;
-      const delta = y - lastY;
-      if (Math.abs(delta) < SCROLL_DELTA) { ticking = false; return; }
-
-      if (y <= HIDE_AFTER) {
-        // Near the top: always visible
-        nav.classList.remove('nav--hidden');
-      } else if (delta > 0) {
-        // Scrolling down past the threshold
-        nav.classList.add('nav--hidden');
-      } else {
-        // Scrolling up
-        nav.classList.remove('nav--hidden');
+      const nextCompact = window.scrollY >= SCROLL_THRESHOLD;
+      if (nextCompact !== compact) {
+        compact = nextCompact;
+        nav.classList.toggle('scrolled', compact);
+        window.setTimeout(() => window.dispatchEvent(new Event('navstatechange')), 310);
       }
-
-      nav.classList.toggle('scrolled', y > 50);
-      lastY = y;
       ticking = false;
     };
 
@@ -191,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
 
     // Initial state
-    nav.classList.toggle('scrolled', window.scrollY > 50);
+    nav.classList.toggle('scrolled', compact);
   }
 
   /* ── MOBILE MENU ── */
@@ -223,18 +233,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── ACTIVE NAV LINK ── */
+  /* ── ACTIVE NAV LINK + HOMEPAGE STORY POSITION ── */
   const currentPage = location.pathname.split('/').pop() || 'index.html';
   const isTourDetail = tours.some(tour => tour.detailUrl === currentPage);
-  document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(link => {
-    const href = link.getAttribute('href');
-    const active = href === currentPage ||
-      (currentPage === '' && href === 'index.html') ||
-      (isTourDetail && href === 'packages.html');
-    link.classList.toggle('active', active);
-    if (active) link.setAttribute('aria-current', 'page');
-    else link.removeAttribute('aria-current');
-  });
+  const desktopNavLinks = [...document.querySelectorAll('.nav-links a')];
+  const mobileNavLinks = [...document.querySelectorAll('.nav-mobile a:not(.btn)')];
+  const navLinks = [...desktopNavLinks, ...mobileNavLinks];
+  const navList = document.querySelector('.nav-links');
+
+  const positionActivePill = () => {
+    if (!navList) return;
+    const activeLink = desktopNavLinks.find(link => link.classList.contains('active'));
+    if (!activeLink) { navList.classList.remove('has-active-indicator'); return; }
+    const listRect = navList.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+    navList.style.setProperty('--nav-active-x', `${linkRect.left - listRect.left}px`);
+    navList.style.setProperty('--nav-active-y', `${linkRect.top - listRect.top}px`);
+    navList.style.setProperty('--nav-active-width', `${linkRect.width}px`);
+    navList.style.setProperty('--nav-active-height', `${linkRect.height}px`);
+    navList.classList.add('has-active-indicator');
+  };
+
+  const setActiveNav = (activeHref, storyPosition = false) => {
+    navLinks.forEach(link => {
+      const active = link.getAttribute('href') === activeHref;
+      link.classList.toggle('active', active);
+      if (active && !storyPosition) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    requestAnimationFrame(positionActivePill);
+  };
+
+  const pageHref = isTourDetail ? 'packages.html' : currentPage || 'index.html';
+  setActiveNav(pageHref);
+
+  const homepageSections = [...document.querySelectorAll('[data-home-section]')];
+  if ((currentPage === 'index.html' || currentPage === '') && homepageSections.length) {
+    const storyNavMap = {
+      hero: 'index.html',
+      founderStory: 'about.html',
+      waysToExperience: 'packages.html',
+      howHosted: 'packages.html',
+      reviewsAndTrust: 'packages.html',
+      planningProcess: 'contact.html',
+      finalInvitation: 'contact.html',
+    };
+    const storyObserver = new IntersectionObserver(entries => {
+      const visible = entries.find(entry => entry.isIntersecting);
+      const activeHref = visible && storyNavMap[visible.target.dataset.homeSection];
+      if (activeHref) setActiveNav(activeHref, activeHref !== 'index.html');
+    }, {rootMargin: '-34% 0px -55% 0px', threshold: 0});
+    homepageSections.forEach(section => storyObserver.observe(section));
+  }
+
+  window.addEventListener('resize', positionActivePill, {passive: true});
+  window.addEventListener('navstatechange', positionActivePill);
+  if ('ResizeObserver' in window && navList) new ResizeObserver(positionActivePill).observe(navList);
 
   /* ── HERO SLIDER ── */
   const heroSlides = document.querySelectorAll('.hero-slide');

@@ -27,6 +27,20 @@ export const homepageSection = defineType({
     defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
     defineField({name: 'headline', title: 'Headline', type: 'string'}),
     defineField({name: 'body', title: 'Body copy', type: 'text'}),
+    defineField({
+      name: 'reassurance',
+      title: 'Reassurance line',
+      type: 'string',
+      hidden: ({document}) => document?.sectionKey !== 'finalInvitation',
+      description: 'A short, low-pressure message shown beneath the final actions.',
+    }),
+    defineField({
+      name: 'trustMessage',
+      title: 'Local team trust message',
+      type: 'string',
+      hidden: ({document}) => document?.sectionKey !== 'finalInvitation',
+      description: 'Confirms who the traveler will speak with after taking action.',
+    }),
     defineField({name: 'media', title: 'Media', type: 'array', of: [{type: 'mediaAsset'}]}),
     defineField({
       name: 'founders',
@@ -63,6 +77,15 @@ export const homepageSection = defineType({
       hidden: ({document}) => document?.sectionKey !== 'reviewsAndTrust',
       validation: (Rule) => Rule.max(8),
       description: 'Select and order the verified reviews shown in the homepage carousel. Traveler country and approved media are read from each review.',
+    }),
+    defineField({
+      name: 'planningSteps',
+      title: 'Journey planning steps',
+      type: 'array',
+      of: [{type: 'reference', to: [{type: 'planningStep'}]}],
+      hidden: ({document}) => document?.sectionKey !== 'planningProcess',
+      validation: (Rule) => Rule.max(3),
+      description: 'Select the three concise steps shown near the end of the homepage. They are ordered by step number.',
     }),
     defineField({
       name: 'ctas',

@@ -1,7 +1,7 @@
 (function () {
   // Claude Code handoff: edit homepage copy, links, image URLs, and section ordering here.
   // Keep visual class names in homepage-sections.js unless you are intentionally changing CSS.
-  // Section keys match the approved 10-section homepage architecture in
+  // Section keys match the approved 7-section homepage architecture in
   // docs/homepage-messaging-brief.md / studio/schemaTypes/documents/homepageSection.ts.
   window.PEOPLE_PLACES_HOME = {
     hero: {
@@ -10,12 +10,12 @@
       },
       headline: 'The People Make the Place.',
       sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets they call home.',
-      cta: { label: 'Explore Experiences', href: 'packages.html' },
+      cta: { label: 'See Ghana With Us', href: 'packages.html' },
     },
     founderStory: {
       eyebrow: 'The Beginning of Our Story',
       headline: 'Why We Started People & Places',
-      body: 'Whenever we shared images from home, we kept hearing the same thing: “I never knew Ghana looked like this.” We realized that too many people were seeing only a small part of the place we knew and loved.\n\nSo we created People & Places to help guests experience the real Ghana — through its culture, everyday moments, and the local people who bring every place to life.',
+      body: 'Whenever we shared images from home, we kept hearing the same thing: “I never knew Ghana looked like this.” We realized that too many people were seeing only a small part of the place we knew and loved.\n\nSo we created People & Places to share more of the Ghana we know: its history, food, daily rhythms, and the people who give each place its meaning.',
       founders: [
         { initials: 'IY', name: 'Isaac Yeboah', preferredName: 'Nana Yeboah', role: 'Co-founder & Tech Lead' },
         { initials: 'EY', name: 'Evans Yirenkyi', preferredName: 'Kojo', role: 'Co-founder & Manager' },
@@ -26,11 +26,11 @@
     waysToExperience: {
       eyebrow: 'Where Ghana Begins For You',
       title: 'What Pulls You In?',
-      intro: 'Some people come looking for history. Others follow the food, the landscape, or the chance to make something with their own hands. Start with what feels closest to you — we’ll introduce you to the people and places behind it.',
+      intro: 'Some people come looking for history. Others follow the food, the landscape, or the chance to make something with their own hands. Start with what feels closest to you. We’ll introduce you to the people and places behind it.',
       pathways: [
         {
           title: 'History & Memory',
-          text: 'Cape Coast, Elmina, Jamestown, and Kumasi — places where Ghana’s history is still carried in walls, streets, and family stories.',
+          text: 'Cape Coast, Elmina, Jamestown, and Kumasi are places where Ghana’s history is still carried in walls, streets, and family stories.',
           href: 'packages.html?category=heritage',
           image: { src: 'assets/photos/pathway-heritage-cannons.jpg', width: 900, height: 900, alt: 'Cannons along the fort ramparts overlooking the Atlantic at Cape Coast' },
         },
@@ -60,7 +60,7 @@
         },
         {
           title: 'The Longer Story',
-          text: 'A few days to connect the coast, cities, food, and history — with local hosts and enough time to let Ghana unfold.',
+          text: 'Take a few days to connect the coast, cities, food, and history, with enough time to let Ghana unfold.',
           href: 'packages.html?category=multi-day',
           image: { src: 'assets/photos/pathway-multiday-group.jpg', width: 675, height: 900, alt: 'A guest group celebrating together after a multi-day Ghana trip' },
         },
@@ -70,12 +70,12 @@
     howHosted: {
       eyebrow: "How You're Hosted",
       titleLines: ['Care You Can', 'Actually Feel'],
-      intro: 'Traveling with us should feel less like following a tour and more like being welcomed in. You move through Ghana with local hosts who notice your pace, share the stories behind each place, and make room for the moments no itinerary can plan.',
+      intro: 'Traveling with us should feel less like following a tour and more like being welcomed in. Your hosts notice your pace, share the stories behind each place, and leave room for the moments no itinerary can plan.',
       principles: [
         {
           icon: 'pin',
           title: 'Places With Meaning',
-          text: 'Understand the history and human stories behind what you see — not just where to stand for a photograph.',
+          text: 'Understand the history and human stories behind what you see, not just where to stand for a photograph.',
           proofQuote: 'This was not just a tour — it was emotional, educational, spiritual, and incredibly meaningful for all of us.',
           proofAuthor: 'Cynthia Muldrow',
         },
@@ -96,7 +96,7 @@
         {
           icon: 'calendar',
           title: 'Plans That Fit Real Life',
-          text: 'We plan honestly around your time, budget, and priorities—and adjust thoughtfully when life changes.',
+          text: 'We plan honestly around your time, budget, and priorities. When life changes, we adjust with you.',
           proofQuote: 'Even with short notice, everything was handled smoothly and without any stress which honestly says a lot.',
           proofAuthor: 'Jacoya Miller',
         },
@@ -105,7 +105,7 @@
     reviewsAndTrust: {
       eyebrow: 'Real Reviews',
       titleLines: ['What Our', 'Travellers Say'],
-      intro: "Don't take our word for it. Here's what people who've actually done the trip have to say about travelling with People & Places.",
+      intro: 'The words below come from people we’ve welcomed across Ghana. They remember the care, the stories, and the people they met along the way.',
       heroImage: {
         src: 'assets/photos/reviews-trust-banner.jpg',
         width: 1120,
@@ -149,46 +149,42 @@
       ],
     },
     planningProcess: {
-      eyebrow: 'Simple Process',
-      title: 'Three Steps to Ghana',
-      intro: "From your first browse to the moment your guide meets you at the hotel — we've made the whole thing effortless.",
+      eyebrow: 'From Dream to Departure',
+      title: 'Your Journey in Three Simple Steps',
+      intro: 'Tell us what you have in mind. We’ll listen, work through the details with you, and make sure you know what to expect before you arrive.',
       steps: [
         {
           icon: 'search',
           number: '01',
-          title: 'Browse & Pick Your Tour',
-          text: 'Filter by destination or vibe — half-day city tours, beach escapes, heritage trips, or the full 8-day Ghana adventure.',
-          cta: { label: 'View all tours →', href: 'packages.html' },
+          title: 'Tell Us About Your Trip',
+          text: 'Share your travel dates, interests, and the pace that feels right for you.',
         },
         {
           icon: 'chat',
           number: '02',
-          title: 'Book in Minutes',
-          text: "WhatsApp us or fill the inquiry form — we usually reply within one hour during business hours. Multi-day tours are secured with a 30% deposit, balance due 30 days before your trip.",
-          cta: {
-            label: 'WhatsApp us →',
-            href: 'https://wa.me/233503673473?text=Hi%21+I%27d+like+to+book+a+tour.',
-            external: true,
-          },
+          title: 'We’ll Design Your Journey',
+          text: 'We’ll put together an itinerary that fits your interests, comfort, and time.',
         },
         {
           icon: 'play',
           number: '03',
-          title: 'Show Up & We Handle the Rest',
-          text: 'Your local guide meets you at your hotel. Transport, entry fees, every detail — sorted. You just experience Ghana.',
+          title: 'Experience Ghana Like a Local',
+          text: 'Arrive knowing your host is ready to welcome you and share Ghana as they know it.',
         },
       ],
     },
     finalInvitation: {
       eyebrow: 'Ready When You Are',
-      headline: "Let's Plan Your Ghana Trip",
-      body: "Tell us what you're picturing and we'll take it from there. We usually reply within one hour during business hours (Monday–Friday, 9am–5pm).",
+      headline: 'Ready to Experience Ghana Like a Local?',
+      body: 'Tell us what kind of time in Ghana feels right for you. We’ll listen, answer your questions, and plan it with you.',
       cta: { label: 'Start Planning', href: 'contact.html' },
       secondaryCta: {
-        label: 'WhatsApp Us',
+        label: 'Chat on WhatsApp',
         href: 'https://wa.me/233503673473?text=Hi%21+I%27d+like+to+book+a+tour.',
         external: true,
       },
+      reassurance: 'No pressure. No commitment. Just a conversation.',
+      trustMessage: "You'll be speaking directly with our Ghana-based team.",
       phone: '+233 50 367 3473',
       internationalPhone: '+1 803 477 6489',
     },

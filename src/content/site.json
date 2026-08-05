@@ -14,7 +14,7 @@
     "navLinks": [
       {"label": "Home", "href": "index.html"},
       {"label": "About", "href": "about.html"},
-      {"label": "Packages", "href": "packages.html"},
+      {"label": "Experiences", "href": "packages.html"},
       {"label": "Contact", "href": "contact.html"}
     ],
     "footerTagline": "Ghana-founded, Ghana-led. Hosted by people who grew up here.",

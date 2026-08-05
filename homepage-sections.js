@@ -18,7 +18,6 @@
     whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>',
   };
 
-  const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;',
@@ -28,7 +27,7 @@
     "'": '&#39;',
   }[char]));
 
-  const renderLines = lines => (lines || []).map(escapeHtml).join('<br>');
+  const renderLines = lines => (lines || []).map(escapeHtml).join('<br> ');
   const renderIcon = name => icons[name] || '';
   const revealClass = index => index % 3 === 1 ? ' reveal-delay-1' : index % 3 === 2 ? ' reveal-delay-2' : index % 3 === 0 && index > 0 ? ' reveal-delay-3' : '';
   const externalAttrs = item => item?.external ? ' target="_blank" rel="noopener"' : '';
@@ -66,7 +65,7 @@
 <!-- Claude Code focus: Hero — editorial bottom-left layout. Keep text out of the video's centre. -->
 <section class="v-hero" aria-label="Hero" data-home-section="hero">
   <div class="v-hero-video-wrap" aria-hidden="true">
-    <video class="v-hero-video" autoplay muted loop playsinline preload="auto">
+    <video class="v-hero-video" autoplay muted loop playsinline preload="metadata"${data.video.poster?.src ? ` poster="${escapeHtml(data.video.poster.src)}"` : ''}>
       <source src="${escapeHtml(data.video.src)}" type="video/mp4" />
     </video>
     <div class="v-hero-overlay"></div>
@@ -75,10 +74,7 @@
   <div class="v-hero-content">
     ${data.headline ? `<h1 class="v-hero-headline">${escapeHtml(data.headline)}</h1>` : ''}
     ${data.sub ? `<p class="v-hero-sub">${escapeHtml(data.sub)}</p>` : ''}
-    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="v-hero-cta-link">
-      <span>${escapeHtml(data.cta.label)}</span>
-      <svg class="v-hero-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </a>` : ''}
+    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="v-hero-cta-link">${escapeHtml(data.cta.label)}</a>` : ''}
   </div>
 </section>`;
   }
@@ -100,7 +96,7 @@
         ${(data.founders || []).map((f, i) => `
         <div class="founder-mini-card reveal reveal-delay-${i + 4}">
           ${f.image?.src
-            ? `<div class="founder-mini-photo">${renderImage(f.image, 'founder-mini-photo-img', 'loading="lazy"')}</div>`
+            ? `<div class="founder-mini-photo">${renderImage(f.image, 'founder-mini-photo-img', 'loading="lazy" sizes="88px"')}</div>`
             : `<div class="founder-mini-avatar" aria-hidden="true">${escapeHtml(f.initials)}</div>`}
           <div class="founder-mini-name">${escapeHtml(f.preferredName || f.name)}</div>
           <div class="founder-mini-role">${escapeHtml(f.role)}</div>
@@ -119,7 +115,7 @@
 <section class="pathways-section white-lift section-pad" aria-label="Ways to experience Ghana" data-home-section="waysToExperience">
   ${renderWeaveMotif('pathways')}
   <div class="container">
-    <div class="section-split" style="margin-bottom:var(--sp-8)">
+    <div class="section-split process-heading">
       <div class="split-headline">
         <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
         <h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.title)}</h2>
@@ -129,11 +125,10 @@
     <div class="pathways-grid">
       ${(data.pathways || []).map((p, i) => `
       <a class="pathway-card pathway-card-media reveal pathway-delay-${i + 1}" href="${escapeHtml(p.href || 'packages.html')}" aria-label="Explore ${escapeHtml(p.title)} experiences">
-        <div class="pathway-card-img">${renderImage(p.image, 'pathway-img', 'loading="lazy"')}</div>
+        <div class="pathway-card-img">${renderImage(p.image, 'pathway-img', 'loading="lazy" sizes="(min-width: 901px) 52vw, (min-width: 600px) 50vw, calc(100vw - 56px)"')}</div>
         <div class="pathway-card-body">
           <h3 class="pathway-title">${escapeHtml(p.title)}</h3>
           <p class="pathway-text">${escapeHtml(p.text)}</p>
-          <span class="pathway-arrow" aria-hidden="true">${arrowIcon}</span>
         </div>
       </a>`).join('')}
     </div>
@@ -186,16 +181,16 @@
       <p class="split-body section-sub process-sub reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
     </div>
 
-    <div class="process-grid">
+    <div class="process-grid" aria-label="Your planning journey">
       ${(data.steps || []).map((step, index) => `
-      <div class="process-step reveal${revealClass(index)}">
-        <div class="process-icon-wrap">${renderIcon(step.icon)}</div>
+      <div class="process-step reveal reveal-delay-${index * 2 + 3}">
         <div class="process-step-num">${escapeHtml(step.number)}</div>
         <div class="process-content">
           <h3>${escapeHtml(step.title)}</h3>
           <p>${escapeHtml(step.text)}</p>
         </div>
         ${step.cta ? `<a href="${escapeHtml(step.cta.href)}" class="process-step-link"${externalAttrs(step.cta)}>${escapeHtml(step.cta.label)}</a>` : ''}
+        ${index < (data.steps || []).length - 1 ? `<span class="process-connector reveal reveal-delay-${index * 2 + 4}" aria-hidden="true"></span>` : ''}
       </div>`).join('')}
     </div>
   </div>
@@ -207,7 +202,7 @@
 <!-- Claude Code focus: Review cards and section header image are isolated here. -->
 <section class="testimonials-section" aria-label="What travellers say" data-home-section="reviewsAndTrust">
   <div class="sec-img-head">
-    ${renderImage(data.heroImage, 'sec-img-head-media', 'loading="lazy"')}
+    ${renderImage(data.heroImage, 'sec-img-head-media', 'loading="lazy" sizes="100vw"')}
     <div class="container">
       <div class="section-split">
         <div class="split-headline">
@@ -246,7 +241,7 @@
             <blockquote class="testi-quote${String(item.quote || '').length > 130 ? ' is-collapsible' : ''}">${escapeHtml(item.quote)}</blockquote>
             ${String(item.quote || '').length > 130 ? '<button type="button" class="testi-read-more" aria-expanded="false">Read more</button>' : ''}
             <div class="testi-author">
-              ${item.image ? renderImage(item.image, 'testi-author-photo', 'loading="lazy"') : `<span class="testi-author-fallback" aria-hidden="true">${escapeHtml(String(item.author || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join(''))}</span>`}
+              ${item.image ? renderImage(item.image, 'testi-author-photo', 'loading="lazy" sizes="44px"') : `<span class="testi-author-fallback" aria-hidden="true">${escapeHtml(String(item.author || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join(''))}</span>`}
               <div>
                 <strong>${escapeHtml(item.author)}</strong>
                 <span>${escapeHtml(item.location)}</span>
@@ -268,15 +263,19 @@
     return `
 <!-- Claude Code focus: Closing CTA + contact reassurance. Replaces the premature newsletter signup (see Sprint 7 in the roadmap). -->
 <section class="final-invitation-section section-pad" aria-label="Plan your trip" data-home-section="finalInvitation">
-  <div class="container final-invitation-inner reveal">
-    <div class="eyebrow eyebrow-dark">${escapeHtml(data.eyebrow)}</div>
-    <h2 class="final-invitation-headline">${escapeHtml(data.headline)}</h2>
-    <p class="final-invitation-body">${escapeHtml(data.body)}</p>
+  <div class="container final-invitation-inner">
+    <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
+    <h2 class="final-invitation-headline reveal">${escapeHtml(data.headline)}</h2>
+    <p class="final-invitation-body reveal reveal-delay-1">${escapeHtml(data.body)}</p>
     <div class="final-invitation-ctas">
-      <a href="${escapeHtml(data.cta.href)}" class="btn btn-primary">${escapeHtml(data.cta.label)}</a>
-      ${data.secondaryCta ? `<a href="${escapeHtml(data.secondaryCta.href)}" class="btn btn-ghost"${externalAttrs(data.secondaryCta)}>${escapeHtml(data.secondaryCta.label)}</a>` : ''}
+      <a href="${escapeHtml(data.cta.href)}" class="btn btn-primary final-invitation-action reveal reveal-delay-2">${escapeHtml(data.cta.label)}</a>
+      ${data.secondaryCta ? `<a href="${escapeHtml(data.secondaryCta.href)}" class="btn btn-ghost final-invitation-action reveal reveal-delay-3"${externalAttrs(data.secondaryCta)}>${escapeHtml(data.secondaryCta.label)}</a>` : ''}
     </div>
-    <div class="final-invitation-phones">
+    <div class="final-invitation-reassurance reveal reveal-delay-4">
+      <p>${escapeHtml(data.reassurance || 'No pressure. No commitment. Just a conversation.')}</p>
+      <span>${escapeHtml(data.trustMessage || "You'll be speaking directly with our Ghana-based team.")}</span>
+    </div>
+    <div class="final-invitation-phones reveal reveal-delay-5">
       <a href="tel:${escapeHtml(data.phone.replace(/\s+/g, ''))}">${escapeHtml(data.phone)}</a>
       <span aria-hidden="true">·</span>
       <a href="tel:${escapeHtml(data.internationalPhone.replace(/\s+/g, ''))}">${escapeHtml(data.internationalPhone)} (US/International)</a>

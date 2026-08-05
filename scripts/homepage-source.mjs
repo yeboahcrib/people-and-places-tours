@@ -16,7 +16,7 @@ function safeCta(cta, sectionKey) {
 }
 
 function applyPrimaryCopy(target, section) {
-  const {sectionKey, eyebrow, headline, body} = section;
+  const {sectionKey, eyebrow, headline, body, reassurance, trustMessage} = section;
   if (eyebrow) target.eyebrow = eyebrow;
   if (headline) {
     if (sectionKey === 'howHosted' || sectionKey === 'reviewsAndTrust') target.titleLines = headline.split(/\s*\n\s*/).filter(Boolean);
@@ -27,6 +27,24 @@ function applyPrimaryCopy(target, section) {
     if (sectionKey === 'hero') target.sub = body;
     else if (sectionKey === 'founderStory' || sectionKey === 'finalInvitation') target.body = body;
     else target.intro = body;
+  }
+  if (sectionKey === 'finalInvitation') {
+    if (reassurance) target.reassurance = reassurance;
+    if (trustMessage) target.trustMessage = trustMessage;
+  }
+  const approvedMedia = (section.media || []).filter(media =>
+    media?.publicApprovalState === 'approved' && media?.placeholderState === 'approved'
+  );
+  if (sectionKey === 'hero' && approvedMedia.length) {
+    const video = approvedMedia.find(media => media.video);
+    const poster = approvedMedia.find(media => media.src);
+    target.video ||= {};
+    if (video) target.video.src = video.video;
+    if (poster) target.video.poster = poster;
+  }
+  if (sectionKey === 'reviewsAndTrust') {
+    const banner = approvedMedia.find(media => media.src);
+    if (banner) target.heroImage = banner;
   }
   const ctas = (section.ctas || []).map(cta => safeCta(cta, sectionKey));
   if (ctas[0]) target.cta = ctas[0];
@@ -41,13 +59,13 @@ function applyPrimaryCopy(target, section) {
         quote: founder.quote || undefined,
         initials: String(displayName || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase(),
       };
-      if (founder.photo?.src && founder.photo.publicApprovalState === 'approved') profile.image = founder.photo;
+      if (founder.photo?.src && founder.photo.publicApprovalState === 'approved' && founder.photo.placeholderState === 'approved') profile.image = founder.photo;
       return profile;
     });
   }
   if (sectionKey === 'waysToExperience' && Array.isArray(section.pathways) && section.pathways.length) {
     target.pathways = section.pathways
-      .filter(pathway => pathway?.title && pathway?.filterKey && pathway?.image?.src)
+      .filter(pathway => pathway?.title && pathway?.filterKey && pathway?.image?.src && pathway.image.publicApprovalState === 'approved' && pathway.image.placeholderState === 'approved')
       .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
       .map(pathway => ({
         title: pathway.title,
@@ -79,9 +97,23 @@ function applyPrimaryCopy(target, section) {
           rating: review.rating || 5,
           sourceUrl: review.sourceUrl || undefined,
         };
-        if (review.image?.src && review.image.publicApprovalState === 'approved') item.image = review.image;
+        if (review.image?.src && review.image.publicApprovalState === 'approved' && review.image.placeholderState === 'approved') item.image = review.image;
         return item;
       });
+  }
+  if (sectionKey === 'planningProcess' && Array.isArray(section.planningSteps) && section.planningSteps.length) {
+    const defaultIcons = ['search', 'chat', 'play'];
+    target.steps = section.planningSteps
+      .filter(step => step?.stepNumber && step?.title && step?.description)
+      .sort((a, b) => a.stepNumber - b.stepNumber)
+      .slice(0, 3)
+      .map((step, index) => ({
+        icon: defaultIcons[index],
+        number: String(step.stepNumber).padStart(2, '0'),
+        title: step.title,
+        text: step.description,
+        cta: safeCta(step.cta, sectionKey),
+      }));
   }
 }
 
@@ -117,7 +149,15 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
 
   const sectionKeyFilter = SECTION_KEYS.map(key => `"${key}"`).join(', ');
   const query = `*[_type == "homepageSection" && sectionKey in [${sectionKeyFilter}]] | order(order asc){
-    sectionKey, order, eyebrow, headline, body,
+    sectionKey, order, eyebrow, headline, body, reassurance, trustMessage,
+    "media": media[]{
+      "src": image.asset->url,
+      "video": video,
+      "alt": altText,
+      "width": image.asset->metadata.dimensions.width,
+      "height": image.asset->metadata.dimensions.height,
+      placeholderState, publicApprovalState
+    },
     "ctas": ctas[]->{label, destination, external},
     "founders": founders[]->{
       name, preferredName, role, quote,
@@ -126,7 +166,8 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
         "alt": photo.altText,
         "width": photo.image.asset->metadata.dimensions.width,
         "height": photo.image.asset->metadata.dimensions.height,
-        "publicApprovalState": photo.publicApprovalState
+        "publicApprovalState": photo.publicApprovalState,
+        "placeholderState": photo.placeholderState
       }
     },
     "pathways": pathways[]->{
@@ -135,7 +176,9 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
         "src": image.image.asset->url,
         "alt": image.altText,
         "width": image.image.asset->metadata.dimensions.width,
-        "height": image.image.asset->metadata.dimensions.height
+        "height": image.image.asset->metadata.dimensions.height,
+        "publicApprovalState": image.publicApprovalState,
+        "placeholderState": image.placeholderState
       }
     },
     "hostingPrinciples": hostingPrinciples[]->{
@@ -149,8 +192,13 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
         "alt": media[0].altText,
         "width": media[0].image.asset->metadata.dimensions.width,
         "height": media[0].image.asset->metadata.dimensions.height,
-        "publicApprovalState": media[0].publicApprovalState
+        "publicApprovalState": media[0].publicApprovalState,
+        "placeholderState": media[0].placeholderState
       }
+    },
+    "planningSteps": planningSteps[]->{
+      stepNumber, title, description,
+      "cta": cta->{label, destination, external}
     }
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
