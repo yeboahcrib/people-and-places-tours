@@ -28,25 +28,26 @@ export function renderPackageTourCards(tours) {
     .map((tour, index) => {
       const tags = (tour.vibes || []).slice(0, 2).map(tag => `<span class="tour-vibe-tag">${escapeHtml(tag)}</span>`).join('');
       const badge = tour.badge ? `<div class="tour-card-badge">${escapeHtml(tour.badge)}</div>` : '';
+      const highlight = tour.cardHighlight ? `<p class="tour-card-highlight">${escapeHtml(tour.cardHighlight)}</p>` : '';
       return `
-        <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
+        <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-categories="${escapeHtml((tour.categories || []).join(' '))}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
           <div class="tour-card-img">
             <img src="${safeImageUrl(tour.packageImage || tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="550" loading="lazy" decoding="async" sizes="${cardImageSizes}">
             ${badge}
-            <div class="tour-card-price">${escapeHtml(tour.price)} <span>${escapeHtml(tour.priceUnit || '')}</span></div>
+            <div class="tour-vibe-tags">${tags}</div>
           </div>
           <div class="tour-card-body">
-            <div class="tour-card-meta">
-              <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
-              <span class="tour-meta-item">${peopleIcon}${escapeHtml(tour.groupSize)}</span>
-              <span class="tour-meta-item">${pinIcon}${escapeHtml(tour.location)}</span>
-            </div>
-            <div class="tour-vibe-tags">${tags}</div>
             <h3 class="tour-card-title"><a href="${safeRelativeUrl(tour.detailUrl)}" class="tour-card-stretched-link">${escapeHtml(tour.title)}</a></h3>
             <p class="tour-card-desc">${escapeHtml(tour.packageDescription || tour.description)}</p>
+            <div class="tour-card-meta">
+              <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
+              <span class="tour-meta-item">${pinIcon}${escapeHtml(tour.location)}</span>
+              <span class="tour-meta-item">${peopleIcon}${escapeHtml(tour.groupSize)}</span>
+            </div>
+            ${highlight}
             <div class="tour-card-footer">
-              <div class="tour-stars" aria-label="5 out of 5 stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-              <a href="${escapeHtml(bookingUrl(tour.slug))}" class="tour-card-book-btn">Request Tour</a>
+              <div class="tour-card-price"><span>From</span>${escapeHtml(tour.price)} <small>${escapeHtml(tour.priceUnit || '')}</small></div>
+              <a href="${safeRelativeUrl(tour.detailUrl)}" class="tour-card-book-btn">View Experience</a>
             </div>
           </div>
         </article>`;

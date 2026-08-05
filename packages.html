@@ -47,7 +47,7 @@
   <section class="page-hero experiences-hero" aria-label="Explore Ghana experiences">
     <!-- CMS media slot: replace this image with an approved Sanity image or a muted, looping video using the same experience-hero-asset class. -->
     <div class="experience-hero-media" aria-hidden="true">
-      <img class="experience-hero-asset" src="https://images.unsplash.com/photo-1622487560941-7f6bd5ed24b6?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" sizes="100vw" />
+      <img class="page-hero-bg experience-hero-asset" src="https://images.unsplash.com/photo-1622487560941-7f6bd5ed24b6?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" sizes="100vw" />
     </div>
     <div class="page-hero-content container">
       <div class="breadcrumb">
@@ -68,15 +68,33 @@
   <section class="section-pad" id="experiences-list" style="background:var(--black);" aria-label="All Ghana experiences">
     <div class="container">
 
-      <!-- Filter Tabs -->
-      <div class="filter-tabs" role="group" aria-label="Filter tours by destination">
-        <button type="button" class="filter-tab active" data-filter="all" aria-pressed="true">All Tours</button>
-        <button type="button" class="filter-tab" data-filter="accra" aria-pressed="false">Accra</button>
-        <button type="button" class="filter-tab" data-filter="cape-coast" aria-pressed="false">Cape Coast</button>
-        <button type="button" class="filter-tab" data-filter="kumasi" aria-pressed="false">Kumasi</button>
-        <button type="button" class="filter-tab" data-filter="ada-foah" aria-pressed="false">Ada Foah</button>
-        <button type="button" class="filter-tab" data-filter="volta" aria-pressed="false">Volta Region</button>
-        <button type="button" class="filter-tab" data-filter="akosombo" aria-pressed="false">Akosombo</button>
+      <!-- Experience Filters -->
+      <div class="experience-filter-nav" aria-label="Explore experiences by interest or destination">
+        <p class="experience-filter-prompt">Choose what you're in the mood to experience.</p>
+
+        <div class="filter-tabs" data-filter-group="category" role="group" aria-label="Filter experiences by travel interest">
+          <button type="button" class="filter-tab active" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="filter-tab" data-filter="culture" aria-pressed="false">Culture</button>
+          <button type="button" class="filter-tab" data-filter="history" aria-pressed="false">History</button>
+          <button type="button" class="filter-tab" data-filter="food" aria-pressed="false">Food</button>
+          <button type="button" class="filter-tab" data-filter="craft" aria-pressed="false">Craft</button>
+          <button type="button" class="filter-tab" data-filter="nature" aria-pressed="false">Nature</button>
+          <button type="button" class="filter-tab" data-filter="adventure" aria-pressed="false">Adventure</button>
+          <button type="button" class="filter-tab" data-filter="multi-day" aria-pressed="false">Multi-Day</button>
+        </div>
+
+        <label class="destination-filter" for="destination-filter">
+          <span>Place</span>
+          <select id="destination-filter" data-destination-filter>
+            <option value="all">Anywhere</option>
+            <option value="accra">Accra</option>
+            <option value="cape-coast">Cape Coast</option>
+            <option value="kumasi">Kumasi</option>
+            <option value="ada-foah">Ada Foah</option>
+            <option value="volta">Volta Region</option>
+            <option value="akosombo">Akosombo</option>
+          </select>
+        </label>
       </div>
 
       <!-- Tours Grid -->

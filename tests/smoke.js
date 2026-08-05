@@ -66,11 +66,13 @@ async function withPage(browser, path, callback) {
     assert(await firstCardImage.getAttribute('height') === '550', 'package tour card image is missing height');
     assert(await firstCardImage.getAttribute('sizes') !== null, 'package tour card image is missing sizes');
 
-    await page.locator('.filter-tab[data-filter="cape-coast"]').click();
+    await page.locator('[data-destination-filter]').selectOption('cape-coast');
+    await page.waitForTimeout(250);
     const visibleCapeCoast = await page.locator('.tour-card:visible').count();
     assert(visibleCapeCoast === 2, `expected 2 visible Cape Coast tours, got ${visibleCapeCoast}`);
 
-    await page.locator('.filter-tab[data-filter="all"]').click();
+    await page.locator('[data-destination-filter]').selectOption('all');
+    await page.waitForTimeout(250);
     const visibleAll = await page.locator('.tour-card:visible').count();
     assert(visibleAll === 15, `expected 15 visible tours after reset, got ${visibleAll}`);
   });
@@ -162,7 +164,7 @@ async function expectPageHeroImage(page, label) {
   const legacyBackgrounds = await page.locator('.page-hero-bg[style*="background-image"]').count();
   assert(legacyBackgrounds === 0, `${label} still uses an inline background image`);
 
-  const heroImage = page.locator('.page-hero > img.page-hero-bg').first();
+  const heroImage = page.locator('.page-hero img.page-hero-bg').first();
   assert(await heroImage.count() === 1, `${label} image element is missing`);
   assert(await heroImage.getAttribute('width') === '1920', `${label} image is missing width`);
   assert(await heroImage.getAttribute('height') === '720', `${label} image is missing height`);

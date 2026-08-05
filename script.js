@@ -89,26 +89,27 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = packageTours.map((tour, index) => {
       const tags = (tour.vibes || []).slice(0, 2).map(tag => `<span class="tour-vibe-tag">${escapeHtml(tag)}</span>`).join('');
       const badge = tour.badge ? `<div class="tour-card-badge">${escapeHtml(tour.badge)}</div>` : '';
+      const highlight = tour.cardHighlight ? `<p class="tour-card-highlight">${escapeHtml(tour.cardHighlight)}</p>` : '';
 
       return `
         <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-categories="${escapeHtml((tour.categories || []).join(' '))}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
           <div class="tour-card-img">
             <img src="${escapeHtml(tour.packageImage || tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="550" loading="lazy" decoding="async" sizes="${cardImageSizes}" />
             ${badge}
-            <div class="tour-card-price">${escapeHtml(tour.price)} <span>${escapeHtml(tour.priceUnit || '')}</span></div>
+            <div class="tour-vibe-tags">${tags}</div>
           </div>
           <div class="tour-card-body">
-            <div class="tour-card-meta">
-              <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
-              <span class="tour-meta-item">${peopleIcon}${escapeHtml(tour.groupSize)}</span>
-              <span class="tour-meta-item">${pinIcon}${escapeHtml(tour.location)}</span>
-            </div>
-            <div class="tour-vibe-tags">${tags}</div>
             <h3 class="tour-card-title"><a href="${escapeHtml(tour.detailUrl)}" class="tour-card-stretched-link">${escapeHtml(tour.title)}</a></h3>
             <p class="tour-card-desc">${escapeHtml(tour.packageDescription || tour.description)}</p>
+            <div class="tour-card-meta">
+              <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
+              <span class="tour-meta-item">${pinIcon}${escapeHtml(tour.location)}</span>
+              <span class="tour-meta-item">${peopleIcon}${escapeHtml(tour.groupSize)}</span>
+            </div>
+            ${highlight}
             <div class="tour-card-footer">
-              <div class="tour-stars" aria-label="5 stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-              <a href="${escapeHtml(bookingUrl(tour.slug))}" class="tour-card-book-btn">Request Tour</a>
+              <div class="tour-card-price"><span>From</span>${escapeHtml(tour.price)} <small>${escapeHtml(tour.priceUnit || '')}</small></div>
+              <a href="${escapeHtml(tour.detailUrl)}" class="tour-card-book-btn">View Experience</a>
             </div>
           </div>
         </article>`;
@@ -467,32 +468,104 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(advanceCarousel);
   }
 
-  /* ── PACKAGE FILTER TABS (packages page) ── */
-  const filterTabs = document.querySelectorAll('.filter-tab');
-  if (filterTabs.length > 0) {
+  /* ── EXPERIENCE FILTERS (experiences page) ── */
+  const experienceFilterNav = document.querySelector('.experience-filter-nav');
+  if (experienceFilterNav) {
+    const grid = document.getElementById('tours-grid');
+    const cards = Array.from(grid?.querySelectorAll('.tour-card[data-categories]') || []);
+    const groups = Array.from(experienceFilterNav.querySelectorAll('[data-filter-group]'));
+    const destinationSelect = experienceFilterNav.querySelector('[data-destination-filter]');
     const queryParams = new URLSearchParams(window.location.search);
-    const requestedExperience = queryParams.get('category') || queryParams.get('experience');
-    const allowedExperiences = new Set(['heritage', 'food', 'nature', 'adventure', 'craft', 'multi-day']);
-    if (requestedExperience && allowedExperiences.has(requestedExperience)) {
-      filterTabs.forEach(tab => { tab.classList.remove('active'); tab.setAttribute('aria-pressed', 'false'); });
-      document.querySelectorAll('.tour-card[data-categories]').forEach(card => {
-        card.style.display = card.dataset.categories.split(/\s+/).includes(requestedExperience) ? '' : 'none';
+    const allowedCategories = new Set(['culture', 'history', 'heritage', 'food', 'craft', 'nature', 'adventure', 'multi-day']);
+    const allowedDestinations = new Set(['accra', 'cape-coast', 'kumasi', 'ada-foah', 'volta', 'akosombo']);
+    const categoryAliases = {
+      history: ['history', 'heritage'],
+      heritage: ['history', 'heritage'],
+    };
+    const requestedCategory = queryParams.get('category') || queryParams.get('experience');
+    const filterState = {
+      category: allowedCategories.has(requestedCategory) ? (requestedCategory === 'heritage' ? 'history' : requestedCategory) : 'all',
+      destination: allowedDestinations.has(queryParams.get('destination')) ? queryParams.get('destination') : 'all',
+    };
+    const filterReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let filterTimer;
+
+    const categoryMatches = (card, filter) => {
+      if (filter === 'all') return true;
+      const categories = card.dataset.categories.split(/\s+/);
+      return (categoryAliases[filter] || [filter]).some(category => categories.includes(category));
+    };
+
+    const setActiveButton = (group, value) => {
+      group.querySelectorAll('.filter-tab').forEach(button => {
+        const active = button.dataset.filter === value;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
       });
-    }
-    filterTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        filterTabs.forEach(t => {
-          t.classList.remove('active');
-          t.setAttribute('aria-pressed', 'false');
+    };
+
+    const syncFilterUrl = () => {
+      const nextParams = new URLSearchParams(window.location.search);
+      if (filterState.category === 'all') nextParams.delete('category');
+      else nextParams.set('category', filterState.category);
+      if (filterState.destination === 'all') nextParams.delete('destination');
+      else nextParams.set('destination', filterState.destination);
+      nextParams.delete('experience');
+      const query = nextParams.toString();
+      history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+    };
+
+    const applyFilters = (animate = true) => {
+      if (!grid) return;
+      window.clearTimeout(filterTimer);
+      grid.classList.toggle('is-filtering', animate);
+
+      const updateCards = () => {
+        let visibleIndex = 0;
+        cards.forEach(card => {
+          const matchesCategory = categoryMatches(card, filterState.category);
+          const matchesDestination = filterState.destination === 'all' || card.dataset.destination === filterState.destination;
+          const visible = matchesCategory && matchesDestination;
+          card.hidden = !visible;
+          card.classList.remove('filter-enter');
+          if (visible) {
+            card.style.setProperty('--filter-index', visibleIndex);
+            visibleIndex += 1;
+          }
         });
-        tab.classList.add('active');
-        tab.setAttribute('aria-pressed', 'true');
-        const filter = tab.dataset.filter;
-        document.querySelectorAll('.tour-card[data-destination]').forEach(card => {
-          card.style.display = (filter === 'all' || card.dataset.destination === filter) ? '' : 'none';
-        });
+        grid.classList.remove('is-filtering');
+        if (animate) {
+          requestAnimationFrame(() => cards.filter(card => !card.hidden).forEach(card => card.classList.add('filter-enter')));
+        }
+      };
+
+      if (animate && !filterReducedMotion) filterTimer = window.setTimeout(updateCards, 160);
+      else updateCards();
+    };
+
+    groups.forEach(group => {
+      const kind = group.dataset.filterGroup;
+      setActiveButton(group, filterState[kind]);
+      group.addEventListener('click', event => {
+        const button = event.target.closest('.filter-tab');
+        if (!button || button.dataset.filter === filterState[kind]) return;
+        filterState[kind] = button.dataset.filter;
+        setActiveButton(group, filterState[kind]);
+        syncFilterUrl();
+        applyFilters();
       });
     });
+
+    if (destinationSelect) {
+      destinationSelect.value = filterState.destination;
+      destinationSelect.addEventListener('change', () => {
+        filterState.destination = destinationSelect.value;
+        syncFilterUrl();
+        applyFilters();
+      });
+    }
+
+    applyFilters(false);
   }
 
   /* ── DESTINATION TABS ── */
