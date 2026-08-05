@@ -2345,8 +2345,26 @@ body.page-entering {
   line-height: 1.75;
 }
 /* Until the real photographs land, a full 3:4 portrait frame filled with two
-   letters reads as a failed image rather than a deliberate placeholder. */
-.team-founders-grid .team-photo { aspect-ratio: auto; overflow: visible; }
+   letters reads as a failed image rather than a deliberate placeholder. A card
+   that has an approved photo keeps the portrait frame; only the initials
+   fallback collapses to an avatar. */
+.team-founders-grid .team-photo:not(.has-photo) { aspect-ratio: auto; overflow: visible; }
+.team-founders-grid .team-photo.has-photo {
+  /* Two founders in a two-column grid means each frame is ~550px wide, so an
+     uncapped 3:4 portrait runs over 700px tall and swamps the section. Cap it
+     so the photographs read as portraits rather than billboards. */
+  max-width: 340px;
+  margin: 0 auto 1rem;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+.team-founders-grid .team-photo.has-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .team-founders-grid .team-photo-placeholder {
   width: 96px;
   height: 96px;

@@ -91,6 +91,64 @@ assert(rendered.includes('>AM<'), 'initials should be AM');
 // The figure is in the markup, so the page is truthful without JavaScript.
 assert(rendered.includes('data-target="42">42<'));
 
+// ── Team photos ──
+// Optional by design: photography is still in progress, so a member without an
+// approved photo must keep the initials placeholder rather than a broken frame.
+const approved = {
+  src: 'https://cdn.sanity.io/images/x/y/nana.jpg', alt: 'Nana outside the office in Accra',
+  width: 900, height: 1200, publicApprovalState: 'approved', placeholderState: 'approved',
+};
+const withPhoto = injectAboutContent(aboutHtml, {
+  ...local,
+  team: [{name: 'Isaac “Nana” Yeboah', role: 'Co-founder', bio: 'A line.', photo: approved}],
+});
+assert(withPhoto.includes('class="team-photo has-photo"'), 'approved photo should render a photo frame');
+assert(withPhoto.includes('alt="Nana outside the office in Accra"'));
+assert(withPhoto.includes('width="900"') && withPhoto.includes('height="1200"'), 'dimensions prevent layout shift');
+assert(withPhoto.includes('loading="lazy"'));
+assert(!withPhoto.includes('team-photo-placeholder'), 'initials should not also render');
+
+assert(!withPhoto.includes('team-placeholder-note'), 'photography note should retire once all photos are approved');
+
+// Mixed state: one member still without a photo means the note is still true.
+const mixed = injectAboutContent(aboutHtml, {
+  ...local,
+  team: [
+    {name: 'Isaac “Nana” Yeboah', role: 'Co-founder', bio: 'A line.', photo: approved},
+    {name: 'Evans “Kojo” Yirenkyi', role: 'Co-founder', bio: 'A line.'},
+  ],
+});
+assert(mixed.includes('team-placeholder-note'), 'note should stay while any photo is missing');
+assert(mixed.includes('team-photo-placeholder'), 'the member without a photo keeps initials');
+assert(mixed.includes('class="team-photo has-photo"'), 'the member with a photo shows it');
+
+// An image that has not cleared both approval gates must never publish.
+for (const unapproved of [
+  {...approved, publicApprovalState: 'pending'},
+  {...approved, placeholderState: 'pending'},
+  {...approved, alt: ''},
+]) {
+  const out = injectAboutContent(aboutHtml, {
+    ...local,
+    team: [{name: 'Ada Mensah', role: 'Host', bio: 'A line.', photo: unapproved}],
+  });
+  assert(out.includes('team-photo-placeholder'), 'unapproved photo must fall back to initials');
+  assert(!out.includes(approved.src), 'unapproved photo must not reach the page');
+}
+
+// A photo with no alt text fails the build rather than shipping unlabelled.
+await assert.rejects(
+  loadAboutContent({
+    localContent: local,
+    env: {SANITY_STUDIO_PROJECT_ID: 'project-123'},
+    fetchImpl: async () => new Response(JSON.stringify({result: {
+      ...local,
+      team: [{name: 'Ada', role: 'Host', bio: 'A line.', photo: {src: 'x.jpg'}}],
+    }}), {status: 200, headers: {'Content-Type': 'application/json'}}),
+  }),
+  /photo with no alt text/,
+);
+
 // Injected copy is escaped, never interpreted as markup.
 const escaped = injectAboutContent(aboutHtml, {...local, heroTitle: '<script>alert(1)</script>'});
 assert(!escaped.includes('<script>alert(1)</script>'));

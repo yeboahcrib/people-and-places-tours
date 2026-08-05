@@ -37,6 +37,11 @@ function validateAbout(about, source) {
       for (const field of fields) {
         if (!entry?.[field]) throw new Error(`${source} ${list}[${index}] is missing "${field}"`);
       }
+      // A photo is optional, but a published one needs alt text and both
+      // approval states, matching the gate the homepage already applies.
+      if (list === 'team' && entry.photo?.src) {
+        if (!entry.photo.alt) throw new Error(`${source} team[${index}] has a photo with no alt text`);
+      }
     }
   }
   return about;
@@ -62,7 +67,17 @@ export async function loadAboutContent({localContent, env = process.env, fetchIm
     ${TEXT_KEYS.join(', ')},
     storyParagraphs,
     differenceItems[]{title, text},
-    team[]{name, role, bio},
+    team[]{
+      name, role, bio,
+      "photo": {
+        "src": photo.image.asset->url,
+        "alt": photo.altText,
+        "width": photo.image.asset->metadata.dimensions.width,
+        "height": photo.image.asset->metadata.dimensions.height,
+        "publicApprovalState": photo.publicApprovalState,
+        "placeholderState": photo.placeholderState
+      }
+    },
     impactStats[]{value, label},
     faqs[]{question, answer}
   }`;

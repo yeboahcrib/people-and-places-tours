@@ -57,15 +57,31 @@ const initials = name => String(name)
   .join('')
   .toUpperCase();
 
-const renderTeam = members => members.map((member, index) => `
-        <div class="team-card team-feature reveal${index ? ' reveal-delay-1' : ''}">
-          <div class="team-photo">
+const photoApproved = photo => Boolean(
+  photo?.src && photo.alt &&
+  photo.publicApprovalState === 'approved' && photo.placeholderState === 'approved',
+);
+
+// Falls back to initials whenever there is no approved photograph, so the
+// section stays presentable while photography is still being shot and
+// an unapproved image can never reach the public site.
+const renderTeam = members => members.map((member, index) => {
+  const photo = member.photo;
+  const media = photoApproved(photo)
+    ? `<div class="team-photo has-photo">
+            <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.alt)}"${photo.width ? ` width="${escapeHtml(photo.width)}"` : ''}${photo.height ? ` height="${escapeHtml(photo.height)}"` : ''} loading="lazy" decoding="async" />
+          </div>`
+    : `<div class="team-photo">
             <div class="team-photo-placeholder" aria-hidden="true">${escapeHtml(initials(member.name))}</div>
-          </div>
+          </div>`;
+  return `
+        <div class="team-card team-feature reveal${index ? ' reveal-delay-1' : ''}">
+          ${media}
           <div class="team-name">${escapeHtml(member.name)}</div>
           <div class="team-role">${escapeHtml(member.role)}</div>
           <p class="team-bio">${escapeHtml(member.bio)}</p>
-        </div>`).join('');
+        </div>`;
+}).join('');
 
 // The figure is written into the markup, not just the counter, so the page is
 // truthful with JavaScript disabled.
@@ -103,6 +119,12 @@ export function injectAboutContent(html, about) {
   output = replaceList(output, 'data-about-story', renderStory(about.storyParagraphs), 'story');
   output = replaceList(output, 'data-about-difference', renderDifference(about.differenceItems, icons), 'difference grid');
   output = replaceList(output, 'data-about-team', renderTeam(about.team), 'team grid');
+  // The "photography in progress" note is a placeholder-state message. Once
+  // every member has an approved photo it is no longer true, so it retires
+  // itself rather than waiting for somebody to remember to delete it.
+  if (about.team.every(member => photoApproved(member.photo))) {
+    output = output.replace(/<p class="team-placeholder-note[^>]*>[\s\S]*?<\/p>/, '');
+  }
   output = replaceList(output, 'data-about-stats', renderStats(about.impactStats), 'impact stats');
   output = replaceList(output, 'data-about-faqs', renderFaqs(about.faqs), 'FAQ list');
   return output;
