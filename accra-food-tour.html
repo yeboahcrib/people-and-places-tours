@@ -37,7 +37,7 @@
     .hero-img-placeholder{width:100%;height:400px;background:linear-gradient(135deg,#2a1a0a 0%,#4a2d0a 50%,#2a1a0a 100%);border-radius:0 0 32px 32px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
     .hero-abbr{font-family:'Archivo Black',sans-serif;font-size:clamp(6rem,15vw,13rem);color:rgba(255,171,0,.07);position:absolute;right:-1rem;top:50%;transform:translateY(-50%);line-height:.85;letter-spacing:-.04em;text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:0;}
     .content-wrap{max-width:1200px;margin:0 auto;padding:4rem 2.5rem;display:grid;grid-template-columns:1fr 320px;gap:4rem;align-items:start;}
-    .section-label{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow);margin-bottom:.75rem;}
+    .section-label{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow-on-light);margin-bottom:.75rem;}
     .content-left h2{font-family:'Archivo Black',sans-serif;font-size:2rem;color:var(--dark);margin-bottom:1rem;}
     .content-left p{color:#555;line-height:1.8;font-size:1rem;margin-bottom:2rem;}
     .fun-facts{background:var(--gray);border-radius:20px;padding:1.75rem;margin-bottom:3rem;}
@@ -94,7 +94,7 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:.9rem;color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:#aaa;transition:transform .2s;flex-shrink:0;}
+    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:.875rem;line-height:1.8;}
     .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
@@ -105,6 +105,7 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 <!-- ═══════════════ NAVIGATION ═══════════════ -->
 <nav class="nav" role="navigation" aria-label="Main navigation">
   <div class="nav-inner">
@@ -133,6 +134,8 @@
     <a href="packages.html" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">Book a Tour</a>
   </nav>
 </nav>
+
+  <main id="main-content">
 
 <div class="trip-hero">
   <div class="hero-abbr" aria-hidden="true">ACCRA</div>
@@ -254,11 +257,12 @@
   </div>
 </div>
 
+  </main>
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
       <a href="index.html" aria-label="People &amp; Places Tours">
-        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo" width="615" height="615" decoding="async">
+        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo" width="615" height="615" loading="lazy" decoding="async">
       </a>
       <p>Discover Ghana, Worry Less.<br>Real experiences led by real locals, no stress.</p>
       <div class="footer-social">

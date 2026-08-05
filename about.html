@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
   <!-- ═══════════════ NAVIGATION ═══════════════ -->
   <nav class="nav" role="navigation" aria-label="Main navigation">
@@ -43,6 +44,8 @@
     </nav>
   </nav>
 
+  <main id="main-content">
+
   <!-- ═══════════════ PAGE HERO ═══════════════ -->
   <section class="page-hero" aria-label="About page hero">
     <img class="page-hero-bg" src="https://images.unsplash.com/photo-1660675133902-acd1b057f75d?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" />
@@ -52,8 +55,8 @@
         <span class="breadcrumb-sep">/</span>
         <span class="breadcrumb-current">About</span>
       </div>
-      <h1 class="page-hero-title">The People<br>Behind the Places</h1>
-      <p class="page-hero-subtitle">We grew up here. This is the Ghana we know, and the people we would want you to meet if you were visiting a friend.</p>
+      <h1 class="page-hero-title" data-about-copy="heroTitle">The People<br>Behind the Places</h1>
+      <p class="page-hero-subtitle" data-about-copy="heroSubtitle">We grew up here. This is the Ghana we know, and the people we would want you to meet if you were visiting a friend.</p>
     </div>
   </section>
 
@@ -62,11 +65,13 @@
     <div class="container">
       <div class="grid-2" style="align-items:center;gap:80px;">
         <div class="reveal">
-          <div class="eyebrow">How It Began</div>
-          <h2 class="section-title">From Passion<br>to Purpose</h2>
+          <div class="eyebrow" data-about-copy="storyEyebrow">How It Began</div>
+          <h2 class="section-title" data-about-copy="storyTitle">From Passion<br>to Purpose</h2>
+          <div data-about-story>
           <p style="font-size:16px;color:var(--gray-2);line-height:1.85;margin-bottom:20px;">People &amp; Places began with a frustration we kept running into. Visitors were seeing Ghana from the outside: through hotel windows, through bus glass, never quite close enough to meet anyone.</p>
           <p style="font-size:16px;color:var(--gray-2);line-height:1.85;margin-bottom:20px;">We are Ghanaians with roots across Accra, Cape Coast, and the Volta Region, so we knew what they were missing. In 2021 we started hosting the trips we wished those visitors had been on.</p>
           <p style="font-size:16px;color:var(--gray-2);line-height:1.85;margin-bottom:40px;">Since then we have hosted more than 300 guests. What we hear most often is not that Ghana was beautiful, though it is. It is that they felt looked after.</p>
+          </div>
           <a href="packages.html" class="btn btn-primary">
             Explore Our Tours
             <svg class="arrow-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -86,11 +91,11 @@
   <!-- ═══════════════ OUR MISSION (3) ═══════════════ -->
   <section style="background:var(--yellow);padding:100px 0;" aria-label="Our mission">
     <div class="container text-center">
-      <div class="eyebrow reveal" style="justify-content:center;color:rgba(0,0,0,0.5);">Our Mission</div>
-      <h2 class="reveal reveal-delay-1" style="font-family:var(--font-display);font-size:clamp(48px,7vw,100px);color:var(--black);line-height:0.95;margin-bottom:32px;">
+      <div class="eyebrow reveal" style="justify-content:center;color:rgba(0,0,0,0.5);" data-about-copy="missionEyebrow">Our Mission</div>
+      <h2 class="reveal reveal-delay-1" style="font-family:var(--font-display);font-size:clamp(48px,7vw,100px);color:var(--black);line-height:0.95;margin-bottom:32px;" data-about-copy="missionTitle">
         We Believe a Place<br>Is Its People
       </h2>
-      <p class="reveal reveal-delay-2" style="font-size:18px;color:rgba(0,0,0,0.55);max-width:600px;margin:0 auto;line-height:1.7;font-weight:400;">
+      <p class="reveal reveal-delay-2" style="font-size:18px;color:rgba(0,0,0,0.55);max-width:600px;margin:0 auto;line-height:1.7;font-weight:400;" data-about-copy="missionBody">
         You can photograph a coastline anywhere in the world. What you remember is who walked it with you, what they told you along the way, and whether you were treated as a guest or as a booking. That is the part we take seriously.
       </p>
     </div>
@@ -102,13 +107,13 @@
     <div class="container">
       <div class="why-asym-head">
         <div>
-          <div class="eyebrow reveal">Why Choose Us</div>
-          <h2 class="section-title reveal reveal-delay-1">The Difference<br>Is Real</h2>
+          <div class="eyebrow reveal" data-about-copy="differenceEyebrow">Why Choose Us</div>
+          <h2 class="section-title reveal reveal-delay-1" data-about-copy="differenceTitle">The Difference Is Real</h2>
         </div>
-        <p class="section-subtitle reveal reveal-delay-2">These are the things we decided to be careful about from the beginning, and the reasons guests tell us the trip felt different.</p>
+        <p class="section-subtitle reveal reveal-delay-2" data-about-copy="differenceIntro">These are the things we decided to be careful about from the beginning, and the reasons guests tell us the trip felt different.</p>
       </div>
 
-      <div class="why-grid">
+      <div class="why-grid" data-about-difference>
         <div class="why-item reveal">
           <div class="why-number">01</div>
           <span class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></span>
@@ -155,13 +160,13 @@
     <div class="container">
       <div class="team-asym-head">
         <div>
-          <div class="eyebrow reveal">The Team</div>
-          <h2 class="section-title reveal reveal-delay-1">The Faces Behind<br>Every Journey</h2>
+          <div class="eyebrow reveal" data-about-copy="teamEyebrow">The Team</div>
+          <h2 class="section-title reveal reveal-delay-1" data-about-copy="teamTitle">The Faces Behind Every Journey</h2>
         </div>
-        <p class="section-subtitle reveal reveal-delay-2">There are two of us. When you write to People &amp; Places, one of us is who answers.</p>
+        <p class="section-subtitle reveal reveal-delay-2" data-about-copy="teamIntro">There are two of us. When you write to People &amp; Places, one of us is who answers.</p>
       </div>
 
-      <div class="team-asym-grid team-founders-grid">
+      <div class="team-asym-grid team-founders-grid" data-about-team>
         <div class="team-card team-feature reveal">
           <div class="team-photo">
             <div class="team-photo-placeholder" aria-hidden="true">IY</div>
@@ -180,7 +185,7 @@
           <p class="team-bio">Co-founded People &amp; Places in 2021. Kojo runs the trips themselves: the routes, the hosts, the timings, and the hundred small details that decide whether a day feels easy.</p>
         </div>
       </div>
-      <p class="team-placeholder-note reveal reveal-delay-2">Our photographs are being taken now. We would rather show you real ones than borrowed ones.</p>
+      <p class="team-placeholder-note reveal reveal-delay-2" data-about-copy="teamNote">Our photographs are being taken now. We would rather show you real ones than borrowed ones.</p>
     </div>
   </section>
 
@@ -188,7 +193,7 @@
   <!-- ═══════════════ OUR IMPACT (6) ═══════════════ -->
   <section class="stats-section" aria-label="Our impact">
     <div class="container">
-      <div class="stats-grid">
+      <div class="stats-grid" data-about-stats>
         <div class="stat-block">
           <span class="stat-num" data-target="300">300</span>
           <span class="stat-lbl">Guests Hosted Since 2021</span>
@@ -220,7 +225,7 @@
           <a href="contact.html" class="btn btn-ghost" style="margin-top:32px;">Get in Touch</a>
         </div>
 
-        <ul class="faq-list reveal reveal-delay-1" role="list">
+        <ul class="faq-list reveal reveal-delay-1" role="list" data-about-faqs>
           <li class="faq-item open">
             <button class="faq-question" aria-expanded="true">
               Are your guides certified?
@@ -245,7 +250,7 @@
               <div class="faq-q-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
             </button>
             <div class="faq-answer">
-              <div class="faq-answer-inner">Yes — we have active partnerships with travel agencies across North America, Europe, and the African diaspora. If you're a travel agent looking to offer Ghana experiences to your clients, reach out about our trade partnerships program.</div>
+              <div class="faq-answer-inner">We do work with travel agents, and we would be glad to hear from you. If you are putting Ghana experiences together for your clients, write to us and we will talk through what that could look like.</div>
             </div>
           </li>
           <li class="faq-item">
@@ -274,20 +279,21 @@
   <!-- ═══════════════ FINAL CTA (8) ═══════════════ -->
   <section class="section-pad about-final-cta" aria-label="Start planning your journey">
     <div class="container text-center">
-      <div class="eyebrow reveal" style="justify-content:center;">Come and See</div>
-      <h2 class="section-title reveal reveal-delay-1">Come and Meet<br>Ghana With Us</h2>
-      <p class="section-subtitle reveal reveal-delay-2" style="margin:0 auto;">You have read about us. Now we would like to hear about you: where you are travelling from, what you are curious about, and what would make this trip matter.</p>
+      <div class="eyebrow reveal" style="justify-content:center;" data-about-copy="ctaEyebrow">Come and See</div>
+      <h2 class="section-title reveal reveal-delay-1" data-about-copy="ctaTitle">Come and Meet Ghana With Us</h2>
+      <p class="section-subtitle reveal reveal-delay-2" style="margin:0 auto;" data-about-copy="ctaBody">You have read about us. Now we would like to hear about you: where you are travelling from, what you are curious about, and what would make this trip matter.</p>
       <div class="about-final-actions reveal reveal-delay-3">
         <a href="contact.html#booking-flow" class="btn btn-primary">Start Planning Together
           <svg class="arrow-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
         <a href="packages.html" class="btn btn-ghost">Browse Experiences</a>
       </div>
-      <p class="about-final-note reveal reveal-delay-4">You are not committing to anything yet. Our team in Accra reads every message and usually replies within one business day.</p>
+      <p class="about-final-note reveal reveal-delay-4" data-about-copy="ctaNote">You are not committing to anything yet. Our team in Accra reads every message and usually replies within one business day.</p>
     </div>
   </section>
 
   <!-- ═══════════════ FOOTER ═══════════════ -->
+  </main>
   <footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer-top">

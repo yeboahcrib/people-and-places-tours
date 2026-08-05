@@ -2,10 +2,10 @@
   "bookingFlow": {
     "eyebrow": "Begin Your Journey",
     "title": "A few details. Then we plan it together.",
-    "intro": "This is the start of a conversation, not a commitment. Share what you know now — we'll work out the rest with you.",
+    "intro": "This is the start of a conversation, not a commitment. Share what you know now, and we'll work out the rest with you.",
     "step1Name": "Your trip",
     "step1Legend": "Tell us about the experience you're imagining",
-    "step1Help": "Rough answers are perfectly fine — dates and numbers can change later.",
+    "step1Help": "Rough answers are perfectly fine. Dates and numbers can change later.",
     "nextLabel": "Continue Your Journey",
     "nextNote": "You're not committing to anything yet.",
     "step2Name": "How we reach you",
@@ -16,7 +16,7 @@
     "privacyNote": "We use these details only to reply and plan with you. Please don't include passport, payment, medical, or other sensitive information.",
     "altPrompt": "Would you rather just talk it through?",
     "successTitle": "Your Ghana journey has started.",
-    "successText": "Thank you for trusting us with it. Someone from our team in Accra will read your note personally and write back — usually within one business day.",
+    "successText": "Thank you for trusting us with it. Someone from our team in Accra will read your note personally and write back, usually within one business day.",
     "trustPoints": [
       {
         "icon": "pin",
@@ -68,7 +68,7 @@
       },
       {
         "question": "Do you offer airport pickup?",
-        "answer": "Yes — we offer airport pickup and drop-off as an add-on service. Our driver will meet you at Kotoka International Airport with your name on a sign and transfer you to your hotel. Please provide your flight details when booking."
+        "answer": "Yes, we offer airport pickup and drop-off as an add-on service. Our driver will meet you at Kotoka International Airport with your name on a sign and transfer you to your hotel. Please provide your flight details when booking."
       },
       {
         "question": "Can I book a tour for tomorrow?",

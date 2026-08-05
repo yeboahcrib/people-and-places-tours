@@ -13,6 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 </head>
 <body class="ui-v2">
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav" role="navigation" aria-label="Main navigation">
@@ -124,7 +125,7 @@
   <div class="cmd-modal">
     <div class="cmd-input-wrap">
       <svg class="cmd-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="cmd-input" id="cmd-input" type="text" placeholder="Search tours, destinations…" autocomplete="off" spellcheck="false" />
+      <input class="cmd-input" id="cmd-input" type="text" aria-label="Search tours and destinations" placeholder="Search tours, destinations…" autocomplete="off" spellcheck="false" />
       <button class="cmd-esc" id="cmd-close" aria-label="Close search">ESC</button>
     </div>
 

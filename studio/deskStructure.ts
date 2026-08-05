@@ -12,6 +12,7 @@ const SINGLETONS = [
   {id: 'originStory', type: 'originStory', title: 'Origin Story'},
   {id: 'featuredTourCollection', type: 'featuredTourCollection', title: 'Featured Tour Collection'},
   {id: 'bookingFlow', type: 'bookingFlow', title: 'Booking Flow'},
+  {id: 'aboutPage', type: 'aboutPage', title: 'About Page'},
 ]
 
 const SINGLETON_TYPES = new Set(SINGLETONS.map((s) => s.type))

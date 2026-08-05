@@ -8,8 +8,14 @@ import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {injectBookingContent, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
+import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
+import {loadAboutContent, loadLocalAboutContent} from './about-source.mjs';
+import {injectAboutContent} from './render-about.mjs';
 
 const projectRoot = process.cwd();
+const siteUrl = normaliseSiteUrl(process.env.SITE_URL);
+const ogImage = 'assets/photos/reviews-trust-banner.jpg';
+const indexableFiles = [];
 const outputRoot = join(projectRoot, 'dist');
 
 // Public root files are intentionally allow-listed. This prevents internal
@@ -27,19 +33,22 @@ const footerTemplate = await readFile(join(projectRoot, 'src/partials/footer.htm
 const {content: siteContent, source: contentSource} = await loadSiteContent({projectRoot});
 const navigation = renderNavigationTemplate(navigationTemplate, siteContent);
 const footer = renderFooterTemplate(footerTemplate, siteContent);
-const [localTours, localHomepageContent, localBookingContent] = await Promise.all([
+const [localTours, localHomepageContent, localBookingContent, localAboutContent] = await Promise.all([
   loadLocalTours(projectRoot),
   loadLocalHomepageContent(projectRoot),
   loadLocalBookingContent(projectRoot),
+  loadLocalAboutContent(projectRoot),
 ]);
 const [
   {tours, source: tourContentSource},
   {content: homepageContent, source: homepageContentSource},
   {content: bookingContent, source: bookingContentSource},
+  {content: aboutContent, source: aboutContentSource},
 ] = await Promise.all([
   loadTourContent({localTours}),
   loadHomepageContent({localContent: localHomepageContent}),
   loadBookingContent({localContent: localBookingContent}),
+  loadAboutContent({localContent: localAboutContent}),
 ]);
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
@@ -63,16 +72,27 @@ for (const entry of rootEntries) {
         `<main id="homepage-root" data-homepage-renderer="homepage-sections">${homepageMarkup}</main>`,
       )
       : withFooter;
-    const withBooking = injectBookingContent(withHomepage, bookingContent);
+    const withAbout = injectAboutContent(withHomepage, aboutContent);
+    const withBooking = injectBookingContent(withAbout, bookingContent);
     const withContact = injectSiteContact(withBooking, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
     const rendered = injectTourCards(withTurnstile, tours);
-    await writeFile(join(outputRoot, entry.name), rendered, 'utf8');
+    const withMeta = injectPageMeta(rendered, {
+      file: entry.name,
+      siteUrl,
+      siteName: siteContent.siteSettings.businessName,
+      ogImage,
+    });
+    if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(entry.name);
+    await writeFile(join(outputRoot, entry.name), withMeta, 'utf8');
   } else {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));
   }
   copiedRootFiles.push(entry.name);
 }
+
+await writeFile(join(outputRoot, 'sitemap.xml'), renderSitemap(siteUrl, indexableFiles, new Date().toISOString().slice(0, 10)), 'utf8');
+await writeFile(join(outputRoot, 'robots.txt'), renderRobots(siteUrl), 'utf8');
 
 for (const directory of publicDirectories) {
   await cp(join(projectRoot, directory), join(outputRoot, directory), {recursive: true});
@@ -91,6 +111,8 @@ const buildHealth = {
   tourContentSource,
   homepageContentSource,
   bookingContentSource,
+  aboutContentSource,
+  siteUrl,
   botProtection: process.env.TURNSTILE_SITE_KEY ? 'turnstile' : 'none',
 };
 

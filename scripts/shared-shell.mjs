@@ -1,4 +1,4 @@
-function findBalancedElementEnd(html, startIndex, tagName) {
+export function findBalancedElementEnd(html, startIndex, tagName) {
   const tokenPattern = new RegExp(`<\\/?${tagName}\\b[^>]*>`, 'gi');
   tokenPattern.lastIndex = startIndex;
   let depth = 0;

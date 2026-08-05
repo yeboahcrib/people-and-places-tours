@@ -1,0 +1,105 @@
+{
+  "aboutPage": {
+    "heroTitle": "The People Behind the Places",
+    "heroSubtitle": "We grew up here. This is the Ghana we know, and the people we would want you to meet if you were visiting a friend.",
+    "storyEyebrow": "How It Began",
+    "storyTitle": "From Passion to Purpose",
+    "storyParagraphs": [
+      "People & Places began with a frustration we kept running into. Visitors were seeing Ghana from the outside: through hotel windows, through bus glass, never quite close enough to meet anyone.",
+      "We are Ghanaians with roots across Accra, Cape Coast, and the Volta Region, so we knew what they were missing. In 2021 we started hosting the trips we wished those visitors had been on.",
+      "Since then we have hosted more than 300 guests. What we hear most often is not that Ghana was beautiful, though it is. It is that they felt looked after."
+    ],
+    "missionEyebrow": "Our Mission",
+    "missionTitle": "We Believe a Place Is Its People",
+    "missionBody": "You can photograph a coastline anywhere in the world. What you remember is who walked it with you, what they told you along the way, and whether you were treated as a guest or as a booking. That is the part we take seriously.",
+    "differenceEyebrow": "Why Choose Us",
+    "differenceTitle": "The Difference Is Real",
+    "differenceIntro": "These are the things we decided to be careful about from the beginning, and the reasons guests tell us the trip felt different.",
+    "differenceItems": [
+      {
+        "title": "Authentic Local Guides",
+        "text": "Every guide on our team was born and raised in Ghana. They speak the language, know the people, and will take you places no guidebook ever could."
+      },
+      {
+        "title": "Careful, Attentive Hosting",
+        "text": "Reliable, well-maintained vehicles suited to each route, and hosts who know the terrain. Safety is built into the plan rather than added to it."
+      },
+      {
+        "title": "Comfortable, Handled Logistics",
+        "text": "Air-conditioned vehicles, comfortable accommodations on multi-day tours, and every logistic detail handled so you can just show up."
+      },
+      {
+        "title": "Community First",
+        "text": "We hire locally and buy locally wherever we can, supporting the same communities and craftspeople we bring you to meet."
+      },
+      {
+        "title": "Tailored Experiences",
+        "text": "No two groups are the same. We shape each trip around your interests, your pace, and how many of you are travelling, whether that is one person or fifteen."
+      },
+      {
+        "title": "Responsive Support",
+        "text": "We usually reply within one hour during business hours (Monday–Friday, 9am–5pm), and we stay reachable on WhatsApp from your first message to the day you fly home."
+      }
+    ],
+    "teamEyebrow": "The Team",
+    "teamTitle": "The Faces Behind Every Journey",
+    "teamIntro": "There are two of us. When you write to People & Places, one of us is who answers.",
+    "teamNote": "Our photographs are being taken now. We would rather show you real ones than borrowed ones.",
+    "team": [
+      {
+        "name": "Isaac “Nana” Yeboah",
+        "role": "Co-founder & Tech Lead",
+        "bio": "Co-founded People & Places in 2021. Nana looks after the side you are using right now: the website, the planning tools, and the messages that arrive through them."
+      },
+      {
+        "name": "Evans “Kojo” Yirenkyi",
+        "role": "Co-founder & Manager",
+        "bio": "Co-founded People & Places in 2021. Kojo runs the trips themselves: the routes, the hosts, the timings, and the hundred small details that decide whether a day feels easy."
+      }
+    ],
+    "impactStats": [
+      {
+        "value": "300",
+        "label": "Guests Hosted Since 2021"
+      },
+      {
+        "value": "5.0",
+        "label": "Google Rating"
+      },
+      {
+        "value": "15",
+        "label": "Google Reviews"
+      },
+      {
+        "value": "7",
+        "label": "Places We Host In"
+      }
+    ],
+    "faqs": [
+      {
+        "question": "Are your guides certified?",
+        "answer": "Our team doesn't hold formal guide certifications yet — we're in the process of completing our Ghana Tourism Authority licensing. What we bring is real, hands-on hosting experience, including welcoming guests from the diaspora across the US and beyond who've trusted us with a meaningful trip home."
+      },
+      {
+        "question": "What languages do your guides speak?",
+        "answer": "Our guides are fluent in English and several Ghanaian languages including Twi, Ga, Ewe, and Hausa. We can also arrange tours in French upon request for francophone visitors."
+      },
+      {
+        "question": "Do you work with travel agencies?",
+        "answer": "We do work with travel agents, and we would be glad to hear from you. If you are putting Ghana experiences together for your clients, write to us and we will talk through what that could look like."
+      },
+      {
+        "question": "Do you run homecoming / diaspora tours?",
+        "answer": "This is one of our specialties. We've been helping members of the African diaspora reconnect with their roots since our founding. Our heritage tours include Cape Coast Castle visits and meetings with local communities. Contact us for a custom homecoming package."
+      },
+      {
+        "question": "What time do tours typically start?",
+        "answer": "Most full-day tours depart at 7:00am to beat the Accra traffic and make the most of daylight hours. Half-day tours typically begin at 8:00am or 1:00pm. Exact pickup times are confirmed during booking based on your hotel location."
+      }
+    ],
+    "ctaEyebrow": "Come and See",
+    "ctaTitle": "Come and Meet Ghana With Us",
+    "ctaBody": "You have read about us. Now we would like to hear about you: where you are travelling from, what you are curious about, and what would make this trip matter.",
+    "ctaNote": "You are not committing to anything yet. Our team in Accra reads every message and usually replies within one business day."
+  }
+}

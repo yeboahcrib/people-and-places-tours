@@ -18,6 +18,7 @@ import {socialStory} from './documents/socialStory'
 import {cta} from './documents/cta'
 import {policy} from './documents/policy'
 import {bookingFlow} from './documents/bookingFlow'
+import {aboutPage} from './documents/aboutPage'
 
 export const schemaTypes = [
   // Reusable objects
@@ -42,4 +43,5 @@ export const schemaTypes = [
   cta,
   policy,
   bookingFlow,
+  aboutPage,
 ]

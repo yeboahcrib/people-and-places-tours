@@ -24,6 +24,10 @@
   /* Aliases kept for backward compatibility with existing rules */
   --yellow:        var(--pap-yellow);
   --yellow-dark:   #D9960A;
+  /* Brand yellow as text on white fails WCAG AA badly (1.73:1). Use this
+     deepened amber wherever yellow carries words on a light surface;
+     --yellow stays the accent/fill colour on dark. 4.69:1 on white. */
+  --yellow-on-light: #9C6A00;
   --yellow-glow:   rgba(255,184,28,.15);
   --black:         var(--pap-charcoal);
   --black-2:       #111111;
@@ -101,6 +105,23 @@ img { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; }
 button { font-family: var(--font-body); cursor: pointer; border: none; background: none; }
+
+/* Lets keyboard and screen-reader users jump the nav, which repeats on all
+   21 pages. Off-screen until focused, then anchored top-left. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--sp-2);
+  z-index: 10001;
+  padding: var(--sp-1-5) var(--sp-3);
+  border-radius: var(--radius-sm);
+  background: var(--yellow);
+  color: var(--black);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: top 180ms cubic-bezier(0.16,1,0.3,1);
+}
+.skip-link:focus { top: var(--sp-2); }
 
 /* A visible, consistent keyboard focus indicator. Components may customize
    color/offset, but must not remove this without an equivalent replacement. */
@@ -1412,7 +1433,7 @@ body.page-entering {
   padding-bottom: 3rem;
 }
 .footer-brand p {
-  color: rgba(255,255,255,.4);
+  color: var(--gray-2);
   font-size: 0.86rem;
   line-height: 1.7;
   margin-top: 1rem;
@@ -1457,7 +1478,7 @@ body.page-entering {
 .footer-col ul { display: flex; flex-direction: column; gap: var(--sp-1-5); }
 .footer-col a {
   font-size: 0.86rem;
-  color: rgba(255,255,255,.45);
+  color: var(--gray-2);
   transition: color 260ms ease-out, transform 260ms ease-out;
 }
 .footer-col a:hover,
@@ -1470,7 +1491,7 @@ body.page-entering {
   justify-content: space-between;
   align-items: center;
   font-size: 0.8rem;
-  color: rgba(255,255,255,.25);
+  color: var(--gray-2);
   flex-wrap: wrap;
   gap: 0.5rem;
 }
@@ -2653,7 +2674,10 @@ body.page-entering {
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
 }
 .tour-card[hidden] { display: none; }
-.tour-card:hover {
+/* .reveal-ready .reveal.visible sets a transform at (0,3,0) and outranks a
+   plain .tour-card:hover, so this lift never applied. Match its context. */
+.tour-card:hover,
+.reveal-ready .tour-card.reveal.visible:hover {
   transform: translateY(-5px);
   box-shadow: 0 24px 64px rgba(0,0,0,.34);
   border-color: var(--yellow);
@@ -3629,12 +3653,12 @@ body.page-entering {
   margin-top: 0.15rem;
 }
 .footer-contact-item span { font-size: 0.86rem; color: rgba(255,255,255,.45); }
-.footer-copy { font-size: 0.8rem; color: rgba(255,255,255,.25); }
-.footer-copy span { color: rgba(255,255,255,.4); }
+.footer-copy { font-size: 0.8rem; color: var(--gray-2); }
+.footer-copy span { color: rgba(255,255,255,.7); }
 .footer-legal { display: flex; gap: 1.5rem; }
 .footer-legal a {
   font-size: 0.8rem;
-  color: rgba(255,255,255,.25);
+  color: var(--gray-2);
   transition: color var(--transition);
 }
 .footer-legal a:hover { color: rgba(255,255,255,.5); }
