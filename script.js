@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tours = Array.isArray(window.PEOPLE_PLACES_TOURS) ? window.PEOPLE_PLACES_TOURS : [];
   const bySlug = new Map(tours.map(tour => [tour.slug, tour]));
-  const bookingUrl = slug => `contact.html?tour=${encodeURIComponent(slug)}`;
+  const bookingUrl = slug => `contact.html?tour=${encodeURIComponent(slug)}#booking-flow`;
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;',
     '<': '&lt;',
@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('');
 
     select.innerHTML = `
-      <option value="" disabled selected>Select a tour...</option>
+      <option value="" selected>I'm open to ideas</option>
       ${options}
-      <option value="custom">Custom / Bespoke Tour</option>`;
+      <option value="custom">Something made around me</option>`;
   }
 
   function hydrateTourDetailFromCatalog() {
@@ -690,8 +690,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
+    let updateTourName = () => {};
     if (tourSelect) {
-      const updateTourName = () => {
+      updateTourName = () => {
         const selected = tourSelect.options[tourSelect.selectedIndex];
         if (tourNameInput) tourNameInput.value = selected?.value ? selected.textContent.trim() : '';
       };
@@ -703,29 +704,131 @@ document.addEventListener('DOMContentLoaded', () => {
       updateTourName();
     }
 
-    contactForm.addEventListener('submit', async e => {
-      const btn = contactForm.querySelector('button[type="submit"]');
+    /* ── Booking flow ──
+       Two progressively disclosed steps. Visibility is driven by
+       data-booking-current on the form, so CSS owns the layout and no nodes
+       are moved at runtime. Without JavaScript the form stays a single page
+       and still posts natively, so this only ever adds behaviour. */
+    const bookingPanel = contactForm.closest('.booking-panel');
+    const bookingSteps = [...contactForm.querySelectorAll('[data-booking-step]')]
+      .sort((a, b) => Number(a.dataset.bookingStep) - Number(b.dataset.bookingStep));
+    const progressBar = contactForm.querySelector('[data-booking-progress]');
+    const progressItems = [...contactForm.querySelectorAll('[data-booking-progress-step]')];
+    const announcer = contactForm.querySelector('[data-booking-announce]');
+    const nextButton = contactForm.querySelector('.booking-next');
+    const backButton = contactForm.querySelector('.booking-back');
+    const travelDate = contactForm.querySelector('#travel-date');
+    const successPanel = bookingPanel?.querySelector('[data-booking-success]');
+    const errorEl = contactForm.querySelector('.form-error');
+    const totalSteps = bookingSteps.length;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let currentBookingStep = 1;
+    let showBookingStep = () => {};
 
-      // Validate required fields
-      const firstName = contactForm.querySelector('#first-name').value.trim();
-      const lastName  = contactForm.querySelector('#last-name').value.trim();
-      const email     = contactForm.querySelector('#email').value.trim();
-      const emailOk   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const requiredFields = () => [
+      [contactForm.querySelector('#first-name'), value => Boolean(value)],
+      [contactForm.querySelector('#last-name'), value => Boolean(value)],
+      [contactForm.querySelector('#email'), value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)],
+    ];
 
-      let errEl = contactForm.querySelector('.form-error');
-      if (!errEl) {
-        errEl = document.createElement('p');
-        errEl.className = 'form-error';
-        const actions = contactForm.querySelector('.form-actions');
-        actions.parentNode.insertBefore(errEl, actions);
+    const clearFieldError = field => {
+      field.setAttribute('aria-invalid', 'false');
+      if (errorEl && requiredFields().every(([input, isValid]) => isValid(input.value.trim()))) {
+        errorEl.textContent = '';
       }
+    };
 
-      if (!firstName || !lastName || !emailOk) {
+    requiredFields().forEach(([field]) => {
+      field?.addEventListener('input', () => clearFieldError(field));
+    });
+
+    if (totalSteps > 1) {
+      contactForm.classList.add('booking-flow-ready');
+
+      showBookingStep = (step, moveFocus = false) => {
+        currentBookingStep = Math.min(Math.max(step, 1), totalSteps);
+        contactForm.dataset.bookingCurrent = String(currentBookingStep);
+
+        let stepName = '';
+        progressItems.forEach(item => {
+          const index = Number(item.dataset.bookingProgressStep);
+          item.classList.toggle('is-complete', index < currentBookingStep);
+          if (index === currentBookingStep) {
+            item.setAttribute('aria-current', 'step');
+            stepName = item.querySelector('.booking-progress-name')?.textContent.trim() || '';
+          } else {
+            item.removeAttribute('aria-current');
+          }
+        });
+        if (progressBar) progressBar.style.transform = `scaleX(${currentBookingStep / totalSteps})`;
+        if (announcer) announcer.textContent = `Step ${currentBookingStep} of ${totalSteps}. ${stepName}.`;
+
+        if (!moveFocus) return;
+        const panel = bookingSteps.find(item => Number(item.dataset.bookingStep) === currentBookingStep);
+        const legend = panel?.querySelector('legend');
+        if (legend) {
+          legend.tabIndex = -1;
+          legend.focus({preventScroll: true});
+        }
+        // Only pull the flow back into view when the step heading has scrolled
+        // off; scrolling on every click makes the transition feel jumpy.
+        const top = bookingPanel?.getBoundingClientRect().top ?? 0;
+        if (top < 0) {
+          bookingPanel.scrollIntoView({behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start'});
+        }
+      };
+
+      nextButton?.addEventListener('click', () => showBookingStep(currentBookingStep + 1, true));
+      backButton?.addEventListener('click', () => showBookingStep(currentBookingStep - 1, true));
+      showBookingStep(1);
+    }
+
+    // A past travel date is never a useful answer, and the browser can say so
+    // before anyone submits.
+    if (travelDate) {
+      const now = new Date();
+      travelDate.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    }
+
+    const showBookingSuccess = reference => {
+      if (!successPanel || !bookingPanel) return false;
+      const referenceEl = successPanel.querySelector('[data-booking-reference]');
+      if (referenceEl) referenceEl.textContent = reference || 'sent';
+      successPanel.hidden = false;
+      bookingPanel.classList.add('is-complete');
+      const heading = successPanel.querySelector('.booking-success-title');
+      if (heading) {
+        heading.tabIndex = -1;
+        heading.focus({preventScroll: true});
+      }
+      successPanel.scrollIntoView({behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'center'});
+      return true;
+    };
+
+    contactForm.addEventListener('submit', async e => {
+      // Pressing Enter in a step 1 field implicitly submits the form. Treat
+      // that as "continue" rather than firing an inquiry the person has not
+      // finished writing.
+      if (totalSteps > 1 && currentBookingStep < totalSteps) {
         e.preventDefault();
-        errEl.textContent = 'Please fill in your first name, last name, and a valid email address.';
+        showBookingStep(currentBookingStep + 1, true);
         return;
       }
-      errEl.textContent = '';
+
+      const btn = contactForm.querySelector('button[type="submit"]');
+
+      const fields = requiredFields();
+      fields.forEach(([field, isValid]) => field?.setAttribute('aria-invalid', String(!isValid(field.value.trim()))));
+      const firstInvalid = fields.find(([field, isValid]) => !isValid(field.value.trim()))?.[0];
+
+      if (firstInvalid) {
+        e.preventDefault();
+        if (errorEl) errorEl.textContent = 'Please share your name and a valid email so we know how to reach you.';
+        if (totalSteps > 1 && currentBookingStep !== totalSteps) showBookingStep(totalSteps);
+        firstInvalid.focus();
+        return;
+      }
+      if (errorEl) errorEl.textContent = '';
 
       const original = btn.innerHTML;
       btn.textContent = 'Sending…';
@@ -747,21 +850,23 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify(payload),
         });
         const result = await res.json().catch(() => ({}));
-        if (res.ok) {
-          btn.textContent = 'Inquiry sent — we\'ll be in touch soon.';
+        if (!res.ok) throw new Error(result.error || 'Inquiry could not be sent');
+
+        contactForm.reset();
+        updateTourName();
+        if (totalSteps > 1) showBookingStep(1);
+        if (!showBookingSuccess(result.reference)) {
+          btn.textContent = 'Your Ghana journey has started.';
           btn.style.background = '#22c55e';
-          contactForm.reset();
           setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 5000);
-        } else {
-          throw new Error(result.error || 'Inquiry could not be sent');
         }
       } catch {
         // Do not automatically submit to the fallback here. The function may
         // have delivered the email even if its response was interrupted, and
         // an automatic retry could create a duplicate inquiry.
-        btn.textContent = 'Couldn\'t confirm delivery — please use WhatsApp';
-        btn.style.background = '#ef4444';
-        setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 4500);
+        if (errorEl) errorEl.textContent = 'We could not confirm that your message reached us. Please try again in a moment, or send us a note on WhatsApp and we will pick it up from there.';
+        btn.innerHTML = original;
+        btn.disabled = false;
       }
     });
   }

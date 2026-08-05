@@ -6,6 +6,8 @@ import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from '.
 import {injectTourCards} from './render-tour-cards.mjs';
 import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
+import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
+import {injectBookingContent} from './render-booking.mjs';
 
 const projectRoot = process.cwd();
 const outputRoot = join(projectRoot, 'dist');
@@ -25,13 +27,19 @@ const footerTemplate = await readFile(join(projectRoot, 'src/partials/footer.htm
 const {content: siteContent, source: contentSource} = await loadSiteContent({projectRoot});
 const navigation = renderNavigationTemplate(navigationTemplate, siteContent);
 const footer = renderFooterTemplate(footerTemplate, siteContent);
-const [localTours, localHomepageContent] = await Promise.all([
+const [localTours, localHomepageContent, localBookingContent] = await Promise.all([
   loadLocalTours(projectRoot),
   loadLocalHomepageContent(projectRoot),
+  loadLocalBookingContent(projectRoot),
 ]);
-const [{tours, source: tourContentSource}, {content: homepageContent, source: homepageContentSource}] = await Promise.all([
+const [
+  {tours, source: tourContentSource},
+  {content: homepageContent, source: homepageContentSource},
+  {content: bookingContent, source: bookingContentSource},
+] = await Promise.all([
   loadTourContent({localTours}),
   loadHomepageContent({localContent: localHomepageContent}),
+  loadBookingContent({localContent: localBookingContent}),
 ]);
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
@@ -55,7 +63,8 @@ for (const entry of rootEntries) {
         `<main id="homepage-root" data-homepage-renderer="homepage-sections">${homepageMarkup}</main>`,
       )
       : withFooter;
-    const rendered = injectTourCards(withHomepage, tours);
+    const withBooking = injectBookingContent(withHomepage, bookingContent);
+    const rendered = injectTourCards(withBooking, tours);
     await writeFile(join(outputRoot, entry.name), rendered, 'utf8');
   } else {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));
@@ -79,6 +88,7 @@ const buildHealth = {
   contentSource,
   tourContentSource,
   homepageContentSource,
+  bookingContentSource,
 };
 
 await writeFile(

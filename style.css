@@ -2940,6 +2940,510 @@ body.page-entering {
 }
 
 /* ────────────────────────────────────────────────────────────── */
+/*  BOOKING FLOW (contact page)                                   */
+/*                                                                */
+/*  A two-step, progressively disclosed inquiry built on the same  */
+/*  tokens, easing and reveal language as the homepage and         */
+/*  Experiences page. Step 1 asks only about the trip and requires */
+/*  nothing; step 2 collects the minimum needed to write back.     */
+/*                                                                */
+/*  Progressive enhancement contract: without JavaScript both      */
+/*  fieldsets render as one continuous form and the native POST    */
+/*  still works, so the step chrome (progress, Continue, Back) is  */
+/*  hidden until script.js adds .booking-flow-ready. Step          */
+/*  visibility is then driven entirely by [data-booking-current]   */
+/*  on the form — no DOM moves, so nothing reflows unexpectedly.   */
+/* ────────────────────────────────────────────────────────────── */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+/* Matches .contact-sidebar so the flow and the "what happens next" panel
+   read as one pair of surfaces rather than two unrelated treatments. */
+.booking-panel {
+  background: var(--black-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+/* Clears the floating pill nav when linked to as #booking-flow or scrolled
+   to on a step change. */
+#booking-flow { scroll-margin-top: 110px; }
+.booking-flow-label { margin-bottom: var(--sp-1-5); }
+.booking-flow-title {
+  max-width: 20ch;
+  margin-bottom: var(--sp-1-5);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.2vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+.booking-flow-intro {
+  max-width: 56ch;
+  margin-bottom: var(--sp-4);
+  color: var(--gray-2);
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+.contact-form.booking-flow { gap: var(--sp-3); }
+
+/* ── Progress ─────────────────────────────────────────────────── */
+/* Hidden until JS confirms the flow is stepped. */
+.booking-progress { display: none; }
+.booking-flow-ready .booking-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1-5);
+}
+.booking-progress-steps {
+  display: flex;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.booking-progress-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: rgba(255,255,255,.5);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 320ms cubic-bezier(0.16,1,0.3,1);
+}
+.booking-progress-num {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  transition: background 320ms cubic-bezier(0.16,1,0.3,1),
+              border-color 320ms cubic-bezier(0.16,1,0.3,1),
+              color 320ms cubic-bezier(0.16,1,0.3,1);
+}
+.booking-progress-step.is-complete { color: rgba(255,255,255,.55); }
+.booking-progress-step.is-complete .booking-progress-num {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+.booking-progress-step[aria-current="step"] { color: var(--white); }
+.booking-progress-step[aria-current="step"] .booking-progress-num {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--black);
+}
+.booking-progress-track {
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.09);
+  overflow: hidden;
+}
+.booking-progress-track > span {
+  display: block;
+  height: 100%;
+  background: var(--yellow);
+  transform: scaleX(0.5);
+  transform-origin: left center;
+  transition: transform 560ms cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Steps ────────────────────────────────────────────────────── */
+/* Explicit margins rather than flex gap: a <legend> does not lay
+   out reliably inside a flex fieldset across browsers. */
+.booking-step {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.booking-step-legend {
+  display: block;
+  width: 100%;
+  max-width: 32ch;
+  margin-bottom: var(--sp-1);
+  padding: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.booking-step-legend:focus { outline: none; }
+.booking-step-help {
+  max-width: 52ch;
+  margin: 0 0 var(--sp-3);
+  color: rgba(255,255,255,.55);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.booking-step > .form-row,
+.booking-step > .form-group { margin-bottom: var(--sp-2-5); }
+.booking-step > *:last-child { margin-bottom: 0; }
+.form-group-half { max-width: 340px; }
+
+.booking-flow-ready .booking-step { display: none; }
+.booking-flow-ready[data-booking-current="1"] .booking-step[data-booking-step="1"],
+.booking-flow-ready[data-booking-current="2"] .booking-step[data-booking-step="2"] {
+  display: block;
+  animation: booking-step-in 460ms cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes booking-step-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── Fields ───────────────────────────────────────────────────── */
+/* Sentence-case labels: an uppercase, letter-spaced form reads like
+   an airline checkout, which is the opposite of the intent here. */
+.booking-flow .form-label {
+  display: block;
+  color: rgba(255,255,255,.74);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+/* Inline rather than a flex item so it wraps with the label text instead of
+   being stranded on the first line when the question is long. */
+.form-optional {
+  margin-left: 0.4rem;
+  color: rgba(255,255,255,.5);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.form-help {
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+.booking-flow .form-input,
+.booking-flow .form-select,
+.booking-flow .form-textarea {
+  min-height: 52px;
+  padding: 0.9rem 1.1rem;
+  background: rgba(255,255,255,.03);
+  border-color: rgba(255,255,255,.12);
+  font-size: 0.95rem;
+  transition: border-color 260ms cubic-bezier(0.16,1,0.3,1),
+              background 260ms cubic-bezier(0.16,1,0.3,1),
+              box-shadow 260ms cubic-bezier(0.16,1,0.3,1);
+}
+.booking-flow .form-textarea { min-height: 132px; line-height: 1.65; }
+/* The default .25 placeholder is too faint to read the example prompts. */
+.booking-flow .form-input::placeholder,
+.booking-flow .form-textarea::placeholder { color: rgba(255,255,255,.45); }
+.booking-flow .form-input:hover,
+.booking-flow .form-select:hover,
+.booking-flow .form-textarea:hover { border-color: rgba(255,255,255,.22); }
+.booking-flow .form-input:focus,
+.booking-flow .form-select:focus,
+.booking-flow .form-textarea:focus {
+  background: rgba(255,255,255,.05);
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px var(--yellow-glow);
+}
+/* .form-select sets appearance:none, so it needs its own indicator. */
+.booking-flow .form-select {
+  padding-right: 2.9rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFB81C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.1rem center;
+  background-size: 16px 16px;
+}
+/* The base field rule sets outline:none, which outranks the site-wide
+   :where() focus ring. Put a real ring back for keyboard users. */
+.booking-flow .form-input:focus-visible,
+.booking-flow .form-select:focus-visible,
+.booking-flow .form-textarea:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}
+.booking-flow [aria-invalid="true"] { border-color: #ef4444; }
+.booking-flow [aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.18); }
+
+/* ── Actions ──────────────────────────────────────────────────── */
+/* Default (no JS): the Continue button is meaningless, the submit
+   button must be reachable. */
+.booking-step-actions[data-booking-actions="1"] { display: none; }
+.booking-step-actions[data-booking-actions="2"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1-5);
+}
+.booking-back { display: none; }
+.booking-flow-ready .booking-step-actions { display: none; }
+.booking-flow-ready[data-booking-current="1"] .booking-step-actions[data-booking-actions="1"],
+.booking-flow-ready[data-booking-current="2"] .booking-step-actions[data-booking-actions="2"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1-5);
+}
+.booking-flow-ready .booking-back { display: inline-flex; }
+.booking-final-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1-5);
+}
+.booking-flow .form-submit-btn { padding: var(--sp-2) var(--sp-6); }
+.booking-flow .booking-next { padding: var(--sp-2) var(--sp-5); }
+.booking-action-note {
+  max-width: 46ch;
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+/* The global note colour is tuned for the darker page background; on the
+   panel it drops under 4.5:1. */
+.booking-flow .form-privacy-note { color: rgba(255,255,255,.55); }
+.booking-flow .form-error:empty { display: none; }
+.booking-flow .form-error {
+  margin: 0;
+  padding: var(--sp-1-5) var(--sp-2);
+  border: 1px solid rgba(239,68,68,.35);
+  border-radius: var(--radius-sm);
+  background: rgba(239,68,68,.08);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+/* ── Reassurance ──────────────────────────────────────────────── */
+.booking-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+  margin: 0;
+  padding: var(--sp-2-5) 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+}
+.booking-trust li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: rgba(255,255,255,.55);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.booking-trust svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  stroke: var(--yellow);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.booking-alt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-0-5) var(--sp-1-5);
+  color: rgba(255,255,255,.55);
+  font-size: 0.85rem;
+}
+.booking-wa-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0.55rem 0;
+  color: var(--white);
+  font-weight: 600;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,.22);
+  transition: color 260ms cubic-bezier(0.16,1,0.3,1),
+              box-shadow 260ms cubic-bezier(0.16,1,0.3,1);
+}
+.booking-wa-link svg { width: 16px; height: 16px; flex-shrink: 0; fill: currentColor; }
+.booking-wa-link:hover,
+.booking-wa-link:focus-visible {
+  color: #25D366;
+  box-shadow: inset 0 -1px 0 #25D366;
+}
+
+/* ── Confirmation ─────────────────────────────────────────────── */
+/* The confirmation replaces the flow in place, so the panel keeps its
+   position on the page and nothing below it jumps. */
+.booking-panel.is-complete > :not(.booking-success) { display: none; }
+.booking-success { animation: booking-step-in 620ms cubic-bezier(0.16,1,0.3,1) both; }
+.booking-success-mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--sp-3);
+  border: 1px solid var(--border-yellow);
+  border-radius: 50%;
+  background: rgba(255,184,28,.1);
+}
+.booking-success-mark svg {
+  width: 26px;
+  height: 26px;
+  stroke: var(--yellow);
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.booking-success-title {
+  max-width: 18ch;
+  margin-bottom: var(--sp-2);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.booking-success-text {
+  max-width: 54ch;
+  margin-bottom: var(--sp-2);
+  color: var(--gray-2);
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+.booking-success-meta {
+  margin-bottom: var(--sp-3);
+  color: rgba(255,255,255,.5);
+  font-size: 0.78rem;
+}
+.booking-success-meta span {
+  color: rgba(255,255,255,.55);
+  font-variant-numeric: tabular-nums;
+}
+.booking-success-actions { display: flex; flex-wrap: wrap; gap: var(--sp-1-5); }
+
+/* ── "What happens next" sidebar ──────────────────────────────── */
+/* Same content as before, moved out of inline styles so it can be
+   rendered from src/content/booking.json at build time. */
+.booking-next-steps {
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  list-style: none;
+}
+.booking-next-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2-5) 0;
+  border-bottom: 1px solid var(--border);
+}
+.booking-next-step:last-child { border-bottom: 0; padding-bottom: 0; }
+.booking-next-step-num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--black);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+.booking-next-step-title {
+  margin-bottom: var(--sp-0-5);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.booking-next-step-text {
+  margin: 0;
+  color: var(--gray-2);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.booking-sidebar-call {
+  padding: var(--sp-2-5);
+  border: 1px solid var(--border-yellow);
+  border-radius: var(--radius);
+  background: rgba(255,184,28,.07);
+}
+.booking-sidebar-call-title {
+  margin-bottom: var(--sp-1);
+  color: var(--yellow);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+.booking-sidebar-call-text {
+  margin: 0 0 var(--sp-2);
+  color: var(--gray-2);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.booking-sidebar-call-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1-5);
+  min-height: 32px;
+  color: var(--yellow);
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: opacity 260ms cubic-bezier(0.16,1,0.3,1);
+}
+.booking-sidebar-call-link:hover { opacity: 0.78; }
+.booking-sidebar-call-link svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: var(--yellow);
+  fill: none;
+  stroke-width: 2;
+}
+
+/* ── Breakpoints ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .booking-panel { padding: var(--sp-3) var(--sp-2-5); }
+  .booking-progress-steps { gap: var(--sp-2); }
+  .booking-progress-step { font-size: 0.68rem; letter-spacing: 0.06em; }
+  .booking-progress-num { width: 24px; height: 24px; }
+  .form-group-half { max-width: none; }
+  .booking-final-actions { width: 100%; }
+  .booking-final-actions .btn { flex: 1 1 100%; justify-content: center; }
+  .booking-flow .form-submit-btn,
+  .booking-flow .booking-next { width: 100%; padding: var(--sp-2) var(--sp-3); }
+  .booking-trust { gap: var(--sp-1) var(--sp-2); }
+}
+
+/* Two full step names do not fit beside each other on a small phone. Keep the
+   current one named and let the others stand on their number. */
+@media (max-width: 480px) {
+  .booking-progress-step:not([aria-current="step"]) .booking-progress-name { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-flow-ready[data-booking-current="1"] .booking-step[data-booking-step="1"],
+  .booking-flow-ready[data-booking-current="2"] .booking-step[data-booking-step="2"],
+  .booking-success {
+    animation: none;
+  }
+  .booking-progress-track > span,
+  .booking-progress-step,
+  .booking-progress-num { transition: none; }
+}
+
+/* ────────────────────────────────────────────────────────────── */
 /*  FOOTER — ALTERNATE STRUCTURE (about / packages / contact)    */
 /* ────────────────────────────────────────────────────────────── */
 .footer-top {
@@ -4309,6 +4813,7 @@ a.trust-rating:focus-visible .trust-rating-source {
    focus. This lives after component rules so their smaller desktop type cannot
    override the mobile accessibility minimum. */
 @media (max-width: 600px) {
+  .booking-flow .form-input, .booking-flow .form-select, .booking-flow .form-textarea,
   .form-input, .form-select, .form-textarea,
   input, select, textarea { font-size: 16px; }
 }

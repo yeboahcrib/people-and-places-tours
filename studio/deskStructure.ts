@@ -1,7 +1,8 @@
 import type {StructureResolver} from 'sanity/structure'
 
 /**
- * Singletons (siteSettings, navigation, originStory, featuredTourCollection)
+ * Singletons (siteSettings, navigation, originStory, featuredTourCollection,
+ * bookingFlow)
  * get a pinned single-document entry instead of a list — there should only
  * ever be one of each.
  */
@@ -10,6 +11,7 @@ const SINGLETONS = [
   {id: 'navigation', type: 'navigation', title: 'Navigation & Footer'},
   {id: 'originStory', type: 'originStory', title: 'Origin Story'},
   {id: 'featuredTourCollection', type: 'featuredTourCollection', title: 'Featured Tour Collection'},
+  {id: 'bookingFlow', type: 'bookingFlow', title: 'Booking Flow'},
 ]
 
 const SINGLETON_TYPES = new Set(SINGLETONS.map((s) => s.type))
