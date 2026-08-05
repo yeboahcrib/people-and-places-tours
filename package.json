@@ -13,9 +13,15 @@
     "test:inquiry": "node tests/inquiry-function.mjs",
     "test:responsive": "node tests/responsive.js",
     "test:resilience": "node tests/resilient-rendering.js",
-    "test:smoke": "node tests/smoke.js"
+    "test:smoke": "node tests/smoke.js",
+    "test:visual": "node tests/visual-regression.js",
+    "test:visual:baseline": "node tests/visual-regression.js --baseline"
   },
   "devDependencies": {
     "playwright": "^1.61.1"
+  },
+  "dependencies": {
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0"
   }
 }
