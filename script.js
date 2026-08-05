@@ -688,6 +688,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
     const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
+
+    // FormSubmit needs an absolute redirect target, and a hard-coded one 404s
+    // everywhere except the single host it names. Resolve thanks.html against
+    // the current page instead, so the same markup lands correctly on GitHub
+    // Pages (which serves this site from a /people-and-places-tours/ subpath),
+    // on Cloudflare Pages, on a custom domain, and on localhost. The committed
+    // value stays as the no-JS fallback.
+    const nextField = contactForm.querySelector('input[name="_next"]');
+    if (nextField) nextField.value = new URL('thanks.html', window.location.href).href;
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
     let updateTourName = () => {};
