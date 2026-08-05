@@ -98,7 +98,7 @@ function serveDist() {
   await context.close();
   await browser.close();
   if (hosted) hosted.server.close();
-  console.log('JavaScript-free resilient-rendering checks passed against dist/.');
+  console.log(`JavaScript-free resilient-rendering checks passed against ${hosted ? 'dist/' : BASE_URL}.`);
 })().catch(error => {
   console.error(error.message);
   process.exit(1);
