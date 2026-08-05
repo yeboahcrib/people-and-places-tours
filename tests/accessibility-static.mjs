@@ -1,6 +1,37 @@
 import assert from 'node:assert/strict';
 import {readdir, readFile} from 'node:fs/promises';
 
+// Elements that never carry a closing tag, plus svg, whose internals are
+// checked by nobody here and would only add noise.
+const VOID_ELEMENTS = new Set([
+  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'link', 'meta', 'param', 'source', 'track', 'wbr',
+]);
+
+/**
+ * Mis-nested markup once shipped to production unnoticed: a </section> closing
+ * a <div> ended a landmark early and orphaned everything after it, and every
+ * suite still passed because none of them looked at document structure. This
+ * walks the tag stack and fails on the first mismatch.
+ */
+function findNestingError(html) {
+  const withoutSvg = html.replace(/<svg\b[\s\S]*?<\/svg>/gi, '');
+  const stack = [];
+  for (const match of withoutSvg.matchAll(/<(\/?)([a-zA-Z][a-zA-Z0-9-]*)\b([^>]*)>/g)) {
+    const [tag, closing, name, attributes] = match;
+    const element = name.toLowerCase();
+    if (VOID_ELEMENTS.has(element) || attributes.trimEnd().endsWith('/')) continue;
+    if (!closing) {
+      stack.push(element);
+      continue;
+    }
+    if (stack.length === 0) return `stray ${tag} with nothing open`;
+    const open = stack.pop();
+    if (open !== element) return `${tag} closes <${open}>`;
+  }
+  return stack.length ? `unclosed <${stack[stack.length - 1]}>` : null;
+}
+
 const root = new URL('../', import.meta.url);
 const files = (await readdir(root)).filter(file => file.endsWith('.html'));
 
@@ -9,6 +40,9 @@ for (const file of files) {
   assert(/<html\s+[^>]*lang="en"/i.test(html), `${file} is missing the English document language`);
   assert(/<meta\s+[^>]*name="viewport"/i.test(html), `${file} is missing a viewport meta tag`);
   assert(!/href="#"/i.test(html), `${file} contains a non-functional # link`);
+
+  const nestingError = findNestingError(html);
+  assert.equal(nestingError, null, `${file} has malformed markup: ${nestingError}`);
 
   for (const match of html.matchAll(/<img\b[^>]*>/gi)) {
     assert(/\balt="[^"]*"/i.test(match[0]), `${file} has an image without an alt attribute: ${match[0].slice(0, 100)}`);
