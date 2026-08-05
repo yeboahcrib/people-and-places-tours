@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="preconnect" href="https://images.unsplash.com" />
   <meta name="description" content="An 8-day immersive Ghana adventure. Accra, Cape Coast, Kumasi, Volta Region, Ada Foah — the best of the country with local guides who know it inside out." />
   <title>Just Go Ghana | People & Places Tours</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <style>
@@ -22,15 +22,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--dark); }
 
-    /* NAV */
-    nav { background: var(--black); display: flex; align-items: center; justify-content: space-between; padding: 1rem 2.5rem; position: sticky; top: 0; z-index: 100; }
-    .nav-logo { display: flex; align-items: center; text-decoration: none; }
-    .nav-logo img { height: 52px; width: auto; display: block; }
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
-    .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--yellow); }
-    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
-    .nav-phone { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+    /* Global navigation is inherited from style.css. */
     .btn-yellow { background: var(--yellow); color: var(--black); border: none; padding: 0.7rem 1.8rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; }
     .btn-yellow:hover { background: #e09900; transform: translateY(-1px); }
     .btn-outline { background: transparent; color: var(--dark); border: 2px solid var(--dark); padding: 0.7rem 1.8rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-block; }
@@ -43,7 +35,7 @@
     .back-link:hover { color: var(--yellow); }
     .tag-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
     .tag { background: rgba(255,171,0,0.15); color: var(--yellow); border: 1px solid rgba(255,171,0,0.3); padding: 0.3rem 1rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-    .trip-hero h1 { font-family: 'Archivo Black', sans-serif;  font-size: clamp(3rem, 7vw, 5.5rem); color: var(--white); line-height: 1; margin-bottom: 1rem; }
+    .trip-hero h1 { font-family:'Archivo Black',sans-serif;  font-size: clamp(3rem, 7vw, 5.5rem); color: var(--white); line-height: 1; margin-bottom: 1rem; }
     .trip-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
     .trip-meta-item { color: rgba(255,255,255,0.6); font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; }
     .trip-meta-item strong { color: var(--white); }
@@ -51,7 +43,7 @@
     /* HERO IMAGE */
     .hero-img { width: 100%; height: 500px; object-fit: cover; border-radius: 0 0 32px 32px; background: linear-gradient(135deg, #1a3a2a, #2d5a3d); display: flex; align-items: center; justify-content: center; }
     .hero-img-placeholder { width: 100%; height: 500px; background: linear-gradient(135deg, #1a3a2a 0%, #2d5a3d 50%, #1a3a2a 100%); border-radius: 0 0 32px 32px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-    .hero-img-placeholder::before { content: 'GHANA'; font-family: 'Archivo Black', sans-serif;  font-size: 12rem; color: rgba(255,171,0,0.08); position: absolute; }
+    .hero-img-placeholder::before { content: 'GHANA'; font-family:'Archivo Black',sans-serif;  font-size: 12rem; color: rgba(255,171,0,0.08); position: absolute; }
 
     /* CONTENT */
     .content-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2.5rem; display: grid; grid-template-columns: 1fr 340px; gap: 4rem; align-items: start; }
@@ -59,19 +51,26 @@
 
     /* SECTIONS */
     .section-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem; }
-    .content-left h2 { font-family: 'Archivo Black', sans-serif;  font-size: 2.2rem; color: var(--dark); margin-bottom: 1rem; }
+    .content-left h2 { font-family:'Archivo Black',sans-serif;  font-size: 2.2rem; color: var(--dark); margin-bottom: 1rem; }
     .content-left p { color: #555; line-height: 1.8; font-size: 1rem; margin-bottom: 1.5rem; }
 
     /* HIGHLIGHTS */
-    .highlights { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 3rem; }
-    .highlight-pill { background: var(--gray); color: var(--dark); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500; }
+    .highlights { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-bottom: 3rem; }
+    .highlight-pill {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--gray); color: var(--dark);
+      padding: 0.45rem 1rem; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 500;
+      line-height: 1;
+    }
+    .hi-icon { width: 14px; height: 14px; stroke: var(--yellow-dark, #D9960A); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 
     /* ITINERARY */
     .itinerary { margin-bottom: 3rem; }
     .day-item { border-bottom: 1px solid #eee; }
     .day-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; cursor: pointer; }
     .day-header h3 { font-size: 0.95rem; font-weight: 600; color: var(--dark); }
-    .day-number { font-family: 'Archivo Black', sans-serif;  font-size: 1.1rem; color: var(--yellow); margin-right: 0.75rem; }
+    .day-number { font-family:'Archivo Black',sans-serif;  font-size: 1.1rem; color: var(--yellow); margin-right: 0.75rem; }
     .day-arrow { font-size: 1rem; color: #aaa; transition: transform 0.2s; }
     .day-body { display: none; padding-bottom: 1.25rem; }
     .day-body p { color: #666; font-size: 0.9rem; line-height: 1.8; }
@@ -81,7 +80,7 @@
 
     /* INCLUDED / EXCLUDED */
     .inc-exc { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
-    .inc-exc h3 { font-family: 'Archivo Black', sans-serif;  font-size: 1.4rem; margin-bottom: 1rem; }
+    .inc-exc h3 { font-family:'Archivo Black',sans-serif;  font-size: 1.4rem; margin-bottom: 1rem; }
     .inc-list, .exc-list { list-style: none; }
     .inc-list li, .exc-list li { padding: 0.5rem 0; font-size: 0.9rem; color: #555; display: flex; align-items: flex-start; gap: 0.6rem; border-bottom: 1px solid #f0f0f0; }
     .inc-list li::before { content: '✓'; color: var(--yellow); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
@@ -106,7 +105,7 @@
     /* BOOKING SIDEBAR */
     .booking-card { background: var(--black); border-radius: 24px; padding: 2rem; color: var(--white); margin-bottom: 1.5rem; }
     .booking-card .price-label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.25rem; }
-    .booking-card .price { font-family: 'Archivo Black', sans-serif;  font-size: 3.5rem; color: var(--yellow); line-height: 1; }
+    .booking-card .price { font-family:'Archivo Black',sans-serif;  font-size: 3.5rem; color: var(--yellow); line-height: 1; }
     .booking-card .price-sub { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; }
     .booking-card .deposit-note { background: rgba(255,171,0,0.1); border: 1px solid rgba(255,171,0,0.2); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
     .booking-card .deposit-note p { font-size: 0.8rem; color: rgba(255,255,255,0.7); line-height: 1.6; }
@@ -118,7 +117,7 @@
 
     /* TRIP HIGHLIGHTS SIDEBAR */
     .trip-highlights-card { background: var(--gray); border-radius: 24px; padding: 1.5rem; }
-    .trip-highlights-card h4 { font-family: 'Archivo Black', sans-serif;  font-size: 1.2rem; margin-bottom: 1rem; color: var(--dark); }
+    .trip-highlights-card h4 { font-family:'Archivo Black',sans-serif;  font-size: 1.2rem; margin-bottom: 1rem; color: var(--dark); }
     .highlight-row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid #e8e8e0; font-size: 0.85rem; }
     .highlight-row:last-child { border-bottom: none; }
     .highlight-row span:first-child { color: #888; }
@@ -126,15 +125,15 @@
 
     /* ALSO CHECK OUT */
     .also-check { background: var(--black); padding: 4rem 2.5rem; border-radius: 40px 40px 0 0; }
-    .also-check h2 { font-family: 'Archivo Black', sans-serif;  font-size: 2.5rem; color: var(--white); margin-bottom: 2rem; text-align: center; }
+    .also-check h2 { font-family:'Archivo Black',sans-serif;  font-size: 2.5rem; color: var(--white); margin-bottom: 2rem; text-align: center; }
     .also-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
     .also-card { background: #161616; border: 1px solid #222; border-radius: 20px; overflow: hidden; text-decoration: none; transition: all 0.3s; }
     .also-card:hover { border-color: var(--yellow); transform: translateY(-4px); }
     .also-card-img { height: 200px; background: linear-gradient(135deg, #1a3a2a, #2d5a3d); display: flex; align-items: center; justify-content: center; }
-    .also-card-img span { font-family: 'Archivo Black', sans-serif;  font-size: 3rem; color: rgba(255,171,0,0.3); }
+    .also-card-img span { font-family:'Archivo Black',sans-serif;  font-size: 3rem; color: rgba(255,171,0,0.3); }
     .also-card-body { padding: 1.25rem; }
     .also-card-body .tag-row { margin-bottom: 0.5rem; }
-    .also-card-body h3 { font-family: 'Archivo Black', sans-serif;  font-size: 1.3rem; color: var(--white); margin-bottom: 0.25rem; }
+    .also-card-body h3 { font-family:'Archivo Black',sans-serif;  font-size: 1.3rem; color: var(--white); margin-bottom: 0.25rem; }
     .also-card-body .price { color: var(--yellow); font-size: 0.9rem; font-weight: 600; }
 
     /* FOOTER */
@@ -154,35 +153,55 @@
       .also-grid { grid-template-columns: 1fr; }
       .footer-inner { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .nav-links { display: none; }
       .nav-phone { display: none; }
+    }
+    @media (max-width: 600px) {
       .trip-hero { padding: 2rem 1.25rem; }
       .content-wrap { padding: 2rem 1.25rem; }
     }
+    /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
+       cannot shrink below their content. Collapse to one column. */
+    @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
   </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <a href="index.html" class="nav-logo"><img src="assets/logo-footer.svg" alt="People &amp; Places Tours"></a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="packages.html">Packages</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <span class="nav-phone">+233 50 367 3473</span>
-    <a href="contact.html" class="btn-yellow">Book A Tour</a>
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="People & Places Tours Home">
+      <img src="assets/logo-footer.svg" alt="People & Places Tours" width="1510" height="640" decoding="async">
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="packages.html" class="active">Experiences</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="tel:+233503673473" class="nav-phone">+233 50 367 3473</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
+  <nav class="nav-mobile" aria-label="Mobile navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="packages.html">Experiences</a>
+    <a href="contact.html">Contact</a>
+    <a href="packages.html" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">Book a Tour</a>
+  </nav>
 </nav>
 
 <!-- HERO -->
 <div class="trip-hero">
   <div class="trip-hero-inner">
-    <a href="packages.html" class="back-link">← Back to All Packages</a>
+    <a href="packages.html" class="back-link">← Back to All Experiences</a>
     <div class="tag-row">
       <span class="tag">Culture</span>
       <span class="tag">Adventure</span>
@@ -218,14 +237,14 @@
     <!-- HIGHLIGHTS -->
     <div class="section-label" style="margin-top:2rem;">Trip Highlights</div>
     <div class="highlights">
-      <span class="highlight-pill">🎭 Culture</span>
-      <span class="highlight-pill">🏕️ Adventure</span>
-      <span class="highlight-pill">🦁 Safari Valley</span>
-      <span class="highlight-pill">🎨 Workshops</span>
-      <span class="highlight-pill">⛵ Boat Cruise</span>
-      <span class="highlight-pill">🏖️ Beach</span>
-      <span class="highlight-pill">🏨 Accommodation</span>
-      <span class="highlight-pill">🍽️ Welcome Dinner</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Culture</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>Adventure</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19.2 2.96a1 1 0 0 1 1.8.62 10 10 0 0 1-8.5 11.42c-2.45.66-5.5 1.05-5.7 4"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>Safari Valley</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".75" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r=".75" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r=".75" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12.5" r=".75" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>Workshops</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 18H2a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4Z"/><path d="M21 14 10 2 3 14h18Z"/><path d="M10 2v16"/></svg>Boat Cruise</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 0 0-20 0Z"/><path d="M12 12v8a2 2 0 0 0 4 0"/><path d="M12 2v1"/></svg>Beach</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>Accommodation</span>
+      <span class="highlight-pill"><svg class="hi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>Welcome Dinner</span>
     </div>
 
     <!-- ITINERARY -->
@@ -234,7 +253,7 @@
     <div class="itinerary">
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 1</span> Arrival, Airport Pickup & Welcome Dinner</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -245,7 +264,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 2</span> Batik Workshop, Drum Lessons & Accra City Tour</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -256,7 +275,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 3</span> Aburi Gardens, Cocoa Farm & Waterfalls</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -267,7 +286,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 4</span> Ancestral Trip to Cape Coast</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -278,7 +297,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 5</span> Free Day</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -289,7 +308,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 6</span> Shai Hills & Akosombo Boat Cruise</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -300,7 +319,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 7</span> Safari Valley Day Experience</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -311,7 +330,7 @@
       </div>
 
       <div class="day-item">
-        <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-header">
           <h3><span class="day-number">DAY 8</span> Departure — See You Again!</h3>
           <span class="day-arrow">▼</span>
         </div>
@@ -373,35 +392,35 @@
     <h2>Got Questions?</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Can I pay in installments? <span class="arrow">▼</span></div>
-        <div class="faq-a">Yes! We offer flexible payment plans. After your $400 deposit, you can make monthly payments. Final balance must be cleared 30 days before arrival.</div>
+        <div class="faq-q">Can I pay in installments? <span class="arrow">▼</span></div>
+        <div class="faq-a">Yes! We offer flexible payment plans. After your 30% deposit, you can make monthly payments toward the balance. Final balance must be cleared 30 days before arrival.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Is my deposit refundable? <span class="arrow">▼</span></div>
-        <div class="faq-a">The $400 deposit is non-refundable as it immediately reserves accommodations and transport. Any trip cancelled less than 30 days before arrival is 100% non-refundable.</div>
+        <div class="faq-q">Is my deposit refundable? <span class="arrow">▼</span></div>
+        <div class="faq-a">The 30% deposit is non-refundable as it immediately reserves accommodations and transport. Any trip cancelled less than 30 days before arrival is 100% non-refundable.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Does the price include flights? <span class="arrow">▼</span></div>
+        <div class="faq-q">Does the price include flights? <span class="arrow">▼</span></div>
         <div class="faq-a">No. You book your own flight to Kotoka International Airport (ACC). We recommend booking early to get the best rates.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Is this good for solo travelers? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is this good for solo travelers? <span class="arrow">▼</span></div>
         <div class="faq-a">Absolutely! Just Go Ghana is designed for solo travelers, couples, families and groups alike. Final price may vary depending on room occupancy selection.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Do I need a visa for Ghana? <span class="arrow">▼</span></div>
+        <div class="faq-q">Do I need a visa for Ghana? <span class="arrow">▼</span></div>
         <div class="faq-a">Yes, most international travelers require a visa. Visa fees are not included. We recommend applying well in advance through your nearest Ghanaian Embassy.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What vaccinations are required? <span class="arrow">▼</span></div>
+        <div class="faq-q">What vaccinations are required? <span class="arrow">▼</span></div>
         <div class="faq-a">A Yellow Fever vaccination card is mandatory for Ghana entry. Consult your doctor regarding Malaria prophylaxis and other standard travel vaccines.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How active is the trip? <span class="arrow">▼</span></div>
+        <div class="faq-q">How active is the trip? <span class="arrow">▼</span></div>
         <div class="faq-a">Moderate level. Expect walking during city tours, the cocoa farm, and Shai Hills hike. There's plenty of downtime including a designated free day on Day 5.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Is Ghana safe for tourists? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is Ghana safe for tourists? <span class="arrow">▼</span></div>
         <div class="faq-a">Absolutely. Ghana is widely known as one of the friendliest and safest countries in Africa, especially for the diaspora. Our guides are with you throughout the scheduled itinerary.</div>
       </div>
     </div>
@@ -415,7 +434,7 @@
       <div class="price">$3,000</div>
       <div class="price-sub">per person · 8 Days / 7 Nights</div>
       <div class="deposit-note">
-        <p><strong>Secure your spot:</strong> A non-refundable deposit of <strong>$400/person</strong> reserves your dates. Monthly payment plans available. Full balance due 30 days before arrival.</p>
+        <p><strong>Secure your spot:</strong> A non-refundable deposit of <strong>30% per person</strong> reserves your dates. Monthly payment plans available. Full balance due 30 days before arrival.</p>
       </div>
       <div class="booking-instalment">
         <div class="instalment-row">
@@ -433,8 +452,8 @@
       </div>
 
       <div class="booking-btns">
-        <a href="contact.html" class="btn-yellow">Book Now</a>
-        <a href="contact.html" class="btn-outline-white">Ask A Question</a>
+        <a href="contact.html?tour=just-go-ghana" class="btn-yellow">Book Now</a>
+        <a href="contact.html?tour=just-go-ghana" class="btn-outline-white">Ask A Question</a>
       </div>
     </div>
     <div class="trip-highlights-card">
@@ -457,7 +476,7 @@
   <h2>Also Check Out</h2>
   <div class="also-grid">
     <a href="cape-coast-tour.html" class="also-card">
-      <div class="also-card-img"><img src="https://images.unsplash.com/photo-1712700853174-f555aeb2c80d?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div>
+      <div class="also-card-img"><img src="https://images.unsplash.com/photo-1712700853174-f555aeb2c80d?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" width="600" height="400" decoding="async" /></div>
       <div class="also-card-body">
         <div class="tag-row"><span class="tag">Culture</span><span class="tag">Adventure</span></div>
         <h3>Cape Coast Ancestral Tour</h3>
@@ -465,7 +484,7 @@
       </div>
     </a>
     <a href="shai-hills-tour.html" class="also-card">
-      <div class="also-card-img"><img src="https://images.unsplash.com/photo-1590409110365-70d93eff6b4c?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div>
+      <div class="also-card-img"><img src="https://images.unsplash.com/photo-1590409110365-70d93eff6b4c?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" width="600" height="400" decoding="async" /></div>
       <div class="also-card-body">
         <div class="tag-row"><span class="tag">Adventure</span><span class="tag">Nature</span></div>
         <h3>Shai Hills & Boat Cruise</h3>
@@ -488,7 +507,7 @@
   <div class="footer-inner">
     <div class="footer-brand">
       <a href="index.html" aria-label="People &amp; Places Tours">
-        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo">
+        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo" width="615" height="615" decoding="async">
       </a>
       <p>Discover Ghana, Worry Less.<br>Real experiences led by real locals, no stress.</p>
       <div class="footer-social">
@@ -506,36 +525,28 @@
     <div class="footer-col">
       <h4>Quick Links</h4>
       <a href="index.html">Home</a>
-      <a href="packages.html">Packages</a>
       <a href="about.html">About</a>
+      <a href="packages.html">Experiences</a>
       <a href="contact.html">Contact</a>
     </div>
     <div class="footer-col">
-      <h4>Packages</h4>
+      <h4>Experiences</h4>
       <a href="just-go-ghana.html">Just Go Ghana</a>
-      <a href="packages.html#day-tours">Day Tours</a>
+      <a href="packages.html">Day Tours</a>
       <a href="contact.html">Private Experiences</a>
     </div>
     <div class="footer-col">
       <h4>Contact</h4>
       <a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a>
       <a href="tel:+233503673473">+233 50 367 3473</a>
+      <a href="tel:+18034776489">+1 803 477 6489 (US/International)</a>
       <a href="https://instagram.com/peopleand.places" target="_blank" rel="noopener noreferrer">@peopleand.places</a>
       <a href="https://tiktok.com/@peopandplaces" target="_blank" rel="noopener noreferrer">@peopandplaces</a>
     </div>
   </div>
-  <div class="footer-bottom">© 2025 People & Places Tours. All Rights Reserved.</div>
+  <div class="footer-bottom">© 2026 People & Places Tours. All Rights Reserved.</div>
 </footer>
-
-<script>
-  function toggleDay(header) {
-    const item = header.parentElement;
-    item.classList.toggle('open');
-  }
-  function toggleFaq(q) {
-    const item = q.parentElement;
-    item.classList.toggle('open');
-  }
-</script>
+<script src="tours.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

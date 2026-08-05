@@ -4,28 +4,28 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="preconnect" href="https://images.unsplash.com" />
   <meta name="description" content="Discover Accra after dark on a guided food crawl through the best local spots. Grilled tilapia, kelewele, waakye, and cold beer — far from the tourist trail." />
   <title>Accra After Dark Food Tour | People & Places Tours</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <style>
     :root{--yellow:#FFB81C;--black:#1A1A1A;--dark:#1B1B1B;--white:#FFFFFF;--gray:#F5F5F0;}
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Inter',sans-serif;background:var(--white);color:var(--dark);}
-    nav{background:var(--black);display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;position:sticky;top:0;z-index:100;}
-    .nav-logo{display:flex;align-items:center;text-decoration:none;}
-    .nav-logo img{height:52px;width:auto;display:block;}
-    .nav-links{display:flex;gap:2rem;list-style:none;}
-    .nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;}
-    .nav-links a:hover{color:var(--yellow);}
-    .nav-right{display:flex;align-items:center;gap:1.5rem;}
-    .nav-phone{color:rgba(255,255,255,.6);font-size:.85rem;}
+    
+    
+    
+    
+    
+    
+    
+    
     .btn-yellow{background:var(--yellow);color:var(--black);border:none;padding:.7rem 1.8rem;border-radius:50px;font-family:'Inter',sans-serif;font-weight:600;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;}
     .btn-yellow:hover{background:#e09900;transform:translateY(-1px);}
-    .trip-hero{background:var(--black);padding:4rem 2.5rem 3rem;}
-    .trip-hero-inner{max-width:900px;margin:0 auto;}
+    .trip-hero{background:var(--black);padding:7rem 2.5rem 3rem;position:relative;overflow:hidden;}
+    .trip-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;}
     .back-link{color:rgba(255,255,255,.5);font-size:.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;margin-bottom:2rem;transition:color .2s;}
     .back-link:hover{color:var(--yellow);}
     .tag-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
@@ -35,7 +35,7 @@
     .trip-meta-item{color:rgba(255,255,255,.6);font-size:.85rem;}
     .trip-meta-item strong{color:var(--white);}
     .hero-img-placeholder{width:100%;height:400px;background:linear-gradient(135deg,#2a1a0a 0%,#4a2d0a 50%,#2a1a0a 100%);border-radius:0 0 32px 32px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
-    .hero-abbr{font-family:'Archivo Black',sans-serif;font-size:14rem;color:rgba(255,171,0,.07);position:absolute;}
+    .hero-abbr{font-family:'Archivo Black',sans-serif;font-size:clamp(6rem,15vw,13rem);color:rgba(255,171,0,.07);position:absolute;right:-1rem;top:50%;transform:translateY(-50%);line-height:.85;letter-spacing:-.04em;text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:0;}
     .content-wrap{max-width:1200px;margin:0 auto;padding:4rem 2.5rem;display:grid;grid-template-columns:1fr 320px;gap:4rem;align-items:start;}
     .section-label{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow);margin-bottom:.75rem;}
     .content-left h2{font-family:'Archivo Black',sans-serif;font-size:2rem;color:var(--dark);margin-bottom:1rem;}
@@ -64,7 +64,7 @@
     .highlight-row:last-child{border-bottom:none;}
     .highlight-row span:first-child{color:#888;}
     .highlight-row span:last-child{font-weight:600;}
-    .also-check{background:var(--black);padding:4rem 2.5rem;border-radius:40px 40px 0 0;}
+    .also-check{background:var(--forest);padding:4rem 2.5rem;border-radius:40px 40px 0 0;}
     .also-check h2{font-family:'Archivo Black',sans-serif;font-size:2.5rem;color:var(--white);margin-bottom:2rem;text-align:center;}
     .also-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1200px;margin:0 auto;}
     .also-card{background:#161616;border:1px solid #222;border-radius:20px;overflow:hidden;text-decoration:none;transition:all .3s;}
@@ -98,27 +98,46 @@
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:.875rem;line-height:1.8;}
     .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
-    @media(max-width:600px){.nav-links,.nav-phone{display:none;}.trip-hero,.content-wrap{padding:2rem 1.25rem;}}
+    @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
+    /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
+       cannot shrink below their content. Collapse to one column. */
+    @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
   </style>
 </head>
 <body>
-<nav>
-  <a href="index.html" class="nav-logo"><img src="assets/logo-footer.svg" alt="People &amp; Places Tours"></a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="packages.html">Packages</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <span class="nav-phone">+233 50 367 3473</span>
-    <a href="contact.html" class="btn-yellow">Book A Tour</a>
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="People & Places Tours Home">
+      <img src="assets/logo-footer.svg" alt="People & Places Tours" width="1510" height="640" decoding="async">
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="packages.html" class="active">Experiences</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="tel:+233503673473" class="nav-phone">+233 50 367 3473</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
+  <nav class="nav-mobile" aria-label="Mobile navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="packages.html">Experiences</a>
+    <a href="contact.html">Contact</a>
+    <a href="packages.html" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">Book a Tour</a>
+  </nav>
 </nav>
 
 <div class="trip-hero">
+  <div class="hero-abbr" aria-hidden="true">ACCRA</div>
   <div class="trip-hero-inner">
-    <a href="packages.html" class="back-link">← Back to All Tours</a>
+    <a href="packages.html" class="back-link">← Back to All Experiences</a>
     <div class="tag-row"><span class="tag">Food</span><span class="tag">Culture</span></div>
     <h1>Accra After Dark Food Tour</h1>
     <div class="trip-meta">
@@ -129,7 +148,7 @@
   </div>
 </div>
 
-<div class="hero-img-placeholder"><img src="https://images.unsplash.com/photo-1672537627568-3530c83694f6?auto=format&fit=crop&w=1920&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" /></div>
+<div class="hero-img-placeholder"><img src="https://images.unsplash.com/photo-1672537627568-3530c83694f6?auto=format&fit=crop&w=1920&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" width="1920" height="400" fetchpriority="high" decoding="async" /></div>
 
 <div class="content-wrap">
   <div class="content-left">
@@ -181,7 +200,7 @@
 
       <div class="booking-btns">
         <a href="https://wa.me/233503673473?text=Hi%21%20I%27d%20like%20to%20book%20the%20Accra%20After%20Dark%20Food%20Tour." target="_blank" rel="noopener" class="btn-yellow" style="text-align:center;display:block;">Book on WhatsApp</a>
-        <a href="contact.html" class="btn-outline-white">Send Inquiry</a>
+        <a href="contact.html?tour=accra-food" class="btn-outline-white">Send Inquiry</a>
       </div>
     </div>
     <div class="trip-highlights-card">
@@ -200,27 +219,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What time does this tour start? <span class="arrow">▼</span></div>
+        <div class="faq-q">What time does this tour start? <span class="arrow">▼</span></div>
         <div class="faq-a">Evening tour. We pick you up around 6:30–7pm, when Accra's night food scene starts coming alive.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How many food stops are there? <span class="arrow">▼</span></div>
+        <div class="faq-q">How many food stops are there? <span class="arrow">▼</span></div>
         <div class="faq-a">Typically 4–6 stops — a mix of street stalls, chop bars, and local restaurants that Accra residents actually eat at, far from hotel buffets.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Will there be enough food? <span class="arrow">▼</span></div>
+        <div class="faq-q">Will there be enough food? <span class="arrow">▼</span></div>
         <div class="faq-a">Plenty. You'll leave full. Each stop is a real portion, not a small bite.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Are vegetarian options available? <span class="arrow">▼</span></div>
+        <div class="faq-q">Are vegetarian options available? <span class="arrow">▼</span></div>
         <div class="faq-a">Yes. Let us know when booking and we'll ensure each stop has solid vegetarian options ready.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Is it safe to eat street food? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is it safe to eat street food? <span class="arrow">▼</span></div>
         <div class="faq-a">Completely. Our guides take you only to vendors they know personally — high turnover, fresh ingredients, loyal local crowds.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What should I wear? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I wear? <span class="arrow">▼</span></div>
         <div class="faq-a">Casual and comfortable. This is a street crawl, not a sit-down dinner. Wear clothes you can move freely in.</div>
       </div>
     </div>
@@ -229,9 +248,9 @@
 <div class="also-check">
   <h2>Also Check Out</h2>
   <div class="also-grid">
-    <a href="accra-city-tour.html" class="also-card"><div class="also-card-img"><img src="https://images.unsplash.com/photo-1763301531293-c8ee26993927?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div><div class="also-card-body"><div class="tag-row"><span class="tag">Culture</span></div><h3>Accra City Tour</h3><p class="also-price">From $100 · 1 Day</p></div></a>
-    <a href="jamestown-tour.html" class="also-card"><div class="also-card-img"><img src="https://images.unsplash.com/photo-1712700720456-6027038e9874?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div><div class="also-card-body"><div class="tag-row"><span class="tag">Heritage</span></div><h3>Jamestown Heritage Walk</h3><p class="also-price">From $85 · 4 Hours</p></div></a>
-    <a href="just-go-ghana.html" class="also-card"><div class="also-card-img"><img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" /></div><div class="also-card-body"><div class="tag-row"><span class="tag">Culture</span><span class="tag">Adventure</span></div><h3>Just Go Ghana</h3><p class="also-price">From $3,000 · 8 Days</p></div></a>
+    <a href="accra-city-tour.html" class="also-card"><div class="also-card-img"><img src="https://images.unsplash.com/photo-1763301531293-c8ee26993927?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" width="600" height="400" decoding="async" /></div><div class="also-card-body"><div class="tag-row"><span class="tag">Culture</span></div><h3>Accra City Tour</h3><p class="also-price">From $100 · 1 Day</p></div></a>
+    <a href="jamestown-tour.html" class="also-card"><div class="also-card-img"><img src="https://images.unsplash.com/photo-1712700720456-6027038e9874?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" width="600" height="400" decoding="async" /></div><div class="also-card-body"><div class="tag-row"><span class="tag">Heritage</span></div><h3>Jamestown Heritage Walk</h3><p class="also-price">From $85 · 4 Hours</p></div></a>
+    <a href="just-go-ghana.html" class="also-card"><div class="also-card-img"><img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=600&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" width="600" height="400" decoding="async" /></div><div class="also-card-body"><div class="tag-row"><span class="tag">Culture</span><span class="tag">Adventure</span></div><h3>Just Go Ghana</h3><p class="also-price">From $3,000 · 8 Days</p></div></a>
   </div>
 </div>
 
@@ -239,7 +258,7 @@
   <div class="footer-inner">
     <div class="footer-brand">
       <a href="index.html" aria-label="People &amp; Places Tours">
-        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo">
+        <img src="assets/favicon.svg" alt="People &amp; Places Tours" class="logo" width="615" height="615" decoding="async">
       </a>
       <p>Discover Ghana, Worry Less.<br>Real experiences led by real locals, no stress.</p>
       <div class="footer-social">
@@ -257,12 +276,12 @@
     <div class="footer-col">
       <h4>Quick Links</h4>
       <a href="index.html">Home</a>
-      <a href="packages.html">Packages</a>
       <a href="about.html">About</a>
+      <a href="packages.html">Experiences</a>
       <a href="contact.html">Contact</a>
     </div>
     <div class="footer-col">
-      <h4>Packages</h4>
+      <h4>Experiences</h4>
       <a href="just-go-ghana.html">Just Go Ghana</a>
       <a href="packages.html">Day Tours</a>
       <a href="contact.html">Private Experiences</a>
@@ -271,17 +290,14 @@
       <h4>Contact</h4>
       <a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a>
       <a href="tel:+233503673473">+233 50 367 3473</a>
+      <a href="tel:+18034776489">+1 803 477 6489 (US/International)</a>
       <a href="https://instagram.com/peopleand.places" target="_blank" rel="noopener noreferrer">@peopleand.places</a>
       <a href="https://tiktok.com/@peopandplaces" target="_blank" rel="noopener noreferrer">@peopandplaces</a>
     </div>
   </div>
-  <div class="footer-bottom">© 2025 People & Places Tours. All Rights Reserved.</div>
+  <div class="footer-bottom">© 2026 People & Places Tours. All Rights Reserved.</div>
 </footer>
-<script>
-  function toggleFaq(q) {
-    const item = q.parentElement;
-    item.classList.toggle('open');
-  }
-</script>
+<script src="tours.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

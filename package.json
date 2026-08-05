@@ -1,0 +1,21 @@
+{
+  "name": "people-and-places-tours",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run check:js && npm run test:headers && npm run test:a11y-static && npm run test:content && node scripts/build-static.mjs && npm run test:build",
+    "test:a11y-static": "node tests/accessibility-static.mjs",
+    "test:build": "node tests/build-output.mjs",
+    "check:js": "node --check script.js && node --check tours.js && node --check homepage-content.js && node --check homepage-sections.js",
+    "test:health": "node tests/health-function.mjs",
+    "test:content": "node tests/content-source.mjs && node tests/tour-source.mjs && node tests/homepage-source.mjs && node tests/booking-source.mjs",
+    "test:headers": "node tests/security-headers.mjs",
+    "test:inquiry": "node tests/inquiry-function.mjs",
+    "test:responsive": "node tests/responsive.js",
+    "test:resilience": "node tests/resilient-rendering.js",
+    "test:smoke": "node tests/smoke.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

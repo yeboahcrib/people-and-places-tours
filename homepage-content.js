@@ -1,0 +1,192 @@
+(function () {
+  // Claude Code handoff: edit homepage copy, links, image URLs, and section ordering here.
+  // Keep visual class names in homepage-sections.js unless you are intentionally changing CSS.
+  // Section keys match the approved 7-section homepage architecture in
+  // docs/homepage-messaging-brief.md / studio/schemaTypes/documents/homepageSection.ts.
+  window.PEOPLE_PLACES_HOME = {
+    hero: {
+      video: {
+        src: 'https://cdn.prod.website-files.com/651d7335c96bc896d80e6981/65403a4d370634439edde7cc_1030%20(1)(1)-transcode.mp4',
+      },
+      headline: 'The People Make the Place.',
+      sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets they call home.',
+      cta: { label: 'See Ghana With Us', href: 'packages.html' },
+    },
+    founderStory: {
+      eyebrow: 'The Beginning of Our Story',
+      headline: 'Why We Started People & Places',
+      body: 'Whenever we shared images from home, we kept hearing the same thing: “I never knew Ghana looked like this.” We realized that too many people were seeing only a small part of the place we knew and loved.\n\nSo we created People & Places to share more of the Ghana we know: its history, food, daily rhythms, and the people who give each place its meaning.',
+      founders: [
+        { initials: 'IY', name: 'Isaac Yeboah', preferredName: 'Nana Yeboah', role: 'Co-founder & Tech Lead' },
+        { initials: 'EY', name: 'Evans Yirenkyi', preferredName: 'Kojo', role: 'Co-founder & Manager' },
+      ],
+      trustNote: 'Helping travelers discover Ghana with locals since 2021',
+      cta: { label: 'Read our full story', href: 'about.html' },
+    },
+    waysToExperience: {
+      eyebrow: 'Where Ghana Begins For You',
+      title: 'What Pulls You In?',
+      intro: 'Some people come looking for history. Others follow the food, the landscape, or the chance to make something with their own hands. Start with what feels closest to you. We’ll introduce you to the people and places behind it.',
+      pathways: [
+        {
+          title: 'History & Memory',
+          text: 'Cape Coast, Elmina, Jamestown, and Kumasi are places where Ghana’s history is still carried in walls, streets, and family stories.',
+          href: 'packages.html?category=heritage',
+          image: { src: 'assets/photos/pathway-heritage-cannons.jpg', width: 900, height: 900, alt: 'Cannons along the fort ramparts overlooking the Atlantic at Cape Coast' },
+        },
+        {
+          title: 'Food & Everyday Life',
+          text: 'Markets in the morning, chop bars after dark, and the people who know exactly where to find the best plate in Accra.',
+          href: 'packages.html?category=food',
+          image: { src: 'assets/photos/pathway-food-city-jamestown.jpg', width: 675, height: 900, alt: 'Everyday street life near Jamestown, Accra' },
+        },
+        {
+          title: 'Nature & Stillness',
+          text: 'Waterfalls, forest paths, quiet beaches, and the slower rhythm of life beyond the city.',
+          href: 'packages.html?category=nature',
+          image: { src: 'assets/photos/pathway-nature-kakum.jpg', width: 720, height: 900, alt: 'Guests on the Kakum National Park canopy walkway' },
+        },
+        {
+          title: 'Adventure',
+          text: 'Canopy walks, mountain trails, quad bikes, and the kind of days that leave dust on your shoes.',
+          href: 'packages.html?category=adventure',
+          image: { src: 'https://images.unsplash.com/photo-1636389396809-c3ab57b60d93?auto=format&fit=crop&w=1000&q=82&h=760', width: 1000, height: 760, alt: 'Quad bike adventure through forest trails in Ghana' },
+        },
+        {
+          title: 'Craft & Tradition',
+          text: 'Kente, batik, and pottery learned beside the makers who continue these traditions by hand.',
+          href: 'packages.html?category=craft',
+          image: { src: 'https://images.unsplash.com/photo-1720343354398-89c6aa6d12a4?auto=format&fit=crop&w=1000&q=82&h=760', width: 1000, height: 760, alt: 'Kente weaving and artisan traditions in Ghana' },
+        },
+        {
+          title: 'The Longer Story',
+          text: 'Take a few days to connect the coast, cities, food, and history, with enough time to let Ghana unfold.',
+          href: 'packages.html?category=multi-day',
+          image: { src: 'assets/photos/pathway-multiday-group.jpg', width: 675, height: 900, alt: 'A guest group celebrating together after a multi-day Ghana trip' },
+        },
+      ],
+      cta: { label: 'Find Your Way Into Ghana', href: 'packages.html' },
+    },
+    howHosted: {
+      eyebrow: "How You're Hosted",
+      titleLines: ['Care You Can', 'Actually Feel'],
+      intro: 'Traveling with us should feel less like following a tour and more like being welcomed in. Your hosts notice your pace, share the stories behind each place, and leave room for the moments no itinerary can plan.',
+      principles: [
+        {
+          icon: 'pin',
+          title: 'Places With Meaning',
+          text: 'Understand the history and human stories behind what you see, not just where to stand for a photograph.',
+          proofQuote: 'This was not just a tour — it was emotional, educational, spiritual, and incredibly meaningful for all of us.',
+          proofAuthor: 'Cynthia Muldrow',
+        },
+        {
+          icon: 'heart',
+          title: 'Your Comfort Matters',
+          text: 'Your pace, questions, and needs shape the day, whether you travel alone, with family, or as a group.',
+          proofQuote: 'I felt safe, protected and well taken care of.',
+          proofAuthor: 'Myra Mirabel Aboagye',
+        },
+        {
+          icon: 'user-circle',
+          title: 'Hosted From Experience',
+          text: 'The people guiding you know these roads, communities, and stories because Ghana is home.',
+          proofQuote: 'During the trip, you could feel the warmth and passion at every step of the way, and that\'s completely contagious for the group!',
+          proofAuthor: 'Iga Gawronska',
+        },
+        {
+          icon: 'calendar',
+          title: 'Plans That Fit Real Life',
+          text: 'We plan honestly around your time, budget, and priorities. When life changes, we adjust with you.',
+          proofQuote: 'Even with short notice, everything was handled smoothly and without any stress which honestly says a lot.',
+          proofAuthor: 'Jacoya Miller',
+        },
+      ],
+    },
+    reviewsAndTrust: {
+      eyebrow: 'Real Reviews',
+      titleLines: ['What Our', 'Travellers Say'],
+      intro: 'The words below come from people we’ve welcomed across Ghana. They remember the care, the stories, and the people they met along the way.',
+      heroImage: {
+        src: 'assets/photos/reviews-trust-banner.jpg',
+        width: 1120,
+        height: 1400,
+        alt: 'A group of guests celebrating together at a Ghana heritage site',
+      },
+      // The Google rating is the strongest signal in this section, so it is
+      // pulled out as its own anchor rather than competing as one cell in a
+      // four-up row. The founders' names moved out: they are an About fact,
+      // not review credibility, and the long value was the reason the row's
+      // labels never sat on a shared baseline.
+      ratingSummary: {
+        value: '5.0',
+        source: 'Google',
+        count: 15,
+        href: 'https://www.google.com/search?q=People+%26+Places+Tours+Ghana+reviews',
+      },
+      trustFacts: [
+        { label: 'Guests Hosted', value: '300+' },
+        { label: 'Hosting Locally Since', value: '2021' },
+      ],
+      items: [
+        {
+          quote: 'Kojo is an outstanding guide — knowledgeable, patient, and genuinely passionate about sharing Ghana with visitors. People & Places Tours brings pride, warmth, and joy to their work.',
+          author: 'Louis Cameron',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'My tour guide Nana Yeboah was not only knowledgeable but also warm and genuinely passionate about sharing his expertise.',
+          author: 'Heather Harlin',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'The tag team who runs and operates the brand People & Places, Kojo & Nana… they hands down score high in my book!',
+          author: 'Shy osler',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+      ],
+    },
+    planningProcess: {
+      eyebrow: 'From Dream to Departure',
+      title: 'Your Journey in Three Simple Steps',
+      intro: 'Tell us what you have in mind. We’ll listen, work through the details with you, and make sure you know what to expect before you arrive.',
+      steps: [
+        {
+          icon: 'search',
+          number: '01',
+          title: 'Tell Us About Your Trip',
+          text: 'Share your travel dates, interests, and the pace that feels right for you.',
+        },
+        {
+          icon: 'chat',
+          number: '02',
+          title: 'We’ll Design Your Journey',
+          text: 'We’ll put together an itinerary that fits your interests, comfort, and time.',
+        },
+        {
+          icon: 'play',
+          number: '03',
+          title: 'Experience Ghana Like a Local',
+          text: 'Arrive knowing your host is ready to welcome you and share Ghana as they know it.',
+        },
+      ],
+    },
+    finalInvitation: {
+      eyebrow: 'Ready When You Are',
+      headline: 'Ready to Experience Ghana Like a Local?',
+      body: 'Tell us what kind of time in Ghana feels right for you. We’ll listen, answer your questions, and plan it with you.',
+      cta: { label: 'Start Planning', href: 'contact.html' },
+      secondaryCta: {
+        label: 'Chat on WhatsApp',
+        href: 'https://wa.me/233503673473?text=Hi%21+I%27d+like+to+book+a+tour.',
+        external: true,
+      },
+      reassurance: 'No pressure. No commitment. Just a conversation.',
+      trustMessage: "You'll be speaking directly with our Ghana-based team.",
+      phone: '+233 50 367 3473',
+      internationalPhone: '+1 803 477 6489',
+    },
+  };
+})();

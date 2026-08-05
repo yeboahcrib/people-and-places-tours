@@ -1,0 +1,78 @@
+{
+  "bookingFlow": {
+    "eyebrow": "Begin Your Journey",
+    "title": "A few details. Then we plan it together.",
+    "intro": "This is the start of a conversation, not a commitment. Share what you know now — we'll work out the rest with you.",
+
+    "step1Name": "Your trip",
+    "step1Legend": "Tell us about the experience you're imagining",
+    "step1Help": "Rough answers are perfectly fine — dates and numbers can change later.",
+    "nextLabel": "Continue Your Journey",
+    "nextNote": "You're not committing to anything yet.",
+
+    "step2Name": "How we reach you",
+    "step2Legend": "How should our team reach you?",
+    "step2Help": "Just enough for a real person to write back to you.",
+    "submitLabel": "Let's Plan Together",
+    "submitNote": "Our Ghana-based team usually replies within one business day.",
+
+    "privacyNote": "We use these details only to reply and plan with you. Please don't include passport, payment, medical, or other sensitive information.",
+    "altPrompt": "Would you rather just talk it through?",
+
+    "successTitle": "Your Ghana journey has started.",
+    "successText": "Thank you for trusting us with it. Someone from our team in Accra will read your note personally and write back — usually within one business day.",
+
+    "trustPoints": [
+      {"icon": "pin", "label": "Planned by our team in Accra"},
+      {"icon": "clock", "label": "Usually a reply within one business day"},
+      {"icon": "lock", "label": "No payment at this stage"}
+    ],
+
+    "nextStepsTitle": "What happens after you say hello?",
+    "nextStepsIntro": "A real person from our Ghana-based team takes it from here. No automated itinerary, and no pressure.",
+    "nextSteps": [
+      {
+        "title": "We read your note",
+        "description": "Someone from our local team replies personally, usually within one business day."
+      },
+      {
+        "title": "We shape it together",
+        "description": "We'll ask a few thoughtful questions and suggest ideas around your interests, pace, and dates."
+      },
+      {
+        "title": "You decide when it feels right",
+        "description": "Only when you're happy with the plan do we confirm dates, payment, and the practical details."
+      },
+      {
+        "title": "We welcome you to Ghana",
+        "description": "You arrive knowing your host, your plan, and the people you're about to meet."
+      }
+    ],
+
+    "talkTitle": "Would you rather talk?",
+    "talkText": "Call or message us directly. We genuinely enjoy speaking with travelers.",
+
+    "faqs": [
+      {
+        "question": "How far in advance should I book?",
+        "answer": "We recommend booking at least 1–2 weeks in advance, especially during peak season (December–February and July–August). For large groups or custom itineraries, 3–4 weeks ahead is ideal to ensure everything is perfectly arranged."
+      },
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept bank transfers and Mobile Money (MTN, Vodafone Cash, AirtelTigo). A 30% deposit secures your booking, with the balance due 30 days before the tour date."
+      },
+      {
+        "question": "Do you offer airport pickup?",
+        "answer": "Yes — we offer airport pickup and drop-off as an add-on service. Our driver will meet you at Kotoka International Airport with your name on a sign and transfer you to your hotel. Please provide your flight details when booking."
+      },
+      {
+        "question": "Can I book a tour for tomorrow?",
+        "answer": "Subject to availability, yes! WhatsApp us directly at +233 50 367 3473 for last-minute requests. We'll do our best to accommodate you, though we cannot guarantee availability on very short notice during busy periods."
+      },
+      {
+        "question": "Do you accommodate solo travelers?",
+        "answer": "Absolutely. Many of our most memorable tours have been with solo travelers. You'll receive the same quality of experience with a dedicated guide. We can also connect solo travelers with compatible small groups to reduce costs if preferred."
+      }
+    ]
+  }
+}

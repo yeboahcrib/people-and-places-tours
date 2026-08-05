@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="preconnect" href="https://images.unsplash.com" />
   <title>Contact Us — People & Places Tours Ghana</title>
   <meta name="description" content="Get in touch with People & Places Tours Ghana. Call, email, or fill out our inquiry form to plan your perfect Ghana adventure." />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -14,15 +15,15 @@
 <body>
 
   <!-- ═══════════════ NAVIGATION ═══════════════ -->
-  <nav class="nav scrolled" role="navigation" aria-label="Main navigation">
+  <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo" aria-label="People & Places Tours Home">
-        <img src="assets/logo-footer.svg" alt="People & Places Tours">
+        <img src="assets/logo-footer.svg" alt="People & Places Tours" width="1510" height="640" decoding="async">
       </a>
       <ul class="nav-links" role="list">
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About</a></li>
-        <li><a href="packages.html">Packages</a></li>
+        <li><a href="packages.html">Experiences</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-cta">
@@ -36,7 +37,7 @@
     <nav class="nav-mobile" aria-label="Mobile navigation">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
-      <a href="packages.html">Packages</a>
+      <a href="packages.html">Experiences</a>
       <a href="contact.html">Contact</a>
       <a href="packages.html" class="btn btn-primary" style="align-self:flex-start;margin-top:8px;">Book a Tour</a>
     </nav>
@@ -44,15 +45,15 @@
 
   <!-- ═══════════════ PAGE HERO ═══════════════ -->
   <section class="page-hero" aria-label="Contact page hero">
-    <div class="page-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1696343782507-a8188a2e4865?auto=format&fit=crop&w=1920&q=80');"></div>
+    <img class="page-hero-bg" src="https://images.unsplash.com/photo-1696343782507-a8188a2e4865?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" />
     <div class="page-hero-content container">
       <div class="breadcrumb">
         <a href="index.html">Home</a>
         <span class="breadcrumb-sep">/</span>
         <span class="breadcrumb-current">Contact</span>
       </div>
-      <h1 class="page-hero-title">Let's<br><span style="color:var(--yellow);">Talk</span></h1>
-      <p class="page-hero-subtitle">Ready to explore Ghana? We'll help you plan every detail — just say the word.</p>
+      <h1 class="page-hero-title">Let's Plan<br><span style="color:var(--yellow);">Ghana Together</span></h1>
+      <p class="page-hero-subtitle">Tell us a little about the journey you're imagining. Our local team will take it from there with you.</p>
     </div>
   </section>
 
@@ -63,7 +64,7 @@
       <div class="section-header text-center" style="margin-bottom:56px;">
         <div class="eyebrow reveal" style="justify-content:center;">Reach Us</div>
         <h2 class="section-title reveal reveal-delay-1">Multiple Ways<br>to Connect</h2>
-        <p class="section-subtitle reveal reveal-delay-2" style="margin:0 auto;">We typically respond within a few hours. For urgent inquiries, call or WhatsApp us directly.</p>
+        <p class="section-subtitle reveal reveal-delay-2" style="margin:0 auto;">We usually respond within one hour during business hours (Monday–Friday, 9am–5pm). For urgent inquiries, call or WhatsApp us directly.</p>
       </div>
 
       <div class="contact-info-grid">
@@ -74,7 +75,8 @@
           </div>
           <div class="contact-card-label">Phone / WhatsApp</div>
           <div class="contact-card-value">+233 50 367 3473</div>
-          <div class="contact-card-sub">Available daily, 7am – 8pm GMT</div>
+          <div class="contact-card-sub">Mon–Fri, 9am–5pm · usually within one hour</div>
+          <div class="contact-card-sub">US/International: <a href="tel:+18034776489" style="color:inherit;">+1 803 477 6489</a></div>
           <a href="tel:+233503673473" class="btn btn-ghost" style="margin-top:20px;">Call Now</a>
         </div>
 
@@ -84,7 +86,7 @@
           </div>
           <div class="contact-card-label">Email Address</div>
           <div class="contact-card-value" style="font-size:18px;">peopandplaces@gmail.com</div>
-          <div class="contact-card-sub">We reply within 24 hours</div>
+          <div class="contact-card-sub">Usually within one hour during business hours</div>
           <a href="mailto:peopandplaces@gmail.com" class="btn btn-ghost" style="margin-top:20px;">Send Email</a>
         </div>
 
@@ -100,141 +102,204 @@
 
       </div>
 
-      <!-- ─── FORM + SIDEBAR ─── -->
+      <!-- ─── BOOKING FLOW + SIDEBAR ─── -->
       <div class="contact-form-section">
 
-        <!-- Form -->
-        <div class="reveal">
-          <div class="eyebrow" style="margin-bottom:12px;">Send Inquiry</div>
-          <h2 style="font-family:var(--font-display);font-size:clamp(40px,5vw,64px);color:var(--white);margin-bottom:32px;line-height:1;">Plan Your<br>Ghana Journey</h2>
+        <!-- Booking flow -->
+        <div class="reveal" id="booking-flow">
+         <div class="booking-panel">
+          <div class="eyebrow booking-flow-label" data-booking-copy="eyebrow">Begin Your Journey</div>
+          <h2 class="booking-flow-title" data-booking-copy="title">A few details. Then we plan it together.</h2>
+          <p class="booking-flow-intro" data-booking-copy="intro">This is the start of a conversation, not a commitment. Share what you know now — we'll work out the rest with you.</p>
 
-          <form class="contact-form" name="contact" netlify netlify-honeypot="bot-field" novalidate aria-label="Tour inquiry form">
-            <input type="hidden" name="form-name" value="contact">
-            <p hidden><label>Don't fill this out: <input name="bot-field"></label></p>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="first-name">First Name <span style="color:var(--yellow);">*</span></label>
-                <input class="form-input" type="text" id="first-name" name="first-name" placeholder="John" required autocomplete="given-name" />
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="last-name">Last Name <span style="color:var(--yellow);">*</span></label>
-                <input class="form-input" type="text" id="last-name" name="last-name" placeholder="Doe" required autocomplete="family-name" />
-              </div>
+          <form class="contact-form booking-flow" name="contact" action="https://formsubmit.co/peopandplaces@gmail.com" method="POST" novalidate aria-label="Start planning your Ghana experience" data-inquiry-mode="fallback" data-cloudflare-endpoint="/api/inquiry">
+            <input type="hidden" name="_subject" value="New tour inquiry from People & Places website">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_next" value="https://yeboahcrib.github.io/people-and-places-tours/thanks.html">
+            <input type="hidden" name="source" value="Contact page inquiry">
+            <input type="hidden" id="tour-name" name="tour-name" value="">
+            <div class="form-honeypot" aria-hidden="true">
+              <label for="company-website">Leave this field empty</label>
+              <input type="text" id="company-website" name="company-website" tabindex="-1" autocomplete="off">
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="email">Email Address <span style="color:var(--yellow);">*</span></label>
-                <input class="form-input" type="email" id="email" name="email" placeholder="john@example.com" required autocomplete="email" />
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="phone">Phone / WhatsApp</label>
-                <input class="form-input" type="tel" id="phone" name="phone" placeholder="+1 234 567 8900" autocomplete="tel" />
-              </div>
+            <!-- Progress: tells people where they are and how much is left.
+                 The numbered list is the accessible source of truth; the track
+                 is decorative reinforcement. -->
+            <div class="booking-progress">
+              <ol class="booking-progress-steps" role="list">
+                <li class="booking-progress-step" data-booking-progress-step="1" aria-current="step">
+                  <span class="booking-progress-num" aria-hidden="true">1</span>
+                  <span class="booking-progress-name" data-booking-copy="step1Name">Your trip</span>
+                </li>
+                <li class="booking-progress-step" data-booking-progress-step="2">
+                  <span class="booking-progress-num" aria-hidden="true">2</span>
+                  <span class="booking-progress-name" data-booking-copy="step2Name">How we reach you</span>
+                </li>
+              </ol>
+              <div class="booking-progress-track" aria-hidden="true"><span data-booking-progress></span></div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="tour-interest">Tour of Interest</label>
-                <select class="form-select" id="tour-interest" name="tour-interest">
-                  <option value="" disabled selected>Select a tour...</option>
-                  <option value="cape-coast">Cape Coast Ancestral Tour — $160</option>
-                  <option value="accra-city">Accra City Tour — $100</option>
-                  <option value="shai-hills">Shai Hills &amp; Boat Cruise — $130</option>
-                  <option value="quad-bike">Quad Bike &amp; Waterfalls — $130</option>
-                  <option value="aburi">Aburi Day Tour — $100</option>
-                  <option value="kumasi">Kumasi Cultural Immersion — $250</option>
-                  <option value="ada-foah">Ada Foah Beach &amp; Canoe Safari — $150</option>
-                  <option value="akosombo">Akosombo Dam &amp; Lake Volta — $110</option>
-                  <option value="custom">Custom / Bespoke Tour</option>
-                </select>
+            <p class="visually-hidden" data-booking-announce aria-live="polite"></p>
+
+            <!-- Step 1 — the part people enjoy answering. Nothing required. -->
+            <fieldset class="booking-step" data-booking-step="1">
+              <legend class="booking-step-legend" data-booking-copy="step1Legend">Tell us about the experience you're imagining</legend>
+              <p class="booking-step-help" data-booking-copy="step1Help">Rough answers are perfectly fine — dates and numbers can change later.</p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="tour-interest">Which experience is calling you?</label>
+                  <select class="form-select" id="tour-interest" name="tour-interest">
+                    <option value="" selected>I'm open to ideas</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="group-size">Who's traveling?</label>
+                  <select class="form-select" id="group-size" name="group-size">
+                    <option value="" selected>Not sure yet</option>
+                    <option value="solo">Just me</option>
+                    <option value="2">2 people</option>
+                    <option value="3-5">3–5 people</option>
+                    <option value="6-10">6–10 people</option>
+                    <option value="11-15">11–15 people</option>
+                    <option value="15+">More than 15 people</option>
+                  </select>
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="group-size">Group Size</label>
-                <select class="form-select" id="group-size" name="group-size">
-                  <option value="" disabled selected>Select size...</option>
-                  <option value="solo">Solo traveler</option>
-                  <option value="2">2 people</option>
-                  <option value="3-5">3–5 people</option>
-                  <option value="6-10">6–10 people</option>
-                  <option value="11-15">11–15 people</option>
-                  <option value="15+">15+ people (large group)</option>
-                </select>
+
+              <div class="form-group form-group-half">
+                <label class="form-label" for="travel-date">Roughly when would you like to come? <span class="form-optional">optional</span></label>
+                <input class="form-input" type="date" id="travel-date" name="travel-date" aria-describedby="travel-date-help" />
+                <p class="form-help" id="travel-date-help">An approximate date is enough. We'll confirm together.</p>
               </div>
+
+              <div class="form-group">
+                <label class="form-label" for="message">What would make this trip feel special? <span class="form-optional">optional</span></label>
+                <textarea class="form-textarea" id="message" name="message" maxlength="5000" placeholder="Food, history, family roots, nature, a celebration, a slower pace… as much or as little as you like."></textarea>
+              </div>
+            </fieldset>
+
+            <div class="booking-step-actions" data-booking-actions="1">
+              <button type="button" class="btn btn-primary booking-next" data-booking-copy="nextLabel">Continue Your Journey</button>
+              <p class="booking-action-note" data-booking-copy="nextNote">You're not committing to anything yet.</p>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="travel-date">Preferred Travel Date</label>
-                <input class="form-input" type="date" id="travel-date" name="travel-date" />
+            <!-- Step 2 — the only place we ask for anything required. -->
+            <fieldset class="booking-step" data-booking-step="2">
+              <legend class="booking-step-legend" data-booking-copy="step2Legend">How should our team reach you?</legend>
+              <p class="booking-step-help" data-booking-copy="step2Help">Just enough for a real person to write back to you.</p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="first-name">First name</label>
+                  <input class="form-input" type="text" id="first-name" name="first-name" placeholder="Ama" required minlength="1" maxlength="80" autocomplete="given-name" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="last-name">Last name</label>
+                  <input class="form-input" type="text" id="last-name" name="last-name" placeholder="Mensah" required minlength="1" maxlength="80" autocomplete="family-name" />
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="country">Your Country</label>
-                <input class="form-input" type="text" id="country" name="country" placeholder="United States" autocomplete="country-name" />
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="email">Email address</label>
+                  <input class="form-input" type="email" id="email" name="email" placeholder="ama@example.com" required maxlength="254" autocomplete="email" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="phone">Phone or WhatsApp <span class="form-optional">optional</span></label>
+                  <input class="form-input" type="tel" id="phone" name="phone" placeholder="+1 234 567 8900" maxlength="40" autocomplete="tel" aria-describedby="phone-help" />
+                  <p class="form-help" id="phone-help">Handy if you'd rather we voice-note than type.</p>
+                </div>
               </div>
+            </fieldset>
+
+            <div class="booking-step-actions" data-booking-actions="2">
+              <p class="form-error" role="alert"></p>
+              <div class="booking-final-actions">
+                <button type="submit" class="btn btn-primary form-submit-btn" data-booking-copy="submitLabel">Let's Plan Together</button>
+                <button type="button" class="btn btn-ghost booking-back">Back</button>
+              </div>
+              <p class="booking-action-note" data-booking-copy="submitNote">Our Ghana-based team usually replies within one business day.</p>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="message">Message / Special Requests</label>
-              <textarea class="form-textarea" id="message" name="message" placeholder="Tell us about your ideal Ghana experience, any special occasions, accessibility needs, or questions you have..."></textarea>
-            </div>
+            <p class="form-privacy-note" data-booking-copy="privacyNote">We use these details only to reply and plan with you. Please don't include passport, payment, medical, or other sensitive information.</p>
 
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary form-submit-btn" style="padding:18px 48px;font-size:14px;">
-                Send Inquiry
-                <svg class="arrow-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </button>
-              <a href="https://wa.me/233503673473?text=Hi%21+I%27d+like+to+enquire+about+a+tour+with+People+%26+Places+Tours." target="_blank" rel="noopener" class="btn btn-ghost form-wa-btn" style="display:inline-flex;align-items:center;gap:8px;padding:18px 32px;font-size:14px;">
-                <svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;fill:currentColor;" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                WhatsApp Us
+            <ul class="booking-trust" role="list" data-booking-trust>
+              <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Planned by our team in Accra</li>
+              <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Usually a reply within one business day</li>
+              <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>No payment at this stage</li>
+            </ul>
+
+            <div class="booking-alt">
+              <span data-booking-copy="altPrompt">Would you rather just talk it through?</span>
+              <a href="https://wa.me/233503673473?text=Hi%21+I%27d+like+to+enquire+about+a+tour+with+People+%26+Places+Tours." target="_blank" rel="noopener" class="booking-wa-link">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                Chat with us on WhatsApp
               </a>
             </div>
 
           </form>
-        </div>
 
-        <!-- Sidebar -->
-        <div class="contact-sidebar reveal reveal-delay-1">
-          <h3 class="contact-sidebar-title">What Happens Next?</h3>
-          <p>Once we receive your inquiry, here's what to expect from our team:</p>
-
-          <div style="display:flex;flex-direction:column;gap:0;margin-bottom:32px;">
-            <div style="display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
-              <div style="width:32px;height:32px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:18px;color:var(--black);">1</div>
-              <div>
-                <div style="font-family:var(--font-display);font-size:20px;color:var(--white);margin-bottom:4px;">We Confirm Receipt</div>
-                <div style="font-size:13px;color:var(--gray-3);line-height:1.6;">You'll receive an acknowledgment email within 2 hours of submitting your inquiry.</div>
-              </div>
+          <!-- Confirmation state. Shown in place of the form once the inquiry is
+               delivered by the Pages Function; the no-JS fallback posts to
+               thanks.html instead. -->
+          <div class="booking-success" data-booking-success hidden>
+            <div class="booking-success-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <div style="display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
-              <div style="width:32px;height:32px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:18px;color:var(--black);">2</div>
-              <div>
-                <div style="font-family:var(--font-display);font-size:20px;color:var(--white);margin-bottom:4px;">We Build Your Itinerary</div>
-                <div style="font-size:13px;color:var(--gray-3);line-height:1.6;">A dedicated team member reviews your preferences and crafts a personalized proposal within 24 hours.</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);align-items:flex-start;">
-              <div style="width:32px;height:32px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:18px;color:var(--black);">3</div>
-              <div>
-                <div style="font-family:var(--font-display);font-size:20px;color:var(--white);margin-bottom:4px;">We Confirm &amp; Book</div>
-                <div style="font-size:13px;color:var(--gray-3);line-height:1.6;">Once you're happy with the plan, we confirm your booking with a deposit and send all logistics details.</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:16px;padding:20px 0;align-items:flex-start;">
-              <div style="width:32px;height:32px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-display);font-size:18px;color:var(--black);">4</div>
-              <div>
-                <div style="font-family:var(--font-display);font-size:20px;color:var(--white);margin-bottom:4px;">Ghana Awaits You</div>
-                <div style="font-size:13px;color:var(--gray-3);line-height:1.6;">Your guide meets you at your hotel on tour day. The adventure begins.</div>
-              </div>
+            <h3 class="booking-success-title" data-booking-copy="successTitle">Your Ghana journey has started.</h3>
+            <p class="booking-success-text" data-booking-copy="successText">Thank you for trusting us with it. Someone from our team in Accra will read your note personally and write back — usually within one business day.</p>
+            <p class="booking-success-meta">Your reference: <span data-booking-reference>—</span></p>
+            <div class="booking-success-actions">
+              <a href="packages.html" class="btn btn-ghost">Keep exploring experiences</a>
             </div>
           </div>
+         </div>
+        </div>
 
-          <div style="background:rgba(255,171,0,0.08);border:1px solid var(--border-yellow);border-radius:var(--radius);padding:20px;">
-            <div style="font-family:var(--font-display);font-size:18px;color:var(--yellow);margin-bottom:8px;">Prefer to Talk?</div>
-            <p style="font-size:13px;color:var(--gray-2);line-height:1.6;margin-bottom:16px;">Call or WhatsApp us directly for instant answers. We love speaking with travelers.</p>
-            <a href="tel:+233503673473" style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--yellow);">
-              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--yellow);fill:none;stroke-width:2;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.38 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <!-- Sidebar: the "what happens next" promise. Rendered from
+             src/content/booking.json (or Sanity) at build time. -->
+        <div class="contact-sidebar reveal reveal-delay-1">
+          <h3 class="contact-sidebar-title" data-booking-copy="nextStepsTitle">What happens after you say hello?</h3>
+          <p data-booking-copy="nextStepsIntro">A real person from our Ghana-based team takes it from here. No automated itinerary, and no pressure.</p>
+
+          <ol class="booking-next-steps" data-booking-next-steps>
+            <li class="booking-next-step">
+              <span class="booking-next-step-num" aria-hidden="true">1</span>
+              <div>
+                <h4 class="booking-next-step-title">We read your note</h4>
+                <p class="booking-next-step-text">Someone from our local team replies personally, usually within one business day.</p>
+              </div>
+            </li>
+            <li class="booking-next-step">
+              <span class="booking-next-step-num" aria-hidden="true">2</span>
+              <div>
+                <h4 class="booking-next-step-title">We shape it together</h4>
+                <p class="booking-next-step-text">We'll ask a few thoughtful questions and suggest ideas around your interests, pace, and dates.</p>
+              </div>
+            </li>
+            <li class="booking-next-step">
+              <span class="booking-next-step-num" aria-hidden="true">3</span>
+              <div>
+                <h4 class="booking-next-step-title">You decide when it feels right</h4>
+                <p class="booking-next-step-text">Only when you're happy with the plan do we confirm dates, payment, and the practical details.</p>
+              </div>
+            </li>
+            <li class="booking-next-step">
+              <span class="booking-next-step-num" aria-hidden="true">4</span>
+              <div>
+                <h4 class="booking-next-step-title">We welcome you to Ghana</h4>
+                <p class="booking-next-step-text">You arrive knowing your host, your plan, and the people you're about to meet.</p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="booking-sidebar-call">
+            <div class="booking-sidebar-call-title" data-booking-copy="talkTitle">Would you rather talk?</div>
+            <p class="booking-sidebar-call-text" data-booking-copy="talkText">Call or message us directly. We genuinely enjoy speaking with travelers.</p>
+            <a href="tel:+233503673473" class="booking-sidebar-call-link">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.38 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               +233 50 367 3473
             </a>
           </div>
@@ -246,10 +311,12 @@
 
   <!-- ═══════════════ MAP PLACEHOLDER ═══════════════ -->
   <div style="height:420px;overflow:hidden;position:relative;background:var(--black-3);" aria-label="Map location placeholder">
-    <img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=1920&q=80&h=420" alt="Accra, Ghana location" loading="lazy" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" />
+    <img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=1920&q=80&h=420" alt="Accra, Ghana location" loading="lazy" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" width="1920" height="420" decoding="async" />
     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
       <div style="background:rgba(10,10,10,0.8);backdrop-filter:blur(16px);border:1px solid var(--border-yellow);border-radius:var(--radius-lg);padding:32px 48px;text-align:center;">
-        <div style="font-size:36px;margin-bottom:8px;">📍</div>
+        <div style="margin-bottom:12px;display:flex;justify-content:center;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
         <div style="font-family:var(--font-display);font-size:32px;color:var(--white);margin-bottom:4px;">Accra, Ghana</div>
         <div style="font-size:13px;color:var(--gray-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px;">West Africa • GMT+0</div>
         <a href="https://maps.google.com/?q=Accra,Ghana" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
@@ -270,7 +337,7 @@
           <p class="section-subtitle reveal reveal-delay-2">Still have questions? Use the form above or call us — we're always happy to help.</p>
         </div>
 
-        <ul class="faq-list reveal reveal-delay-1" role="list">
+        <ul class="faq-list reveal reveal-delay-1" role="list" data-booking-faqs>
           <li class="faq-item open">
             <button class="faq-question" aria-expanded="true">
               How far in advance should I book?
@@ -286,7 +353,7 @@
               <div class="faq-q-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
             </button>
             <div class="faq-answer">
-              <div class="faq-answer-inner">We accept bank transfers, Mobile Money (MTN, Vodafone Cash, AirtelTigo), and major credit/debit cards. A 30% deposit secures your booking, with the balance due before the tour date.</div>
+              <div class="faq-answer-inner">We accept bank transfers and Mobile Money (MTN, Vodafone Cash, AirtelTigo). A 30% deposit secures your booking, with the balance due 30 days before the tour date.</div>
             </div>
           </li>
           <li class="faq-item">
@@ -327,7 +394,7 @@
       <div class="footer-top">
         <div class="footer-brand">
           <a href="index.html" class="footer-logo-link" aria-label="People & Places Tours">
-            <img src="assets/favicon.svg" alt="People & Places Tours">
+            <img src="assets/favicon.svg" alt="People & Places Tours" width="615" height="615" decoding="async">
           </a>
           <p>We don't just show you Ghana — we help you feel it. Born local, built for the world.</p>
           <div class="footer-social">
@@ -346,8 +413,8 @@
           <h3 class="footer-col-title">Quick Links</h3>
           <ul class="footer-links" role="list">
             <li><a href="index.html">Home</a></li>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="packages.html">Tour Packages</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="packages.html">Experiences</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
@@ -368,6 +435,10 @@
             <span>+233 50 367 3473</span>
           </div>
           <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.38 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>+1 803 477 6489 (US/International)</span>
+          </div>
+          <div class="footer-contact-item">
             <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             <span>peopandplaces@gmail.com</span>
           </div>
@@ -378,15 +449,15 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p class="footer-copy">&copy; 2025 <span>People &amp; Places Tours</span>. All rights reserved.</p>
+        <p class="footer-copy">&copy; 2026 <span>People &amp; Places Tours</span>. All rights reserved.</p>
         <div class="footer-legal">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms &amp; Conditions</a>
+          <span>Policies pending final review</span>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="tours.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

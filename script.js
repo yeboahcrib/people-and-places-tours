@@ -27,18 +27,190 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ── STICKY NAV ── */
+  /* Keep the cinematic hero efficient and respectful of motion preferences.
+     The background video stops whenever it is offscreen or the tab is hidden. */
+  const homepageHeroVideo = document.querySelector('.v-hero-video');
+  if (homepageHeroVideo) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let heroVideoInView = true;
+    const syncHeroVideo = () => {
+      if (prefersReducedMotion || document.hidden || !heroVideoInView) {
+        homepageHeroVideo.pause();
+      } else {
+        homepageHeroVideo.play().catch(() => {});
+      }
+    };
+    if (prefersReducedMotion) homepageHeroVideo.removeAttribute('autoplay');
+    if ('IntersectionObserver' in window) {
+      const heroVideoObserver = new IntersectionObserver(entries => {
+        heroVideoInView = entries.some(entry => entry.isIntersecting);
+        syncHeroVideo();
+      }, {threshold: 0.05});
+      heroVideoObserver.observe(homepageHeroVideo);
+    }
+    document.addEventListener('visibilitychange', syncHeroVideo);
+    syncHeroVideo();
+  }
+
+  const usesExternalFormEndpoint = form => {
+    try {
+      return new URL(form.action).hostname === 'formsubmit.co';
+    } catch {
+      return false;
+    }
+  };
+
+  const tours = Array.isArray(window.PEOPLE_PLACES_TOURS) ? window.PEOPLE_PLACES_TOURS : [];
+  const bySlug = new Map(tours.map(tour => [tour.slug, tour]));
+  const bookingUrl = slug => `contact.html?tour=${encodeURIComponent(slug)}#booking-flow`;
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[char]));
+  const delayClass = index => index % 3 === 1 ? ' reveal-delay-1' : index % 3 === 2 ? ' reveal-delay-2' : '';
+  const tourInitials = title => title.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase();
+  const clockIcon = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+  const peopleIcon = '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>';
+  const pinIcon = '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  const cardImageSizes = '(min-width: 1180px) 360px, (min-width: 760px) 45vw, 100vw';
+
+  function renderPackageTours() {
+    const grid = document.getElementById('tours-grid');
+    if (!grid || tours.length === 0) return;
+
+    const packageTours = tours
+      .filter(tour => tour.packageOrder !== undefined)
+      .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999));
+
+    grid.innerHTML = packageTours.map((tour, index) => {
+      const tags = (tour.vibes || []).slice(0, 2).map(tag => `<span class="tour-vibe-tag">${escapeHtml(tag)}</span>`).join('');
+      const badge = tour.badge ? `<div class="tour-card-badge">${escapeHtml(tour.badge)}</div>` : '';
+      const highlight = tour.cardHighlight ? `<p class="tour-card-highlight">${escapeHtml(tour.cardHighlight)}</p>` : '';
+
+      return `
+        <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-categories="${escapeHtml((tour.categories || []).join(' '))}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
+          <div class="tour-card-img">
+            <img src="${escapeHtml(tour.packageImage || tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="550" loading="lazy" decoding="async" sizes="${cardImageSizes}" />
+            ${badge}
+            <div class="tour-vibe-tags">${tags}</div>
+          </div>
+          <div class="tour-card-body">
+            <h3 class="tour-card-title"><a href="${escapeHtml(tour.detailUrl)}" class="tour-card-stretched-link">${escapeHtml(tour.title)}</a></h3>
+            <p class="tour-card-desc">${escapeHtml(tour.packageDescription || tour.description)}</p>
+            <div class="tour-card-meta">
+              <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
+              <span class="tour-meta-item">${pinIcon}${escapeHtml(tour.location)}</span>
+              <span class="tour-meta-item">${peopleIcon}${escapeHtml(tour.groupSize)}</span>
+            </div>
+            ${highlight}
+            <div class="tour-card-footer">
+              <div class="tour-card-price"><span>From</span>${escapeHtml(tour.price)} <small>${escapeHtml(tour.priceUnit || '')}</small></div>
+              <a href="${escapeHtml(tour.detailUrl)}" class="tour-card-book-btn">View Experience</a>
+            </div>
+          </div>
+        </article>`;
+    }).join('');
+  }
+
+  function renderCommandPaletteTours() {
+    const list = document.getElementById('cmd-list');
+    if (!list || tours.length === 0) return;
+
+    list.innerHTML = tours
+      .slice()
+      .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999))
+      .map(tour => `
+        <li><a class="cmd-item" href="${escapeHtml(tour.detailUrl)}">
+          <span class="cmd-item-icon">${escapeHtml(tourInitials(tour.title))}</span>
+          <span class="cmd-item-text">
+            <strong>${escapeHtml(tour.title)}</strong>
+            <span>${escapeHtml(tour.commandSummary || tour.description)}</span>
+          </span>
+          <span class="cmd-item-meta">${escapeHtml(tour.price)} | ${escapeHtml(tour.duration)}</span>
+        </a></li>`).join('');
+  }
+
+  function renderContactTourOptions() {
+    const select = document.getElementById('tour-interest');
+    if (!select || tours.length === 0) return;
+
+    const options = tours
+      .slice()
+      .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999))
+      .map(tour => `<option value="${escapeHtml(tour.slug)}">${escapeHtml(tour.title)} - ${escapeHtml(tour.price)}</option>`)
+      .join('');
+
+    select.innerHTML = `
+      <option value="" selected>I'm open to ideas</option>
+      ${options}
+      <option value="custom">Something made around me</option>`;
+  }
+
+  function hydrateTourDetailFromCatalog() {
+    if (tours.length === 0) return;
+    const page = location.pathname.split('/').pop() || 'index.html';
+    const tour = tours.find(item => item.detailUrl === page);
+    if (!tour) return;
+
+    document.querySelectorAll('.booking-card .big-price, .booking-card .price').forEach(el => {
+      el.textContent = tour.price;
+    });
+    document.querySelectorAll('.booking-card .price-sub').forEach(el => {
+      el.textContent = `per person · ${tour.duration}`;
+    });
+    document.querySelectorAll('.booking-card .booking-btns a.btn-outline-white').forEach(link => {
+      link.href = bookingUrl(tour.slug);
+    });
+    document.querySelectorAll('.trip-meta-item').forEach(item => {
+      if (item.textContent.includes('From:')) item.innerHTML = `<strong>From:</strong> ${escapeHtml(tour.price)}/person`;
+    });
+  }
+
+  renderPackageTours();
+  renderCommandPaletteTours();
+  renderContactTourOptions();
+  hydrateTourDetailFromCatalog();
+
+  /* ── NAV: light, compact state after the hero ──
+     One passive, rAF-throttled listener updates only when the threshold state
+     changes. The nav stays visible so its glass-to-white transition can read. */
   const nav = document.querySelector('.nav');
   if (nav) {
-    const handleScroll = () => nav.classList.toggle('scrolled', window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    const SCROLL_THRESHOLD = 90;
+    let ticking = false;
+    let compact = window.scrollY >= SCROLL_THRESHOLD;
+
+    const update = () => {
+      const nextCompact = window.scrollY >= SCROLL_THRESHOLD;
+      if (nextCompact !== compact) {
+        compact = nextCompact;
+        nav.classList.toggle('scrolled', compact);
+        window.setTimeout(() => window.dispatchEvent(new Event('navstatechange')), 310);
+      }
+      ticking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Initial state
+    nav.classList.toggle('scrolled', compact);
   }
 
   /* ── MOBILE MENU ── */
   const toggle = document.querySelector('.nav-toggle');
   const mobileMenu = document.querySelector('.nav-mobile');
   if (toggle && mobileMenu) {
+    mobileMenu.id ||= 'mobile-navigation';
+    toggle.setAttribute('aria-controls', mobileMenu.id);
     toggle.addEventListener('click', () => {
       const open = mobileMenu.classList.toggle('open');
       toggle.setAttribute('aria-expanded', open);
@@ -62,14 +234,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── ACTIVE NAV LINK ── */
+  /* ── ACTIVE NAV LINK + HOMEPAGE STORY POSITION ── */
   const currentPage = location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(link => {
-    const href = link.getAttribute('href');
-    if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-      link.classList.add('active');
-    }
-  });
+  const isTourDetail = tours.some(tour => tour.detailUrl === currentPage);
+  const desktopNavLinks = [...document.querySelectorAll('.nav-links a')];
+  const mobileNavLinks = [...document.querySelectorAll('.nav-mobile a:not(.btn)')];
+  const navLinks = [...desktopNavLinks, ...mobileNavLinks];
+  const navList = document.querySelector('.nav-links');
+
+  const positionActivePill = () => {
+    if (!navList) return;
+    const activeLink = desktopNavLinks.find(link => link.classList.contains('active'));
+    if (!activeLink) { navList.classList.remove('has-active-indicator'); return; }
+    const listRect = navList.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+    navList.style.setProperty('--nav-active-x', `${linkRect.left - listRect.left}px`);
+    navList.style.setProperty('--nav-active-y', `${linkRect.top - listRect.top}px`);
+    navList.style.setProperty('--nav-active-width', `${linkRect.width}px`);
+    navList.style.setProperty('--nav-active-height', `${linkRect.height}px`);
+    navList.classList.add('has-active-indicator');
+  };
+
+  const setActiveNav = (activeHref, storyPosition = false) => {
+    navLinks.forEach(link => {
+      const active = link.getAttribute('href') === activeHref;
+      link.classList.toggle('active', active);
+      if (active && !storyPosition) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    requestAnimationFrame(positionActivePill);
+  };
+
+  const pageHref = isTourDetail ? 'packages.html' : currentPage || 'index.html';
+  setActiveNav(pageHref);
+
+  const homepageSections = [...document.querySelectorAll('[data-home-section]')];
+  if ((currentPage === 'index.html' || currentPage === '') && homepageSections.length) {
+    const storyNavMap = {
+      hero: 'index.html',
+      founderStory: 'about.html',
+      waysToExperience: 'packages.html',
+      howHosted: 'packages.html',
+      reviewsAndTrust: 'packages.html',
+      planningProcess: 'contact.html',
+      finalInvitation: 'contact.html',
+    };
+    const storyObserver = new IntersectionObserver(entries => {
+      const visible = entries.find(entry => entry.isIntersecting);
+      const activeHref = visible && storyNavMap[visible.target.dataset.homeSection];
+      if (activeHref) setActiveNav(activeHref, activeHref !== 'index.html');
+    }, {rootMargin: '-34% 0px -55% 0px', threshold: 0});
+    homepageSections.forEach(section => storyObserver.observe(section));
+  }
+
+  window.addEventListener('resize', positionActivePill, {passive: true});
+  window.addEventListener('navstatechange', positionActivePill);
+  if ('ResizeObserver' in window && navList) new ResizeObserver(positionActivePill).observe(navList);
 
   /* ── HERO SLIDER ── */
   const heroSlides = document.querySelectorAll('.hero-slide');
@@ -104,60 +324,248 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── TESTIMONIALS SLIDER ── */
+  /* ── TESTIMONIALS RAIL ── */
   const testimonialsTrack = document.querySelector('.testimonials-track');
-  const testimonialSlides = document.querySelectorAll('.testimonial-slide');
   const testimonialDots   = document.querySelectorAll('.testimonials-dot');
-  let testimonialIndex = 0;
-  let testimonialInterval;
 
-  function showTestimonial(idx) {
-    if (!testimonialsTrack) return;
-    testimonialIndex = idx;
-    testimonialsTrack.style.transform = `translateX(-${idx * 100}%)`;
-    testimonialDots.forEach((d, i) => d.classList.toggle('active', i === idx));
-  }
+  if (testimonialsTrack && testimonialDots.length > 0) {
+    const originalSlides = Array.from(testimonialsTrack.querySelectorAll('.testimonial-slide'));
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let carouselPaused = reducedMotion;
+    let carouselInView = false;
+    let cycleWidth = 0;
+    let lastFrame = 0;
+    let resumeTimer = 0;
+    let dragStartX = 0;
+    let dragStartScroll = 0;
+    let isDragging = false;
 
-  if (testimonialsTrack && testimonialSlides.length > 0) {
-    showTestimonial(0);
-    testimonialInterval = setInterval(() => {
-      showTestimonial((testimonialIndex + 1) % testimonialSlides.length);
-    }, 6000);
+    if (!reducedMotion) {
+      originalSlides.forEach(slide => {
+        const clone = slide.cloneNode(true);
+        clone.classList.remove('reveal', 'visible');
+        clone.setAttribute('aria-hidden', 'true');
+        clone.querySelectorAll('a, button').forEach(control => control.setAttribute('tabindex', '-1'));
+        testimonialsTrack.appendChild(clone);
+      });
+      testimonialsTrack.classList.add('is-auto-scrolling');
+    }
+
+    const allSlides = () => Array.from(testimonialsTrack.querySelectorAll('.testimonial-slide'));
+    const measureCarousel = () => {
+      const first = originalSlides[0];
+      const firstClone = allSlides()[originalSlides.length];
+      cycleWidth = first && firstClone ? firstClone.offsetLeft - first.offsetLeft : testimonialsTrack.scrollWidth;
+    };
+
+    const syncTestimonialDots = () => {
+      if (testimonialsTrack.scrollWidth - testimonialsTrack.clientWidth <= 1) return;
+      const trackLeft = testimonialsTrack.getBoundingClientRect().left;
+      let nearest = 0;
+      let smallest = Infinity;
+      originalSlides.forEach((slide, i) => {
+        const offset = Math.abs(slide.getBoundingClientRect().left - trackLeft);
+        if (offset < smallest) { smallest = offset; nearest = i; }
+      });
+      if (cycleWidth && testimonialsTrack.scrollLeft >= cycleWidth) {
+        const cloneIndex = allSlides().slice(originalSlides.length).reduce((best, slide, i) => {
+          const offset = Math.abs(slide.getBoundingClientRect().left - trackLeft);
+          return offset < best.offset ? {index: i, offset} : best;
+        }, {index: 0, offset: Infinity}).index;
+        nearest = cloneIndex;
+      }
+      testimonialDots.forEach((dot, i) => {
+        const active = i === nearest;
+        dot.classList.toggle('active', active);
+        dot.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    };
+
+    let testimonialRaf = 0;
+    testimonialsTrack.addEventListener('scroll', () => {
+      cancelAnimationFrame(testimonialRaf);
+      testimonialRaf = requestAnimationFrame(syncTestimonialDots);
+    }, { passive: true });
+
     testimonialDots.forEach((dot, i) => {
-      dot.addEventListener('click', () => { clearInterval(testimonialInterval); showTestimonial(i); });
-    });
-  }
-
-  /* ── TRIP CATEGORY FILTER (home page) ── */
-  const tripFilterTags = document.querySelectorAll('.trip-filter-tag');
-  if (tripFilterTags.length > 0) {
-    tripFilterTags.forEach(tag => {
-      tag.addEventListener('click', () => {
-        tripFilterTags.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-        tag.classList.add('active');
-        tag.setAttribute('aria-selected', 'true');
-        const filter = tag.dataset.tripFilter;
-        document.querySelectorAll('.trip-card').forEach(card => {
-          const cats = card.dataset.tripCats || '';
-          card.style.display = (filter === 'all' || cats.includes(filter)) ? '' : 'none';
+      dot.addEventListener('click', () => {
+        const slide = originalSlides[i];
+        if (!slide) return;
+        const delta = slide.getBoundingClientRect().left - testimonialsTrack.getBoundingClientRect().left;
+        testimonialsTrack.scrollTo({
+          left: testimonialsTrack.scrollLeft + delta,
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
         });
       });
     });
+
+    const pauseCarousel = () => { carouselPaused = true; testimonialsTrack.classList.remove('is-auto-scrolling'); };
+    const resumeCarousel = (delay = 0) => {
+      clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        if (!reducedMotion) { carouselPaused = false; testimonialsTrack.classList.add('is-auto-scrolling'); }
+      }, delay);
+    };
+
+    testimonialsTrack.addEventListener('mouseenter', pauseCarousel);
+    testimonialsTrack.addEventListener('mouseleave', () => resumeCarousel(600));
+    testimonialsTrack.addEventListener('focusin', pauseCarousel);
+    testimonialsTrack.addEventListener('focusout', event => {
+      if (!testimonialsTrack.contains(event.relatedTarget)) resumeCarousel(600);
+    });
+    testimonialsTrack.addEventListener('pointerdown', event => {
+      pauseCarousel();
+      if (event.pointerType !== 'mouse' || event.target.closest('button, a')) return;
+      isDragging = true;
+      dragStartX = event.clientX;
+      dragStartScroll = testimonialsTrack.scrollLeft;
+      testimonialsTrack.classList.add('is-dragging');
+      testimonialsTrack.setPointerCapture(event.pointerId);
+    });
+    testimonialsTrack.addEventListener('pointermove', event => {
+      if (!isDragging) return;
+      testimonialsTrack.scrollLeft = dragStartScroll - (event.clientX - dragStartX);
+    });
+    const endDrag = event => {
+      if (!isDragging) { resumeCarousel(3500); return; }
+      isDragging = false;
+      testimonialsTrack.classList.remove('is-dragging');
+      if (testimonialsTrack.hasPointerCapture(event.pointerId)) testimonialsTrack.releasePointerCapture(event.pointerId);
+      resumeCarousel(3500);
+    };
+    testimonialsTrack.addEventListener('pointerup', endDrag);
+    testimonialsTrack.addEventListener('pointercancel', endDrag);
+
+    testimonialsTrack.addEventListener('click', event => {
+      const button = event.target.closest('.testi-read-more');
+      if (!button) return;
+      const quote = button.previousElementSibling;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      button.textContent = expanded ? 'Read more' : 'Show less';
+      quote?.classList.toggle('is-expanded', !expanded);
+    });
+
+    const advanceCarousel = timestamp => {
+      if (!lastFrame) lastFrame = timestamp;
+      const elapsed = Math.min(timestamp - lastFrame, 50);
+      lastFrame = timestamp;
+      if (!carouselPaused && carouselInView && cycleWidth > 0) {
+        testimonialsTrack.scrollLeft += elapsed * 0.008;
+        if (testimonialsTrack.scrollLeft >= cycleWidth) testimonialsTrack.scrollLeft -= cycleWidth;
+      }
+      requestAnimationFrame(advanceCarousel);
+    };
+
+    const carouselObserver = new IntersectionObserver(entries => {
+      carouselInView = entries.some(entry => entry.isIntersecting);
+    }, { threshold: 0.2 });
+    carouselObserver.observe(testimonialsTrack);
+
+    window.addEventListener('resize', () => { measureCarousel(); syncTestimonialDots(); });
+    measureCarousel();
+    syncTestimonialDots();
+    requestAnimationFrame(advanceCarousel);
   }
 
-  /* ── PACKAGE FILTER TABS (packages page) ── */
-  const filterTabs = document.querySelectorAll('.filter-tab');
-  if (filterTabs.length > 0) {
-    filterTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        filterTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const filter = tab.dataset.filter;
-        document.querySelectorAll('.tour-card[data-destination]').forEach(card => {
-          card.style.display = (filter === 'all' || card.dataset.destination === filter) ? '' : 'none';
+  /* ── EXPERIENCE FILTERS (experiences page) ── */
+  const experienceFilterNav = document.querySelector('.experience-filter-nav');
+  if (experienceFilterNav) {
+    const grid = document.getElementById('tours-grid');
+    const cards = Array.from(grid?.querySelectorAll('.tour-card[data-categories]') || []);
+    const groups = Array.from(experienceFilterNav.querySelectorAll('[data-filter-group]'));
+    const destinationSelect = experienceFilterNav.querySelector('[data-destination-filter]');
+    const queryParams = new URLSearchParams(window.location.search);
+    const allowedCategories = new Set(['culture', 'history', 'heritage', 'food', 'craft', 'nature', 'adventure', 'multi-day']);
+    const allowedDestinations = new Set(['accra', 'cape-coast', 'kumasi', 'ada-foah', 'volta', 'akosombo']);
+    const categoryAliases = {
+      history: ['history', 'heritage'],
+      heritage: ['history', 'heritage'],
+    };
+    const requestedCategory = queryParams.get('category') || queryParams.get('experience');
+    const filterState = {
+      category: allowedCategories.has(requestedCategory) ? (requestedCategory === 'heritage' ? 'history' : requestedCategory) : 'all',
+      destination: allowedDestinations.has(queryParams.get('destination')) ? queryParams.get('destination') : 'all',
+    };
+    const filterReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let filterTimer;
+
+    const categoryMatches = (card, filter) => {
+      if (filter === 'all') return true;
+      const categories = card.dataset.categories.split(/\s+/);
+      return (categoryAliases[filter] || [filter]).some(category => categories.includes(category));
+    };
+
+    const setActiveButton = (group, value) => {
+      group.querySelectorAll('.filter-tab').forEach(button => {
+        const active = button.dataset.filter === value;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    };
+
+    const syncFilterUrl = () => {
+      const nextParams = new URLSearchParams(window.location.search);
+      if (filterState.category === 'all') nextParams.delete('category');
+      else nextParams.set('category', filterState.category);
+      if (filterState.destination === 'all') nextParams.delete('destination');
+      else nextParams.set('destination', filterState.destination);
+      nextParams.delete('experience');
+      const query = nextParams.toString();
+      history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+    };
+
+    const applyFilters = (animate = true) => {
+      if (!grid) return;
+      window.clearTimeout(filterTimer);
+      grid.classList.toggle('is-filtering', animate);
+
+      const updateCards = () => {
+        let visibleIndex = 0;
+        cards.forEach(card => {
+          const matchesCategory = categoryMatches(card, filterState.category);
+          const matchesDestination = filterState.destination === 'all' || card.dataset.destination === filterState.destination;
+          const visible = matchesCategory && matchesDestination;
+          card.hidden = !visible;
+          card.classList.remove('filter-enter');
+          if (visible) {
+            card.style.setProperty('--filter-index', visibleIndex);
+            visibleIndex += 1;
+          }
         });
+        grid.classList.remove('is-filtering');
+        if (animate) {
+          requestAnimationFrame(() => cards.filter(card => !card.hidden).forEach(card => card.classList.add('filter-enter')));
+        }
+      };
+
+      if (animate && !filterReducedMotion) filterTimer = window.setTimeout(updateCards, 160);
+      else updateCards();
+    };
+
+    groups.forEach(group => {
+      const kind = group.dataset.filterGroup;
+      setActiveButton(group, filterState[kind]);
+      group.addEventListener('click', event => {
+        const button = event.target.closest('.filter-tab');
+        if (!button || button.dataset.filter === filterState[kind]) return;
+        filterState[kind] = button.dataset.filter;
+        setActiveButton(group, filterState[kind]);
+        syncFilterUrl();
+        applyFilters();
       });
     });
+
+    if (destinationSelect) {
+      destinationSelect.value = filterState.destination;
+      destinationSelect.addEventListener('change', () => {
+        filterState.destination = destinationSelect.value;
+        syncFilterUrl();
+        applyFilters();
+      });
+    }
+
+    applyFilters(false);
   }
 
   /* ── DESTINATION TABS ── */
@@ -197,13 +605,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  /* ── TOUR DETAIL ACCORDIONS ── */
+  function bindStandaloneToggle(control, itemSelector) {
+    const item = control.closest(itemSelector);
+    if (!item) return;
+
+    control.setAttribute('role', 'button');
+    control.setAttribute('tabindex', control.getAttribute('tabindex') || '0');
+    control.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+
+    const toggleItem = () => {
+      item.classList.toggle('open');
+      control.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false');
+    };
+
+    control.addEventListener('click', toggleItem);
+    control.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      toggleItem();
+    });
+  }
+
+  document.querySelectorAll('.day-header').forEach(header => {
+    bindStandaloneToggle(header, '.day-item');
+  });
+
+  document.querySelectorAll('.faq-q').forEach(question => {
+    bindStandaloneToggle(question, '.faq-item');
+  });
+
   /* ── FAQ ── */
   document.querySelectorAll('.faq-question').forEach(btn => {
     btn.addEventListener('click', () => {
       const item   = btn.closest('.faq-item');
       const isOpen = item.classList.contains('open');
-      item.closest('.faq-list')?.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      item.closest('.faq-list')?.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+      });
       if (!isOpen) item.classList.add('open');
+      btn.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
     });
   });
 
@@ -211,11 +653,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const emailForm = document.querySelector('.email-form');
   if (emailForm) {
     emailForm.addEventListener('submit', async e => {
-      e.preventDefault();
       const input = emailForm.querySelector('.email-input');
       const btn   = emailForm.querySelector('.email-submit');
       const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
       if (!emailOk) {
+        e.preventDefault();
         input.style.outline = '2px solid #ef4444';
         setTimeout(() => { input.style.outline = ''; }, 2000);
         return;
@@ -223,9 +665,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const orig = btn.textContent;
       btn.textContent = 'Subscribing…';
       btn.disabled = true;
+      if (usesExternalFormEndpoint(emailForm)) return;
+      e.preventDefault();
       try {
         const body = new URLSearchParams(new FormData(emailForm)).toString();
-        const res  = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+        const res  = await fetch(emailForm.action || '/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
         if (res.ok) {
           btn.textContent = 'Subscribed!';
           btn.style.background = '#22c55e';
@@ -243,47 +687,195 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── CONTACT FORM ── */
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
-    contactForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = contactForm.querySelector('button[type="submit"]');
+    const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
 
-      // Validate required fields
-      const firstName = contactForm.querySelector('#first-name').value.trim();
-      const lastName  = contactForm.querySelector('#last-name').value.trim();
-      const email     = contactForm.querySelector('#email').value.trim();
-      const emailOk   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-      let errEl = contactForm.querySelector('.form-error');
-      if (!errEl) {
-        errEl = document.createElement('p');
-        errEl.className = 'form-error';
-        const actions = contactForm.querySelector('.form-actions');
-        actions.parentNode.insertBefore(errEl, actions);
+    // FormSubmit needs an absolute redirect target, and a hard-coded one 404s
+    // everywhere except the single host it names. Resolve thanks.html against
+    // the current page instead, so the same markup lands correctly on GitHub
+    // Pages (which serves this site from a /people-and-places-tours/ subpath),
+    // on Cloudflare Pages, on a custom domain, and on localhost. The committed
+    // value stays as the no-JS fallback.
+    const nextField = contactForm.querySelector('input[name="_next"]');
+    if (nextField) nextField.value = new URL('thanks.html', window.location.href).href;
+    const tourSelect = contactForm.querySelector('#tour-interest');
+    const tourNameInput = contactForm.querySelector('#tour-name');
+    let updateTourName = () => {};
+    if (tourSelect) {
+      updateTourName = () => {
+        const selected = tourSelect.options[tourSelect.selectedIndex];
+        if (tourNameInput) tourNameInput.value = selected?.value ? selected.textContent.trim() : '';
+      };
+      const requestedTour = new URLSearchParams(window.location.search).get('tour');
+      if (requestedTour && [...tourSelect.options].some(option => option.value === requestedTour)) {
+        tourSelect.value = requestedTour;
       }
+      tourSelect.addEventListener('change', updateTourName);
+      updateTourName();
+    }
 
-      if (!firstName || !lastName || !emailOk) {
-        errEl.textContent = 'Please fill in your first name, last name, and a valid email address.';
+    /* ── Booking flow ──
+       Two progressively disclosed steps. Visibility is driven by
+       data-booking-current on the form, so CSS owns the layout and no nodes
+       are moved at runtime. Without JavaScript the form stays a single page
+       and still posts natively, so this only ever adds behaviour. */
+    const bookingPanel = contactForm.closest('.booking-panel');
+    const bookingSteps = [...contactForm.querySelectorAll('[data-booking-step]')]
+      .sort((a, b) => Number(a.dataset.bookingStep) - Number(b.dataset.bookingStep));
+    const progressBar = contactForm.querySelector('[data-booking-progress]');
+    const progressItems = [...contactForm.querySelectorAll('[data-booking-progress-step]')];
+    const announcer = contactForm.querySelector('[data-booking-announce]');
+    const nextButton = contactForm.querySelector('.booking-next');
+    const backButton = contactForm.querySelector('.booking-back');
+    const travelDate = contactForm.querySelector('#travel-date');
+    const successPanel = bookingPanel?.querySelector('[data-booking-success]');
+    const errorEl = contactForm.querySelector('.form-error');
+    const totalSteps = bookingSteps.length;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let currentBookingStep = 1;
+    let showBookingStep = () => {};
+
+    const requiredFields = () => [
+      [contactForm.querySelector('#first-name'), value => Boolean(value)],
+      [contactForm.querySelector('#last-name'), value => Boolean(value)],
+      [contactForm.querySelector('#email'), value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)],
+    ];
+
+    const clearFieldError = field => {
+      field.setAttribute('aria-invalid', 'false');
+      if (errorEl && requiredFields().every(([input, isValid]) => isValid(input.value.trim()))) {
+        errorEl.textContent = '';
+      }
+    };
+
+    requiredFields().forEach(([field]) => {
+      field?.addEventListener('input', () => clearFieldError(field));
+    });
+
+    if (totalSteps > 1) {
+      contactForm.classList.add('booking-flow-ready');
+
+      showBookingStep = (step, moveFocus = false) => {
+        currentBookingStep = Math.min(Math.max(step, 1), totalSteps);
+        contactForm.dataset.bookingCurrent = String(currentBookingStep);
+
+        let stepName = '';
+        progressItems.forEach(item => {
+          const index = Number(item.dataset.bookingProgressStep);
+          item.classList.toggle('is-complete', index < currentBookingStep);
+          if (index === currentBookingStep) {
+            item.setAttribute('aria-current', 'step');
+            stepName = item.querySelector('.booking-progress-name')?.textContent.trim() || '';
+          } else {
+            item.removeAttribute('aria-current');
+          }
+        });
+        if (progressBar) progressBar.style.transform = `scaleX(${currentBookingStep / totalSteps})`;
+        if (announcer) announcer.textContent = `Step ${currentBookingStep} of ${totalSteps}. ${stepName}.`;
+
+        if (!moveFocus) return;
+        const panel = bookingSteps.find(item => Number(item.dataset.bookingStep) === currentBookingStep);
+        const legend = panel?.querySelector('legend');
+        if (legend) {
+          legend.tabIndex = -1;
+          legend.focus({preventScroll: true});
+        }
+        // Only pull the flow back into view when the step heading has scrolled
+        // off; scrolling on every click makes the transition feel jumpy.
+        const top = bookingPanel?.getBoundingClientRect().top ?? 0;
+        if (top < 0) {
+          bookingPanel.scrollIntoView({behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start'});
+        }
+      };
+
+      nextButton?.addEventListener('click', () => showBookingStep(currentBookingStep + 1, true));
+      backButton?.addEventListener('click', () => showBookingStep(currentBookingStep - 1, true));
+      showBookingStep(1);
+    }
+
+    // A past travel date is never a useful answer, and the browser can say so
+    // before anyone submits.
+    if (travelDate) {
+      const now = new Date();
+      travelDate.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    }
+
+    const showBookingSuccess = reference => {
+      if (!successPanel || !bookingPanel) return false;
+      const referenceEl = successPanel.querySelector('[data-booking-reference]');
+      if (referenceEl) referenceEl.textContent = reference || 'sent';
+      successPanel.hidden = false;
+      bookingPanel.classList.add('is-complete');
+      const heading = successPanel.querySelector('.booking-success-title');
+      if (heading) {
+        heading.tabIndex = -1;
+        heading.focus({preventScroll: true});
+      }
+      successPanel.scrollIntoView({behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'center'});
+      return true;
+    };
+
+    contactForm.addEventListener('submit', async e => {
+      // Pressing Enter in a step 1 field implicitly submits the form. Treat
+      // that as "continue" rather than firing an inquiry the person has not
+      // finished writing.
+      if (totalSteps > 1 && currentBookingStep < totalSteps) {
+        e.preventDefault();
+        showBookingStep(currentBookingStep + 1, true);
         return;
       }
-      errEl.textContent = '';
+
+      const btn = contactForm.querySelector('button[type="submit"]');
+
+      const fields = requiredFields();
+      fields.forEach(([field, isValid]) => field?.setAttribute('aria-invalid', String(!isValid(field.value.trim()))));
+      const firstInvalid = fields.find(([field, isValid]) => !isValid(field.value.trim()))?.[0];
+
+      if (firstInvalid) {
+        e.preventDefault();
+        if (errorEl) errorEl.textContent = 'Please share your name and a valid email so we know how to reach you.';
+        if (totalSteps > 1 && currentBookingStep !== totalSteps) showBookingStep(totalSteps);
+        firstInvalid.focus();
+        return;
+      }
+      if (errorEl) errorEl.textContent = '';
 
       const original = btn.innerHTML;
       btn.textContent = 'Sending…';
       btn.disabled = true;
 
+      // GitHub Pages cannot execute server code. Until Cloudflare cutover, keep
+      // the form's native FormSubmit action as a working fallback. A pages.dev
+      // preview (or explicit data-inquiry-mode="cloudflare") uses our same-origin
+      // Pages Function instead.
+      if (!useCloudflareInquiry) return;
+      e.preventDefault();
+
       try {
-        const body = new URLSearchParams(new FormData(contactForm)).toString();
-        const res  = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-        if (res.ok) {
-          btn.textContent = 'Inquiry Sent! We\'ll be in touch within 2 hours.';
+        const endpoint = contactForm.dataset.cloudflareEndpoint || '/api/inquiry';
+        const payload = Object.fromEntries(new FormData(contactForm).entries());
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(result.error || 'Inquiry could not be sent');
+
+        contactForm.reset();
+        updateTourName();
+        if (totalSteps > 1) showBookingStep(1);
+        if (!showBookingSuccess(result.reference)) {
+          btn.textContent = 'Your Ghana journey has started.';
           btn.style.background = '#22c55e';
-          contactForm.reset();
           setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 5000);
-        } else { throw new Error(); }
+        }
       } catch {
-        btn.textContent = 'Couldn\'t send — please try WhatsApp';
-        btn.style.background = '#ef4444';
-        setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 4500);
+        // Do not automatically submit to the fallback here. The function may
+        // have delivered the email even if its response was interrupted, and
+        // an automatic retry could create a duplicate inquiry.
+        if (errorEl) errorEl.textContent = 'We could not confirm that your message reached us. Please try again in a moment, or send us a note on WhatsApp and we will pick it up from there.';
+        btn.innerHTML = original;
+        btn.disabled = false;
       }
     });
   }
@@ -295,10 +887,10 @@ document.addEventListener('DOMContentLoaded', () => {
     lb.id = 'lightbox';
     lb.innerHTML = `
       <div class="lb-backdrop"></div>
-      <button class="lb-close" aria-label="Close">&times;</button>
-      <button class="lb-prev" aria-label="Previous">&#8592;</button>
-      <button class="lb-next" aria-label="Next">&#8594;</button>
-      <div class="lb-img-wrap"><img class="lb-img" src="" alt="" /></div>
+      <button type="button" class="lb-close" aria-label="Close image viewer">&times;</button>
+      <button type="button" class="lb-prev" aria-label="Previous image">&#8592;</button>
+      <button type="button" class="lb-next" aria-label="Next image">&#8594;</button>
+      <div class="lb-img-wrap"><img class="lb-img" src="" alt="" decoding="async" /></div>
     `;
     Object.assign(lb.style, { position:'fixed', inset:'0', zIndex:'10000', display:'none', alignItems:'center', justifyContent:'center' });
     const lbStyle = document.createElement('style');
@@ -315,13 +907,34 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(lbStyle);
     document.body.appendChild(lb);
 
-    const imgs = [...galleryItems].map(i => i.querySelector('img')?.src).filter(Boolean);
+    lb.setAttribute('role', 'dialog');
+    lb.setAttribute('aria-modal', 'true');
+    lb.setAttribute('aria-label', 'Image viewer');
+
+    const imgs = [...galleryItems].map(i => {
+      const image = i.querySelector('img');
+      return image ? {src: image.src, alt: image.alt || ''} : null;
+    }).filter(Boolean);
     let lbIdx = 0;
+    let lightboxTrigger = null;
 
-    function openLb(idx) { lbIdx = idx; lb.querySelector('.lb-img').src = imgs[idx]; lb.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-    function closeLb()   { lb.style.display = 'none'; document.body.style.overflow = ''; }
+    function openLb(idx, trigger = lightboxTrigger) {
+      lbIdx = idx;
+      lightboxTrigger = trigger;
+      const image = lb.querySelector('.lb-img');
+      image.src = imgs[idx].src;
+      image.alt = imgs[idx].alt;
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      lb.querySelector('.lb-close').focus();
+    }
+    function closeLb() {
+      lb.style.display = 'none';
+      document.body.style.overflow = '';
+      lightboxTrigger?.focus();
+    }
 
-    galleryItems.forEach((item, i) => item.addEventListener('click', () => openLb(i)));
+    galleryItems.forEach((item, i) => item.addEventListener('click', () => openLb(i, item)));
     lb.querySelector('.lb-close').addEventListener('click', closeLb);
     lb.querySelector('.lb-backdrop').addEventListener('click', closeLb);
     lb.querySelector('.lb-next').addEventListener('click', () => openLb((lbIdx + 1) % imgs.length));
@@ -342,14 +955,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ── SCROLL REVEAL ── */
-  const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  /* ── SCROLL REVEAL ──
+     Above-the-fold elements are revealed synchronously on first paint to avoid
+     the brief "stuck hidden" gap before the observer's first async callback.
+     Below-the-fold elements are observed and fade in as they scroll into view. */
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
 
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    // Content is visible by default. Only opt into the hidden animation state
+    // after the observer was created successfully, so a script/API failure can
+    // never strand meaningful content at opacity: 0.
+    document.documentElement.classList.add('reveal-ready');
+
+    function initReveals() {
+      const vh = window.innerHeight;
+      document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+        const r = el.getBoundingClientRect();
+        const inViewport = r.top < vh && r.bottom > 0;
+        if (inViewport) {
+          el.classList.add('reveal-no-stagger', 'visible');
+        } else {
+          revealObserver.observe(el);
+        }
+      });
+    }
+    // Wait one frame so layout has computed before measuring positions.
+    requestAnimationFrame(() => requestAnimationFrame(initReveals));
+
+    const founderSection = document.querySelector('[data-home-section="founderStory"]');
+    const homepageHero = document.querySelector('[data-home-section="hero"]');
+    if (founderSection && homepageHero) {
+      document.documentElement.classList.add('founder-transition-ready');
+      const founderTransitionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          document.documentElement.classList.toggle('founder-transition-active', entry.isIntersecting);
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -8% 0px' });
+      founderTransitionObserver.observe(founderSection);
+    }
+  }
 
   /* ── STATS COUNTER ── */
   function animateCounter(el) {
@@ -374,6 +1022,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.3 });
 
   document.querySelectorAll('.stats-section, .about-stats-row, .stats-bar').forEach(el => statObserver.observe(el));
+
+  const trustMetrics = document.querySelector('.trust-facts-row');
+  if (trustMetrics && 'IntersectionObserver' in window) {
+    const trustMetricObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('[data-count-value]').forEach(metric => {
+          const target = Number(metric.dataset.countValue);
+          const decimals = Number(metric.dataset.countDecimals || 0);
+          const suffix = metric.dataset.countSuffix || '';
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            metric.textContent = `${target.toFixed(decimals)}${suffix}`;
+            return;
+          }
+          metric.textContent = `${(0).toFixed(decimals)}${suffix}`;
+          const start = performance.now();
+          const duration = 1600;
+          const tick = now => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            metric.textContent = `${(target * eased).toFixed(decimals)}${suffix}`;
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
+        trustMetricObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+    trustMetricObserver.observe(trustMetrics);
+  }
 
   /* ── COMMAND PALETTE ── */
   const cmdPalette  = document.getElementById('cmd-palette');
@@ -436,29 +1114,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-/* ── GSAP ANIMATIONS (runs after full page load so layout is complete) ── */
-window.addEventListener('load', () => {
+/* ── GSAP HERO ENTRANCE ──
+   Runs on DOMContentLoaded (not window.load) so the animation isn't blocked
+   waiting for the hero video to finish downloading. Hero markup is rendered
+   by homepage-sections.js's DCL listener which fires first. */
+function runHeroEntrance() {
   if (typeof gsap === 'undefined') return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cta = document.querySelector('.v-hero-cta-link');
+  if (!cta && !document.querySelector('.v-hero-headline')) return;
 
-  /* Hero entrance — eyebrow, tagline, scroll chevron (headline is CSS-animated marquee) */
-  if (document.querySelector('.v-hero-eyebrow')) {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.from('.v-hero-eyebrow', { opacity: 0, y: 20, duration: 0.6 }, 0.2)
-      .from('.v-hero-tagline', { opacity: 0, y: 20, duration: 0.6 }, 0.5)
-      .from('.v-hero-scroll',  { opacity: 0, y: 12, duration: 0.5 }, 0.8);
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  if (document.querySelector('.v-hero-headline')) {
+    tl.from('.v-hero-headline', { opacity: 0, y: 26, duration: 0.85 }, 0.2);
   }
-
-  /* Marquee — scrollWidth is accurate after load */
-  const track = document.querySelector('.marquee-track');
-  if (track) {
-    track.style.animation = 'none';
-    gsap.to(track, {
-      x: -(track.scrollWidth / 2),
-      ease: 'none',
-      duration: 22,
-      repeat: -1,
-    });
+  if (document.querySelector('.v-hero-sub')) {
+    tl.from('.v-hero-sub', { opacity: 0, y: 18, duration: 0.65 }, 0.5);
   }
-});
+  if (cta) {
+    tl.fromTo('.v-hero-cta-link',
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 0.55, clearProps: 'transform' },
+      0.7);
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', runHeroEntrance);
+} else {
+  runHeroEntrance();
+}

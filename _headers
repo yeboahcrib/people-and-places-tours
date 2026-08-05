@@ -1,7 +1,24 @@
+## Cloudflare Pages deployment headers.
+## GitHub Pages ignores this file while the site is hosted there.
 /*
+  Strict-Transport-Security: max-age=31536000
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  X-XSS-Protection: 1; mode=block
+  X-Permitted-Cross-Domain-Policies: none
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=()
-  Content-Security-Policy: default-src 'self'; img-src 'self' https://images.unsplash.com https://picsum.photos data:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://js.paystack.co; connect-src 'self' https://api.paystack.co; media-src https://cdn.prod.website-files.com; frame-src 'none' https://js.paystack.co; frame-ancestors 'none'; upgrade-insecure-requests;
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; img-src 'self' https://images.unsplash.com data:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://cdnjs.cloudflare.com; script-src-attr 'none'; connect-src 'self'; media-src 'self' https://cdn.prod.website-files.com; form-action 'self' https://formsubmit.co; upgrade-insecure-requests;
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.css
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/*.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/health.json
+  Cache-Control: no-store

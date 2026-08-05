@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://peopleandplacestours.com/sitemap.xml
+Sitemap: https://yeboahcrib.github.io/people-and-places-tours/sitemap.xml
