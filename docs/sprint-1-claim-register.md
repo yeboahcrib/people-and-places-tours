@@ -36,6 +36,7 @@ These already carry founder approval per the Brand Foundation (§2, §25).
 | Founders | Co-founded by Isaac Yeboah (Nana Yeboah) and Evans Yirenkyi (Kojo) | Founder approval | Founders | 2026-07-25 | — | All | Approved |
 | Guests served | More than 300 individual guests served | Founder approval | Founders | 2026-07-25 | Re-verify each quarter | All | Approved |
 | Google rating | 5.0 average from 15 Google reviews as of July 2026 | Google Business Profile export | Founders | 2026-07-25 | Re-verify on any new review or quarterly | Website, Google | Approved |
+| Trade partnerships | We partner with other tour companies and travel partners to host their clients in Ghana | Founder confirmation, August 5, 2026 | Founders | 2026-08-05 | Re-verify each quarter | Website (About FAQ) | Approved |
 | Business hours | Monday–Friday, 9:00 a.m.–5:00 p.m. | Founder approval | Founders | 2026-07-25 | — | All | Approved |
 | Response expectation | Usually replies within one hour during business hours | Founder approval | Founders | 2026-07-25 | — | All | Approved |
 | Day-tour availability | Day tours can be booked for any day with advance notice; not a fixed daily-departure schedule | Founder approval | Founders | 2026-07-25 | — | All | Approved |

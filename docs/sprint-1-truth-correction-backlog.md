@@ -228,3 +228,7 @@ breaking or drifting from source-of-truth later.
 - **Rewrite once founders confirm final wording (P1):** response-time
   claims (four conflicting numbers across two files), homepage
   featured-tour count (6 → 3–5).
+
+### Travel-partner claim (resolved 2026-08-05)
+
+The About FAQ claimed "active partnerships with travel agencies across North America, Europe, and the African diaspora". The partnerships are real and confirmed by the founders, but the three-region spread was never sourced. The claim now states what was confirmed — partnerships with other tour companies and travel partners — without naming regions. If the geographic reach is to be claimed publicly, it needs its own verification and register entry.
