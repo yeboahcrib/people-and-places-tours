@@ -1067,9 +1067,17 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── STATS COUNTER ── */
   function animateCounter(el) {
     const target   = parseInt(el.dataset.target, 10);
+    // The markup carries the real figure so it is correct with no JavaScript
+    // and for anyone who never scrolls this far. Only wind back to zero when
+    // an animation is actually going to play.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = target.toLocaleString();
+      return;
+    }
     const duration = 2000;
     const step     = target / (duration / 16);
     let current    = 0;
+    el.textContent = '0';
     const timer = setInterval(() => {
       current += step;
       if (current >= target) { current = target; clearInterval(timer); }

@@ -2312,6 +2312,52 @@ body.page-entering {
   font-size: clamp(2.5rem, 6vw, 4rem);
   letter-spacing: 0.05em;
 }
+/* ── ABOUT PAGE ────────────────────────────────────────────────
+   .team-card and .stats-section appear only on about.html, so these
+   additions cannot reach the frozen pages. Same tokens, easing and reveal
+   language as the rest of the site; no new visual vocabulary. */
+.team-bio {
+  max-width: 34ch;
+  margin: var(--sp-1-5) auto 0;
+  color: var(--gray-2);
+  font-size: 0.88rem;
+  line-height: 1.75;
+}
+/* Until the real photographs land, a full 3:4 portrait frame filled with two
+   letters reads as a failed image rather than a deliberate placeholder. */
+.team-founders-grid .team-photo { aspect-ratio: auto; overflow: visible; }
+.team-founders-grid .team-photo-placeholder {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+  border: 1px solid var(--border-yellow);
+  border-radius: 50%;
+  background: var(--black-2);
+  font-size: 1.7rem;
+}
+.about-final-cta { background: var(--black-2); }
+.about-final-cta .section-title { margin-bottom: var(--sp-2); }
+.about-final-cta .section-subtitle { max-width: 56ch; }
+.about-final-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-1-5);
+  margin-top: var(--sp-5);
+}
+.about-final-note {
+  max-width: 48ch;
+  margin: var(--sp-3) auto 0;
+  color: rgba(255,255,255,.55);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+@media (max-width: 640px) {
+  .about-final-actions { flex-direction: column; align-items: stretch; }
+  .about-final-actions .btn { justify-content: center; }
+  .team-bio { max-width: none; }
+}
+
 .team-placeholder-note {
   margin-top: 1.5rem;
   font-size: 0.78rem;
