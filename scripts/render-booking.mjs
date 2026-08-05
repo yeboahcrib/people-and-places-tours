@@ -69,6 +69,26 @@ export function injectTurnstileSiteKey(html, siteKey) {
   return html.replace(/data-turnstile-sitekey="[^"]*"/, `data-turnstile-sitekey="${key}"`);
 }
 
+// Contact details already live in siteSettings (and in Sanity behind it), but
+// contact.html had them typed in by hand. Bind them so the phone number,
+// hours and response promise have one source of truth rather than four.
+const SITE_COPY_KEYS = ['primaryPhone', 'internationalPhone', 'email', 'hours', 'responsePromise'];
+
+export function injectSiteContact(html, settings) {
+  if (!html.includes('data-site-copy')) return html;
+  let output = html;
+  for (const key of SITE_COPY_KEYS) {
+    const value = settings?.[key];
+    if (!value) continue;
+    const pattern = new RegExp(
+      `(<([a-zA-Z0-9]+)(?=[^>]*\\sdata-site-copy="${key}")[^>]*>)([\\s\\S]*?)(</\\2>)`,
+      'g',
+    );
+    output = output.replace(pattern, (_m, open, _tag, _body, close) => `${open}${escapeHtml(value)}${close}`);
+  }
+  return output;
+}
+
 export function injectBookingContent(html, booking) {
   if (!html.includes('data-booking-copy')) return html;
 

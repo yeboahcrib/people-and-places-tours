@@ -53,7 +53,7 @@
         <span class="breadcrumb-current">Contact</span>
       </div>
       <h1 class="page-hero-title">Let's Plan<br><span style="color:var(--yellow);">Ghana Together</span></h1>
-      <p class="page-hero-subtitle">Tell us a little about the journey you're imagining. Our local team will take it from there with you.</p>
+      <p class="page-hero-subtitle" data-booking-copy="heroSubtitle">Whether this will be your first time in Ghana or a long-awaited return, tell us a little about the journey you're imagining. Our team here in Accra will take it from there with you.</p>
     </div>
   </section>
 
@@ -64,7 +64,7 @@
       <div class="section-header text-center" style="margin-bottom:56px;">
         <div class="eyebrow reveal" style="justify-content:center;">Reach Us</div>
         <h2 class="section-title reveal reveal-delay-1">Multiple Ways<br>to Connect</h2>
-        <p class="section-subtitle reveal reveal-delay-2" style="margin:0 auto;">We usually respond within one hour during business hours (Monday–Friday, 9am–5pm). For urgent inquiries, call or WhatsApp us directly.</p>
+        <p class="section-subtitle reveal reveal-delay-2" style="margin:0 auto;">We usually reply within one hour during business hours (<span data-site-copy="hours">Monday–Friday, 9:00 a.m.–5:00 p.m.</span>). If something is time-sensitive, call or message us on WhatsApp and we will pick it up.</p>
       </div>
 
       <div class="contact-info-grid">
@@ -74,9 +74,9 @@
             <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.38 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </div>
           <div class="contact-card-label">Phone / WhatsApp</div>
-          <div class="contact-card-value">+233 50 367 3473</div>
-          <div class="contact-card-sub">Mon–Fri, 9am–5pm · usually within one hour</div>
-          <div class="contact-card-sub">US/International: <a href="tel:+18034776489" style="color:inherit;">+1 803 477 6489</a></div>
+          <div class="contact-card-value" data-site-copy="primaryPhone">+233 50 367 3473</div>
+          <div class="contact-card-sub" data-site-copy="hours">Monday–Friday, 9:00 a.m.–5:00 p.m.</div>
+          <div class="contact-card-sub">US/International: <a href="tel:+18034776489" style="color:inherit;" data-site-copy="internationalPhone">+1 803 477 6489</a></div>
           <a href="tel:+233503673473" class="btn btn-ghost" style="margin-top:20px;">Call Now</a>
         </div>
 
@@ -85,8 +85,8 @@
             <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </div>
           <div class="contact-card-label">Email Address</div>
-          <div class="contact-card-value" style="font-size:18px;">peopandplaces@gmail.com</div>
-          <div class="contact-card-sub">Usually within one hour during business hours</div>
+          <div class="contact-card-value" style="font-size:18px;" data-site-copy="email">peopandplaces@gmail.com</div>
+          <div class="contact-card-sub" data-site-copy="responsePromise">Usually within one hour during business hours</div>
           <a href="mailto:peopandplaces@gmail.com" class="btn btn-ghost" style="margin-top:20px;">Send Email</a>
         </div>
 
@@ -314,13 +314,13 @@
   </section>
 
   <!-- ═══════════════ MAP PLACEHOLDER ═══════════════ -->
-  <div style="height:420px;overflow:hidden;position:relative;background:var(--black-3);" aria-label="Map location placeholder">
-    <img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=1920&q=80&h=420" alt="Accra, Ghana location" loading="lazy" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" width="1920" height="420" decoding="async" />
+  <section style="height:420px;overflow:hidden;position:relative;background:var(--black-3);" aria-label="Where we are based">
+    <img src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=1920&q=80&h=420" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;opacity:0.4;" width="1920" height="420" decoding="async" />
     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
       <div style="background:rgba(10,10,10,0.8);backdrop-filter:blur(16px);border:1px solid var(--border-yellow);border-radius:var(--radius-lg);padding:32px 48px;text-align:center;">
         <div style="margin-bottom:12px;display:flex;justify-content:center;">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
+        </section>
         <div style="font-family:var(--font-display);font-size:32px;color:var(--white);margin-bottom:4px;">Accra, Ghana</div>
         <div style="font-size:13px;color:var(--gray-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px;">West Africa • GMT+0</div>
         <a href="https://maps.google.com/?q=Accra,Ghana" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">

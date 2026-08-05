@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {loadBookingContent, loadLocalBookingContent, TEXT_KEYS} from '../scripts/booking-source.mjs';
-import {injectBookingContent, injectTurnstileSiteKey} from '../scripts/render-booking.mjs';
+import {injectBookingContent, injectSiteContact, injectTurnstileSiteKey} from '../scripts/render-booking.mjs';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const local = await loadLocalBookingContent(projectRoot);
@@ -89,6 +89,26 @@ assert(rendered.includes('Replies fast'));
 assert(rendered.includes('Only question?'));
 assert(!rendered.includes(local.faqs[1].question), 'stale FAQ survived injection');
 assert.equal((rendered.match(/class="booking-next-step"/g) || []).length, 1);
+
+// ── Contact details bind to siteSettings ──
+// Every bound element must actually be replaced, including the phone number
+// that appears in more than one card.
+const settings = {
+  primaryPhone: '+233 00 000 0000',
+  internationalPhone: '+1 000 000 0000',
+  email: 'changed@example.com',
+  hours: 'Tuesday-Saturday, 10:00 a.m.-6:00 p.m.',
+  responsePromise: 'Usually the same day',
+};
+const contact = injectSiteContact(contactHtml, settings);
+for (const value of Object.values(settings)) {
+  assert(contact.includes(value), `site contact injection missed "${value}"`);
+}
+assert(!contact.includes('peopandplaces@gmail.com>'), 'stale email survived injection');
+// Values land in HTML text, so they must be escaped like any other copy.
+assert(injectSiteContact(contactHtml, {email: '<script>x</script>'}).includes('&lt;script&gt;'));
+// A page with no bindings must pass through untouched.
+assert.equal(injectSiteContact('<p>no bindings</p>', settings), '<p>no bindings</p>');
 
 // ── Turnstile site key injection ──
 // Absent by default so the GitHub Pages build loads no challenge script.

@@ -21,6 +21,15 @@ export const bookingFlow = defineType({
     {name: 'faqs', title: 'FAQs'},
   ],
   fields: [
+    defineField({
+      name: 'heroSubtitle',
+      title: 'Hero supporting copy',
+      type: 'text',
+      rows: 3,
+      group: 'intro',
+      description: 'Sits under "Let\u2019s Plan Ghana Together". Should quietly hold both first-time visitors and members of the diaspora returning, without labelling either.',
+      validation: r => r.required().max(260),
+    }),
     defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string', group: 'intro', validation: r => r.required().max(40)}),
     defineField({name: 'title', title: 'Headline', type: 'string', group: 'intro', validation: r => r.required().max(90)}),
     defineField({

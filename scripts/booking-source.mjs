@@ -7,6 +7,7 @@ const API_VERSION = '2026-08-02';
 // typo in Sanity (or in booking.json) fails the build instead of silently
 // leaving stale copy on the live page.
 const TEXT_KEYS = [
+  'heroSubtitle',
   'eyebrow', 'title', 'intro',
   'step1Name', 'step1Legend', 'step1Help', 'nextLabel', 'nextNote',
   'step2Name', 'step2Legend', 'step2Help', 'submitLabel', 'submitNote',

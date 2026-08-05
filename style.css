@@ -2954,6 +2954,48 @@ body.page-entering {
   line-height: 1.1;
 }
 .contact-card-sub { font-size: 0.82rem; color: rgba(255,255,255,.4); line-height: 1.5; }
+
+/* Contact cards had no hover state at all, which made them the only cards on
+   the site that did not respond. Same lift, shadow and yellow border as
+   .tour-card on Experiences, so the behaviour is borrowed rather than
+   invented. focus-within covers keyboard users reaching the card's link. */
+.contact-card {
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+/* The reveal system sets a transform on .visible at (0,3,0), which outranks a
+   plain .contact-card:hover and silently cancels the lift. Match its context so
+   the hover actually wins. */
+.contact-card:hover,
+.contact-card:focus-within,
+.reveal-ready .contact-card.reveal.visible:hover,
+.reveal-ready .contact-card.reveal.visible:focus-within {
+  transform: translateY(-4px);
+  border-color: var(--yellow);
+  box-shadow: 0 20px 52px rgba(0,0,0,.32);
+}
+.contact-card-icon {
+  transition: transform var(--transition), background var(--transition), border-color var(--transition);
+}
+.contact-card:hover .contact-card-icon,
+.contact-card:focus-within .contact-card-icon {
+  transform: scale(1.06);
+  background: rgba(255,171,0,.16);
+  border-color: rgba(255,171,0,.45);
+}
+/* .contact-card-sub is decorative-weight text on a card that can now lift;
+   .4 alpha sits under 4.5:1 against --black-card. */
+.contact-card-sub { color: rgba(255,255,255,.55); }
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card,
+  .contact-card-icon { transition: none; }
+  .contact-card:hover,
+  .contact-card:focus-within,
+  .reveal-ready .contact-card.reveal.visible:hover,
+  .reveal-ready .contact-card.reveal.visible:focus-within,
+  .contact-card:hover .contact-card-icon,
+  .contact-card:focus-within .contact-card-icon { transform: none; }
+}
 .contact-form-section {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
