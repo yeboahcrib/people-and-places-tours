@@ -1,0 +1,66 @@
+name: Deploy to GitHub Pages
+
+# GitHub Pages serves the repository root by default, which for this project is
+# the editable source: the homepage is an empty shell and the packages grid has
+# no cards until JavaScript runs. This workflow publishes dist/ instead, so the
+# live site is the assembled build — the same artifact Cloudflare Pages will
+# serve later, which makes that cutover a hosting swap rather than a change in
+# behaviour.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never cancel a deploy that is already applying. A half-published Pages
+# deployment is worse than one that is a few minutes stale.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # Every suite that gates the build is plain Node; only the browser suites
+      # need Playwright and they are not run here. Skipping the browser download
+      # keeps the deploy quick and removes a large network dependency.
+      - name: Install dependencies
+        run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+      # `npm run build` runs the JavaScript syntax check plus the security
+      # header, static accessibility and content-contract suites before it
+      # writes dist/. A failure here stops the deploy instead of publishing a
+      # broken site.
+      - name: Build and verify
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
