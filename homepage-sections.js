@@ -18,7 +18,7 @@
     whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>',
   };
 
-  const buttonStar = '<svg class="doodle doodle-btn-star" aria-hidden="true" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1 L8.85 7.15 L15 8 L8.85 8.85 L8 15 L7.15 8.85 L1 8 L7.15 7.15 Z" fill="var(--yellow-dark)" stroke="none"/></svg>';
+  const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;',
@@ -47,6 +47,14 @@
 
   const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
   const renderStars = label => `<span class="testi-stars" role="img" aria-label="${escapeHtml(label)}">${STAR_SVG.repeat(5)}</span>`;
+  const renderCountValue = (value, className) => {
+    const text = String(value ?? '');
+    const match = text.match(/([\d,.]+)(.*)/);
+    if (!match) return `<span class="${className}">${escapeHtml(text)}</span>`;
+    const numeric = Number(match[1].replace(/,/g, ''));
+    const decimals = (match[1].split('.')[1] || '').length;
+    return `<span class="${className}" data-count-value="${escapeHtml(numeric)}" data-count-decimals="${decimals}" data-count-suffix="${escapeHtml(match[2])}">${escapeHtml(text)}</span>`;
+  };
 
   function renderImage(image, className, extraAttrs = '') {
     if (!image?.src) return '';
@@ -85,16 +93,20 @@
       <div class="founder-story-text">
         <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
         <h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.headline)}</h2>
-        <p class="founder-story-body reveal reveal-delay-2">${escapeHtml(data.body)}</p>
-        ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark reveal reveal-delay-2">${escapeHtml(data.cta.label)}</a>` : ''}
+        <div class="founder-story-body reveal reveal-delay-2">${renderLines(String(data.body || '').split(/\n\s*\n/))}</div>
+        ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark reveal reveal-delay-3">${escapeHtml(data.cta.label)}</a>` : ''}
       </div>
       <div class="founder-mini-grid">
         ${(data.founders || []).map((f, i) => `
-        <div class="founder-mini-card reveal${revealClass(i)}">
-          <div class="founder-mini-avatar" aria-hidden="true">${escapeHtml(f.initials)}</div>
+        <div class="founder-mini-card reveal reveal-delay-${i + 4}">
+          ${f.image?.src
+            ? `<div class="founder-mini-photo">${renderImage(f.image, 'founder-mini-photo-img', 'loading="lazy"')}</div>`
+            : `<div class="founder-mini-avatar" aria-hidden="true">${escapeHtml(f.initials)}</div>`}
           <div class="founder-mini-name">${escapeHtml(f.preferredName || f.name)}</div>
           <div class="founder-mini-role">${escapeHtml(f.role)}</div>
+          ${f.quote ? `<blockquote class="founder-mini-quote">“${escapeHtml(f.quote)}”</blockquote>` : ''}
         </div>`).join('')}
+        ${data.trustNote ? `<p class="founder-trust-note reveal reveal-delay-5"><span aria-hidden="true">✓</span>${escapeHtml(data.trustNote)}</p>` : ''}
       </div>
     </div>
   </div>
@@ -103,7 +115,7 @@
 
   function renderWaysToExperienceSection(data) {
     return `
-<!-- Claude Code focus: Editorial tour groupings, not a rigid filter — link out to the full catalogue. -->
+<!-- Experience-style gateways into the filtered catalogue. -->
 <section class="pathways-section white-lift section-pad" aria-label="Ways to experience Ghana" data-home-section="waysToExperience">
   ${renderWeaveMotif('pathways')}
   <div class="container">
@@ -116,41 +128,16 @@
     </div>
     <div class="pathways-grid">
       ${(data.pathways || []).map((p, i) => `
-      <div class="pathway-card${p.image ? ' pathway-card-media' : ''} reveal${revealClass(i)}">
-        ${p.image ? `<div class="pathway-card-img">${renderImage(p.image, 'pathway-img', 'loading="lazy"')}</div>` : ''}
+      <a class="pathway-card pathway-card-media reveal pathway-delay-${i + 1}" href="${escapeHtml(p.href || 'packages.html')}" aria-label="Explore ${escapeHtml(p.title)} experiences">
+        <div class="pathway-card-img">${renderImage(p.image, 'pathway-img', 'loading="lazy"')}</div>
         <div class="pathway-card-body">
-          <div class="pathway-count">${escapeHtml(p.tourCount)} ${p.tourCount === 1 ? 'tour' : 'tours'}</div>
           <h3 class="pathway-title">${escapeHtml(p.title)}</h3>
           <p class="pathway-text">${escapeHtml(p.text)}</p>
+          <span class="pathway-arrow" aria-hidden="true">${arrowIcon}</span>
         </div>
-      </div>`).join('')}
+      </a>`).join('')}
     </div>
-    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark pathways-cta reveal">${escapeHtml(data.cta.label)}${buttonStar}</a>` : ''}
-  </div>
-</section>`;
-  }
-
-  function renderToursSection(data) {
-    return `
-<!-- Claude Code focus: Tour card UI is rendered from tours.js by script.js into #trips-grid. -->
-<section class="trips-section white-lift section-pad" aria-label="Upcoming tours" data-home-section="availableTours">
-  <div class="container">
-    <div class="trips-header">
-      <div>
-        <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
-        <h2 class="section-title trips-title reveal reveal-delay-1">${escapeHtml(data.title)}</h2>
-      </div>
-      <a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark reveal reveal-delay-2" style="align-self:flex-end;">
-        ${escapeHtml(data.cta.label)}
-        ${buttonStar}
-      </a>
-    </div>
-
-    <div class="trip-filters" role="group" aria-label="Filter tours by type">
-      ${(data.filters || []).map(filter => `<button type="button" class="trip-filter-tag${filter.active ? ' active' : ''}" data-trip-filter="${escapeHtml(filter.value)}" aria-pressed="${filter.active ? 'true' : 'false'}">${escapeHtml(filter.label)}</button>`).join('\n      ')}
-    </div>
-
-    <div class="trips-grid" id="trips-grid" data-tour-source="catalog"></div>
+    ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark pathways-cta reveal"><span>${escapeHtml(data.cta.label)}</span></a>` : ''}
   </div>
 </section>`;
   }
@@ -168,16 +155,16 @@
           <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
           <h2 class="why-editorial-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
         </div>
-        <p class="why-editorial-intro reveal reveal-delay-1">${escapeHtml(data.intro)}</p>
+        <p class="why-editorial-intro reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
       </div>
       <ol class="why-editorial-list">
         ${(data.principles || []).map((p, index) => `
-        <li class="why-row reveal${revealClass(index)}">
+        <li class="why-row reveal why-row-delay-${Math.floor(index / 2) + 1}">
           <span class="why-row-icon" aria-hidden="true">${renderIcon(p.icon)}</span>
           <div class="why-row-content">
             <h3>${escapeHtml(p.title)}</h3>
             <p>${escapeHtml(p.text)}</p>
-            <blockquote class="principle-proof">&ldquo;${escapeHtml(p.proofQuote)}&rdquo; <cite>— ${escapeHtml(p.proofAuthor)}</cite></blockquote>
+            ${p.proofQuote ? `<blockquote class="principle-proof">&ldquo;${escapeHtml(p.proofQuote)}&rdquo;${p.proofAuthor ? ` <cite>— ${escapeHtml(p.proofAuthor)}</cite>` : ''}</blockquote>` : ''}
           </div>
         </li>`).join('')}
       </ol>
@@ -234,10 +221,10 @@
 
   <div class="container testimonials-body">
     ${(data.ratingSummary || (data.trustFacts && data.trustFacts.length)) ? `
-    <div class="trust-facts-row">
+    <div class="trust-facts-row reveal reveal-delay-1">
       ${data.ratingSummary ? `
       <${data.ratingSummary.href ? 'a' : 'div'} class="trust-rating"${data.ratingSummary.href ? ` href="${escapeHtml(data.ratingSummary.href)}" target="_blank" rel="noopener"` : ''}>
-        <span class="trust-rating-value">${escapeHtml(data.ratingSummary.value)}</span>
+        ${renderCountValue(data.ratingSummary.value, 'trust-rating-value')}
         <span class="trust-rating-meta">
           ${renderStars(`Rated ${data.ratingSummary.value} out of 5`)}
           <span class="trust-rating-source">${escapeHtml(`${data.ratingSummary.count} ${data.ratingSummary.source} reviews`)}</span>
@@ -245,20 +232,21 @@
       </${data.ratingSummary.href ? 'a' : 'div'}>` : ''}
       ${(data.trustFacts || []).map(f => `
       <div class="trust-fact">
-        <span class="trust-fact-value">${escapeHtml(f.value)}</span>
+        ${renderCountValue(f.value, 'trust-fact-value')}
         <span class="trust-fact-label">${escapeHtml(f.label)}</span>
       </div>`).join('')}
     </div>` : ''}
 
-    <div class="testimonials-wrap">
-      <div class="testimonials-track">
+    <div class="testimonials-wrap reveal reveal-delay-3">
+      <div class="testimonials-track" role="region" aria-label="Traveler reviews carousel" tabindex="0">
         ${(data.items || []).map((item, idx) => `
-        <div class="testimonial-slide">
+        <div class="testimonial-slide reveal testimonial-delay-${Math.min(idx + 1, 3)}">
           <div class="testimonial-card${idx === 0 ? ' testimonial-card-feature' : ''}">
-            ${renderStars('Rated 5 out of 5')}
-            <blockquote class="testi-quote">${escapeHtml(item.quote)}</blockquote>
+            ${renderStars(`Rated ${item.rating || 5} out of 5`)}
+            <blockquote class="testi-quote${String(item.quote || '').length > 130 ? ' is-collapsible' : ''}">${escapeHtml(item.quote)}</blockquote>
+            ${String(item.quote || '').length > 130 ? '<button type="button" class="testi-read-more" aria-expanded="false">Read more</button>' : ''}
             <div class="testi-author">
-              ${item.image ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.author)}" loading="lazy" width="160" height="160" decoding="async" />` : ''}
+              ${item.image ? renderImage(item.image, 'testi-author-photo', 'loading="lazy"') : `<span class="testi-author-fallback" aria-hidden="true">${escapeHtml(String(item.author || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join(''))}</span>`}
               <div>
                 <strong>${escapeHtml(item.author)}</strong>
                 <span>${escapeHtml(item.location)}</span>
@@ -303,7 +291,6 @@
       renderHeroSection(homeContent.hero),
       renderFounderStorySection(homeContent.founderStory),
       renderWaysToExperienceSection(homeContent.waysToExperience),
-      renderToursSection(homeContent.availableTours),
       renderHowHostedSection(homeContent.howHosted),
       renderReviewsAndTrustSection(homeContent.reviewsAndTrust),
       renderBookingStepsSection(homeContent.planningProcess),

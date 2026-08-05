@@ -28,23 +28,21 @@ async function withPage(browser, path, callback) {
   const browser = await chromium.launch({ headless: true });
 
   await withPage(browser, '/index.html', async page => {
-    await page.waitForSelector('.trip-card');
+    await page.waitForSelector('.pathway-card');
     const homepageContentLoaded = await page.evaluate(() => Boolean(window.PEOPLE_PLACES_HOME?.hero));
     assert(homepageContentLoaded, 'homepage content data did not load');
 
     const renderedSections = await page.locator('#homepage-root [data-home-section]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-home-section')));
-    const expectedSections = ['hero', 'founderStory', 'waysToExperience', 'availableTours', 'howHosted', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
+    const expectedSections = ['hero', 'founderStory', 'waysToExperience', 'howHosted', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
     assert(renderedSections.join('|') === expectedSections.join('|'), `unexpected homepage section order: ${renderedSections.join(', ')}`);
 
     const cards = await page.locator('.trip-card').count();
     const searchItems = await page.locator('.cmd-item').count();
-    assert(cards === 4, `expected 4 homepage trip cards, got ${cards}`);
+    assert(cards === 0, `expected no homepage trip cards, got ${cards}`);
     assert(searchItems === 15, `expected 15 command palette items, got ${searchItems}`);
 
-    const firstCardImage = page.locator('.trip-card-img img').first();
-    assert(await firstCardImage.getAttribute('width') === '800', 'homepage tour card image is missing width');
-    assert(await firstCardImage.getAttribute('height') === '560', 'homepage tour card image is missing height');
-    assert(await firstCardImage.getAttribute('decoding') === 'async', 'homepage tour card image is missing async decoding');
+    const pathwayLinks = await page.locator('.pathway-card[href*="packages.html?category="]').count();
+    assert(pathwayLinks === 6, `expected 6 filtered experience links, got ${pathwayLinks}`);
 
     const instagramFooterLink = await page.locator('footer a[href="https://instagram.com/peopleand.places"]').count();
     assert(instagramFooterLink >= 1, `expected an Instagram link in the footer, got ${instagramFooterLink}`);
@@ -75,6 +73,12 @@ async function withPage(browser, path, callback) {
     await page.locator('.filter-tab[data-filter="all"]').click();
     const visibleAll = await page.locator('.tour-card:visible').count();
     assert(visibleAll === 15, `expected 15 visible tours after reset, got ${visibleAll}`);
+  });
+
+  await withPage(browser, '/packages.html?category=craft', async page => {
+    await page.waitForSelector('.tour-card');
+    const visibleCraft = await page.locator('.tour-card:visible').count();
+    assert(visibleCraft === 3, `expected 3 visible craft experiences, got ${visibleCraft}`);
   });
 
   await withPage(browser, '/about.html', async page => {

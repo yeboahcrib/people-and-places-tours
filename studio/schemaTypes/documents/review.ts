@@ -6,6 +6,7 @@ export const review = defineType({
   type: 'document',
   fields: [
     defineField({name: 'reviewerName', title: 'Reviewer name', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'country', title: 'Country of origin', type: 'string', description: 'Only publish when supplied or confirmed by the traveler.'}),
     defineField({
       name: 'sourceText',
       title: 'Full source text (verbatim)',

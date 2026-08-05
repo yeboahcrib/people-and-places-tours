@@ -53,41 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
   const cardImageSizes = '(min-width: 1180px) 360px, (min-width: 760px) 45vw, 100vw';
 
-  function renderHomeTours() {
-    const grid = document.getElementById('trips-grid');
-    if (!grid || tours.length === 0) return;
-
-    const homeTours = tours
-      .filter(tour => tour.homeFeatured)
-      .sort((a, b) => (a.homeOrder ?? 999) - (b.homeOrder ?? 999));
-
-    grid.innerHTML = homeTours.map((tour, index) => {
-      const ctaUrl = tour.slug === 'just-go-ghana' ? tour.detailUrl : bookingUrl(tour.slug);
-      const ctaLabel = tour.slug === 'just-go-ghana' ? 'View Tour' : 'Request Tour';
-      const tags = (tour.vibes || []).slice(0, 3).map(tag => `<span class="trip-tag">${escapeHtml(tag)}</span>`).join('');
-      const badge = tour.badge ? `<div class="trip-card-badge">${escapeHtml(tour.badge.toUpperCase())}</div>` : '';
-
-      return `
-      <article class="trip-card reveal${delayClass(index)}" data-trip-cats="${escapeHtml((tour.categories || []).join(' '))}" data-tour-slug="${escapeHtml(tour.slug)}">
-        <div class="trip-card-img">
-          <img src="${escapeHtml(tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="560" loading="lazy" decoding="async" sizes="${cardImageSizes}" />
-          ${badge}
-        </div>
-        <div class="trip-card-body">
-          <div class="trip-card-tags">${tags}</div>
-          <h3 class="trip-card-title">${escapeHtml(tour.homeTitle || tour.title)}</h3>
-          <p class="trip-card-desc">${escapeHtml(tour.description)}</p>
-          <div class="trip-card-footer">
-            <span class="trip-card-price">From <strong>${escapeHtml(tour.price)}</strong></span>
-            <a href="${escapeHtml(ctaUrl)}" class="trip-card-link">
-              ${escapeHtml(ctaLabel)} ${arrowIcon}
-            </a>
-          </div>
-        </div>
-      </article>`;
-    }).join('');
-  }
-
   function renderPackageTours() {
     const grid = document.getElementById('tours-grid');
     if (!grid || tours.length === 0) return;
@@ -101,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const badge = tour.badge ? `<div class="tour-card-badge">${escapeHtml(tour.badge)}</div>` : '';
 
       return `
-        <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
+        <article class="tour-card reveal${delayClass(index)}" data-destination="${escapeHtml(tour.destination)}" data-categories="${escapeHtml((tour.categories || []).join(' '))}" data-tour-slug="${escapeHtml(tour.slug)}" aria-label="${escapeHtml(tour.title)}">
           <div class="tour-card-img">
             <img src="${escapeHtml(tour.packageImage || tour.image)}" alt="${escapeHtml(tour.alt || tour.title)}" width="800" height="550" loading="lazy" decoding="async" sizes="${cardImageSizes}" />
             ${badge}
@@ -179,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  renderHomeTours();
   renderPackageTours();
   renderCommandPaletteTours();
   renderContactTourOptions();
@@ -305,28 +269,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ── TESTIMONIALS RAIL ──
-     The track is a three-up grid on desktop and a scroll-snap rail below
-     900px. The dots mirror scroll position instead of driving a transform:
-     the previous version translated the grid by 100% on a timer, which slid
-     every review out of the overflow-hidden wrapper and left the section
-     blank. There is no auto-advance — the reader controls it. */
+  /* ── TESTIMONIALS RAIL ── */
   const testimonialsTrack = document.querySelector('.testimonials-track');
   const testimonialDots   = document.querySelectorAll('.testimonials-dot');
 
   if (testimonialsTrack && testimonialDots.length > 0) {
-    const testimonialSlides = Array.from(testimonialsTrack.querySelectorAll('.testimonial-slide'));
+    const originalSlides = Array.from(testimonialsTrack.querySelectorAll('.testimonial-slide'));
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let carouselPaused = reducedMotion;
+    let carouselInView = false;
+    let cycleWidth = 0;
+    let lastFrame = 0;
+    let resumeTimer = 0;
+    let dragStartX = 0;
+    let dragStartScroll = 0;
+    let isDragging = false;
+
+    if (!reducedMotion) {
+      originalSlides.forEach(slide => {
+        const clone = slide.cloneNode(true);
+        clone.classList.remove('reveal', 'visible');
+        clone.setAttribute('aria-hidden', 'true');
+        clone.querySelectorAll('a, button').forEach(control => control.setAttribute('tabindex', '-1'));
+        testimonialsTrack.appendChild(clone);
+      });
+      testimonialsTrack.classList.add('is-auto-scrolling');
+    }
+
+    const allSlides = () => Array.from(testimonialsTrack.querySelectorAll('.testimonial-slide'));
+    const measureCarousel = () => {
+      const first = originalSlides[0];
+      const firstClone = allSlides()[originalSlides.length];
+      cycleWidth = first && firstClone ? firstClone.offsetLeft - first.offsetLeft : testimonialsTrack.scrollWidth;
+    };
 
     const syncTestimonialDots = () => {
-      // Grid layout: nothing scrolls, so leave the dots (which are hidden) alone.
       if (testimonialsTrack.scrollWidth - testimonialsTrack.clientWidth <= 1) return;
       const trackLeft = testimonialsTrack.getBoundingClientRect().left;
       let nearest = 0;
       let smallest = Infinity;
-      testimonialSlides.forEach((slide, i) => {
+      originalSlides.forEach((slide, i) => {
         const offset = Math.abs(slide.getBoundingClientRect().left - trackLeft);
         if (offset < smallest) { smallest = offset; nearest = i; }
       });
+      if (cycleWidth && testimonialsTrack.scrollLeft >= cycleWidth) {
+        const cloneIndex = allSlides().slice(originalSlides.length).reduce((best, slide, i) => {
+          const offset = Math.abs(slide.getBoundingClientRect().left - trackLeft);
+          return offset < best.offset ? {index: i, offset} : best;
+        }, {index: 0, offset: Infinity}).index;
+        nearest = cloneIndex;
+      }
       testimonialDots.forEach((dot, i) => {
         const active = i === nearest;
         dot.classList.toggle('active', active);
@@ -342,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     testimonialDots.forEach((dot, i) => {
       dot.addEventListener('click', () => {
-        const slide = testimonialSlides[i];
+        const slide = originalSlides[i];
         if (!slide) return;
         const delta = slide.getBoundingClientRect().left - testimonialsTrack.getBoundingClientRect().left;
         testimonialsTrack.scrollTo({
@@ -352,30 +344,87 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    window.addEventListener('resize', syncTestimonialDots);
-    syncTestimonialDots();
-  }
+    const pauseCarousel = () => { carouselPaused = true; testimonialsTrack.classList.remove('is-auto-scrolling'); };
+    const resumeCarousel = (delay = 0) => {
+      clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        if (!reducedMotion) { carouselPaused = false; testimonialsTrack.classList.add('is-auto-scrolling'); }
+      }, delay);
+    };
 
-  /* ── TRIP CATEGORY FILTER (home page) ── */
-  const tripFilterTags = document.querySelectorAll('.trip-filter-tag');
-  if (tripFilterTags.length > 0) {
-    tripFilterTags.forEach(tag => {
-      tag.addEventListener('click', () => {
-        tripFilterTags.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-pressed', 'false'); });
-        tag.classList.add('active');
-        tag.setAttribute('aria-pressed', 'true');
-        const filter = tag.dataset.tripFilter;
-        document.querySelectorAll('.trip-card').forEach(card => {
-          const cats = card.dataset.tripCats || '';
-          card.style.display = (filter === 'all' || cats.includes(filter)) ? '' : 'none';
-        });
-      });
+    testimonialsTrack.addEventListener('mouseenter', pauseCarousel);
+    testimonialsTrack.addEventListener('mouseleave', () => resumeCarousel(600));
+    testimonialsTrack.addEventListener('focusin', pauseCarousel);
+    testimonialsTrack.addEventListener('focusout', event => {
+      if (!testimonialsTrack.contains(event.relatedTarget)) resumeCarousel(600);
     });
+    testimonialsTrack.addEventListener('pointerdown', event => {
+      pauseCarousel();
+      if (event.pointerType !== 'mouse' || event.target.closest('button, a')) return;
+      isDragging = true;
+      dragStartX = event.clientX;
+      dragStartScroll = testimonialsTrack.scrollLeft;
+      testimonialsTrack.classList.add('is-dragging');
+      testimonialsTrack.setPointerCapture(event.pointerId);
+    });
+    testimonialsTrack.addEventListener('pointermove', event => {
+      if (!isDragging) return;
+      testimonialsTrack.scrollLeft = dragStartScroll - (event.clientX - dragStartX);
+    });
+    const endDrag = event => {
+      if (!isDragging) { resumeCarousel(3500); return; }
+      isDragging = false;
+      testimonialsTrack.classList.remove('is-dragging');
+      if (testimonialsTrack.hasPointerCapture(event.pointerId)) testimonialsTrack.releasePointerCapture(event.pointerId);
+      resumeCarousel(3500);
+    };
+    testimonialsTrack.addEventListener('pointerup', endDrag);
+    testimonialsTrack.addEventListener('pointercancel', endDrag);
+
+    testimonialsTrack.addEventListener('click', event => {
+      const button = event.target.closest('.testi-read-more');
+      if (!button) return;
+      const quote = button.previousElementSibling;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      button.textContent = expanded ? 'Read more' : 'Show less';
+      quote?.classList.toggle('is-expanded', !expanded);
+    });
+
+    const advanceCarousel = timestamp => {
+      if (!lastFrame) lastFrame = timestamp;
+      const elapsed = Math.min(timestamp - lastFrame, 50);
+      lastFrame = timestamp;
+      if (!carouselPaused && carouselInView && cycleWidth > 0) {
+        testimonialsTrack.scrollLeft += elapsed * 0.008;
+        if (testimonialsTrack.scrollLeft >= cycleWidth) testimonialsTrack.scrollLeft -= cycleWidth;
+      }
+      requestAnimationFrame(advanceCarousel);
+    };
+
+    const carouselObserver = new IntersectionObserver(entries => {
+      carouselInView = entries.some(entry => entry.isIntersecting);
+    }, { threshold: 0.2 });
+    carouselObserver.observe(testimonialsTrack);
+
+    window.addEventListener('resize', () => { measureCarousel(); syncTestimonialDots(); });
+    measureCarousel();
+    syncTestimonialDots();
+    requestAnimationFrame(advanceCarousel);
   }
 
   /* ── PACKAGE FILTER TABS (packages page) ── */
   const filterTabs = document.querySelectorAll('.filter-tab');
   if (filterTabs.length > 0) {
+    const queryParams = new URLSearchParams(window.location.search);
+    const requestedExperience = queryParams.get('category') || queryParams.get('experience');
+    const allowedExperiences = new Set(['heritage', 'food', 'nature', 'adventure', 'craft', 'multi-day']);
+    if (requestedExperience && allowedExperiences.has(requestedExperience)) {
+      filterTabs.forEach(tab => { tab.classList.remove('active'); tab.setAttribute('aria-pressed', 'false'); });
+      document.querySelectorAll('.tour-card[data-categories]').forEach(card => {
+        card.style.display = card.dataset.categories.split(/\s+/).includes(requestedExperience) ? '' : 'none';
+      });
+    }
     filterTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         filterTabs.forEach(t => {
@@ -695,6 +744,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Wait one frame so layout has computed before measuring positions.
     requestAnimationFrame(() => requestAnimationFrame(initReveals));
+
+    const founderSection = document.querySelector('[data-home-section="founderStory"]');
+    const homepageHero = document.querySelector('[data-home-section="hero"]');
+    if (founderSection && homepageHero) {
+      document.documentElement.classList.add('founder-transition-ready');
+      const founderTransitionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          document.documentElement.classList.toggle('founder-transition-active', entry.isIntersecting);
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -8% 0px' });
+      founderTransitionObserver.observe(founderSection);
+    }
   }
 
   /* ── STATS COUNTER ── */
@@ -720,6 +781,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.3 });
 
   document.querySelectorAll('.stats-section, .about-stats-row, .stats-bar').forEach(el => statObserver.observe(el));
+
+  const trustMetrics = document.querySelector('.trust-facts-row');
+  if (trustMetrics && 'IntersectionObserver' in window) {
+    const trustMetricObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('[data-count-value]').forEach(metric => {
+          const target = Number(metric.dataset.countValue);
+          const decimals = Number(metric.dataset.countDecimals || 0);
+          const suffix = metric.dataset.countSuffix || '';
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            metric.textContent = `${target.toFixed(decimals)}${suffix}`;
+            return;
+          }
+          metric.textContent = `${(0).toFixed(decimals)}${suffix}`;
+          const start = performance.now();
+          const duration = 1600;
+          const tick = now => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            metric.textContent = `${(target * eased).toFixed(decimals)}${suffix}`;
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
+        trustMetricObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+    trustMetricObserver.observe(trustMetrics);
+  }
 
   /* ── COMMAND PALETTE ── */
   const cmdPalette  = document.getElementById('cmd-palette');
