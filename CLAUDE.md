@@ -66,6 +66,8 @@ for (const w of [375, 430, 768, 1024, 1440]) {
 
 `tests/smoke.js` runs an end-to-end happy-path check across the main pages — run it (`node tests/smoke.js` with the server up) before declaring work done.
 
+`tests/resilient-rendering.js` is the exception to the "start a server first" rule: it checks what a visitor sees with JavaScript disabled, which is only meaningful against `dist/`, because the homepage sections and the packages grid are assembled at build time. It serves `dist/` itself on an ephemeral port, so run `npm run build` first and then `npm run test:resilience` with no server of your own. Setting `BASE_URL` overrides that and will point it at the raw source, where an empty homepage shell is expected and the failures are not real.
+
 ### Reporting the check
 
 When finishing visual work, say what you checked, at what widths, and what you saw. Examples that are acceptable:
