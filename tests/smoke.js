@@ -78,9 +78,16 @@ async function withPage(browser, path, callback) {
   });
 
   await withPage(browser, '/packages.html?category=craft', async page => {
-    await page.waitForSelector('.tour-card');
+    // Wait for a *visible* card: the first card in DOM order is filtered out
+    // by this category, so waiting on '.tour-card' would wait on a hidden one.
+    await page.waitForSelector('.tour-card:visible');
+    // Derived from the catalog rather than hard-coded, so recategorising a
+    // tour cannot silently drift away from what the filter actually shows.
+    const expectedCraft = await page.evaluate(() =>
+      (window.PEOPLE_PLACES_TOURS || []).filter(tour => (tour.categories || []).includes('craft')).length);
     const visibleCraft = await page.locator('.tour-card:visible').count();
-    assert(visibleCraft === 3, `expected 3 visible craft experiences, got ${visibleCraft}`);
+    assert(expectedCraft > 0, 'catalog has no craft experiences to filter');
+    assert(visibleCraft === expectedCraft, `expected ${expectedCraft} visible craft experiences, got ${visibleCraft}`);
   });
 
   await withPage(browser, '/about.html', async page => {

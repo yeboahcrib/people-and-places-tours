@@ -161,6 +161,9 @@
       .trip-hero { padding: 2rem 1.25rem; }
       .content-wrap { padding: 2rem 1.25rem; }
     }
+    /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
+       cannot shrink below their content. Collapse to one column. */
+    @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
   </style>
 </head>
 <body>

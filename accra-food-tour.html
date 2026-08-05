@@ -99,6 +99,9 @@
     .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
+    /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
+       cannot shrink below their content. Collapse to one column. */
+    @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
   </style>
 </head>
 <body>
