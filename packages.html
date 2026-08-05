@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="preconnect" href="https://images.unsplash.com" />
-  <title>Tour Packages — People & Places Tours Ghana</title>
-  <meta name="description" content="Browse all Ghana tour packages from People & Places Tours. Cape Coast, Accra, Kumasi, Volta Region, Ada Foah, and Akosombo — filter by destination." />
+  <title>Explore Ghana Experiences — People & Places</title>
+  <meta name="description" content="Explore locally hosted Ghana experiences shaped around the country's people, culture, food, history, craft, cities, and landscapes." />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,21 +44,28 @@
   </nav>
 
   <!-- ═══════════════ PAGE HERO ═══════════════ -->
-  <section class="page-hero" aria-label="Packages page hero">
-    <img class="page-hero-bg" src="https://images.unsplash.com/photo-1622487560941-7f6bd5ed24b6?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" />
+  <section class="page-hero experiences-hero" aria-label="Explore Ghana experiences">
+    <!-- CMS media slot: replace this image with an approved Sanity image or a muted, looping video using the same experience-hero-asset class. -->
+    <div class="experience-hero-media" aria-hidden="true">
+      <img class="experience-hero-asset" src="https://images.unsplash.com/photo-1622487560941-7f6bd5ed24b6?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" sizes="100vw" />
+    </div>
     <div class="page-hero-content container">
       <div class="breadcrumb">
         <a href="index.html">Home</a>
         <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-current">Packages</span>
+        <span class="breadcrumb-current">Experiences</span>
       </div>
-      <h1 class="page-hero-title">Tour<br><span style="color:var(--yellow);">Packages</span></h1>
-      <p class="page-hero-subtitle">Every tour is a gateway into Ghana's most remarkable landscapes, culture, and history. Find yours below.</p>
+      <h1 class="page-hero-title">Explore Ghana<br><span>Experiences</span></h1>
+      <p class="page-hero-subtitle">Spend time with Ghana through the people who know it firsthand. Follow the history, food, craft, cities, and landscapes that shape everyday life here.</p>
+      <a class="experience-scroll-indicator" href="#experiences-list" aria-label="Browse all Ghana experiences">
+        <span>Browse Experiences</span>
+        <i aria-hidden="true"></i>
+      </a>
     </div>
   </section>
 
   <!-- ═══════════════ PACKAGES GRID ═══════════════ -->
-  <section class="section-pad" style="background:var(--black);" aria-label="All tour packages">
+  <section class="section-pad" id="experiences-list" style="background:var(--black);" aria-label="All Ghana experiences">
     <div class="container">
 
       <!-- Filter Tabs -->
