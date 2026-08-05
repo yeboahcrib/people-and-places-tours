@@ -16,6 +16,22 @@ Configure these encrypted/environment bindings in Cloudflare Pages:
 - `INQUIRY_FROM_EMAIL` — sender on a domain verified with Resend.
 - `ALLOWED_ORIGINS` — comma-separated production/preview origins in addition
   to the function's own origin.
+- `TURNSTILE_SECRET_KEY` — secret half of the Turnstile key pair. When set, a
+  valid token is required and verification failures fail closed, including
+  when Cloudflare's verify endpoint is unreachable. When unset, the endpoint
+  still works and falls back to the honeypot, origin check and field limits;
+  `/api/health` reports `botProtectionConfigured: false` so the gap is visible.
+
+The public half is a **build** variable, not a runtime binding, because it is
+injected into `contact.html`:
+
+- `TURNSTILE_SITE_KEY` — set in the Pages build environment. Left unset, the
+  form carries an empty `data-turnstile-sitekey` and never loads the widget
+  script, which is what keeps the GitHub Pages fallback free of a challenge it
+  has no Function to verify against.
+
+A request with no `Origin` header is refused outright. Browsers always send it
+on a POST, so its absence means the caller is not a browser following our form.
 
 The contact form remains in `fallback` mode on GitHub Pages. It automatically
 uses this endpoint on a `*.pages.dev` preview. At custom-domain cutover, set

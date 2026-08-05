@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {loadBookingContent, loadLocalBookingContent, TEXT_KEYS} from '../scripts/booking-source.mjs';
-import {injectBookingContent} from '../scripts/render-booking.mjs';
+import {injectBookingContent, injectTurnstileSiteKey} from '../scripts/render-booking.mjs';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const local = await loadLocalBookingContent(projectRoot);
@@ -89,6 +89,19 @@ assert(rendered.includes('Replies fast'));
 assert(rendered.includes('Only question?'));
 assert(!rendered.includes(local.faqs[1].question), 'stale FAQ survived injection');
 assert.equal((rendered.match(/class="booking-next-step"/g) || []).length, 1);
+
+// ── Turnstile site key injection ──
+// Absent by default so the GitHub Pages build loads no challenge script.
+const noKey = injectTurnstileSiteKey(contactHtml, undefined);
+assert(noKey.includes('data-turnstile-sitekey=""'), 'missing key should leave the attribute empty');
+
+const keyed = injectTurnstileSiteKey(contactHtml, '0x4AAAAAAABkMYinukEnkKk');
+assert(keyed.includes('data-turnstile-sitekey="0x4AAAAAAABkMYinukEnkKk"'));
+assert(!keyed.includes('data-turnstile-sitekey=""'));
+
+// The key lands in an HTML attribute, so anything that could break out of it
+// must fail the build rather than be written to the page.
+assert.throws(() => injectTurnstileSiteKey(contactHtml, 'evil" onload="alert(1)'), /Unsafe Turnstile site key/);
 
 // Injected copy must be escaped, never interpreted as markup.
 const escaped = injectBookingContent(contactHtml, {...local, title: '<script>alert(1)</script>'});

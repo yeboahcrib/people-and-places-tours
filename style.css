@@ -3213,6 +3213,11 @@ body.page-entering {
   font-size: 0.8rem;
   line-height: 1.55;
 }
+/* Turnstile's mount takes no space until the widget renders into it, so the
+   GitHub Pages fallback shows no gap where a challenge would be. */
+.booking-turnstile:empty { display: none; }
+.booking-turnstile { display: flex; }
+
 /* The global note colour is tuned for the darker page background; on the
    panel it drops under 4.5:1. */
 .booking-flow .form-privacy-note { color: rgba(255,255,255,.55); }

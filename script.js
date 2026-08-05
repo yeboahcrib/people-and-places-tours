@@ -697,6 +697,61 @@ document.addEventListener('DOMContentLoaded', () => {
     // value stays as the no-JS fallback.
     const nextField = contactForm.querySelector('input[name="_next"]');
     if (nextField) nextField.value = new URL('thanks.html', window.location.href).href;
+
+    /* ── Turnstile ──
+       Loaded only when a site key was injected at build time, so the GitHub
+       Pages fallback — which has no Function to verify a token against —
+       pulls in no third-party script at all.
+
+       Executed at submit rather than on load: a token expires after five
+       minutes and this is a two-step form people take their time over, so
+       minting it at the moment of sending avoids a stale-token rejection.
+       `interaction-only` keeps it invisible unless a challenge is genuinely
+       needed, and even then it resolves inline instead of sending anyone to
+       a CAPTCHA page. */
+    const turnstileSiteKey = contactForm.dataset.turnstileSitekey;
+    const turnstileMount = contactForm.querySelector('[data-turnstile]');
+    let turnstileWidget = null;
+    let pendingTurnstile = null;
+
+    const settleTurnstile = token => {
+      if (!pendingTurnstile) return;
+      const resolve = pendingTurnstile;
+      pendingTurnstile = null;
+      resolve(token);
+    };
+
+    if (turnstileSiteKey && turnstileMount) {
+      window.onBookingTurnstileLoad = () => {
+        turnstileWidget = window.turnstile.render(turnstileMount, {
+          sitekey: turnstileSiteKey,
+          appearance: 'interaction-only',
+          execution: 'execute',
+          callback: token => settleTurnstile(token),
+          'error-callback': () => settleTurnstile(''),
+          'timeout-callback': () => settleTurnstile(''),
+        });
+      };
+      const turnstileScript = document.createElement('script');
+      turnstileScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onBookingTurnstileLoad&render=explicit';
+      turnstileScript.async = true;
+      turnstileScript.defer = true;
+      document.head.appendChild(turnstileScript);
+    }
+
+    const requestTurnstileToken = () => new Promise(resolve => {
+      if (!turnstileSiteKey || turnstileWidget === null || !window.turnstile) return resolve('');
+      pendingTurnstile = resolve;
+      // Never leave somebody watching a spinner for a challenge that is not
+      // coming back. An empty token fails the server check honestly instead.
+      setTimeout(() => settleTurnstile(''), 15000);
+      try {
+        window.turnstile.reset(turnstileWidget);
+        window.turnstile.execute(turnstileWidget);
+      } catch {
+        settleTurnstile('');
+      }
+    });
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
     let updateTourName = () => {};
@@ -853,13 +908,23 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const endpoint = contactForm.dataset.cloudflareEndpoint || '/api/inquiry';
         const payload = Object.fromEntries(new FormData(contactForm).entries());
+        payload['cf-turnstile-response'] = await requestTurnstileToken();
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
           body: JSON.stringify(payload),
         });
         const result = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(result.error || 'Inquiry could not be sent');
+
+        // The function's own messages are written for travellers to read, and
+        // a rejected challenge needs its specific "reload and try again"
+        // wording rather than the generic delivery warning below.
+        if (!res.ok) {
+          if (errorEl) errorEl.textContent = result.error || 'Your message could not be sent. Please try again in a moment.';
+          btn.innerHTML = original;
+          btn.disabled = false;
+          return;
+        }
 
         contactForm.reset();
         updateTourName();

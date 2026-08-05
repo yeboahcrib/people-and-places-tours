@@ -7,7 +7,7 @@ import {injectTourCards} from './render-tour-cards.mjs';
 import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
-import {injectBookingContent} from './render-booking.mjs';
+import {injectBookingContent, injectTurnstileSiteKey} from './render-booking.mjs';
 
 const projectRoot = process.cwd();
 const outputRoot = join(projectRoot, 'dist');
@@ -64,7 +64,8 @@ for (const entry of rootEntries) {
       )
       : withFooter;
     const withBooking = injectBookingContent(withHomepage, bookingContent);
-    const rendered = injectTourCards(withBooking, tours);
+    const withTurnstile = injectTurnstileSiteKey(withBooking, process.env.TURNSTILE_SITE_KEY);
+    const rendered = injectTourCards(withTurnstile, tours);
     await writeFile(join(outputRoot, entry.name), rendered, 'utf8');
   } else {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));
@@ -89,6 +90,7 @@ const buildHealth = {
   tourContentSource,
   homepageContentSource,
   bookingContentSource,
+  botProtection: process.env.TURNSTILE_SITE_KEY ? 'turnstile' : 'none',
 };
 
 await writeFile(

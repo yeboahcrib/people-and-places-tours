@@ -59,6 +59,16 @@ const renderFaqs = faqs => faqs.map((faq, index) => `
             </div>
           </li>`).join('');
 
+// The Turnstile site key is public, but it differs per environment and must be
+// absent where there is no Function to verify against — on GitHub Pages the
+// empty value keeps the widget script from loading at all.
+export function injectTurnstileSiteKey(html, siteKey) {
+  if (!html.includes('data-turnstile-sitekey')) return html;
+  const key = String(siteKey || '').trim();
+  if (key && !/^[\w-]+$/.test(key)) throw new Error(`Unsafe Turnstile site key: ${key}`);
+  return html.replace(/data-turnstile-sitekey="[^"]*"/, `data-turnstile-sitekey="${key}"`);
+}
+
 export function injectBookingContent(html, booking) {
   if (!html.includes('data-booking-copy')) return html;
 

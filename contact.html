@@ -112,7 +112,7 @@
           <h2 class="booking-flow-title" data-booking-copy="title">A few details. Then we plan it together.</h2>
           <p class="booking-flow-intro" data-booking-copy="intro">This is the start of a conversation, not a commitment. Share what you know now — we'll work out the rest with you.</p>
 
-          <form class="contact-form booking-flow" name="contact" action="https://formsubmit.co/peopandplaces@gmail.com" method="POST" novalidate aria-label="Start planning your Ghana experience" data-inquiry-mode="fallback" data-cloudflare-endpoint="/api/inquiry">
+          <form class="contact-form booking-flow" name="contact" action="https://formsubmit.co/peopandplaces@gmail.com" method="POST" novalidate aria-label="Start planning your Ghana experience" data-inquiry-mode="fallback" data-cloudflare-endpoint="/api/inquiry" data-turnstile-sitekey="">
             <input type="hidden" name="_subject" value="New tour inquiry from People & Places website">
             <input type="hidden" name="_template" value="table">
             <input type="hidden" name="_next" value="https://yeboahcrib.github.io/people-and-places-tours/thanks.html">
@@ -215,6 +215,10 @@
             </fieldset>
 
             <div class="booking-step-actions" data-booking-actions="2">
+              <!-- Turnstile mounts here only when a site key is injected at
+                   build time. It stays empty and inert otherwise, so the
+                   GitHub Pages fallback loads no third-party script. -->
+              <div class="booking-turnstile" data-turnstile></div>
               <p class="form-error" role="alert"></p>
               <div class="booking-final-actions">
                 <button type="submit" class="btn btn-primary form-submit-btn" data-booking-copy="submitLabel">Let's Plan Together</button>

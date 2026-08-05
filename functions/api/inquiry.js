@@ -38,7 +38,11 @@ const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({
 
 function allowedOrigin(request, env) {
   const origin = request.headers.get('Origin');
-  if (!origin) return true;
+  // Browsers always send Origin on a cross-site or same-site POST, and this
+  // endpoint is only ever called by fetch() from our own pages. A request
+  // without one is therefore not a browser following our form — treat the
+  // missing header as a failed check rather than an exemption from it.
+  if (!origin) return false;
 
   const configured = String(env.ALLOWED_ORIGINS || '')
     .split(',')
@@ -46,6 +50,37 @@ function allowedOrigin(request, env) {
     .filter(Boolean);
 
   return origin === new URL(request.url).origin || configured.includes(origin);
+}
+
+// Turnstile runs inline on our own page and never navigates the visitor to a
+// challenge hosted elsewhere, which is the whole reason for preferring it to
+// the CAPTCHA interstitial the FormSubmit fallback can show.
+async function passedTurnstile(token, request, env) {
+  const secret = env.TURNSTILE_SECRET_KEY;
+  // Not configured (local dev, early previews): the honeypot, origin check and
+  // field limits still apply. /api/health reports this so the gap is visible
+  // rather than silent.
+  if (!secret) return true;
+  if (!token) return false;
+
+  const form = new FormData();
+  form.append('secret', secret);
+  form.append('response', token);
+  const clientIp = request.headers.get('CF-Connecting-IP');
+  if (clientIp) form.append('remoteip', clientIp);
+
+  try {
+    const verification = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: form,
+    });
+    if (!verification.ok) return false;
+    const result = await verification.json();
+    return result.success === true;
+  } catch {
+    // A verification outage must not silently let unverified traffic through.
+    return false;
+  }
 }
 
 function normalizePayload(input) {
@@ -123,6 +158,12 @@ async function handlePost({request, env}) {
   // Bots commonly fill fields visually hidden from people. Return a normal
   // success response so the bot does not learn how the filter works.
   if (clean(input['company-website'], 200)) return json(200, {ok: true});
+
+  // Verified before any real work: a token that fails here should cost us
+  // nothing beyond the check itself.
+  if (!await passedTurnstile(clean(input['cf-turnstile-response'], 2048), request, env)) {
+    return json(403, {error: 'We could not confirm this was submitted by a person. Please reload the page and try again.'});
+  }
 
   const payload = normalizePayload(input);
   const validationError = validate(payload);

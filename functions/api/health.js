@@ -17,12 +17,18 @@ export function onRequest({request, env}) {
     inquirySender: Boolean(env.INQUIRY_FROM_EMAIL),
   };
   const ready = Object.values(configuration).every(Boolean);
+  // Reported but deliberately not part of `ready`: without Turnstile the form
+  // still delivers, so this must not take the endpoint to 503 on a preview.
+  // It is surfaced so monitoring can catch a custom-domain cutover that went
+  // out without bot protection. See docs/availability-and-monitoring-runbook.md.
+  const botProtectionConfigured = Boolean(env.TURNSTILE_SECRET_KEY);
   const body = {
     status: ready ? 'ok' : 'degraded',
     service: 'people-and-places-inquiry',
     revision: env.CF_PAGES_COMMIT_SHA || 'unknown',
     checks: {
       deliveryConfigured: ready,
+      botProtectionConfigured,
     },
   };
 
