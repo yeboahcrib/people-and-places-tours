@@ -607,7 +607,7 @@ async function seed() {
     navLinks: [
       {_type: 'navLink', _key: 'home', label: 'Home', href: 'index.html'},
       {_type: 'navLink', _key: 'about', label: 'About', href: 'about.html'},
-      {_type: 'navLink', _key: 'packages', label: 'Packages', href: 'packages.html'},
+      {_type: 'navLink', _key: 'packages', label: 'Experiences', href: 'packages.html'},
       {_type: 'navLink', _key: 'contact', label: 'Contact', href: 'contact.html'},
     ],
     footerColumns: [
@@ -616,10 +616,10 @@ async function seed() {
         _key: 'quick-links',
         heading: 'Quick Links',
         links: [
-          {_type: 'footerLink', _key: 'about', label: 'About Us', href: 'about.html'},
-          {_type: 'footerLink', _key: 'packages', label: 'All Packages', href: 'packages.html'},
-          {_type: 'footerLink', _key: 'contact', label: 'Contact Us', href: 'contact.html'},
-          {_type: 'footerLink', _key: 'jgg', label: 'Just Go Ghana', href: 'just-go-ghana.html'},
+          {_type: 'footerLink', _key: 'home', label: 'Home', href: 'index.html'},
+          {_type: 'footerLink', _key: 'about', label: 'About', href: 'about.html'},
+          {_type: 'footerLink', _key: 'packages', label: 'Experiences', href: 'packages.html'},
+          {_type: 'footerLink', _key: 'contact', label: 'Contact', href: 'contact.html'},
         ],
       },
       {
