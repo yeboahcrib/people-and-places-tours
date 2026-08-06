@@ -29,14 +29,14 @@
     .btn-outline:hover { background: var(--dark); color: var(--white); }
 
     /* HERO */
-    .trip-hero { background: var(--black); padding: 4rem 2.5rem 3rem; }
+    .trip-hero { background: var(--black); padding: var(--sp-8) var(--sp-5) var(--sp-6); }
     .trip-hero-inner { max-width: 900px; margin: 0 auto; }
-    .back-link { color: rgba(255,255,255,0.5); font-size:var(--text-base); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; transition: color 0.2s; }
+    .back-link { color: rgba(255,255,255,0.5); font-size:var(--text-base); text-decoration: none; display: inline-flex; align-items: center; gap: var(--sp-1); margin-bottom: var(--sp-4); transition: color 0.2s; }
     .back-link:hover { color: var(--yellow); }
-    .tag-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .tag { background: rgba(255,171,0,0.15); color: var(--yellow); border: 1px solid rgba(255,171,0,0.3); padding: 0.3rem 1rem; border-radius: 50px; font-size:var(--text-xs); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-    .trip-hero h1 { font-family:'Archivo Black',sans-serif;  font-size: clamp(3rem, 7vw, 5.5rem); color: var(--white); line-height: 1; margin-bottom: 1rem; }
-    .trip-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .tag-row { display: flex; gap: var(--sp-1); flex-wrap: wrap; margin-bottom: var(--sp-3); }
+    .tag { background: rgba(255,171,0,0.15); color: var(--yellow); border: 1px solid rgba(255,171,0,0.3); padding: 0.3rem var(--sp-2); border-radius: 50px; font-size:var(--text-xs); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .trip-hero h1 { font-family:'Archivo Black',sans-serif;  font-size: clamp(3rem, 7vw, 5.5rem); color: var(--white); line-height: 1; margin-bottom: var(--sp-2); }
+    .trip-meta { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
     .trip-meta-item { color: rgba(255,255,255,0.6); font-size:var(--text-base); display: flex; align-items: center; gap: 0.4rem; }
     .trip-meta-item strong { color: var(--white); }
 
@@ -46,105 +46,105 @@
     .hero-img-placeholder::before { content: 'GHANA'; font-family:'Archivo Black',sans-serif;  font-size: 12rem; color: rgba(255,171,0,0.08); position: absolute; }
 
     /* CONTENT */
-    .content-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2.5rem; display: grid; grid-template-columns: 1fr 340px; gap: 4rem; align-items: start; }
+    .content-wrap { max-width: 1200px; margin: 0 auto; padding: var(--sp-8) var(--sp-5); display: grid; grid-template-columns: 1fr 340px; gap: var(--sp-8); align-items: start; }
     .content-right { position: sticky; top: 100px; }
 
     /* SECTIONS */
-    .section-label { font-size:var(--text-2xs); font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow-on-light); margin-bottom: 0.75rem; }
-    .content-left h2 { font-family:'Archivo Black',sans-serif;  font-size: 2.2rem; color: var(--dark); margin-bottom: 1rem; }
-    .content-left p { color: #555; line-height: 1.8; font-size:var(--text-lg); margin-bottom: 1.5rem; }
+    .section-label { font-size:var(--text-2xs); font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow-on-light); margin-bottom: var(--sp-1-5); }
+    .content-left h2 { font-family:'Archivo Black',sans-serif;  font-size: 2.2rem; color: var(--dark); margin-bottom: var(--sp-2); }
+    .content-left p { color: #555; line-height: 1.8; font-size:var(--text-lg); margin-bottom: var(--sp-3); }
 
     /* HIGHLIGHTS */
-    .highlights { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-bottom: 3rem; }
+    .highlights { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-bottom: var(--sp-6); }
     .highlight-pill {
-      display: inline-flex; align-items: center; gap: 0.5rem;
+      display: inline-flex; align-items: center; gap: var(--sp-1);
       background: var(--gray); color: var(--dark);
-      padding: 0.45rem 1rem; border-radius: 50px;
+      padding: 0.45rem var(--sp-2); border-radius: 50px;
       font-size:var(--text-sm); font-weight: 500;
       line-height: 1;
     }
     .hi-icon { width: 14px; height: 14px; stroke: var(--yellow-dark, #D9960A); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 
     /* ITINERARY */
-    .itinerary { margin-bottom: 3rem; }
+    .itinerary { margin-bottom: var(--sp-6); }
     .day-item { border-bottom: 1px solid #eee; }
-    .day-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; cursor: pointer; }
+    .day-header { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-2-5) 0; cursor: pointer; }
     .day-header h3 { font-size:var(--text-md); font-weight: 600; color: var(--dark); }
-    .day-number { font-family:'Archivo Black',sans-serif;  font-size:var(--text-xl); color: var(--yellow); margin-right: 0.75rem; }
+    .day-number { font-family:'Archivo Black',sans-serif;  font-size:var(--text-xl); color: var(--yellow); margin-right: var(--sp-1-5); }
     .day-arrow { font-size:var(--text-lg); color: #aaa; transition: transform 0.2s; }
-    .day-body { display: none; padding-bottom: 1.25rem; }
-    .day-body p { color: #666; font-size:var(--text-base); line-height: 1.8; }
-    .day-body .meals { margin-top: 0.75rem; font-size:var(--text-sm); color: var(--yellow); font-weight: 600; }
+    .day-body { display: none; padding-bottom: var(--sp-2-5); }
+    .day-body p { color: #555; font-size:var(--text-lg); line-height: 1.8; }
+    .day-body .meals { margin-top: var(--sp-1-5); font-size:var(--text-sm); color: var(--yellow); font-weight: 600; }
     .day-item.open .day-arrow { transform: rotate(180deg); }
     .day-item.open .day-body { display: block; }
 
     /* INCLUDED / EXCLUDED */
-    .inc-exc { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
-    .inc-exc h3 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-3xl); margin-bottom: 1rem; }
+    .inc-exc { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); margin-bottom: var(--sp-6); }
+    .inc-exc h3 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-3xl); margin-bottom: var(--sp-2); }
     .inc-list, .exc-list { list-style: none; }
-    .inc-list li, .exc-list li { padding: 0.5rem 0; font-size:var(--text-base); color: #555; display: flex; align-items: flex-start; gap: 0.6rem; border-bottom: 1px solid #f0f0f0; }
+    .inc-list li, .exc-list li { padding: var(--sp-1) 0; font-size:var(--text-base); color: #555; display: flex; align-items: flex-start; gap: 0.6rem; border-bottom: 1px solid #f0f0f0; }
     .inc-list li::before { content: '✓'; color: var(--yellow); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
     .exc-list li::before { content: '✗'; color: #ccc; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
 
     /* TESTIMONIALS */
-    .testimonials { background: var(--gray); border-radius: 24px; padding: 2rem; margin-bottom: 3rem; }
-    .testimonial { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e8e0; }
+    .testimonials { background: var(--gray); border-radius: 24px; padding: var(--sp-4); margin-bottom: var(--sp-6); }
+    .testimonial { margin-bottom: var(--sp-3); padding-bottom: var(--sp-3); border-bottom: 1px solid #e8e8e0; }
     .testimonial:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-    .testimonial p { color: #444; font-size:var(--text-md); line-height: 1.8;  margin-bottom: 0.5rem; }
+    .testimonial p { color: #444; font-size:var(--text-md); line-height: 1.8;  margin-bottom: var(--sp-1); }
     .testimonial strong { font-size:var(--text-base); color: var(--dark); font-style: normal; }
 
     /* FAQ */
-    .faq { margin-bottom: 3rem; }
+    .faq { margin-bottom: var(--sp-6); }
     .faq-item { border-bottom: 1px solid #eee; }
-    .faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; cursor: pointer; font-weight: 600; font-size:var(--text-base); color: var(--dark); }
+    .faq-q { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-2-5) 0; cursor: pointer; font-weight: 600; font-size: var(--text-lg); color: var(--dark); }
     .faq-q .arrow { color: #aaa; transition: transform 0.2s; }
-    .faq-a { display: none; padding-bottom: 1.25rem; color: #666; font-size:var(--text-base); line-height: 1.8; }
+    .faq-a { display: none; padding-bottom: var(--sp-2-5); color: #555; font-size:var(--text-lg); line-height: 1.8; }
     .faq-item.open .faq-q .arrow { transform: rotate(180deg); }
     .faq-item.open .faq-a { display: block; }
 
     /* BOOKING SIDEBAR */
-    .booking-card { background: var(--black); border-radius: 24px; padding: 2rem; color: var(--white); margin-bottom: 1.5rem; }
-    .booking-card .price-label { font-size:var(--text-xs); letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.25rem; }
+    .booking-card { background: var(--black); border-radius: 24px; padding: var(--sp-4); color: var(--white); margin-bottom: var(--sp-3); }
+    .booking-card .price-label { font-size:var(--text-xs); letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: var(--sp-0-5); }
     .booking-card .price { font-family:'Archivo Black',sans-serif;  font-size:var(--text-9xl); color: var(--yellow); line-height: 1; }
-    .booking-card .price-sub { font-size:var(--text-sm); color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; }
-    .booking-card .deposit-note { background: rgba(255,171,0,0.1); border: 1px solid rgba(255,171,0,0.2); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+    .booking-card .price-sub { font-size:var(--text-sm); color: rgba(255,255,255,0.5); margin-bottom: var(--sp-3); }
+    .booking-card .deposit-note { background: rgba(255,171,0,0.1); border: 1px solid rgba(255,171,0,0.2); border-radius: 12px; padding: var(--sp-2); margin-bottom: var(--sp-3); }
     .booking-card .deposit-note p { font-size:var(--text-sm); color: rgba(255,255,255,0.7); line-height: 1.6; }
     .booking-card .deposit-note strong { color: var(--yellow); }
-    .booking-btns { display: flex; flex-direction: column; gap: 0.75rem; }
+    .booking-btns { display: flex; flex-direction: column; gap: var(--sp-1-5); }
     .booking-btns a { text-align: center; }
     .btn-outline-white { background: transparent; color: var(--white); border: 2px solid rgba(255,255,255,0.3); padding: 0.85rem 1.8rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-weight: 600; font-size:var(--text-base); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; display: block; text-align: center; }
     .btn-outline-white:hover { border-color: var(--white); background: rgba(255,255,255,0.1); }
 
     /* TRIP HIGHLIGHTS SIDEBAR */
-    .trip-highlights-card { background: var(--gray); border-radius: 24px; padding: 1.5rem; }
-    .trip-highlights-card h4 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); margin-bottom: 1rem; color: var(--dark); }
+    .trip-highlights-card { background: var(--gray); border-radius: 24px; padding: var(--sp-3); }
+    .trip-highlights-card h4 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); margin-bottom: var(--sp-2); color: var(--dark); }
     .highlight-row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid #e8e8e0; font-size:var(--text-base); }
     .highlight-row:last-child { border-bottom: none; }
     .highlight-row span:first-child { color: #888; }
     .highlight-row span:last-child { font-weight: 600; color: var(--dark); }
 
     /* ALSO CHECK OUT */
-    .also-check { background: var(--black); padding: 4rem 2.5rem; border-radius: 40px 40px 0 0; }
-    .also-check h2 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-7xl); color: var(--white); margin-bottom: 2rem; text-align: center; }
-    .also-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .also-check { background: var(--black); padding: var(--sp-8) var(--sp-5); border-radius: 40px 40px 0 0; }
+    .also-check h2 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-7xl); color: var(--white); margin-bottom: var(--sp-4); text-align: center; }
+    .also-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); max-width: 1200px; margin: 0 auto; }
     .also-card { background: #161616; border: 1px solid #222; border-radius: 20px; overflow: hidden; text-decoration: none; transition: all 0.3s; }
     .also-card:hover { border-color: var(--yellow); transform: translateY(-4px); }
     .also-card-img { height: 200px; background: linear-gradient(135deg, #1a3a2a, #2d5a3d); display: flex; align-items: center; justify-content: center; }
     .also-card-img span { font-family:'Archivo Black',sans-serif;  font-size:var(--text-8xl); color: rgba(255,171,0,0.3); }
-    .also-card-body { padding: 1.25rem; }
-    .also-card-body .tag-row { margin-bottom: 0.5rem; }
-    .also-card-body h3 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); color: var(--white); margin-bottom: 0.25rem; }
+    .also-card-body { padding: var(--sp-2-5); }
+    .also-card-body .tag-row { margin-bottom: var(--sp-1); }
+    .also-card-body h3 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); color: var(--white); margin-bottom: var(--sp-0-5); }
     .also-card-body .price { color: var(--yellow); font-size:var(--text-base); font-weight: 600; }
 
     /* FOOTER */
-    footer { background: #050505; padding: 3rem 2.5rem 2rem; }
-    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 2rem; }
-    .footer-brand .logo { display: block; height: 48px; width: auto; margin-bottom: 0.5rem; }
+    footer { background: #050505; padding: var(--sp-6) var(--sp-5) var(--sp-4); }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--sp-6); margin-bottom: var(--sp-4); }
+    .footer-brand .logo { display: block; height: 48px; width: auto; margin-bottom: var(--sp-1); }
     .footer-brand p { color: rgba(255,255,255,0.4); font-size:var(--text-base); line-height: 1.7; }
-    .footer-col h4 { font-size:var(--text-2xs); letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow); margin-bottom: 1rem; }
-    .footer-col a { display: block; color: rgba(255,255,255,0.5); font-size:var(--text-base); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+    .footer-col h4 { font-size:var(--text-2xs); letter-spacing: 0.2em; text-transform: uppercase; color: var(--yellow); margin-bottom: var(--sp-2); }
+    .footer-col a { display: block; color: rgba(255,255,255,0.5); font-size:var(--text-base); text-decoration: none; margin-bottom: var(--sp-1); transition: color 0.2s; }
     .footer-col a:hover { color: var(--white); }
-    .footer-bottom { border-top: 1px solid #1a1a1a; padding-top: 1.5rem; text-align: center; color: rgba(255,255,255,0.25); font-size:var(--text-sm); }
+    .footer-bottom { border-top: 1px solid #1a1a1a; padding-top: var(--sp-3); text-align: center; color: rgba(255,255,255,0.25); font-size:var(--text-sm); }
 
     @media (max-width: 900px) {
       .content-wrap { grid-template-columns: 1fr; }
@@ -158,13 +158,18 @@
       .nav-phone { display: none; }
     }
     @media (max-width: 600px) {
-      .trip-hero { padding: 2rem 1.25rem; }
-      .content-wrap { padding: 2rem 1.25rem; }
+      .trip-hero { padding: var(--sp-4) var(--sp-2-5); }
+      .content-wrap { padding: var(--sp-4) var(--sp-2-5); }
     }
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
-    @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
-  </style>
+    @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap: var(--sp-4);}.footer-inner>*{min-width:0;}}
+  
+    .jgg-stars { display:inline-flex; align-items:center; gap:.16rem; color:var(--color-primary); vertical-align:middle; }
+    .jgg-stars svg { width:14px; height:14px; }
+    .meals { display:flex; align-items:center; gap:var(--sp-1); }
+    .meals svg { width:15px; height:15px; flex-shrink:0; }
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -262,7 +267,7 @@
         </div>
         <div class="day-body">
           <p>Upon arrival at Kotoka International Airport, you will be met by a People & Places representative who will assist with your luggage and transfer you to your hotel. After checking in and freshening up, enjoy a welcome dinner at a fine dining restaurant in Accra, a chance to meet your tour guide and prepare for the exciting days ahead.</p>
-          <div class="meals">🍽 Meals included: Dinner</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Dinner</div>
         </div>
       </div>
 
@@ -273,7 +278,7 @@
         </div>
         <div class="day-body">
           <p>Visit a batik-making center, learn the art of batik and create your own patterns and handmade clothes. Next, head to the Art Center for drum lessons and interaction with local artisans. Afternoon city tour of Accra visiting Kwame Nkrumah Park and Independence Square. Evening free for personal exploration.</p>
-          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast, Lunch</div>
         </div>
       </div>
 
@@ -284,7 +289,7 @@
         </div>
         <div class="day-body">
           <p>Journey into the lush Eastern Region for a day filled with nature and history. Visit Aburi Botanical Gardens, then Tetteh Quarshie's Cocoa Farm, the first cocoa farm in Ghana. Learn about Ghana's cocoa history and taste fresh cocoa beans when available. End at Asenema Waterfalls for photos and relaxation.</p>
-          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast, Lunch</div>
         </div>
       </div>
 
@@ -295,7 +300,7 @@
         </div>
         <div class="day-body">
           <p>A deeply meaningful journey into history and heritage. Visit Assin Manso Ancestral Slave River, a sacred site where enslaved Africans took their last bath on African soil. Then continue to Cape Coast Castle, a UNESCO World Heritage Site. Optional evening boat cruise in Elmina. A reflective, educational and transformative day.</p>
-          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast, Lunch</div>
         </div>
       </div>
 
@@ -306,7 +311,7 @@
         </div>
         <div class="day-body">
           <p>A flexible day designed for rest and personal exploration. Relax and recharge or explore Accra at your own pace. Optional activities include shea butter making, pottery, candle making, beach visits and other cultural experiences. Our team is on standby with recommendations based on your interests.</p>
-          <div class="meals">🍽 Meals included: Breakfast</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast</div>
         </div>
       </div>
 
@@ -317,7 +322,7 @@
         </div>
         <div class="day-body">
           <p>Depart for an exciting day of nature and adventure. Explore Shai Hills Resource Reserve on a guided walk, spotting antelopes, baboons and bird species. Continue to Akosombo for a relaxing boat cruise on the Volta River with optional kayaking for the adventurous.</p>
-          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast, Lunch</div>
         </div>
       </div>
 
@@ -328,7 +333,7 @@
         </div>
         <div class="day-body">
           <p>Full day at Safari Eco Park, welcomed with freshly squeezed juice, followed by a guided safari tour. Enjoy a farm-to-table meal of your choice. Recreational activities include swimming, horseback riding, animal feeding, golf, cycling, walking trails, indoor and outdoor games, and a children's amusement park.</p>
-          <div class="meals">🍽 Meals included: Breakfast, Lunch</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast, Lunch</div>
         </div>
       </div>
 
@@ -339,7 +344,7 @@
         </div>
         <div class="day-body">
           <p>Time to say goodbye to Ghana. Last-minute shopping or exploration before your transfer to Kotoka International Airport. We'll miss you and hope to see you again soon!</p>
-          <div class="meals">🍽 Meals included: Breakfast</div>
+          <div class="meals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 2v7a3 3 0 0 0 6 0V2"/><path d="M6 9v13"/><path d="M18 2c-1.7 1.2-2.5 3.2-2.5 6 0 2 .8 3.4 2.5 4v10"/></svg>Meals included: Breakfast</div>
         </div>
       </div>
 
@@ -382,11 +387,11 @@
     <div class="testimonials">
       <div class="testimonial">
         <p>"It was a wonderful experience in Ghana. People and Places took care of everything and planned an excellent itinerary. We laughed and made wonderful memories. They were also willing to work within our budget and make the necessary adjustments. My favorite part was definitely the food."</p>
-        <strong>— Precious Nwokeleme ⭐⭐⭐⭐⭐</strong>
+        <strong>— Precious Nwokeleme</strong> <span class="jgg-stars" role="img" aria-label="Rated 5 out of 5"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
       </div>
       <div class="testimonial">
         <p>"Our best trip in a long time! We discovered P&P through Melanin Travel Magic, and from start to finish, we didn't have to worry about a thing — just enjoy the moment. The P&P crew took care of us like royalty from the moment we landed to the day we flew back home. Genuinely funny, reliable and incredibly resourceful."</p>
-        <strong>— Tamaro Diallo ⭐⭐⭐⭐⭐</strong>
+        <strong>— Tamaro Diallo</strong> <span class="jgg-stars" role="img" aria-label="Rated 5 out of 5"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
       </div>
     </div>
 
@@ -395,12 +400,8 @@
     <h2>Got Questions?</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">Can I pay in installments? <span class="arrow">▼</span></div>
-        <div class="faq-a">Yes! We offer flexible payment plans. After your 30% deposit, you can make monthly payments toward the balance. Final balance must be cleared 30 days before arrival.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Is my deposit refundable? <span class="arrow">▼</span></div>
-        <div class="faq-a">The 30% deposit is non-refundable as it immediately reserves accommodations and transport. Any trip cancelled less than 30 days before arrival is 100% non-refundable.</div>
+        <div class="faq-q">How does paying work? <span class="arrow">▼</span></div>
+        <div class="faq-a">A deposit reserves your dates and the balance is settled before you travel. We can spread it across monthly payments if that helps. We will go through the specifics with you directly, so nothing is decided before you have asked everything you want to ask.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">Does the price include flights? <span class="arrow">▼</span></div>
@@ -436,24 +437,7 @@
       <div class="price-label">Starting at</div>
       <div class="price">$3,000</div>
       <div class="price-sub">per person · 8 Days / 7 Nights</div>
-      <div class="deposit-note">
-        <p><strong>Secure your spot:</strong> A non-refundable deposit of <strong>30% per person</strong> reserves your dates. Monthly payment plans available. Full balance due 30 days before arrival.</p>
-      </div>
-      <div class="booking-instalment">
-        <div class="instalment-row">
-          <div class="instalment-cell">
-            <span class="instalment-cell-label">Deposit now</span>
-            <span class="instalment-cell-value">30%</span>
-          </div>
-          <span class="instalment-arrow">→</span>
-          <div class="instalment-cell">
-            <span class="instalment-cell-label">Balance due</span>
-            <span class="instalment-cell-value">Before tour</span>
-          </div>
-        </div>
-        <p class="payment-methods-mini">Mobile Money &nbsp;·&nbsp; Bank Transfer &nbsp;·&nbsp; Card</p>
-      </div>
-
+      <p class="deposit-note">A deposit reserves your dates. We will walk you through the details when we speak, and nothing is due to ask a question.</p>
       <div class="booking-btns">
         <a href="contact.html?tour=just-go-ghana" class="btn-yellow">Book Now</a>
         <a href="contact.html?tour=just-go-ghana" class="btn-outline-white">Ask A Question</a>

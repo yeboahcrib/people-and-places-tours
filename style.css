@@ -2593,7 +2593,7 @@ body.page-entering {
   justify-content: space-between;
   align-items: center;
   padding: 1.4rem 0;
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   font-weight: 600;
   color: var(--white);
   cursor: pointer;
@@ -2634,7 +2634,7 @@ body.page-entering {
 .faq-item.open .faq-answer { max-height: 500px; }
 .faq-answer-inner {
   padding: 0 0 var(--sp-3);
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   color: var(--muted);
   line-height: 1.8;
 }
