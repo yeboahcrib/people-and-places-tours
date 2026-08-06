@@ -137,6 +137,35 @@
   --ease-out:       cubic-bezier(0.16,1,0.3,1);
   --ease-standard:  cubic-bezier(0.4,0,0.2,1);
 
+  /* ── ELEVATION ───────────────────────────────────────────────
+     35 distinct shadows across 39 declarations, which is to say almost
+     every one was unique. Grouped by role rather than forced onto one
+     ladder: dark surfaces need a stronger shadow than the cream
+     sections, a brand glow is not elevation, and a focus ring is not a
+     shadow at all. Each step is anchored on the most common existing
+     geometry so the drift stays small. */
+  --elevation-1:       0 8px 20px rgba(0,0,0,.20);
+  --elevation-2:       0 16px 40px rgba(0,0,0,.32);
+  --elevation-3:       0 24px 56px rgba(0,0,0,.34);
+  /* Cream sections: forest-tinted and far softer, because a black shadow
+     on cream reads as dirt. */
+  --elevation-light-1: 0 12px 30px rgba(18,63,53,.06);
+  --elevation-light-2: 0 16px 34px rgba(18,63,53,.12);
+  --elevation-light-3: 0 22px 44px rgba(18,63,53,.17);
+  /* Brand glows carry the primary colour; they signal interactivity. */
+  --glow-primary:      0 6px 18px rgba(255,184,28,.32);
+  --glow-primary-lift: 0 10px 24px rgba(255,184,28,.4);
+  --glow-primary-soft: 0 8px 20px rgba(255,171,0,.16);
+  --glow-accent:       0 4px 14px rgba(194,85,61,.32);
+  /* The primary button pairs a glow with a one-pixel inset highlight.
+     Kept whole: flattening it would quietly change every CTA. */
+  --shadow-button:       var(--glow-primary), 0 1px 0 rgba(0,0,0,.08) inset;
+  --shadow-button-lift:  var(--glow-primary-lift), 0 1px 0 rgba(0,0,0,.08) inset;
+  /* Rings are not elevation. */
+  --ring-focus:        0 0 0 3px var(--yellow-glow);
+  --ring-error:        0 0 0 3px rgba(239,68,68,.18);
+  --ring-photo:        0 0 0 6px rgba(18,63,53,.07);
+
   --shadow:        0 20px 60px rgba(0,0,0,.3);
   --transition:    0.3s cubic-bezier(0.4,0,0.2,1);
   --container:     1200px;
@@ -446,7 +475,7 @@ body.page-entering {
   height: var(--nav-active-height);
   border-radius: var(--radius-pill);
   background: var(--color-primary);
-  box-shadow: 0 6px 18px rgba(255,184,28,0.3), 0 1px 0 rgba(0,0,0,0.08) inset;
+  box-shadow: var(--shadow-button);
   opacity: 1;
   transform: translate3d(var(--nav-active-x), var(--nav-active-y), 0);
   transition: transform var(--motion-base) ease-out, width var(--motion-base) ease-out, height var(--motion-base) ease-out, opacity var(--motion-fast) ease-out;
@@ -468,9 +497,7 @@ body.page-entering {
 .nav-links a.active {
   background: var(--color-primary);
   color: var(--black);
-  box-shadow:
-    0 6px 18px rgba(255,184,28,0.32),
-    0 1px 0 rgba(0,0,0,0.08) inset;
+  box-shadow: var(--shadow-button);
 }
 .nav-links a.active:hover { background: var(--color-primary); color: var(--black); }
 .nav-links.has-active-indicator a.active,
@@ -500,17 +527,13 @@ body.page-entering {
   font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.16em;
-  box-shadow:
-    0 6px 18px rgba(255,184,28,0.32),
-    0 1px 0 rgba(0,0,0,0.08) inset;
+  box-shadow: var(--shadow-button);
 }
 .nav .btn-primary:hover,
 .nav .nav-cta .btn:hover {
   background: #ffc54f;
   transform: translateY(-2px);
-  box-shadow:
-    0 10px 24px rgba(255,184,28,0.4),
-    0 1px 0 rgba(0,0,0,0.08) inset;
+  box-shadow: var(--shadow-button-lift);
 }
 .nav-toggle {
   display: none;
@@ -549,7 +572,7 @@ body.page-entering {
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.32);
+  box-shadow: var(--elevation-2);
 }
 .nav-mobile a {
   font-size: var(--text-xs);
@@ -748,12 +771,12 @@ body.page-entering {
   border: none;
   flex-shrink: 0;
   transition: background var(--motion-fast) ease, transform 0.15s ease, box-shadow var(--motion-fast) ease;
-  box-shadow: 0 4px 16px rgba(255,184,28,.4);
+  box-shadow: var(--glow-primary);
 }
 .hs-btn:hover {
   background: var(--color-primary-deep);
   transform: scale(1.03);
-  box-shadow: 0 6px 24px rgba(255,184,28,.55);
+  box-shadow: var(--glow-primary-lift);
 }
 .hs-btn-icon {
   width: 15px;
@@ -1038,7 +1061,7 @@ body.page-entering {
 /* Stats bar: slightly more air and a faint lift shadow */
 .stats-bar {
   padding: var(--sp-8) 0;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  box-shadow: var(--elevation-light-1);
 }
 
 /* Process → Testimonials: white-to-dark — yellow accent line marks the boundary */
@@ -1255,7 +1278,7 @@ body.page-entering {
   transform: translateY(-4px);
   border-color: rgba(255,184,28,0.38);
   background: rgba(255,255,255,0.04);
-  box-shadow: 0 24px 50px rgba(0,0,0,0.2);
+  box-shadow: var(--elevation-3);
 }
 .testimonial-card-feature {
   background: rgba(255,184,28,0.04);
@@ -1437,7 +1460,7 @@ body.page-entering {
 }
 .newsletter-form:focus-within {
   border-color: var(--black);
-  box-shadow: 0 8px 24px rgba(20,20,15,0.06);
+  box-shadow: var(--elevation-light-1);
 }
 .newsletter-input {
   flex: 1;
@@ -1534,7 +1557,7 @@ body.page-entering {
   border-color: rgba(255,171,0,0.72);
   background: rgba(255,171,0,0.08);
   color: var(--color-primary);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  box-shadow: var(--elevation-1);
 }
 .footer-col h2,
 .footer-col h4 {
@@ -2357,7 +2380,7 @@ body.page-entering {
   text-transform: uppercase;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
-  box-shadow: 0 4px 14px rgba(194,85,61,0.32);
+  box-shadow: var(--glow-accent);
 }
 .team-asym-stack {
   display: flex;
@@ -2681,7 +2704,7 @@ body.page-entering {
   background: var(--color-primary);
   color: var(--black);
   border-color: var(--color-primary);
-  box-shadow: 0 7px 20px rgba(255,171,0,0.16);
+  box-shadow: var(--glow-primary-soft);
 }
 .destination-filter {
   display: flex;
@@ -2767,7 +2790,7 @@ body.page-entering {
 .tour-card:hover,
 .reveal-ready .tour-card.reveal.visible:hover {
   transform: translateY(-5px);
-  box-shadow: 0 24px 64px rgba(0,0,0,.34);
+  box-shadow: var(--elevation-3);
   border-color: var(--color-primary);
 }
 .tour-card-img {
@@ -2946,7 +2969,7 @@ body.page-entering {
 .tour-card-book-btn:hover,
 .tour-card-book-btn:focus-visible {
   background: #ffc34a;
-  box-shadow: 0 8px 20px rgba(255,171,0,0.16);
+  box-shadow: var(--glow-primary-soft);
   transform: translateY(-1px);
 }
 
@@ -3083,7 +3106,7 @@ body.page-entering {
 .reveal-ready .contact-card.reveal.visible:focus-within {
   transform: translateY(-4px);
   border-color: var(--color-primary);
-  box-shadow: 0 20px 52px rgba(0,0,0,.32);
+  box-shadow: var(--elevation-3);
 }
 .contact-card-icon {
   transition: transform var(--transition), background var(--transition), border-color var(--transition);
@@ -3357,7 +3380,7 @@ body.page-entering {
 .booking-flow .form-textarea:focus {
   background: rgba(255,255,255,.05);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--yellow-glow);
+  box-shadow: var(--ring-focus);
 }
 /* .form-select sets appearance:none, so it needs its own indicator. */
 .booking-flow .form-select {
@@ -3376,7 +3399,7 @@ body.page-entering {
   outline-offset: 2px;
 }
 .booking-flow [aria-invalid="true"] { border-color: var(--color-error); }
-.booking-flow [aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.18); }
+.booking-flow [aria-invalid="true"]:focus { box-shadow: var(--ring-error); }
 
 /* ── Actions ──────────────────────────────────────────────────── */
 /* Default (no JS): the Continue button is meaningless, the submit
@@ -4142,7 +4165,7 @@ body.page-entering {
   overflow: hidden;
   border-radius: var(--radius-circle);
   background: var(--light-surface-alt);
-  box-shadow: 0 0 0 6px rgba(18,63,53,0.07);
+  box-shadow: var(--ring-photo);
 }
 .founder-mini-photo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .founder-mini-name {
@@ -4426,23 +4449,23 @@ body.page-entering {
   border: 1px solid rgba(18,63,53,0.2);
   border-left: 3px solid rgba(18,63,53,0.62);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  box-shadow: 0 12px 30px rgba(18,63,53,0.06);
+  box-shadow: var(--elevation-light-1);
   transition: transform var(--home-motion-duration) var(--home-motion-ease), box-shadow var(--home-motion-duration) ease-out, border-color var(--home-motion-duration) ease-out;
 }
 .ui-v2 .founder-mini-card:nth-child(even) {
   transform: none;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  box-shadow: 0 12px 30px rgba(18,63,53,0.06);
+  box-shadow: var(--elevation-light-1);
 }
 .ui-v2 .founder-mini-card:hover,
 .ui-v2 .founder-mini-card:nth-child(even):hover {
   transform: translateY(-3px);
   border-color: rgba(18,63,53,0.38);
-  box-shadow: 0 20px 44px rgba(18,63,53,0.12);
+  box-shadow: var(--elevation-light-3);
 }
 .ui-v2 .founder-mini-avatar {
   background: var(--pap-forest);
-  box-shadow: 0 0 0 6px rgba(18,63,53,0.07);
+  box-shadow: var(--ring-photo);
 }
 .ui-v2 .founder-mini-quote { transition: opacity var(--home-motion-duration) ease-out, transform var(--home-motion-duration) var(--home-motion-ease); }
 
@@ -4495,7 +4518,7 @@ body.page-entering {
   background: var(--pap-cream);
   border: 1px solid rgba(18,63,53,0.28);
   border-radius: 18px;
-  box-shadow: 0 16px 34px rgba(18,63,53,0.12);
+  box-shadow: var(--elevation-light-2);
   transition: transform var(--home-motion-duration) var(--home-motion-ease), box-shadow var(--home-motion-duration) ease-out, border-color var(--home-motion-duration) ease-out;
 }
 .ui-v2 .pathway-card:nth-child(odd) { grid-column: span 7; }
@@ -4510,7 +4533,7 @@ body.page-entering {
 .ui-v2 .pathway-card:hover {
   transform: translateY(-4px);
   border-color: rgba(18,63,53,0.48);
-  box-shadow: 0 22px 42px rgba(18,63,53,0.17);
+  box-shadow: var(--elevation-light-3);
 }
 .ui-v2 .pathway-card:nth-child(2):hover,
 .ui-v2 .pathway-card:nth-child(4):hover { transform: translateY(-4px); }
@@ -4623,7 +4646,7 @@ body.page-entering {
 .ui-v2 .pathways-cta:focus-visible {
   transform: translateY(-2px);
   background: var(--pap-forest-deep);
-  box-shadow: 0 12px 26px rgba(18,63,53,0.2);
+  box-shadow: var(--elevation-light-3);
 }
 .ui-v2 .pathways-cta:hover::after,
 .ui-v2 .pathways-cta:focus-visible::after { transform: scaleX(1); }
@@ -4954,12 +4977,12 @@ a.trust-rating:focus-visible .trust-rating-source {
   background: var(--black);
   color: var(--white);
   padding-inline: var(--sp-4);
-  box-shadow: 0 12px 28px rgba(10,10,10,0.2);
+  box-shadow: var(--elevation-1);
 }
 .final-invitation-section .btn-primary:hover,
 .final-invitation-section .btn-primary:focus-visible {
   background: #242424;
-  box-shadow: 0 17px 34px rgba(10,10,10,0.27);
+  box-shadow: var(--elevation-2);
 }
 .final-invitation-section .btn-ghost {
   border-color: rgba(0,0,0,0.32);
@@ -4970,7 +4993,7 @@ a.trust-rating:focus-visible .trust-rating-source {
 .final-invitation-section .btn-ghost:focus-visible {
   border-color: rgba(0,0,0,0.48);
   background: rgba(255,255,255,0.3);
-  box-shadow: 0 12px 26px rgba(10,10,10,0.1);
+  box-shadow: var(--elevation-1);
 }
 .reveal-ready .final-invitation-action.visible:hover,
 .reveal-ready .final-invitation-action.visible:focus-visible {

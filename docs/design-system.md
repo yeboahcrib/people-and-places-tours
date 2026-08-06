@@ -82,6 +82,34 @@ guard existed.
 thing. Every control here is far shorter than either, so they rendered
 identically.
 
+## Elevation
+
+Grouped by role rather than forced onto one ladder, because a shadow that
+works on charcoal reads as dirt on cream, a brand glow is not elevation, and a
+focus ring is not a shadow at all.
+
+**Dark surfaces** — `--elevation-1` `--elevation-2` `--elevation-3`
+**Cream sections** — `--elevation-light-1/2/3`, forest-tinted and far softer
+**Brand** — `--glow-primary`, `--glow-primary-lift`, `--glow-primary-soft`, `--glow-accent`
+**Buttons** — `--shadow-button`, `--shadow-button-lift` (glow plus a 1px inset
+highlight, kept whole; flattening them would quietly change every CTA)
+**Rings** — `--ring-focus`, `--ring-error`, `--ring-photo`
+
+Replaced 35 distinct values across 39 declarations — nearly every shadow on
+the site was unique. Each step is anchored on the most common existing
+geometry, so the drift stays small.
+
+Six shadows are deliberately left unique: the two nav treatments, the hero
+search bar, the command palette, the upward section lift, and the WhatsApp
+link's inset underline. Each is a one-off composition, not a missing scale
+member.
+
+**A limitation worth knowing.** `npm run test:visual` reported no change for
+this work, which was misleading rather than reassuring: most shadows live on
+`:hover`, and a static screenshot never triggers them. Shadow and hover work
+has to be verified by reading computed styles directly. The suite is a
+regression net for layout, not a substitute for checking interaction states.
+
 ## Motion
 
 `--motion-instant` 120ms · `--motion-fast` 200 · `--motion-base` 300 ·
@@ -105,9 +133,9 @@ more motion.
 Deliberately deferred, because collapsing them changes how the site looks and
 that belongs with the visual language, not before it:
 
-- **Shadows.** 33 distinct values, no elevation scale. The last of the Phase 1
-  token debt.
-- **Fluid display type.** ~40 distinct `clamp()` expressions.
+- **Fluid display type.** ~40 distinct `clamp()` expressions sizing the large
+  responsive headings. Collapsing them decides how display type behaves
+  between breakpoints, which is editorial layout work.
 
 Design both alongside Phase 2 rather than reverse-engineering them from what
 happens to exist.
