@@ -46,8 +46,16 @@ jobs:
       # header, static accessibility and content-contract suites before it
       # writes dist/. A failure here stops the deploy instead of publishing a
       # broken site.
+      # SITE_URL is pinned to the GitHub Pages address because that is where
+      # this workflow publishes. The build default is the real domain, so
+      # without this line these pages would carry canonical tags pointing at
+      # peopleplacesgh.com while it is still parked — telling search engines
+      # the authoritative copy lives somewhere that does not yet resolve.
+      # Delete this workflow at cutover; until then both hosts stay correct.
       - name: Build and verify
         run: npm run build
+        env:
+          SITE_URL: https://yeboahcrib.github.io/people-and-places-tours
 
       - uses: actions/configure-pages@v5
 
