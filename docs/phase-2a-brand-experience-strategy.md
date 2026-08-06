@@ -13,6 +13,25 @@ of a page. That is this document's job.
 
 ---
 
+## Decisions of record
+
+Both open questions were settled by the founders on 5 August 2026.
+
+**1. The site leads with the diaspora.** This confirms Brand Foundation §8
+rather than the Phase 2A brief's "neither audience should feel secondary"
+framing, which is superseded. The reasoning is in §0.1: the returner's
+emotional register includes the first-time visitor, while the discovery
+register excludes the returner. Every ambiguous copy or image decision from
+here resolves toward the returner.
+
+**2. Real photography is a few weeks out.** It is being shot now and the CMS
+path for it is already built. This changes the Phase 2B order — see the
+sequencing note at the end of this document. In short: do the work that does
+not depend on photographs first, and do not design the environment against
+placeholder images.
+
+---
+
 ## 0. Two conflicts to settle before designing anything
 
 Design briefs fail quietly when they contradict an earlier approved document
@@ -498,17 +517,49 @@ would still be the more successful outcome.
 
 ---
 
-## Sequencing recommendation for Phase 2B
+## Sequencing for Phase 2B
 
-Ordered by contribution to the success criteria, not by appetite:
+Photography is a few weeks out and is being shot in parallel, which reorders
+the work. The principle: **anything that must be designed against the real
+images waits for them; everything else starts now.**
 
-1. **Type scale.** Everything editorial depends on it.
-2. **Real photography** through the CMS path already built.
-3. **Diaspora messaging** in the four or five identified places.
-4. **Elevation/shadow scale.** The remaining Phase 1 token debt.
-5. **Fix the carousel's reduced-motion defect.**
-6. **Background system**, starting with Silent and Quiet.
+### Now — independent of photography
+
+1. **Type scale.** 199 raw sizes across 49 distinct values, and no scale.
+   Editorial design is impossible without one, and every later decision
+   inherits it. First task, no exceptions.
+2. **Diaspora messaging in the four or five identified places.** The homepage
+   currently contains *zero* diaspora language, which is the single clearest
+   failure against Foundation §8. Four or five precisely placed sentences, not
+   a rewrite. This is copy, so it is not blocked by the shoot.
+3. **Elevation/shadow scale.** The remaining Phase 1 token debt: 33 distinct
+   shadows, no scale.
+4. **The carousel's reduced-motion defect.** Fix before any new motion is
+   added, or Phase 2 inherits a broken foundation.
+
+### On arrival of the photographs
+
+5. **Photography integration**, then a treatment pass: crops, captions,
+   full-bleed placement, and the legibility treatment where text sits over
+   images.
+
+### After photography is in place
+
+6. **Background system**, beginning with Silent and Quiet.
 7. **SVG system**, last and smallest.
 
-The order matters: items 1–3 change how the site feels. Items 6–7 change how
-it looks. Doing the latter first would decorate an unfinished foundation.
+### Why the environment waits
+
+It is tempting to use backgrounds to compensate for stock imagery in the
+interim. That would be designing for a condition about to disappear, and every
+one of those decisions would need undoing.
+
+Environmental treatment is a *response* to photography — to its composition,
+its colour temperature, where it is dense and where it has room. Designed
+against placeholders, it will be wrong in ways that are not obvious until the
+real images arrive and the two fight each other.
+
+The four items above are worth more than any background system, and none of
+them are blocked. By the time the photographs land, the type will carry the
+editorial register and the returner will be addressed on the homepage — which
+is the environment the photographs deserve to arrive into.

@@ -171,6 +171,17 @@ real guest stories.
 
 ## 8. Audience strategy
 
+> **Reaffirmed 5 August 2026.** The Phase 2A brief proposed treating both
+> audiences as equal. Raised with the founders and resolved in favour of this
+> section: the site leads with the diaspora. The reasoning is that the
+> returner's emotional register already includes the first-time visitor, while
+> the discovery register excludes the returner — so leading with the returner
+> is the more inclusive choice, not the narrower one. See
+> `phase-2a-brand-experience-strategy.md` §0.1.
+>
+> Note for implementation: as of this date the homepage contains no diaspora
+> language at all, so this section is stated but not yet delivered.
+
 The homepage will lead with the African diaspora while remaining explicitly
 welcoming to international travellers. Audience priority guides the homepage
 story; it does not prevent other customers from booking.
