@@ -1,410 +1,317 @@
-# Phase 2B — Environmental Design System
+# Environmental Design System
 
-The measuring stick for Phase 2 implementation.
+The visual grammar for every background, shape, divider and environmental
+animation on the site.
 
-**Read `phase-2a-brand-experience-strategy.md` first.** That document decides
-what we believe: photography leads, environmental density is inverse to
-emotional weight, nothing decorative goes near sites of memory. Those
-decisions are not restated here.
+**Read `phase-2a-brand-experience-strategy.md` first.** That decides what we
+believe. This decides how you check a thing obeys it.
 
-This document exists because a principle cannot be checked. "Backgrounds
-should support photography, never compete with it" is correct and unarguable,
-and two designers will disagree about whether a given gradient obeys it. So
-every rule below is written as something you can measure, count or fail a
-review against.
-
-Where 2A and 2B appear to conflict, 2A wins and this document is wrong.
+This is the second version. The first was reviewed and largely rewritten: it
+carried about twenty numeric limits of which roughly half were invented, and at
+410 lines it was too long to be used. What follows keeps the measurements that
+rest on something real — accessibility thresholds, the site's own breakpoints,
+frame rate, layout shift — and replaces the invented ceilings with comparative
+tests. A test with a reason beats a number without one.
 
 ---
 
-## 1. The four registers
+## The whole system in one page
 
-Every section on the site is assigned exactly one register. This is the single
-most important decision in the system, and it is made from the *content's
-emotional weight*, never from a wish for variety.
+**Four registers.** Every section is exactly one:
 
-| Register | Layers | Max coverage | Max opacity | Motion |
-| --- | --- | --- | --- | --- |
-| **Open** | up to 3 | 100% of section | 0.18 | scroll-linked, ≤ 40px travel |
-| **Ambient** | up to 2 | 60% | 0.10 | scroll-linked, ≤ 24px travel |
-| **Quiet** | 1 | 30%, edges only | 0.06 | none |
-| **Silent** | 0 | — | — | none |
-
-**Coverage** means the proportion of the section's area touched by any
-decorative element, including gradients. **Opacity** is the element's effective
-alpha against its own background, including any blur.
-
-### Register assignment
-
-| Section | Register | Why |
+| Register | The visitor is… | What it carries |
 | --- | --- | --- |
-| Homepage hero | Open | The invitation; the one place expression is the point |
-| Homepage final invitation | Open | Closing beat |
-| Homepage mid sections | Ambient | Support, not spectacle |
-| Experiences listing | Ambient | Photography is dense already |
-| About story & mission | Ambient | |
-| Experience detail body | Quiet | Reading |
-| FAQs, itineraries | Quiet | Scanning |
-| **Heritage content** | **Silent** | §4.2 below |
-| **Booking flow** | **Silent** | Trust is the job |
-| **Confirmation** | **Silent** | |
-| 404, thanks | Quiet | |
+| **Open** | arriving, or being invited | The fullest expression. Layers, light, gentle scroll motion |
+| **Ambient** | being shown something | One quiet gesture. Tone, a single horizon |
+| **Quiet** | reading, or deciding | Ground tone only. No shapes, no motion |
+| **Silent** | grieving, or trusting us | Nothing at all |
 
-A section may move one register *down* (quieter) at any time without review. It
-may only move *up* with a reason recorded in this table.
+**Three shapes.** Nothing else is in the vocabulary:
 
----
+- **Horizon** — one near-level edge across the full width. Level, or gently
+  curved. May be layered two or three deep to imply distance.
+- **Mask** — a shape that reveals or clips a photograph at its boundary.
+- **Field** — an area of tone or gradient with no discernible edge.
 
-## 2. Density budget
+**Six rules.** In priority order — where they conflict, the earlier wins:
 
-Per page, across all sections combined:
+1. **Nothing decorative near grief or trust.** Heritage content and the booking
+   flow are Silent, permanently.
+2. **Text stays readable.** No element may drop any text below WCAG AA.
+3. **Photography leads.** If you notice the decoration before the photograph,
+   the decoration is wrong.
+4. **One gesture per section.** A section with a horizon does not also get a
+   mask and a texture.
+5. **Motion is driven, never autonomous.** Scroll-linked or still. Nothing
+   loops, nothing drifts on its own.
+6. **If removing it would not be noticed, it should not ship.**
 
-- **No more than 2 Open sections.** Three means none of them reads as special.
-- **At least 40% of sections must be Quiet or Silent.** Rhythm requires rest.
-- **Never two Open sections adjacent.** Always separate them with Ambient or
-  quieter.
-
-Per element:
-
-- **Maximum 3 stacked layers** in any one section, including gradients.
-- **Nothing decorative may exceed 40% of the viewport height** at any
-  breakpoint. Backgrounds are ground, not subject.
-- **One "gesture" per section.** If a section has a horizon, it does not also
-  get a corner form and a topographic line.
+That is the system. Everything below is reference.
 
 ---
 
-## 3. Shape vocabulary
+## 1. Choosing a register
 
-The system draws from a closed set. If a proposed element is not in this list,
-either it is wrong or the list needs a recorded amendment.
+Register follows what the visitor is *doing*, not what the page is called. This
+is why it works for pages that do not exist yet.
 
-**Permitted:**
+- **Arriving or being invited** → Open. The homepage hero and its closing
+  invitation. Nothing else, on any page.
+- **Being shown something** → Ambient. Most mid-page sections.
+- **Reading or deciding** → Quiet. Experience detail bodies, itineraries, FAQs.
+- **Grieving, or trusting us with something** → Silent. §3.
 
-1. **Horizon** — a single near-horizontal edge, ≤ 6° from level, spanning the
-   full width. The primary form.
-2. **Layered planes** — 2–3 overlapping horizons implying distance.
-3. **Soft arc** — a shallow curve, radius ≥ 2× the section width. Never a
-   semicircle, never a wave with more than one crest.
-4. **Edge mask** — a shape that reveals or clips a photograph at its boundary.
-5. **Field** — an untextured area of tone or gradient, no discernible edge.
+**Open is the first and last impression only.** Two competing invitations on one
+page means neither is an invitation. That is the reason, and it holds for any
+future page without needing a number.
 
-**Forbidden as shapes:** anything representational. No huts, drums, wildlife,
-maps, kente patterns, Adinkra glyphs, or symbolic marks of any kind. If it can
-be named as a thing, it is illustration, not environment.
-
-### Construction rules
-
-- **Corner radius**: shapes are either fully straight-edged or use radii from
-  the existing scale (`--radius-lg`, `--radius-xl`). No arbitrary curves.
-- **Angles**: 0°, or between 2° and 6°. Nothing between 7° and 88° — diagonal
-  energy belongs to a different brand.
-- **Colour**: from the existing palette only. Environmental elements may not
-  introduce a hue. Tints and gradients of `--pap-charcoal`, `--pap-forest`,
-  `--pap-cream` and `--pap-soft-gold` only. **`--color-primary` is never a
-  background field** — yellow is reserved for action.
-- **Family test**: any two elements from the system, placed side by side,
-  should be recognisable as the same hand. If one is drawn and one is
-  photographic, one of them is wrong.
+A section may always move quieter without discussion. Moving louder needs a
+reason someone is willing to write down.
 
 ---
 
-## 4. Where environment is forbidden
+## 2. Density
 
-### 4.1 Over text
+Density is governed by one rule — **one gesture per section** — and one
+question: *what is the visitor doing here?*
 
-No decorative element may reduce any text's contrast below the AA threshold
-already enforced site-wide: **4.5:1 for body, 3:1 for large text**. This is
-measured, not judged. A background that passes on desktop and fails at 375px
-fails.
+There is deliberately no layer count, coverage percentage or opacity ceiling.
+The first version had all three and none could be justified; 0.18 opacity was
+not better reasoned than 0.15, it was simply typed. They also measured the
+wrong thing, because a pale shape over a busy photograph is more intrusive than
+a stronger one over flat tone.
 
-Where text sits over photography, the legibility treatment is a scrim, not a
-decorative shape.
+The replacement is comparative, and it is the test that actually matters:
 
-### 4.2 Sites of memory
+> Look at the section. If your eye goes to the decoration before it goes to the
+> photograph or the words, the decoration is too strong. Reduce it until that
+> stops being true.
+
+Where that judgement is contested, the tie-break is measurable: **contrast**
+(§4) and **the removal test** (rule 6).
+
+---
+
+## 3. Where environment is forbidden
+
+### Sites of memory — permanent
 
 **Cape Coast, Elmina, Assin Manso, and any future content about the
-transatlantic slave trade carry the Silent register permanently.**
+transatlantic slave trade are Silent, permanently.**
 
-No gradient, no horizon, no mask, no motion, no divider. The design response to
-that material is space and stillness. This rule cannot be overridden by a
-future brief without an explicit founder decision recorded in this document.
+No gradient, no horizon, no mask, no motion, no divider, no treatment of the
+photography beyond a legibility scrim where text is unavoidable.
 
-The test: would this feel appropriate to someone in tears?
+This is proposed as a permanent brand rule, not a default. A visitor may be
+standing at the place their ancestor was taken from. Any decorative gesture
+there converts grief into styling, and no brief should be able to override it
+casually. Changing it requires a recorded founder decision in this document.
 
-### 4.3 The booking flow
+The test: *would this feel appropriate to someone in tears?*
 
-Silent, for the length of the flow including the confirmation. A person is
-deciding whether to trust the company with a journey. Decoration reads as
-distraction precisely when attention matters most.
+### The booking flow — permanent
 
-### 4.4 Anything that has to load before a photograph
+Silent for its whole length, including the confirmation. A person is deciding
+whether to trust the company with a journey and handing over their details.
+Decoration reads as distraction exactly when attention matters most.
 
-An environmental element may never delay, obscure or shift a photograph.
-Concretely: no decorative asset above a photo in load order, and nothing that
-causes layout shift.
+### Over a face, or over the words
+
+Nothing decorative overlays a photograph's subject or sits between the reader
+and the text. Where text must sit on an image, the treatment is a legibility
+scrim — not a shape.
 
 ---
 
-## 5. Layering model
+## 4. What is actually measured
 
-Three planes, no more.
+These are the numbers that survive, because each rests on something outside our
+own preference.
 
-| Plane | Contains | Rule |
+| Measure | Limit | Why this number |
 | --- | --- | --- |
-| **Ground** | Tone, gradient, field | Never moves independently |
-| **Middle** | Horizons, planes, arcs | May move on scroll, ≤ 40px |
-| **Content** | Photography, text, UI | Always fully opaque and legible |
+| Text contrast | 4.5:1 body, 3:1 large | WCAG AA, already enforced site-wide |
+| Layout shift from environment | Zero | Any shift moves content under a reader's eye |
+| Load order | Nothing decorative before a photograph | The photograph is the content |
+| Motion properties | `transform` and `opacity` only | Anything else forces layout and drops frames |
+| Frame rate | 60fps on mid-range Android over 3G | The device most of this audience uses |
+| Breakpoints declared | 375 / 768 / 1440 | The site's existing breakpoints |
+| Element angle | Level, or within a few degrees | The Atlantic horizon is the organising line; diagonal energy belongs to another brand |
 
-Environmental elements never occupy the Content plane. Nothing decorative
-overlaps a photograph's subject, and nothing sits between the reader and the
-words.
-
-**Stacking:** all environmental elements sit behind content in a single
-declared band. They never interleave with content, because that is how a
-decoration ends up on top of a face.
-
----
-
-## 6. Scale and placement
-
-**Scale.** Elements size relative to their *section*, never the viewport, so a
-tall section does not get a stretched shape. Horizons span 100% width. Arcs and
-masks scale with container width and are capped at 40% of section height.
-
-**Placement.** Environmental elements attach to edges — top, bottom, or a
-single side. **Nothing floats in the middle of a section.** A centred
-decorative shape has no relationship to anything and always looks applied
-rather than designed.
-
-**Responsive.** Every element declares behaviour at 375px, 768px and 1440px.
-The default at 375px is *removal*, not scaling: a small screen has no room for
-atmosphere, and the phone is where most people will read this site. An element
-that only exists on desktop is a legitimate design, and usually the right one.
+**Weight** is comparative rather than fixed: *an environmental element should
+cost less than the photograph it frames.* A stated kilobyte ceiling would be
+invented; this one has a reason and scales with the page.
 
 ---
 
-## 7. Section dividers
+## 5. Shapes
 
-**The default is no divider.** A change of background tone is a transition. Most
-sections need nothing else.
+Three forms, listed above. Two constraints on all of them:
 
-A divider is permitted only when **all** of these hold:
+**It must not be nameable as a thing.** If it can be called a hut, a drum, a
+map, an animal or a symbol, it is illustration and belongs to a different
+project. Adinkra informs composition and rhythm, never ornament — see 2A §8.
 
-1. The two sections have genuinely different registers, and
-2. The tonal change alone reads as an accident rather than a decision, and
-3. The divider is a horizon or edge mask from §3 — never a repeating motif.
+**Colour comes from the palette, and never introduces a hue.** Tints and
+gradients of `--pap-charcoal`, `--pap-forest`, `--pap-cream` and
+`--pap-soft-gold`. **Yellow is never a background field** — it is reserved for
+action, and a yellow field would compete with every call to action on the page.
 
-Maximum **two dividers per page**. If a page seems to need more, the section
-structure is the problem, not the transitions.
+**Family test:** place any two elements from the system side by side. If they
+do not read as the same hand, one of them is wrong.
 
-Never place a divider immediately before or after Silent content. A flourish
-introducing the Cape Coast dungeons is exactly the failure this system exists
-to prevent.
+---
+
+## 6. Placement
+
+**Elements attach to edges.** Top, bottom, or one side. Nothing floats in the
+middle of a section — a centred decorative shape has no relationship to
+anything and always reads as applied rather than designed.
+
+**Elements sit behind content, in one band.** They never interleave with
+content, because interleaving is how a decoration ends up over a face.
+
+**Elements size to their section, not the viewport**, so a tall section does
+not get a stretched shape.
+
+**On small screens the default is removal, not scaling.** A phone has no room
+for atmosphere, and the phone is where most of this audience reads. An element
+that exists only on desktop is a legitimate design and often the right one.
+
+**Elements respect the image hotspot.** Sanity lets an editor choose the part
+of a photograph that must stay visible. A mask may never cover it.
+
+---
+
+## 7. Dividers
+
+**The default is no divider.** A change of background tone *is* a transition.
+
+A divider is permitted only when the two sections carry different registers,
+the tonal change alone reads as an accident, and the divider is a horizon or
+mask from §5. Never a repeating motif.
+
+Never immediately before or after Silent content. A flourish introducing the
+Cape Coast dungeons is precisely the failure this system exists to prevent.
+
+If a page seems to need several dividers, the section structure is the problem.
 
 ---
 
 ## 8. Motion
 
-Motion tokens already exist and environmental motion uses them rather than
-inventing timings: `--motion-instant` 120ms, `--motion-fast` 200ms,
-`--motion-base` 300ms, `--motion-slow` 560ms, `--motion-reveal` 620ms, with
-`--ease-out` `cubic-bezier(0.16,1,0.3,1)` as the house curve.
+Environmental motion uses the existing tokens rather than inventing timings:
+`--motion-fast` 200ms, `--motion-base` 300ms, `--motion-slow` 560ms,
+`--motion-reveal` 620ms, with `--ease-out` `cubic-bezier(0.16,1,0.3,1)` as the
+house curve — fast to arrive, slow to settle, which is the brand in a function.
 
-**Rules:**
-
-1. **Scroll-linked or nothing.** No autonomous loops, no ambient drift, no
-   perpetual motion in the periphery. The visitor drives it; when they stop, it
-   stops.
-2. **Travel budget**: ≤ 40px in Open, ≤ 24px in Ambient, 0 elsewhere. Parallax
-   beyond that stops reading as depth and starts reading as a slide.
-3. **Never during reading.** No motion in a section whose primary job is text.
-4. **Reduced motion is a design, not a fallback.** Every element ships with its
-   still state specified at the same time. The still state must look
-   *composed*, not like something failed to start.
-5. **Performance**: transform and opacity only. Nothing that triggers layout.
-   If an effect cannot hold 60fps on a mid-range Android over 3G, it does not
-   ship — that is the device most of this audience will use.
+1. **Scroll-linked or still.** No loops, no drift, no perpetual motion. The
+   visitor drives it; when they stop, it stops.
+2. **Movement is slight.** Parallax should read as depth. Past roughly the
+   height of a line of text it starts reading as sliding, and that is the
+   ceiling — not a pixel value, a perceptual one.
+3. **Never during reading.** No motion in a section whose job is text.
+4. **The still version is designed, not derived.** Every element specifies its
+   reduced-motion state at the same time, and that state must look composed
+   rather than like something failed to start.
 
 ---
 
-## 9. Photography hierarchy
+## 9. Photography
 
-Photography is the subject; this system is its frame. Four roles, and a page
-should use no more than three of them.
+Photography is the subject; this system is its frame.
 
-| Role | Size | Frequency | Purpose |
-| --- | --- | --- | --- |
-| **Anchor** | Full-bleed or near | Once per page, at most | The image the page is about |
-| **Feature** | 50–70% width | 2–4 per page | Carries a section |
-| **Support** | Card or column width | Many | Rhythm and evidence |
-| **Detail** | Small, inline | Sparing | A hand, a texture, a face |
-
-**Rules:**
+Four roles: **Anchor** (full-bleed, once per page at most), **Feature** (carries
+a section), **Support** (rhythm and evidence), **Detail** (a hand, a texture, a
+face). A page uses no more than three of them.
 
 - **One Anchor per page.** Two competing full-bleed images means neither is the
   subject.
-- **Environmental elements frame, mask or ground a photograph. They never
-  overlay its subject.**
-- **Every image declares width and height.** Non-negotiable: it is what stops
-  the page jumping while photos load.
-- Portraits are never cropped tighter than the shoulders by an environmental
-  mask.
-- Heritage imagery takes no mask, no overlay, no treatment beyond a legibility
-  scrim where text is required.
+- Environment **frames, masks or grounds** a photograph. It never overlays the
+  subject.
+- **Every image declares width and height.** This is what stops the page
+  jumping as photographs load.
+- Heritage imagery takes no mask and no treatment.
 
 ---
 
-## 10. Composition
+## 10. Designing before the photographs exist
 
-1. **The horizon is the organising line.** Where a section has an
-   environmental element, it should relate to a single horizontal — the same
-   logic that makes the Atlantic edge meaningful without illustrating anything.
-2. **Asymmetry over symmetry.** The site's existing layouts are asymmetric;
-   environment should follow, not centre things.
-3. **One focal point per screen.** If a visitor's eye has two places to go,
-   the design has not decided.
-4. **Negative space is an element.** It is specified, not left over. A section
-   with generous space and nothing in it is a finished design.
-5. **Edges do the work.** Interest belongs at the boundary between sections,
-   not in the middle of them.
+Every image on the site today is a placeholder — 84 stock photographs across 20
+pages. Real photography arrives later through Sanity, in a dedicated curation
+phase. That imposes three constraints, and they are the ones most likely to be
+broken under pressure:
 
----
-
-## 11. Budgets
-
-Measurable ceilings. An element exceeding these fails review regardless of how
-good it looks.
-
-| Budget | Limit |
-| --- | --- |
-| Per environmental element | ≤ 2KB inline |
-| Per page, all environmental assets | ≤ 12KB |
-| Added to Largest Contentful Paint | 0ms — nothing decorative loads before a photograph |
-| Cumulative Layout Shift | 0 from any environmental element |
-| Contrast reduction on any text | 0 — must still pass AA |
-| Frame rate during scroll motion | ≥ 60fps on mid-range Android |
-
-Inline SVG only, themed by token. No raster decoration, no external requests,
-no icon fonts.
-
----
-
-## 12. Things we will never do
-
-Extending 2A §11, specific to environment:
-
-- Decorate heritage or memorial content.
-- Use Adinkra symbols, kente or printed cloth as pattern, texture or divider.
-- Put a decorative element over a person's face.
-- Let a background reduce text contrast below AA.
-- Animate anything perpetually in the periphery.
-- Introduce a colour that is not in the palette.
-- Use yellow as a background field.
-- Float a decorative shape in the centre of a section.
-- Ship an effect without its reduced-motion design.
-- Add a flourish to compensate for a weak photograph. Replace the photograph.
-- Design a section's environment before its photograph exists.
-
----
-
-## 13. Asset strategy
-
-**Every image on the site today is a placeholder.** 84 stock photographs across
-20 pages. The system must therefore be designed for photography that does not
-exist yet, which imposes three constraints:
-
-1. **No element may depend on a specific image.** A mask tuned to the
-   composition of one placeholder breaks when the real photograph arrives. Masks
-   attach to the frame, not to the content.
-2. **Every element must hold up against an unknown image** — dark or light,
-   busy or calm, portrait or landscape. If it only works against one, it is
+1. **No element may depend on a specific image.** Masks attach to the frame,
+   never to the composition of whatever is currently behind them.
+2. **Every element must survive an unknown photograph** — dark or light, busy
+   or calm, portrait or landscape. If it only works against one image, it is
    tuned to a placeholder.
-3. **Environmental design for a section waits until that section's real
-   photograph exists.** This is the sequencing rule from 2A, restated because it
-   is the one most likely to be broken under pressure.
+3. **A section's environment is not finalised until its real photograph
+   exists.**
 
-Sanity now holds the media model — hotspot cropping, required descriptions, and
-an approval gate that prevents an unapproved image publishing. Environmental
-elements must respect the hotspot: the focal point an editor chooses is the
-part a mask may never cover.
-
----
-
-## 14. Review checklist
-
-The instrument. Any proposed environmental element is checked against this, and
-any single failure means it does not ship.
-
-**Register**
-- [ ] The section has exactly one register, from the §1 table
-- [ ] Layers, coverage and opacity are within that register's budget
-- [ ] The page has ≤ 2 Open sections, and ≥ 40% Quiet or Silent
-
-**Form**
-- [ ] The shape is in the §3 vocabulary
-- [ ] It cannot be named as a thing
-- [ ] Angle is 0°, or 2–6°
-- [ ] Colour is from the palette; no new hue; not yellow as a field
-
-**Placement**
-- [ ] Attached to an edge, not floating
-- [ ] Behind content, never interleaved
-- [ ] ≤ 40% of section height
-- [ ] Behaviour declared at 375 / 768 / 1440
-
-**Safety**
-- [ ] Text contrast still passes AA at every breakpoint
-- [ ] Not on heritage content, the booking flow, or a confirmation
-- [ ] Does not overlay a face or a photograph's subject
-- [ ] Respects the image hotspot
-
-**Motion**
-- [ ] Scroll-linked or static; never autonomous
-- [ ] Travel within budget
-- [ ] Still state designed, not derived
-- [ ] Transform/opacity only
-
-**Cost**
-- [ ] ≤ 2KB; page total ≤ 12KB
-- [ ] Zero layout shift; loads after photography
-
-**The final question**, from 2A: *would removing this be noticed?* If not, it
-should not ship.
+**This does not mean waiting to start.** Most of the site is Quiet or Silent,
+and those registers are largely the *absence* of decoration — they can be
+specified, built and reviewed now, against any imagery. Only Open and Ambient
+sections need to wait, and there are few of them.
 
 ---
 
-## 15. Implementation roadmap
+## 11. Review checklist
 
-Nothing here is built until the type scale and real photography are in place.
-The order from 2A stands, with the environmental work expanded:
+Six questions. Any single failure means it does not ship.
 
-**Before any environmental work**
-1. Fluid display type — the last of the type system
-2. Real photography through Sanity
+1. Does this section's register match what the visitor is doing here?
+2. Is the shape one of the three, and impossible to name as a thing?
+3. Does all text still pass AA, at every breakpoint?
+4. Does your eye reach the photograph before the decoration?
+5. Is the motion scroll-driven, with its still state designed?
+6. Would removing this be noticed?
 
-**Then, in this order**
-3. **Silent and Quiet registers first.** Most of the site is one of these, and
-   they are mostly the *absence* of decoration. Doing them first proves the
-   density discipline before anything is drawn.
-4. **Ambient register** — tone and gradient fields only, no shapes.
-5. **The horizon** — one element, applied to the homepage hero, reviewed
-   against §14 before anything else is drawn.
-6. **Layered planes** — only if the horizon has proved itself.
-7. **Edge masks** for photography.
-8. **Dividers** — last and fewest.
+---
 
-Each step ships and is reviewed before the next begins. If the horizon alone
-makes the site feel more like itself, that may be the whole system, and the
-rest should not be built for completeness.
+## 12. Changing these rules
+
+The system is meant to outlive the people who wrote it, so it needs a way to
+change that is not "someone edited the file".
+
+- **Rules 1 and 2 in the one-page summary** (grief and trust; readability) are
+  permanent and need a recorded founder decision to alter.
+- **Everything else** may be amended by adding a dated line to this section
+  saying what changed and why. An amendment with a reason is a healthy system;
+  an undocumented exception is how a design language rots.
+- **If a rule blocks something genuinely good**, that is evidence about the
+  rule. Record it rather than quietly working around it.
+
+---
+
+## 13. Implementation order
+
+Nothing is built until fluid display type and real photography are in place.
+
+1. **Quiet and Silent first.** Most of the site, and mostly the absence of
+   decoration. Doing these first proves the density discipline before anything
+   is drawn.
+2. **Ambient** — tone and gradient only, no shapes.
+3. **One horizon**, on the homepage hero. Review against §11 before anything
+   else is drawn.
+4. **Layered horizons**, only if the single one has earned it.
+5. **Masks** for photography.
+6. **Dividers**, last and fewest.
+
+Each step ships and is reviewed before the next begins.
+
+**If the horizon alone makes the site feel more like itself, that may be the
+entire system**, and the rest should not be built for the sake of completeness.
 
 ---
 
 ## Success criteria
 
-The document works if a disagreement about a proposed element can be settled by
-pointing at a rule rather than by opinion.
+The document works if a disagreement about an element can be settled by
+pointing at a rule rather than trading opinions — and if someone joining in two
+years can read the first page and start work.
 
 The system works if a visitor could not describe the backgrounds afterwards but
-found the site calm — and if every photograph looks more considered for being
+found the site calm, and if every photograph looks more considered for being
 framed by it.
