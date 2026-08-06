@@ -52,6 +52,40 @@ const [
 ]);
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
+// 404.html only.
+//
+// Every other page is served at a path we control, so relative links resolve
+// correctly. The 404 page is different: Cloudflare serves it for *any*
+// unmatched URL, at whatever depth the visitor happened to type. Hit
+// /people-and-places-tours/about.html — which is exactly what old GitHub Pages
+// links look like, so this will happen — and href="style.css" resolves to
+// /people-and-places-tours/style.css, which does not exist. The visitor gets
+// an unstyled page with a broken menu at the moment they are already lost.
+//
+// Rewriting to root-absolute fixes it at any depth. A <base href="/"> tag
+// would be one line, but it also rewrites fragment links, sending the skip
+// link to the homepage instead of past the navigation — so this rewrites the
+// attributes instead and leaves anchors, tel:, mailto: and absolute URLs
+// alone. Attribute-scoped, so it cannot disturb element structure.
+const rootRelativeUrls = html => html.replace(
+  /\b(src|href)="(?!https?:|\/\/|\/|#|tel:|mailto:|data:)([^"]+)"/g,
+  (_match, attr, value) => `${attr}="/${value}"`,
+);
+
+// FormSubmit's _next is where a visitor lands after submitting, and it has to
+// be an absolute URL because the redirect happens on FormSubmit's servers.
+//
+// It was hardcoded to the GitHub Pages address. script.js rewrites it on load,
+// so this was invisible in testing — but the only people who reach FormSubmit
+// at all are the ones without JavaScript, which is precisely the group that
+// rewrite never runs for. They would have submitted an enquiry and been sent
+// to a different domain to read the thank-you page. Deriving it from siteUrl
+// means it follows the site wherever it is deployed.
+const injectFormNext = (html, site) => html.replace(
+  /(<input[^>]*name="_next"[^>]*value=")[^"]*(")/g,
+  (_match, before, after) => `${before}${site}/thanks.html${after}`,
+);
+
 await rm(outputRoot, {recursive: true, force: true});
 await mkdir(outputRoot, {recursive: true});
 
@@ -84,7 +118,9 @@ for (const entry of rootEntries) {
       ogImage,
     });
     if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(entry.name);
-    await writeFile(join(outputRoot, entry.name), withMeta, 'utf8');
+    const withNext = injectFormNext(withMeta, siteUrl);
+    const final = entry.name === '404.html' ? rootRelativeUrls(withNext) : withNext;
+    await writeFile(join(outputRoot, entry.name), final, 'utf8');
   } else {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));
   }

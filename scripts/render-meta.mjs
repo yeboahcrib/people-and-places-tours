@@ -9,8 +9,15 @@
 // The site URL is a single build variable so the GitHub Pages host, a
 // pages.dev preview and the eventual custom domain all emit correct absolute
 // URLs without a code change. sitemap.xml and robots.txt read the same value.
+//
+// The default is the real domain, not the GitHub Pages host. It used to be the
+// latter, which meant a build that simply forgot to set SITE_URL would emit
+// canonical tags pointing at a different domain — telling Google the old site
+// was the authoritative one and competing with itself in search. A missing
+// variable should degrade to the right answer, not a quietly wrong one.
+// Override it per-environment (a pages.dev preview should set its own).
 
-export const DEFAULT_SITE_URL = 'https://yeboahcrib.github.io/people-and-places-tours';
+export const DEFAULT_SITE_URL = 'https://peopleplacesgh.com';
 
 const escapeAttr = value => String(value ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

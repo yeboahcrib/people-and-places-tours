@@ -9,7 +9,6 @@ assert(cspLine, 'Content-Security-Policy header is missing');
 for (const directive of [
   "base-uri 'self'",
   "object-src 'none'",
-  "frame-src 'none'",
   "frame-ancestors 'none'",
   "script-src-attr 'none'",
   "form-action 'self' https://formsubmit.co",
@@ -19,6 +18,25 @@ for (const directive of [
 
 const scriptDirective = cspLine.match(/script-src ([^;]+)/)?.[1] || '';
 assert(!scriptDirective.includes("'unsafe-inline'"), 'script-src must not allow unsafe-inline');
+
+// frame-src used to be 'none', which silently broke Turnstile: it renders in
+// an iframe, so the booking form's spam check would never appear. It is now an
+// allow-list of one. The protection that actually matters against clickjacking
+// is frame-ancestors, asserted above and still 'none'.
+const frameDirective = cspLine.match(/frame-src ([^;]+)/)?.[1]?.trim() || '';
+assert.equal(frameDirective, 'https://challenges.cloudflare.com',
+  'frame-src must allow Turnstile and nothing else');
+
+// Turnstile and Sanity are required by the live site but appear nowhere in the
+// markup, so a future tidy-up could plausibly delete them as unused. These
+// assertions make that failure loud at build time rather than in production.
+for (const [host, directive] of [
+  ['https://challenges.cloudflare.com', 'script-src'],
+  ['https://cdn.sanity.io', 'img-src'],
+]) {
+  const value = cspLine.match(new RegExp(`${directive} ([^;]+)`))?.[1] || '';
+  assert(value.includes(host), `${directive} must allow ${host}`);
+}
 assert(headers.includes('Strict-Transport-Security: max-age=31536000'), 'HSTS header is missing');
 assert(headers.includes('X-Content-Type-Options: nosniff'), 'nosniff header is missing');
 assert(headers.includes('Cross-Origin-Opener-Policy: same-origin'), 'COOP header is missing');

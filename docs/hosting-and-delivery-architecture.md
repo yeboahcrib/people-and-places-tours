@@ -188,3 +188,58 @@ revision, and timestamp. Cloudflare also exposes `/api/health` for the inquiry
 service. These signals remain separate so an inquiry configuration failure does
 not incorrectly make the static travel site unhealthy. Monitoring and response
 procedures are defined in `docs/availability-and-monitoring-runbook.md`.
+
+## Cutover checklist
+
+Settings to enter when creating the Cloudflare Pages project. Framework preset
+is **None** — this is a plain static build.
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Node version | read from `.nvmrc` (22) |
+
+`.nvmrc` exists so the Node version is version-controlled rather than typed
+into a dashboard. Cloudflare's default is older than this build needs, and the
+failure it produces is a confusing syntax error rather than a clear message.
+
+**Runtime variables** — used by the inquiry Function when a visitor submits:
+
+| Variable | Purpose |
+| --- | --- |
+| `RESEND_API_KEY` | Sends the notification email. Secret |
+| `INQUIRY_TO_EMAIL` | Where enquiries arrive |
+| `INQUIRY_FROM_EMAIL` | Must be on a Resend-verified domain |
+| `ALLOWED_ORIGINS` | Origins permitted to post. Include the live domain and any preview host in use |
+| `TURNSTILE_SECRET_KEY` | Server half of the spam check. Secret |
+
+**Build variables** — read while the site is being generated:
+
+| Variable | Purpose |
+| --- | --- |
+| `SITE_URL` | Canonical tags, sitemap, and the no-JS form redirect. Defaults to the live domain; **set it explicitly on preview environments** or previews will emit canonical tags pointing at production |
+| `TURNSTILE_SITE_KEY` | Public half of the spam check |
+| `SANITY_STUDIO_PROJECT_ID` | Only once the CMS goes live. Absent means the committed content is used |
+
+### Order of operations
+
+1. Deploy without `SANITY_STUDIO_PROJECT_ID` first. This isolates hosting
+   problems from CMS problems; adding both at once means a failure could be
+   either.
+2. Start Resend domain verification early — it waits on DNS propagation and is
+   the most likely thing to hold up launch.
+3. Submit a real enquiry on the `.pages.dev` URL before pointing the domain.
+   **The Function has never executed** — GitHub Pages cannot run it — so this
+   is its first real test, and it is the one step with no prior evidence.
+4. Test with JavaScript disabled too. That path goes to FormSubmit rather than
+   the Function, and it is the only way to check the fallback still works.
+5. Point the domain last.
+
+### Why the no-JS form still uses a third party
+
+The Function requires a Turnstile token, and Turnstile needs JavaScript to
+produce one. A visitor without JavaScript therefore cannot use the Function at
+all — a submission would be rejected as unverified. FormSubmit remains their
+fallback for that reason, not through inertia. Removing it would silently drop
+those enquiries.

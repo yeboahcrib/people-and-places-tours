@@ -1,5 +1,16 @@
 ## Cloudflare Pages deployment headers.
 ## GitHub Pages ignores this file while the site is hosted there.
+##
+## Three hosts in the policy exist for a specific reason and must not be
+## trimmed as "unused" — nothing on the page references them in markup:
+##   challenges.cloudflare.com  Turnstile. Loads a script AND renders inside an
+##                              iframe, so it needs script-src, frame-src and
+##                              connect-src. frame-src was 'none' and would
+##                              have silently broken the booking form.
+##   cdn.sanity.io              Where photographs uploaded to the CMS are
+##                              served from. Blocked here means every real
+##                              photograph fails to load once Sanity is on.
+##   images.unsplash.com        The stock placeholders, until the shoot lands.
 /*
   Strict-Transport-Security: max-age=31536000
   X-Frame-Options: DENY
@@ -8,7 +19,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; img-src 'self' https://images.unsplash.com data:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://cdnjs.cloudflare.com; script-src-attr 'none'; connect-src 'self'; media-src 'self' https://cdn.prod.website-files.com; form-action 'self' https://formsubmit.co; upgrade-insecure-requests;
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; img-src 'self' https://images.unsplash.com https://cdn.sanity.io data:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://cdnjs.cloudflare.com https://challenges.cloudflare.com; script-src-attr 'none'; connect-src 'self' https://challenges.cloudflare.com; media-src 'self' https://cdn.prod.website-files.com; form-action 'self' https://formsubmit.co; upgrade-insecure-requests;
   Cache-Control: public, max-age=0, must-revalidate
 
 /assets/*
