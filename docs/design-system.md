@@ -48,6 +48,31 @@ An 8px scale with 4px half-steps. Use it for padding, margin and gap.
 `--sp-3` 24 · `--sp-3-5` 28 · `--sp-4` 32 · `--sp-4-5` 36 · `--sp-5` 40 ·
 `--sp-6` 48 · `--sp-7` 56 · `--sp-8` 64 · `--sp-10` 80 · `--sp-12` 96
 
+## Type
+
+Sixteen steps, fitted to what the site actually uses rather than derived from
+a ratio and imposed: dense through the small sizes where labels, captions and
+meta live, sparse at display sizes. Every step is in use.
+
+`--text-3xs` 10px · `--text-2xs` 11 · `--text-xs` 12 · `--text-sm` 13 ·
+`--text-base` 14 · `--text-md` 15 · `--text-lg` 16 · `--text-xl` 18 ·
+`--text-2xl` 20 · `--text-3xl` 22 · `--text-4xl` 24 · `--text-5xl` 28 ·
+`--text-6xl` 32 · `--text-7xl` 40 · `--text-8xl` 48 · `--text-9xl` 56
+
+It replaced 49 distinct sizes across 621 declarations, 28 of which sat between
+9.6px and 16px — five of them within 0.7px of each other.
+
+**Fluid display type is deliberately not in the scale.** Around 40 `clamp()`
+expressions size the large headings responsively; collapsing those is a
+separate exercise that should happen alongside the editorial layout work, not
+ahead of it.
+
+**Three values are intentionally outside the scale** and left raw: the `10rem`
+and `12rem` hero watermarks, and one `2.2rem`. Anything more than 2px from its
+nearest step is a one-off rather than a scale member, and snapping it would be
+destructive — an early pass crushed the 12rem watermark to 56px before that
+guard existed.
+
 ## Radius
 
 `--radius-sm` 8px · `--radius-md` 16 · `--radius-lg` 24 · `--radius-xl` 40 ·
@@ -80,9 +105,9 @@ more motion.
 Deliberately deferred, because collapsing them changes how the site looks and
 that belongs with the visual language, not before it:
 
-- **Typography.** 199 raw font sizes across 49 distinct values, and no scale.
-  This is the biggest remaining debt.
-- **Shadows.** 33 distinct values, no elevation scale.
+- **Shadows.** 33 distinct values, no elevation scale. The last of the Phase 1
+  token debt.
+- **Fluid display type.** ~40 distinct `clamp()` expressions.
 
 Design both alongside Phase 2 rather than reverse-engineering them from what
 happens to exist.
