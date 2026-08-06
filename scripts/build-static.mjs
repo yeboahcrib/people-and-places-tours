@@ -56,11 +56,15 @@ const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent)
 //
 // Every other page is served at a path we control, so relative links resolve
 // correctly. The 404 page is different: Cloudflare serves it for *any*
-// unmatched URL, at whatever depth the visitor happened to type. Hit
-// /people-and-places-tours/about.html — which is exactly what old GitHub Pages
-// links look like, so this will happen — and href="style.css" resolves to
-// /people-and-places-tours/style.css, which does not exist. The visitor gets
-// an unstyled page with a broken menu at the moment they are already lost.
+// unmatched URL, at whatever depth the visitor happened to type. Request
+// /anything/deep and href="style.css" resolves to /anything/style.css, which
+// does not exist — an unstyled page with a broken menu, shown to someone who
+// is already lost.
+//
+// Nothing on the site links that deep today, so this is insurance rather than
+// a fix for a known bad link: mistyped URLs, truncated shares, and any future
+// move to nested paths. It costs one build step and removes a whole class of
+// failure at the least forgiving moment.
 //
 // Rewriting to root-absolute fixes it at any depth. A <base href="/"> tag
 // would be one line, but it also rewrites fragment links, sending the skip
