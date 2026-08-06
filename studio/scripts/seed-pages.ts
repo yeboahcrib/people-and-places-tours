@@ -73,14 +73,6 @@ function aboutPageDoc() {
   return {...about, _id: 'aboutPage', _type: 'aboutPage'}
 }
 
-// The navigation document already exists with its links and footer columns,
-// so this adds only the one missing field rather than replacing the document.
-async function patchNavigation() {
-  const tagline = readJson('src/content/site.json').navigation.footerTagline
-  await client.patch('navigation').set({footerTagline: tagline}).commit()
-  return tagline
-}
-
 // The build requires a featured collection of 3-5 tours. Nothing on the site
 // currently renders it, so this is a validation gate rather than a visible
 // choice; seeded from the first three in the site's own catalogue order and
@@ -105,39 +97,48 @@ function featuredCollection() {
   }
 }
 
-// A first run created these with dotted ids, which Sanity stores but hides
-// from public reads. Remove them so they do not linger invisibly.
+// The first run created these with dotted ids, which Sanity stores but hides
+// from public reads. Clearing them is housekeeping, not a prerequisite, so it
+// runs last and can never prevent the documents that matter from being written.
 async function removeHiddenSections() {
-  const stale = SECTION_ORDER.map(key => `homepageSection.${key}`)
-  const tx = stale.reduce((t, id) => t.delete(id), client.transaction())
-  await tx.commit().catch(() => {})
-  return stale.length
+  let removed = 0
+  for (const key of SECTION_ORDER) {
+    try {
+      await client.delete(`homepageSection.${key}`)
+      removed += 1
+    } catch {
+      // Already gone, or not deletable. Either way it is invisible and harmless.
+    }
+  }
+  return removed
 }
 
 async function run() {
-  const removed = await removeHiddenSections()
+  console.log('Reading content from the site files...')
   const documents = [...homepageSections(), bookingFlowDoc(), aboutPageDoc(), featuredCollection()]
+  console.log(`  prepared ${documents.length} documents`)
+  documents.forEach(doc => console.log(`    ${doc._id}`))
 
-  const transaction = documents.reduce(
-    (tx, doc) => tx.createOrReplace(doc),
-    client.transaction(),
-  )
+  console.log('\nWriting to Sanity...')
+  const transaction = documents.reduce((tx, doc) => tx.createOrReplace(doc), client.transaction())
   await transaction.commit()
-  const tagline = await patchNavigation()
+  console.log('  written')
 
-  console.log(`Loaded ${documents.length} documents:`)
-  console.log(`  ${SECTION_ORDER.length} homepage sections`)
-  console.log('  1 booking flow')
-  console.log('  1 about page')
-  console.log('  1 featured tour collection')
-  console.log(`  navigation patched with footerTagline: "${tagline}"`)
-  console.log(`  cleared ${removed} hidden documents from the earlier run`)
-  console.log('\nNext: from the project root, confirm the site reads them with')
-  console.log('  SANITY_STUDIO_PROJECT_ID=<id> npm run build')
-  console.log('and check dist/health.json reports "sanity" rather than "local".')
+  console.log('\nPatching navigation...')
+  const tagline = readJson('src/content/site.json').navigation.footerTagline
+  await client.patch('navigation').set({footerTagline: tagline}).commit()
+  console.log(`  footerTagline set to "${tagline}"`)
+
+  console.log('\nClearing hidden documents from the first run...')
+  const removed = await removeHiddenSections()
+  console.log(`  removed ${removed}`)
+
+  console.log('\nDone. Tell Claude it finished and it will verify the site reads them.')
 }
 
 run().catch(error => {
-  console.error('Seed failed:', error.message)
+  console.error('\nSeed failed at the step above.')
+  console.error('Reason:', error && error.message ? error.message : error)
+  if (error && error.statusCode) console.error('Status:', error.statusCode)
   process.exit(1)
 })
