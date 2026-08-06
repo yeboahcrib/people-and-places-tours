@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res  = await fetch(emailForm.action || '/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
         if (res.ok) {
           btn.textContent = 'Subscribed!';
-          btn.style.background = '#22c55e';
+          btn.style.background = 'var(--color-success)';
           input.value = '';
           setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.disabled = false; }, 3500);
         } else { throw new Error(); }
@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalSteps > 1) showBookingStep(1);
         if (!showBookingSuccess(result.reference)) {
           btn.textContent = 'Your Ghana journey has started.';
-          btn.style.background = '#22c55e';
+          btn.style.background = 'var(--color-success)';
           setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.disabled = false; }, 5000);
         }
       } catch {
