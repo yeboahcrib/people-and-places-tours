@@ -1,5 +1,10 @@
 # Environmental Design System
 
+> **Frozen — version 1.0, approved 6 August 2026.** Reviewed and rewritten
+> once before approval. Rules 1 and 2 of the one-page summary (grief and trust;
+> readability) are permanent. Everything else may be amended by adding a dated
+> line to §12 saying what changed and why.
+
 The visual grammar for every background, shape, divider and environmental
 animation on the site.
 
