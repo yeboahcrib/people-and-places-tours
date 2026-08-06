@@ -252,12 +252,12 @@ should remain the default for essentially everything.
    Every environmental effect must be conceived with its still version at the
    same time.
 
-### An open defect
+### Correction
 
-The homepage testimonials carousel advances on `requestAnimationFrame` and is
-the only animated element on the site that never checks
-`prefers-reduced-motion`. It must be fixed before Phase 2 adds any motion, or
-the new work inherits a broken foundation.
+An earlier revision recorded the homepage testimonials carousel as ignoring
+`prefers-reduced-motion`. Verified since: it does honour the preference,
+pausing at setup and skipping the slide duplication entirely. There is no
+open motion defect. Phase 2 inherits a sound foundation on this point.
 
 ---
 
@@ -534,8 +534,8 @@ images waits for them; everything else starts now.**
    a rewrite. This is copy, so it is not blocked by the shoot.
 3. **Elevation/shadow scale.** The remaining Phase 1 token debt: 33 distinct
    shadows, no scale.
-4. **The carousel's reduced-motion defect.** Fix before any new motion is
-   added, or Phase 2 inherits a broken foundation.
+4. *(Removed: the carousel reduced-motion defect recorded here did not
+   exist. See the correction in §5.)*
 
 ### On arrival of the photographs
 

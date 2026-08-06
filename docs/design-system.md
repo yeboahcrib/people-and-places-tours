@@ -123,10 +123,13 @@ symmetric fallback.
 job. A 40ms difference on a hover is not perceptible; one value is far easier
 to retune.
 
-**Every animation must honour `prefers-reduced-motion`.** One exception
-currently exists and is a known bug: the homepage testimonials carousel
-advances on `requestAnimationFrame` without checking. Fix before Phase 2 adds
-more motion.
+**Every animation must honour `prefers-reduced-motion`**, and every one
+currently does. An earlier revision of this document claimed the homepage
+testimonials carousel was an exception. That was wrong: it reads the
+preference at setup, and under `reduce` it neither duplicates its slides nor
+adds `is-auto-scrolling`, so it never moves. The mistake came from watching it
+move in a screenshot harness and inferring the cause instead of reading the
+code.
 
 ## Not yet consolidated
 
