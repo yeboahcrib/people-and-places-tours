@@ -50,7 +50,7 @@ function homepageSections() {
     const body = section.body || section.intro || section.sub
 
     return {
-      _id: `homepageSection.${sectionKey}`,
+      _id: `homepageSection-${sectionKey}`,
       _type: 'homepageSection',
       sectionKey,
       order: index + 1,
@@ -105,7 +105,17 @@ function featuredCollection() {
   }
 }
 
+// A first run created these with dotted ids, which Sanity stores but hides
+// from public reads. Remove them so they do not linger invisibly.
+async function removeHiddenSections() {
+  const stale = SECTION_ORDER.map(key => `homepageSection.${key}`)
+  const tx = stale.reduce((t, id) => t.delete(id), client.transaction())
+  await tx.commit().catch(() => {})
+  return stale.length
+}
+
 async function run() {
+  const removed = await removeHiddenSections()
   const documents = [...homepageSections(), bookingFlowDoc(), aboutPageDoc(), featuredCollection()]
 
   const transaction = documents.reduce(
@@ -121,6 +131,7 @@ async function run() {
   console.log('  1 about page')
   console.log('  1 featured tour collection')
   console.log(`  navigation patched with footerTagline: "${tagline}"`)
+  console.log(`  cleared ${removed} hidden documents from the earlier run`)
   console.log('\nNext: from the project root, confirm the site reads them with')
   console.log('  SANITY_STUDIO_PROJECT_ID=<id> npm run build')
   console.log('and check dist/health.json reports "sanity" rather than "local".')
