@@ -347,8 +347,27 @@ body.page-entering {
 .reveal.reveal-no-stagger { transition-delay: 0s; }
 
 @media (prefers-reduced-motion: reduce) {
+  /* !important is deliberate, and it is the only place in this stylesheet that
+     should need it.
+
+     This rule is a guarantee, not a style: a visitor who has asked their
+     device for less motion must never be left looking at content stuck at
+     opacity 0. Written as an ordinary rule it lost on source order to any
+     later decorative rule with equal specificity — `.reveal-ready
+     .process-connector` at ~1200 did exactly that, so the connectors in the
+     planning section stayed invisible for reduced-motion visitors until they
+     happened to scroll past. It was found by the responsive suite only after
+     an unrelated change shifted load timing, which is to say it survived a
+     long time by luck.
+
+     Marking it !important means the next decorative rule someone adds cannot
+     silently reintroduce the same bug. */
   .reveal-ready .reveal,
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* ── ASYMMETRIC SECTION SPLIT (60 / 40) ──────────────────────── */
@@ -614,13 +633,25 @@ body.page-entering {
   height: 100%;
   object-fit: cover;
 }
-/* Soft, low-contrast gradient — keeps the video as the main visual */
+/* Legibility scrim — keeps the photograph the main visual while guaranteeing
+   the headline and subheading stay readable over it.
+
+   Tuned for a still photograph rather than the darker video this hero used to
+   carry. Measured against the current image, the previous gradient left 24% of
+   the headline's area below 3:1 and 12% of the subheading below 4.5:1, which
+   breaks the one design-system rule that cannot be amended. The scrim is the
+   sanctioned tool for this ("where text must sit on an image, the treatment is
+   a legibility scrim") — the alternative, moving text off the subject, is not
+   available when the subject is a person standing where the text goes.
+
+   Deliberately still a gradient, not a flat wash: the top two-thirds of the
+   photograph stay untouched. Re-measure if the hero image changes. */
 .v-hero-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.12) 48%, transparent 72%),
-    linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 55%);
+    linear-gradient(to top, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.62) 26%, rgba(0,0,0,0.44) 48%, rgba(0,0,0,0.14) 66%, transparent 80%),
+    linear-gradient(to right, rgba(0,0,0,0.46) 0%, rgba(0,0,0,0.16) 42%, transparent 64%);
 }
 /* Lower-third placement: sits above the bottom edge, breathing room on all sides */
 .v-hero-content {
@@ -637,6 +668,36 @@ body.page-entering {
   align-items: flex-start;
   text-align: left;
 }
+
+/* Hero entrance — replaces a 70KB CDN animation library that did three fades.
+   Timings and offsets are carried over from it unchanged; the easing is now
+   the house curve (--ease-out) rather than the library's own, which is a
+   marginally different acceleration and one fewer thing to keep in sync.
+
+   The .v-hero-entrance class is added by script.js. It is deliberately not on
+   the markup: without it, the headline, subheading and button render at full
+   opacity in their final positions. A blocked or failed script therefore costs
+   the animation, never the content. Anything that starts an element at
+   opacity 0 in the stylesheet is one script error away from an invisible
+   homepage. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes v-hero-rise {
+    from { opacity: 0; transform: translateY(var(--hero-rise, 26px)); }
+    to   { opacity: 1; transform: none; }
+  }
+  .v-hero-entrance .v-hero-headline,
+  .v-hero-entrance .v-hero-sub,
+  .v-hero-entrance .v-hero-cta-link {
+    animation: v-hero-rise var(--hero-duration, 850ms) var(--ease-out) var(--hero-delay, 200ms) both;
+  }
+  .v-hero-entrance .v-hero-sub {
+    --hero-rise: 18px; --hero-duration: 650ms; --hero-delay: 500ms;
+  }
+  .v-hero-entrance .v-hero-cta-link {
+    --hero-rise: 14px; --hero-duration: 550ms; --hero-delay: 700ms;
+  }
+}
+
 .v-hero-headline {
   font-family: var(--font-display);
   font-size: clamp(2.4rem, 5vw, 4.4rem);

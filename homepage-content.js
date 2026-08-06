@@ -5,8 +5,17 @@
   // docs/homepage-messaging-brief.md / studio/schemaTypes/documents/homepageSection.ts.
   window.PEOPLE_PLACES_HOME = {
     hero: {
-      video: {
-        src: 'https://cdn.prod.website-files.com/651d7335c96bc896d80e6981/65403a4d370634439edde7cc_1030%20(1)(1)-transcode.mp4',
+      // TEMPORARY placeholder, like the rest of the stock imagery — replace
+      // with People & Places' own photography or footage after the shoot.
+      //
+      // This replaced a video hotlinked from another company's server that we
+      // had no confirmed right to use. Setting `video: { src, poster }` here
+      // instead of `image` switches the hero back to film; the renderer
+      // supports both and prefers `image`.
+      image: {
+        src: 'https://images.unsplash.com/photo-1660675133902-acd1b057f75d?auto=format&fit=crop&w=1920&q=80',
+        width: 1920,
+        height: 1280,
       },
       headline: 'The People Make the Place.',
       sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets we call home, whether you are seeing them for the first time or coming back to them.',

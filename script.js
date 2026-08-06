@@ -28,8 +28,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* Keep the cinematic hero efficient and respectful of motion preferences.
-     The background video stops whenever it is offscreen or the tab is hidden. */
-  const homepageHeroVideo = document.querySelector('.v-hero-video');
+     The background video stops whenever it is offscreen or the tab is hidden.
+
+     The hero can be a still image instead of a video — it is one today, while
+     the borrowed footage is out and People & Places' own is not yet shot — and
+     an <img> has no play() or pause(). Checking the tag rather than assuming
+     matters more than it looks: when this ran unguarded it threw on the first
+     line of DOMContentLoaded and took every later feature on the page down
+     with it, including the search palette. One unguarded assumption about the
+     hero was enough to break the whole homepage. */
+  const homepageHeroVideo = document.querySelector('video.v-hero-video');
   if (homepageHeroVideo) {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let heroVideoInView = true;
@@ -1187,29 +1195,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-/* ── GSAP HERO ENTRANCE ──
+/* ── HERO ENTRANCE ──
    Runs on DOMContentLoaded (not window.load) so the animation isn't blocked
-   waiting for the hero video to finish downloading. Hero markup is rendered
-   by homepage-sections.js's DCL listener which fires first. */
-function runHeroEntrance() {
-  if (typeof gsap === 'undefined') return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const cta = document.querySelector('.v-hero-cta-link');
-  if (!cta && !document.querySelector('.v-hero-headline')) return;
+   waiting for the hero image to finish downloading. Hero markup is rendered
+   by homepage-sections.js's DCL listener which fires first.
 
-  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  if (document.querySelector('.v-hero-headline')) {
-    tl.from('.v-hero-headline', { opacity: 0, y: 26, duration: 0.85 }, 0.2);
-  }
-  if (document.querySelector('.v-hero-sub')) {
-    tl.from('.v-hero-sub', { opacity: 0, y: 18, duration: 0.65 }, 0.5);
-  }
-  if (cta) {
-    tl.fromTo('.v-hero-cta-link',
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: 0.55, clearProps: 'transform' },
-      0.7);
-  }
+   This used to load GSAP from a CDN — 70KB of animation library to fade three
+   elements up by a couple of dozen pixels. The same three fades are now CSS
+   keyframes, which removes the download and one third-party dependency from
+   the most important page on the site.
+
+   The ordering here matters more than it looks. The headline is NOT hidden by
+   default: CSS only hides it once this class is on the section. Written the
+   other way round — hide in CSS, reveal with JS — a script failure or a
+   blocked file would leave the homepage headline permanently invisible, which
+   is a far worse outcome than a missing animation. Nothing on this page may
+   depend on JavaScript running in order to be readable. */
+function runHeroEntrance() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const hero = document.querySelector('.v-hero');
+  if (!hero) return;
+  if (!hero.querySelector('.v-hero-headline') && !hero.querySelector('.v-hero-cta-link')) return;
+  hero.classList.add('v-hero-entrance');
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', runHeroEntrance);

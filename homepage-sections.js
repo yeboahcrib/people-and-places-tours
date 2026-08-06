@@ -60,14 +60,37 @@
     return `<img class="${escapeHtml(className)}" src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || '')}" width="${escapeHtml(image.width || '')}" height="${escapeHtml(image.height || '')}" ${extraAttrs} decoding="async" />`;
   }
 
+  // The hero takes either a still image or a video, and prefers the image when
+  // both are present.
+  //
+  // It was a video hotlinked from another company's server, which meant two
+  // problems: their homepage could break ours by deleting a file, and we had no
+  // record of permission to use it — flagged in the media source register and
+  // in the messaging brief ("avoid the current externally hosted hero video
+  // unless ownership and usage rights are confirmed"). It also cost 3.5 MB on
+  // a phone, with no poster frame, so the hero was empty until it arrived.
+  //
+  // The video branch is kept deliberately. When People & Places has its own
+  // footage, restoring it is a content change here — set `video.src` and drop
+  // `image` — not a rewrite. Give it a poster too; the still is what most
+  // visitors on slow connections will actually see.
+  function renderHeroMedia(data) {
+    if (data.image?.src) {
+      return `<img class="v-hero-video" src="${escapeHtml(data.image.src)}" alt="" width="${escapeHtml(data.image.width || '')}" height="${escapeHtml(data.image.height || '')}" fetchpriority="high" decoding="async" />`;
+    }
+    if (!data.video?.src) return '';
+    const poster = data.video.poster?.src ? ` poster="${escapeHtml(data.video.poster.src)}"` : '';
+    return `<video class="v-hero-video" autoplay muted loop playsinline preload="metadata"${poster}>
+      <source src="${escapeHtml(data.video.src)}" type="video/mp4" />
+    </video>`;
+  }
+
   function renderHeroSection(data) {
     return `
-<!-- Claude Code focus: Hero — editorial bottom-left layout. Keep text out of the video's centre. -->
+<!-- Claude Code focus: Hero — editorial bottom-left layout. Keep text out of the media's centre. -->
 <section class="v-hero" aria-label="Hero" data-home-section="hero">
   <div class="v-hero-video-wrap" aria-hidden="true">
-    <video class="v-hero-video" autoplay muted loop playsinline preload="metadata"${data.video.poster?.src ? ` poster="${escapeHtml(data.video.poster.src)}"` : ''}>
-      <source src="${escapeHtml(data.video.src)}" type="video/mp4" />
-    </video>
+    ${renderHeroMedia(data)}
     <div class="v-hero-overlay"></div>
   </div>
 
