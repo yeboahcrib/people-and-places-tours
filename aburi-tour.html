@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -208,27 +209,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">What time does the tour depart? <span class="arrow">▼</span></div>
+        <div class="faq-q">What time does the tour depart? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">We pick you up from your Accra accommodation around 7:00am to beat the heat and make the most of the day.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Do I need to be fit for this tour? <span class="arrow">▼</span></div>
+        <div class="faq-q">Do I need to be fit for this tour? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Easy level. The botanical gardens and cocoa farm are flat, gentle walks. The waterfall trail is short and accessible for most fitness levels.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is lunch included? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is lunch included? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. Lunch at the scenic Peduase Lodge is included — it's one of the highlights of the day.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How long is the drive from Accra? <span class="arrow">▼</span></div>
+        <div class="faq-q">How long is the drive from Accra? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">About 1 hour each way. The mountain road winds through beautiful greenery — half the experience.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I bring? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I bring? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Comfortable walking shoes, sunscreen, a light jacket (Aburi is noticeably cooler than Accra), and a camera.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can I buy souvenirs? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can I buy souvenirs? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. The botanical gardens have a gift shop, and the town has local craft stalls with quality pieces.</div>
       </div>
     </div>

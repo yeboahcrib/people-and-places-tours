@@ -75,7 +75,8 @@
     .day-body { display: none; padding-bottom: var(--sp-2-5); }
     .day-body p { color: #555; font-size:var(--text-lg); line-height: 1.8; }
     .day-body .meals { margin-top: var(--sp-1-5); font-size:var(--text-sm); color: var(--yellow); font-weight: 600; }
-    .day-item.open .day-arrow { transform: rotate(180deg); }
+    .day-item.open .day-arrow svg { transform: rotate(180deg); }
+    .day-item.open .day-arrow { background: var(--color-primary); border-color: var(--color-primary); color: var(--pap-charcoal); }
     .day-item.open .day-body { display: block; }
 
     /* INCLUDED / EXCLUDED */
@@ -97,9 +98,7 @@
     .faq { margin-bottom: var(--sp-6); }
     .faq-item { border-bottom: 1px solid #eee; }
     .faq-q { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-2-5) 0; cursor: pointer; font-weight: 600; font-size: var(--text-lg); color: var(--dark); }
-    .faq-q .arrow { color: #aaa; transition: transform 0.2s; }
     .faq-a { display: none; padding-bottom: var(--sp-2-5); color: #555; font-size:var(--text-lg); line-height: 1.8; }
-    .faq-item.open .faq-q .arrow { transform: rotate(180deg); }
     .faq-item.open .faq-a { display: block; }
 
     /* BOOKING SIDEBAR */
@@ -169,7 +168,10 @@
     .jgg-stars svg { width:14px; height:14px; }
     .meals { display:flex; align-items:center; gap:var(--sp-1); }
     .meals svg { width:15px; height:15px; flex-shrink:0; }
-</style>
+    .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
+      .day-arrow{color:var(--muted-dark);}
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -263,7 +265,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 1</span> Arrival, Airport Pickup & Welcome Dinner</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>Upon arrival at Kotoka International Airport, you will be met by a People & Places representative who will assist with your luggage and transfer you to your hotel. After checking in and freshening up, enjoy a welcome dinner at a fine dining restaurant in Accra, a chance to meet your tour guide and prepare for the exciting days ahead.</p>
@@ -274,7 +276,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 2</span> Batik Workshop, Drum Lessons & Accra City Tour</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>Visit a batik-making center, learn the art of batik and create your own patterns and handmade clothes. Next, head to the Art Center for drum lessons and interaction with local artisans. Afternoon city tour of Accra visiting Kwame Nkrumah Park and Independence Square. Evening free for personal exploration.</p>
@@ -285,7 +287,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 3</span> Aburi Gardens, Cocoa Farm & Waterfalls</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>Journey into the lush Eastern Region for a day filled with nature and history. Visit Aburi Botanical Gardens, then Tetteh Quarshie's Cocoa Farm, the first cocoa farm in Ghana. Learn about Ghana's cocoa history and taste fresh cocoa beans when available. End at Asenema Waterfalls for photos and relaxation.</p>
@@ -296,7 +298,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 4</span> Ancestral Trip to Cape Coast</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>A deeply meaningful journey into history and heritage. Visit Assin Manso Ancestral Slave River, a sacred site where enslaved Africans took their last bath on African soil. Then continue to Cape Coast Castle, a UNESCO World Heritage Site. Optional evening boat cruise in Elmina. A reflective, educational and transformative day.</p>
@@ -307,7 +309,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 5</span> Free Day</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>A flexible day designed for rest and personal exploration. Relax and recharge or explore Accra at your own pace. Optional activities include shea butter making, pottery, candle making, beach visits and other cultural experiences. Our team is on standby with recommendations based on your interests.</p>
@@ -318,7 +320,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 6</span> Shai Hills & Akosombo Boat Cruise</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>Depart for an exciting day of nature and adventure. Explore Shai Hills Resource Reserve on a guided walk, spotting antelopes, baboons and bird species. Continue to Akosombo for a relaxing boat cruise on the Volta River with optional kayaking for the adventurous.</p>
@@ -329,7 +331,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 7</span> Safari Valley Day Experience</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>Full day at Safari Eco Park, welcomed with freshly squeezed juice, followed by a guided safari tour. Enjoy a farm-to-table meal of your choice. Recreational activities include swimming, horseback riding, animal feeding, golf, cycling, walking trails, indoor and outdoor games, and a children's amusement park.</p>
@@ -340,7 +342,7 @@
       <div class="day-item">
         <div class="day-header">
           <h3><span class="day-number">DAY 8</span> Departure: See You Again!</h3>
-          <span class="day-arrow">▼</span>
+          <span class="day-arrow faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="day-body">
           <p>Time to say goodbye to Ghana. Last-minute shopping or exploration before your transfer to Kotoka International Airport. We'll miss you and hope to see you again soon!</p>
@@ -400,31 +402,31 @@
     <h2>Got Questions?</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">How does paying work? <span class="arrow">▼</span></div>
+        <div class="faq-q">How does paying work? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">A deposit reserves your dates and the balance is settled before you travel. We can spread it across monthly payments if that helps. We will go through the specifics with you directly, so nothing is decided before you have asked everything you want to ask.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Does the price include flights? <span class="arrow">▼</span></div>
+        <div class="faq-q">Does the price include flights? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">No. You book your own flight to Kotoka International Airport (ACC). We recommend booking early to get the best rates.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is this good for solo travelers? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is this good for solo travelers? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Absolutely! Just Go Ghana is designed for solo travelers, couples, families and groups alike. Final price may vary depending on room occupancy selection.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Do I need a visa for Ghana? <span class="arrow">▼</span></div>
+        <div class="faq-q">Do I need a visa for Ghana? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes, most international travelers require a visa. Visa fees are not included. We recommend applying well in advance through your nearest Ghanaian Embassy.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What vaccinations are required? <span class="arrow">▼</span></div>
+        <div class="faq-q">What vaccinations are required? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">A Yellow Fever vaccination card is mandatory for Ghana entry. Consult your doctor regarding Malaria prophylaxis and other standard travel vaccines.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How active is the trip? <span class="arrow">▼</span></div>
+        <div class="faq-q">How active is the trip? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Moderate level. Expect walking during city tours, the cocoa farm, and Shai Hills hike. There's plenty of downtime including a designated free day on Day 5.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is Ghana safe for tourists? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is Ghana safe for tourists? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Absolutely. Ghana is widely known as one of the friendliest and safest countries in Africa, especially for the diaspora. Our guides are with you throughout the scheduled itinerary.</div>
       </div>
     </div>

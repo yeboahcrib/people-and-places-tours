@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -208,27 +209,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">Where does the workshop take place? <span class="arrow">▼</span></div>
+        <div class="faq-q">Where does the workshop take place? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">At an artisan compound in Accra where master batik and pottery craftspeople work, teach, and pass their skills to the next generation.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How long is the workshop? <span class="arrow">▼</span></div>
+        <div class="faq-q">How long is the workshop? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">About 3–4 hours covering both batik fabric-making and pottery. You take everything you create home with you.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Do I need any artistic experience? <span class="arrow">▼</span></div>
+        <div class="faq-q">Do I need any artistic experience? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">None at all. This is designed for complete beginners. The joy is in the doing, not the perfection.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can children join? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can children join? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. The workshop is family-friendly and children tend to love both activities. It's one of the best family experiences we offer.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can I take my work home? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can I take my work home? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes — your batik piece and pottery creation are yours. Pottery needs to dry first; your guide will pack it safely for travel.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I wear? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I wear? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Clothes you don't mind getting dye or clay on. Aprons are provided but batik dye has a mind of its own.</div>
       </div>
     </div>

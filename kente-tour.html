@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -223,27 +224,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">Where is the Kente village? <span class="arrow">▼</span></div>
+        <div class="faq-q">Where is the Kente village? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Bonwire — the spiritual home of Kente cloth — sits about 25km from Kumasi in the Ashanti region, roughly 4 hours from Accra.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can I try weaving myself? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can I try weaving myself? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. You'll sit at a traditional hand loom under a master weaver's guidance. It's harder than it looks and one of those experiences you'll talk about for years.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can I buy Kente directly from the weavers? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can I buy Kente directly from the weavers? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes, and this is the best place to do it. Prices are fair and the pieces are authentic — not the tourist-market reproductions you find in Accra.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can I commission a custom piece? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can I commission a custom piece? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. Specify your pattern, colors, and size and the weavers will make it for you. Allow a few days for completion; we can arrange shipping if needed.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What else do we see? <span class="arrow">▼</span></div>
+        <div class="faq-q">What else do we see? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">The tour pairs Bonwire with the Kumasi Cultural Center, giving you full context for Ashanti artisanship and its place in Ghanaian culture.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What's the group size? <span class="arrow">▼</span></div>
+        <div class="faq-q">What's the group size? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Small groups of 2–10 people. Intimate enough for a real experience.</div>
       </div>
     </div>

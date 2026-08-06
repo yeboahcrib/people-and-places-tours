@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -223,27 +224,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">What's included in the tour? <span class="arrow">▼</span></div>
+        <div class="faq-q">What's included in the tour? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Return transport from Accra, a guided tour of the Akosombo Dam, a Lake Volta boat cruise, and lunch.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How long is the drive from Accra? <span class="arrow">▼</span></div>
+        <div class="faq-q">How long is the drive from Accra? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">About 2 hours each way on a comfortable highway. The scenery improves as you approach the Volta.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is there much walking? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is there much walking? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Moderate. The dam overlook and the boat embarkation involve some walking on uneven terrain. Sturdy shoes recommended.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is this good for history lovers? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is this good for history lovers? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Brilliantly so. The Akosombo story touches Kwame Nkrumah's industrialization vision, Cold War politics, and the forced displacement of 78,000 people. Your guide brings it alive.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Can I kayak on Lake Volta? <span class="arrow">▼</span></div>
+        <div class="faq-q">Can I kayak on Lake Volta? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Kayaking can be arranged as an optional add-on. Ask us when booking.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I bring? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I bring? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Sunscreen, camera, a light jacket (breezy on the water), and comfortable closed-toe shoes.</div>
       </div>
     </div>

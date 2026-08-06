@@ -2609,7 +2609,7 @@ body.page-entering {
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  border: 1px solid var(--color-border);
+  border: 1px solid currentColor;
   border-radius: var(--radius-circle);
   display: flex;
   align-items: center;
@@ -2629,7 +2629,7 @@ body.page-entering {
   border-color: var(--color-primary);
   color: var(--black);
 }
-.faq-item.open .faq-q-icon svg { transform: rotate(45deg); }
+.faq-item.open .faq-q-icon svg { transform: rotate(180deg); }
 .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
 .faq-item.open .faq-answer { max-height: 500px; }
 .faq-answer-inner {

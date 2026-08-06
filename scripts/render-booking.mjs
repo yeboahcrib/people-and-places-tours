@@ -52,7 +52,7 @@ const renderFaqs = faqs => faqs.map((faq, index) => `
           <li class="faq-item${index === 0 ? ' open' : ''}">
             <button class="faq-question" aria-expanded="${index === 0}">
               ${escapeHtml(faq.question)}
-              <div class="faq-q-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+              <div class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></div>
             </button>
             <div class="faq-answer">
               <div class="faq-answer-inner">${escapeHtml(faq.answer)}</div>

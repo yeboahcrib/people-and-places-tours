@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -208,27 +209,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">Which waterfall do we visit? <span class="arrow">▼</span></div>
+        <div class="faq-q">Which waterfall do we visit? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Wli Falls — the highest waterfall in West Africa at over 80 metres. We hike to the beautiful lower falls, which is accessible to most fitness levels.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What is the rope suspension bridge? <span class="arrow">▼</span></div>
+        <div class="faq-q">What is the rope suspension bridge? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">The Tafi Atome rope bridge is a thrilling walk above the forest canopy — great views and a genuine adrenaline moment. One of the most photographed spots in the Volta Region.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How long is the drive from Accra? <span class="arrow">▼</span></div>
+        <div class="faq-q">How long is the drive from Accra? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">4–5 hours each way. We depart very early (around 4–5am) to make the most of daylight at the sites.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is the hike to the waterfall difficult? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is the hike to the waterfall difficult? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Moderate. The lower falls trail takes about 30–45 minutes on a forest path. Regular fitness is fine. Slippery in wet season — hiking shoes or sturdy trainers recommended.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is lunch included? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is lunch included? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. Lunch at a local Volta Region restaurant is included in the tour price.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I bring? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I bring? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Hiking shoes, a light rain jacket (the waterfall area is misty), swimwear if you want to swim in the pool at the base, and a change of clothes.</div>
       </div>
     </div>

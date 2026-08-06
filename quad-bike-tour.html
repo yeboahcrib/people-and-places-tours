@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -208,27 +209,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">Do I need riding experience? <span class="arrow">▼</span></div>
+        <div class="faq-q">Do I need riding experience? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">None at all. You'll receive a full safety briefing and practice time on a flat area before heading out on the trails.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What age is required? <span class="arrow">▼</span></div>
+        <div class="faq-q">What age is required? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">You must be at least 16 years old to ride solo. Younger participants or those who prefer can ride as a passenger behind a guide.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is lunch included? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is lunch included? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. Lunch at the beautiful Peduase Lodge with panoramic mountain views is included in your tour price.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I wear? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I wear? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Closed-toe shoes and long trousers. Helmets are provided. Wear clothes you don't mind getting dusty.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What are the waterfalls like? <span class="arrow">▼</span></div>
+        <div class="faq-q">What are the waterfalls like? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Scenic and refreshing. The trail leads to a natural waterfall in lush green terrain — perfect for a swim or cool-off after the ride.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is the quad biking physically demanding? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is the quad biking physically demanding? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Moderate. Steering on uneven terrain takes some arm strength, but most people find it completely manageable. It's fun from the first minute.</div>
       </div>
     </div>

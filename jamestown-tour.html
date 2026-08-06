@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -221,27 +222,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">Where does the walk start? <span class="arrow">▼</span></div>
+        <div class="faq-q">Where does the walk start? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">We meet at the Jamestown Lighthouse — one of Accra's oldest landmarks — and begin the walk from there.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How long is the walk? <span class="arrow">▼</span></div>
+        <div class="faq-q">How long is the walk? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">About 2–3 hours at a relaxed pace, with stops for conversations, photos, and street food along the way.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is it safe? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is it safe? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. Our guides are connected to Jamestown and known in the community. You're in trusted, local hands.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Will we meet local residents? <span class="arrow">▼</span></div>
+        <div class="faq-q">Will we meet local residents? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">That's the entire point. Your guide has real relationships throughout the neighborhood — expect genuine, unscripted conversations.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is this good for photographers? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is this good for photographers? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Brilliantly so. Every alley, mural, fishing boat, and face is a photograph. Early morning has the best light.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I bring? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I bring? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Comfortable shoes, a camera, and an open mind. Leave preconceptions at the hotel — this neighborhood will surprise you.</div>
       </div>
     </div>

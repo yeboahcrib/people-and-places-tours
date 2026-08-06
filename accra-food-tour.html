@@ -94,14 +94,15 @@
     .faq{border-top:1px solid #e5e7eb;}
     .faq-item{border-bottom:1px solid #e5e7eb;}
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
-    .faq-q .arrow{color:var(--muted-dark);transition:transform .2s;flex-shrink:0;}
+    
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
-    .faq-item.open .faq-q .arrow{transform:rotate(180deg);}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}
+      .faq-q .faq-q-icon{color:var(--muted-dark);}
+    .faq-item.open .faq-q .faq-q-icon{background:var(--color-primary);border-color:var(--color-primary);color:var(--pap-charcoal);}
   </style>
 </head>
 <body>
@@ -222,27 +223,27 @@
     <h2 style="margin-bottom:1.5rem;">Got Questions? We've Got Answers.</h2>
     <div class="faq">
       <div class="faq-item">
-        <div class="faq-q">What time does this tour start? <span class="arrow">▼</span></div>
+        <div class="faq-q">What time does this tour start? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Evening tour. We pick you up around 6:30–7pm, when Accra's night food scene starts coming alive.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">How many food stops are there? <span class="arrow">▼</span></div>
+        <div class="faq-q">How many food stops are there? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Typically 4–6 stops — a mix of street stalls, chop bars, and local restaurants that Accra residents actually eat at, far from hotel buffets.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Will there be enough food? <span class="arrow">▼</span></div>
+        <div class="faq-q">Will there be enough food? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Plenty. You'll leave full. Each stop is a real portion, not a small bite.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Are vegetarian options available? <span class="arrow">▼</span></div>
+        <div class="faq-q">Are vegetarian options available? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Yes. Let us know when booking and we'll ensure each stop has solid vegetarian options ready.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">Is it safe to eat street food? <span class="arrow">▼</span></div>
+        <div class="faq-q">Is it safe to eat street food? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Completely. Our guides take you only to vendors they know personally — high turnover, fresh ingredients, loyal local crowds.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What should I wear? <span class="arrow">▼</span></div>
+        <div class="faq-q">What should I wear? <span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span></div>
         <div class="faq-a">Casual and comfortable. This is a street crawl, not a sit-down dinner. Wear clothes you can move freely in.</div>
       </div>
     </div>
