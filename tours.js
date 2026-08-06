@@ -82,7 +82,7 @@
       image: 'https://images.unsplash.com/photo-1672537627568-3530c83694f6?auto=format&fit=crop&w=800&q=80&h=560',
       packageImage: 'https://images.unsplash.com/photo-1672537627568-3530c83694f6?auto=format&fit=crop&w=800&q=80&h=550',
       alt: 'Accra food and nightlife tour',
-      description: 'Discover Accra after dark through waakye stalls, kelewele vendors, rooftop bars, chop bars, and night markets.',
+      description: 'Eat your way through Accra after dark: waakye stalls, kelewele vendors, rooftop bars, chop bars, and night markets.',
       packageDescription: 'From waakye stalls to kelewele vendors and rooftop bars - taste Accra\'s legendary food scene as the city lights up at night.',
       commandSummary: 'Waakye, kelewele, chop bars, night markets',
       packageOrder: 3
@@ -280,7 +280,7 @@
       packageImage: 'https://images.unsplash.com/photo-1636739970121-6eeb25262090?auto=format&fit=crop&w=800&q=80&h=550',
       alt: 'Aburi Botanical Gardens day tour',
       description: 'Escape Accra for cool Aburi hills, botanical gardens, cocoa history, waterfalls, and scenic views.',
-      packageDescription: 'Escape the Accra heat to the lush Aburi Botanical Gardens in the hills. Cool air, exotic trees, and panoramic views of the plains below.',
+      packageDescription: 'Escape the Accra heat to the lush Aburi Botanical Gardens in the hills. Cool air, towering trees, and panoramic views of the plains below.',
       commandSummary: 'Botanical Gardens, hill views, cocoa farm',
       packageOrder: 12
     },

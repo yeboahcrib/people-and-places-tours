@@ -9,7 +9,7 @@
         src: 'https://cdn.prod.website-files.com/651d7335c96bc896d80e6981/65403a4d370634439edde7cc_1030%20(1)(1)-transcode.mp4',
       },
       headline: 'The People Make the Place.',
-      sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets they call home.',
+      sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets we call home, whether you are seeing them for the first time or coming back to them.',
       cta: { label: 'See Ghana With Us', href: 'packages.html' },
     },
     founderStory: {
@@ -20,17 +20,17 @@
         { initials: 'IY', name: 'Isaac Yeboah', preferredName: 'Nana Yeboah', role: 'Co-founder & Tech Lead' },
         { initials: 'EY', name: 'Evans Yirenkyi', preferredName: 'Kojo', role: 'Co-founder & Manager' },
       ],
-      trustNote: 'Helping travelers discover Ghana with locals since 2021',
+      trustNote: 'Welcoming first-time visitors and people coming home since 2021',
       cta: { label: 'Read our full story', href: 'about.html' },
     },
     waysToExperience: {
       eyebrow: 'Where Ghana Begins For You',
       title: 'What Pulls You In?',
-      intro: 'Some people come looking for history. Others follow the food, the landscape, or the chance to make something with their own hands. Start with what feels closest to you. We’ll introduce you to the people and places behind it.',
+      intro: 'Some people come looking for history, or for the places their family came from. Others follow the food, the landscape, or the chance to make something with their own hands. Start with what feels closest to you. We’ll introduce you to the people and places behind it.',
       pathways: [
         {
           title: 'History & Memory',
-          text: 'Cape Coast, Elmina, Jamestown, and Kumasi are places where Ghana’s history is still carried in walls, streets, and family stories.',
+          text: 'Cape Coast, Elmina, Jamestown and Kumasi hold histories still carried in walls, streets and family stories. For some who come, they are also personal.',
           href: 'packages.html?category=heritage',
           image: { src: 'assets/photos/pathway-heritage-cannons.jpg', width: 900, height: 900, alt: 'Cannons along the fort ramparts overlooking the Atlantic at Cape Coast' },
         },
@@ -175,7 +175,7 @@
     },
     finalInvitation: {
       eyebrow: 'Ready When You Are',
-      headline: 'Ready to Experience Ghana Like a Local?',
+      headline: 'Ready to See Ghana With People Who Live Here?',
       body: 'Tell us what kind of time in Ghana feels right for you. We’ll listen, answer your questions, and plan it with you.',
       cta: { label: 'Start Planning', href: 'contact.html' },
       secondaryCta: {
