@@ -96,6 +96,37 @@ function validate(payload) {
   return null;
 }
 
+// A booking reference a person can say out loud: "P P dash K 7 M 2 Q X".
+//
+// The alphabet leaves out 0, O, 1, I and L on purpose. Those are the pairs
+// people mishear and mistype, and this string's whole job is to survive being
+// read down a phone line, written on paper, and typed back into an email by
+// somebody who is excited about a trip rather than concentrating.
+//
+// Thirty-one characters to the power of six is about 890 million
+// combinations, which is far past what this company will ever issue. Uniqueness
+// that actually matters is handled by the idempotency key, not by this.
+const REFERENCE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+
+function bookingReference() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  let out = '';
+  for (const byte of bytes) {
+    // Reject the top of the byte range so every character stays equally
+    // likely; 248 is the largest multiple of 31 that fits in a byte.
+    if (byte >= 248) continue;
+    out += REFERENCE_ALPHABET[byte % REFERENCE_ALPHABET.length];
+    if (out.length === 6) break;
+  }
+  // Rejection can, very rarely, leave us short. Top up rather than return a
+  // stubby reference.
+  while (out.length < 6) {
+    out += REFERENCE_ALPHABET[Math.floor(Math.random() * REFERENCE_ALPHABET.length)];
+  }
+  return `PP-${out}`;
+}
+
 function inquiryText(payload, requestId) {
   return [
     `Inquiry reference: ${requestId}`,
@@ -173,7 +204,18 @@ async function handlePost({request, env}) {
     return json(503, {error: 'Inquiry delivery is not configured.'});
   }
 
+  // Two different identifiers, because they are asked to do opposite things.
+  //
+  // requestId is the idempotency key. Nobody ever sees it, so it should be as
+  // close to impossible to repeat as we can make it — a repeat would make
+  // Resend treat a second, genuine enquiry as a duplicate and silently drop it.
+  // A full UUID it stays.
+  //
+  // reference is what a guest reads back over the phone. It was the UUID too,
+  // which meant quoting thirty-six characters of hexadecimal to someone in
+  // Accra.
   const requestId = crypto.randomUUID();
+  const reference = bookingReference();
   const emailResponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -186,8 +228,10 @@ async function handlePost({request, env}) {
       to: [env.INQUIRY_TO_EMAIL],
       reply_to: payload.email,
       subject: `Tour inquiry: ${payload['tour-name'] || payload['tour-interest'] || 'General request'}`,
-      text: inquiryText(payload, requestId),
-      html: inquiryHtml(payload, requestId),
+      // The email carries the guest-facing reference, not the internal id —
+      // it has to be the string they will quote back when they reply.
+      text: inquiryText(payload, reference),
+      html: inquiryHtml(payload, reference),
     }),
   });
 
@@ -196,7 +240,7 @@ async function handlePost({request, env}) {
     return json(502, {error: 'Inquiry delivery could not be confirmed.'});
   }
 
-  return json(200, {ok: true, reference: requestId});
+  return json(200, {ok: true, reference});
 }
 
 export function onRequest(context) {

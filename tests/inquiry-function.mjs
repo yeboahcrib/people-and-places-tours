@@ -162,4 +162,27 @@ assert(!email.html.includes('<script>'));
 assert(!email.html.includes('<img src=x'));
 assert(email.html.includes('&lt;script&gt;'));
 
+// The booking reference is read aloud down a phone line, so its shape is a
+// promise to guests rather than an implementation detail. Guard all three
+// properties: the brand prefix, the fixed length, and — the one most likely to
+// be undone by someone "simplifying" the alphabet later — the absence of the
+// character pairs people mishear.
+const {reference} = JSON.parse(await response.clone().text());
+assert.match(reference, /^PP-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/,
+  `booking reference should look like PP-K7M2QX, got ${reference}`);
+assert(!/[0O1IL]/.test(reference.slice(3)),
+  `booking reference must avoid look-alike characters, got ${reference}`);
+
+// It must also be the string the guest sees in the email, or the reference they
+// quote will not match anything the team can find.
+assert(email.html.includes(reference), 'email should carry the guest-facing reference');
+assert(email.text.includes(reference), 'plain-text email should carry the reference too');
+
+// The idempotency key is deliberately NOT the guest reference: it guards
+// against a duplicate send, so it must stay a full UUID even though the
+// reference beside it is short.
+assert.match(providerRequest.init.headers['Idempotency-Key'],
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+  'idempotency key must remain a UUID, separate from the short reference');
+
 console.log('Inquiry function tests passed.');
