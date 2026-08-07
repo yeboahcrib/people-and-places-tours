@@ -29,29 +29,23 @@ for (const file of generatedHtmlFiles) {
   assert.equal((html.match(/<!-- shared: navigation -->/g) || []).length, 1, `${file} should contain one shared navigation`);
   assert(html.includes('href="tel:+233503673473"'), `${file} did not render site settings into navigation`);
   assert(!html.includes('{{'), `${file} contains an unresolved template token`);
-  // thanks.html used to be excluded here as "intentionally has no footer". That
-  // decision was reversed on 6 August 2026 after seeing the page in a browser:
-  // the hero ends partway down the viewport and, with nothing beneath it, the
-  // page reads as broken — the owner's first reaction was that it was "cut off
-  // to half". A distraction-free confirmation page is a legitimate design, but
-  // this is not one: it already carries the full navigation and two onward
-  // links, so removing only the footer bought no focus and cost the ending.
+  // Every page carries the footer, including thanks.html. A distraction-free
+  // confirmation page is a legitimate design, but this one already carries the
+  // full navigation and two onward links, so omitting only the footer gains no
+  // focus and leaves the page ending in blank space below the hero.
   const footerCount = (html.match(/<!-- shared: footer -->/g) || []).length;
   assert.equal(footerCount, 1, `${file} should contain one canonical shared footer`);
 
-  // `container` is what holds hero content inside the site's column. thanks.html
-  // and 404.html were both missing it and rendered with the heading and buttons
-  // flush against the left edge of the window — on 404 that had gone unnoticed
-  // entirely. It is a class on an element rather than a rule in the stylesheet,
-  // so nothing else can catch it going missing.
-  // Cloudflare serves /about and 308-redirects /about.html to it, so an
-  // internal link written with the extension costs a redirect round trip before
-  // the page starts loading. There were 546 of them.
+  // `container` holds hero content inside the site's column. Without it the
+  // heading and buttons sit flush against the window edge. It is a class on an
+  // element rather than a rule in the stylesheet, so nothing else catches it
+  // going missing.
+  // Cloudflare serves /about and 308-redirects /about.html to it, so a link
+  // written with the extension costs a redirect round trip.
   //
-  // This also guards something subtler that had already broken in production:
-  // script.js identifies the current page from the URL, and mixing the two
-  // forms is what killed the active navigation highlight and stopped tour pages
-  // reading their price from the catalogue. One consistent style, checked here.
+  // It also keeps one consistent style: script.js identifies the current page
+  // from the URL, and mixing the two forms breaks the active navigation
+  // highlight and the catalogue lookup on tour detail pages.
   const extensionLinks = (html.match(/\b(?:href|src)="[a-z0-9][a-z0-9-]*\.html(?:[?#][^"]*)?"/g) || []);
   assert.equal(extensionLinks.length, 0,
     `${file} still links to .html URLs, which redirect on Cloudflare: ${extensionLinks.slice(0, 3).join(', ')}`);
@@ -65,20 +59,18 @@ for (const file of generatedHtmlFiles) {
   // Every stylesheet and script must carry a content hash.
   //
   // Cloudflare caches these for four hours and the _headers rule intended to
-  // shorten that is not applied, so without a hash in the URL a returning
-  // visitor runs old JavaScript against new HTML after every deploy — two
-  // versions of the site at once, with nothing reporting an error. Measured on
-  // the live site: cf-cache-status HIT, age 1151, serving a script that was
-  // missing a function the deployed commit had added.
+  // shorten that is not applied, so without a changing URL a returning visitor
+  // runs stale JavaScript against new HTML after a deploy, with no error
+  // raised.
   for (const asset of html.match(/\b(?:href|src)="[a-z0-9][a-z0-9-]*\.(?:css|js)(?:\?[^"]*)?"/g) || []) {
     assert.match(asset, /\?v=[a-f0-9]{10}"/,
       `${file} references an asset with no content hash, so a cached copy can outlive a deploy: ${asset}`);
   }
 
   // The booking form must post to our own Function on any build that has one.
-  // This was decided at runtime from the hostname, which silently stopped being
-  // true the moment the custom domain went live — enquiries went to FormSubmit
-  // instead, bypassing Turnstile and Resend, with nothing reporting an error.
+  // Deciding this at runtime from the hostname cannot distinguish a custom
+  // domain with a Function from one without, and getting it wrong routes
+  // enquiries to the fallback endpoint with no error raised.
   const inquiryMode = html.match(/data-inquiry-mode="([^"]*)"/)?.[1];
   if (inquiryMode !== undefined) {
     const expected = process.env.CF_PAGES ? 'cloudflare' : 'fallback';

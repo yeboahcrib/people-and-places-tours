@@ -101,10 +101,9 @@ function serveDist() {
   assert(packageState.inquiryLinks === 15, 'JavaScript-free inquiry links are incomplete');
   assert(packageState.width <= packageState.viewport + 1, `JavaScript-free packages page overflows horizontally: ${JSON.stringify(packageState.overflowing)}`);
 
-  // The contact form is the only page on the site where a JavaScript failure
-  // costs money rather than polish, and it was the one page this suite never
-  // opened. Everything above checks that content still renders; these check
-  // that a visitor can still actually reach the team.
+  // The contact form is the page where a JavaScript failure costs an enquiry
+  // rather than polish. Everything above checks that content still renders;
+  // these check that a visitor can still reach the team.
   const contact = await context.newPage();
   await contact.goto(`${BASE_URL}/contact.html`, {waitUntil: 'load'});
   const formState = await contact.evaluate(() => {
@@ -133,9 +132,8 @@ function serveDist() {
   assert(formState.action.startsWith('http'), 'JavaScript-free form has no absolute action to post to');
   assert(formState.method === 'POST', `JavaScript-free form method is ${formState.method}`);
 
-  // The bug this was written for: with the attribute in the markup, nothing
-  // validated the form when the script was absent, so an enquiry could arrive
-  // with no email address on it and no way to answer it.
+  // With the attribute in the markup nothing validates the form when the
+  // script is absent, so an enquiry can arrive with no address to reply to.
   assert(!formState.hasNoValidateAttribute,
     'contact form carries novalidate in the markup, so a visitor without JavaScript gets no validation at all');
 
@@ -145,19 +143,17 @@ function serveDist() {
   }
 
   // FormSubmit's built-in CAPTCHA is reCAPTCHA, which needs JavaScript to draw
-  // its checkbox — and everyone who reaches FormSubmit got there by not having
-  // JavaScript. Leaving it on ended the fallback on "help us fight spam" above
-  // a box that could never render, with no way to continue. A fallback for
-  // people without JavaScript must not itself require JavaScript.
+  // its checkbox — and every visitor who reaches FormSubmit does so because
+  // JavaScript is unavailable. Left on, the fallback dead-ends on a challenge
+  // that can never render.
   assert(formState.captchaDisabled,
     'FormSubmit CAPTCHA is not disabled; the no-JavaScript path ends on a challenge that cannot render without JavaScript');
   assert(formState.formSubmitHoneypot,
     'FormSubmit honeypot (_honey) is missing, so nothing replaces the CAPTCHA that was turned off');
 
-  // The experience dropdown was built only by script.js, so without JavaScript
-  // it offered one choice — "I'm open to ideas" — and a visitor had no way to
-  // name the experience they were writing about. The enquiry still arrived; it
-  // just arrived missing the single detail that makes it answerable.
+  // The experience list must be present in the HTML. Built only by script.js,
+  // the dropdown offers a single choice without JavaScript and the enquiry
+  // arrives with no indication of which experience it concerns.
   assert(formState.tourOptions > 5,
     `JavaScript-free experience dropdown offers only ${formState.tourOptions} option(s); the tour list is not in the HTML`);
   assert(formState.tourOptionLabels.includes("I'm open to ideas"),

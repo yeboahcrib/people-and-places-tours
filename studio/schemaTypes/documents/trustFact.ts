@@ -4,7 +4,7 @@ export const trustFact = defineType({
   name: 'trustFact',
   title: 'Trust Fact',
   type: 'document',
-  description: 'The productionized version of the Sprint 1 Claim Register — one record per approved public fact.',
+  description: 'One record per approved public fact.',
   fields: [
     defineField({name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required()}),
     defineField({name: 'value', title: 'Value', type: 'string', validation: (Rule) => Rule.required()}),

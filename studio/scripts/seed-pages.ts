@@ -124,20 +124,13 @@ async function run() {
   await transaction.commit()
   console.log('  written')
 
-  // The menu, the footer columns and the contact details are synced in full,
-  // not just the tagline.
+  // The menu, footer columns and contact details are synced in full. Patching
+  // only the tagline leaves the rest of these two documents to drift from what
+  // the site renders, which is not visible until the build reads from Sanity.
   //
-  // Only footerTagline used to be patched here, so everything else in these two
-  // documents kept whatever it was first given. By the time the site was ready
-  // to read from Sanity they had drifted badly: the menu still said "Packages"
-  // where the site says "Experiences", the footer listed "About Us" and "All
-  // Packages", and the international phone number was missing entirely.
-  // Switching the build over would have silently reverted all of it — caught
-  // only by diffing a Sanity build against a local one before flipping.
-  //
-  // src/content/site.json is what the live site renders today, so it is the
-  // truth this restores. After the switch, Sanity becomes the source and this
-  // script is for repair rather than routine use.
+  // src/content/site.json is the committed content the site renders, so it is
+  // the source this restores. Once the build reads from Sanity, Sanity becomes
+  // the source and this script is for repair rather than routine use.
   console.log('\nSyncing navigation and contact details...')
   const site = readJson('src/content/site.json')
   await client
@@ -157,7 +150,7 @@ async function run() {
   const removed = await removeHiddenSections()
   console.log(`  removed ${removed}`)
 
-  console.log('\nDone. Tell Claude it finished and it will verify the site reads them.')
+  console.log('\nDone. Rebuild the site to confirm it reads the new content.')
 }
 
 run().catch(error => {

@@ -12,7 +12,7 @@ export const review = defineType({
       title: 'Full source text (verbatim)',
       type: 'text',
       validation: (Rule) => Rule.required(),
-      description: 'Exact wording from the source — never rewritten, never cleaned up (Sprint 1 non-negotiable #5). Enforce "no edits after initial entry" via role permissions (Reviewer/Editor can create, only Administrator can amend) rather than a schema-level lock, which needs custom document actions beyond this first-pass schema.',
+      description: 'Exact wording from the source — never rewritten, never cleaned up. Enforce "no edits after initial entry" via role permissions (Reviewer/Editor can create, only Administrator can amend) rather than a schema-level lock, which needs custom document actions beyond this first-pass schema.',
     }),
     defineField({
       name: 'selectedExcerpt',
@@ -40,7 +40,7 @@ export const review = defineType({
       title: 'Hosts named',
       type: 'array',
       of: [{type: 'string'}],
-      description: 'e.g. "Kojo", "Nana" — don\'t attribute an unnamed review to a founder to manufacture symmetry (Sprint 1 Review Register).',
+      description: 'e.g. "Kojo", "Nana" — don\'t attribute an unnamed review to a founder to manufacture symmetry.',
     }),
     defineField({name: 'media', title: 'Optional related media', type: 'array', of: [{type: 'mediaAsset'}]}),
     defineField({name: 'trust', title: 'Trust & provenance', type: 'trustFields'}),

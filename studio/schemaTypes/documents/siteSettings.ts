@@ -20,7 +20,7 @@ export const siteSettings = defineType({
       title: 'International phone',
       type: 'string',
       initialValue: '+1 803 477 6489',
-      description: 'Labelled for diaspora/international guests specifically, per the Sprint 1 Claim Register decision.',
+      description: 'Labelled for diaspora/international guests specifically, a deliberate decision.',
     }),
     defineField({name: 'email', title: 'Public email', type: 'string'}),
     defineField({name: 'hours', title: 'Business hours', type: 'string', initialValue: 'Monday–Friday, 9:00 a.m.–5:00 p.m.'}),

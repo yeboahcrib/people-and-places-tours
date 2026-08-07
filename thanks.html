@@ -60,15 +60,12 @@
   </section>
 </main>
 
-<!-- The build replaces this with the shared footer (scripts/shared-shell.mjs).
-     The element has to exist first: replaceFooter swaps one that is already
-     there and quietly does nothing when the page has none. That is why this
-     page shipped with no footer while every other page had one — it simply
-     stopped below the hero, leaving a band of empty white on the screen
-     someone sees immediately after trusting us with their details.
-     Do not write element names in angle brackets in comments here; both this
-     replacement and the markup checker search the raw HTML and will match the
-     example instead of the real thing. -->
+<!-- Replaced at build time with the shared footer (scripts/shared-shell.mjs).
+     The element must exist first: replaceFooter swaps an existing one and does
+     nothing when a page has none.
+     Avoid writing element names in angle brackets in comments on this page —
+     the footer replacement and the markup checker both scan the raw HTML and
+     would match the example rather than the real element. -->
 <footer class="footer" role="contentinfo"></footer>
 
 <script src="tours.js"></script>

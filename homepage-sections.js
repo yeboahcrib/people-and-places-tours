@@ -87,7 +87,7 @@
 
   function renderHeroSection(data) {
     return `
-<!-- Claude Code focus: Hero — editorial bottom-left layout. Keep text out of the media's centre. -->
+<!-- Hero — editorial bottom-left layout. Keep text out of the media's centre. -->
 <section class="v-hero" aria-label="Hero" data-home-section="hero">
   <div class="v-hero-video-wrap" aria-hidden="true">
     ${renderHeroMedia(data)}
@@ -104,7 +104,7 @@
 
   function renderFounderStorySection(data) {
     return `
-<!-- Claude Code focus: Founder story — editorial split, real founders behind neutral initials placeholders (no stock photos). -->
+<!-- Founder story — editorial split, real founders behind neutral initials placeholders (no stock photos). -->
 <section class="founder-story-section white-lift section-pad" aria-label="Our founders" data-home-section="founderStory">
   ${renderWeaveMotif('founder')}
   <div class="container">
@@ -162,7 +162,7 @@
 
   function renderHowHostedSection(data) {
     return `
-<!-- Claude Code focus: Hosting principles, each backed by a real, unedited review excerpt. -->
+<!-- Hosting principles, each backed by a real, unedited review excerpt. -->
 <section class="why-section" aria-label="How you're hosted" data-home-section="howHosted">
   ${renderWeaveMotif('hosted')}
   ${renderWeaveMotif('hosted-lower')}
@@ -193,7 +193,7 @@
 
   function renderBookingStepsSection(data) {
     return `
-<!-- Claude Code focus: Booking steps are content-driven and can be redesigned without touching form logic. -->
+<!-- Booking steps are content-driven and can be redesigned without touching form logic. -->
 <section class="process-section white-lift section-pad" aria-label="How it works" data-home-section="planningProcess">
   <div class="container">
     <div class="section-split" style="margin-bottom:var(--sp-8)">
@@ -222,7 +222,7 @@
 
   function renderReviewsAndTrustSection(data) {
     return `
-<!-- Claude Code focus: Review cards and section header image are isolated here. -->
+<!-- Review cards and section header image are isolated here. -->
 <section class="testimonials-section" aria-label="What travellers say" data-home-section="reviewsAndTrust">
   <div class="sec-img-head">
     ${renderImage(data.heroImage, 'sec-img-head-media', 'loading="lazy" sizes="100vw"')}
@@ -284,7 +284,7 @@
 
   function renderFinalInvitationSection(data) {
     return `
-<!-- Claude Code focus: Closing CTA + contact reassurance. Replaces the premature newsletter signup (see Sprint 7 in the roadmap). -->
+<!-- Closing CTA and contact reassurance. -->
 <section class="final-invitation-section section-pad" aria-label="Plan your trip" data-home-section="finalInvitation">
   <div class="container final-invitation-inner">
     <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
@@ -327,8 +327,8 @@
   function renderHomepage() {
     const root = document.getElementById('homepage-root');
     if (!root || !content) return;
-    // Cloudflare receives homepage HTML generated at build time (including
-    // Sanity content). Only the legacy GitHub Pages source has an empty root.
+    // The deployed homepage is generated at build time, so its root already
+    // has children. Only the un-built source tree leaves it empty.
     if (root.children.length) return;
     root.innerHTML = renderHomepageMarkup(content);
   }

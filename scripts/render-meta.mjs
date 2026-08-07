@@ -6,16 +6,13 @@
 // from the <title> and description each page already carries. Editors keep
 // maintaining one title and one description; everything else follows.
 //
-// The site URL is a single build variable so the GitHub Pages host, a
-// pages.dev preview and the eventual custom domain all emit correct absolute
-// URLs without a code change. sitemap.xml and robots.txt read the same value.
+// The site URL is a single build variable so the production domain and any
+// preview host emit correct absolute URLs without a code change. sitemap.xml
+// and robots.txt read the same value.
 //
-// The default is the real domain, not the GitHub Pages host. It used to be the
-// latter, which meant a build that simply forgot to set SITE_URL would emit
-// canonical tags pointing at a different domain — telling Google the old site
-// was the authoritative one and competing with itself in search. A missing
-// variable should degrade to the right answer, not a quietly wrong one.
-// Override it per-environment (a pages.dev preview should set its own).
+// The default is the production domain so a build that omits SITE_URL degrades
+// to the correct answer rather than emitting canonical tags for another host.
+// Preview environments should set their own value.
 
 export const DEFAULT_SITE_URL = 'https://peopleplacesgh.com';
 

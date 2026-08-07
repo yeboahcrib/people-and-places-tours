@@ -60,8 +60,8 @@ const renderFaqs = faqs => faqs.map((faq, index) => `
           </li>`).join('');
 
 // The Turnstile site key is public, but it differs per environment and must be
-// absent where there is no Function to verify against — on GitHub Pages the
-// empty value keeps the widget script from loading at all.
+// absent where there is no Function to verify against: an empty value keeps the
+// widget script from loading at all.
 export function injectTurnstileSiteKey(html, siteKey) {
   if (!html.includes('data-turnstile-sitekey')) return html;
   const key = String(siteKey || '').trim();
@@ -73,17 +73,14 @@ export function injectTurnstileSiteKey(html, siteKey) {
  * Decide at build time whether the booking form posts to our own Function or
  * falls back to FormSubmit.
  *
- * script.js used to work this out at runtime with
- * `location.hostname.endsWith('.pages.dev')`, which was true for the preview
- * address and false for the real domain. The day peopleplacesgh.com went live,
- * every enquiry with JavaScript silently started going to FormSubmit instead —
- * no Turnstile, no Resend, arriving in a different inbox. Nothing failed; it
- * just quietly stopped using the thing we built.
+ * The build knows which host it is producing for; the runtime does not. A
+ * hostname test at runtime cannot distinguish a custom domain with a Function
+ * from one without, and getting it wrong routes enquiries to the fallback
+ * endpoint with no error raised.
  *
- * The build knows which host it is producing for, and the runtime does not, so
- * the decision belongs here. `CF_PAGES` is set by Cloudflare Pages during its
- * builds and by nothing else, so a local or GitHub Pages build still gets the
- * fallback — correct, because neither can run a Function.
+ * `CF_PAGES` is set by Cloudflare Pages during its builds and by nothing else,
+ * so a build produced anywhere else gets the fallback, which is correct
+ * because it cannot run a Function.
  */
 export function injectInquiryMode(html, isCloudflareBuild) {
   if (!html.includes('data-inquiry-mode')) return html;

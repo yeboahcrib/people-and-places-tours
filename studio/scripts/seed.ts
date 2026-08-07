@@ -1,15 +1,14 @@
 /**
- * One-time content seed for Sprint 3A. Sources:
+ * Initial content seed for a fresh dataset. Sources:
  * - docs/sprint-1-tour-inventory.md (corrected tour fields)
  * - docs/sprint-1-review-source-register.md + the founder's Google Business
  *   Profile Takeout export (verbatim review text, real ratings/dates)
  * - docs/people-and-places-brand-foundation.md (origin story, founder bios)
  * - docs/sprint-1-claim-register.md (site settings facts)
  *
- * Deliberately NOT seeded here: featuredTourCollection (founders still need
- * to cut the current 6 down to the approved 3-5), trustFact/cta/policy/
- * homepageSection (Sprint 3B content work, not yet drafted), and all media —
- * no real approved photography exists yet.
+ * Not seeded here: featuredTourCollection, bookingFlow, aboutPage and
+ * homepageSection are handled by seed-pages.ts, and media is uploaded through
+ * the Studio rather than committed.
  *
  * Run from studio/: npx sanity exec scripts/seed.ts --with-user-token
  * Safe to re-run — every document uses a fixed _id via createOrReplace.

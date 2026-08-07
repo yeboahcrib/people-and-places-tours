@@ -118,26 +118,21 @@
           <form class="contact-form booking-flow" name="contact" action="https://formsubmit.co/peopandplaces@gmail.com" method="POST" aria-label="Start planning your Ghana experience" data-inquiry-mode="fallback" data-cloudflare-endpoint="/api/inquiry" data-turnstile-sitekey="">
             <input type="hidden" name="_subject" value="New tour inquiry from People & Places website">
             <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_next" value="https://yeboahcrib.github.io/people-and-places-tours/thanks.html">
+            <input type="hidden" name="_next" value="https://peopleplacesgh.com/thanks">
             <input type="hidden" name="source" value="Contact page inquiry">
             <input type="hidden" id="tour-name" name="tour-name" value="">
-            <!-- Turn off FormSubmit's own CAPTCHA.
-                 It is reCAPTCHA, which needs JavaScript to draw its checkbox —
-                 and the only people who ever reach FormSubmit are the ones
-                 without JavaScript. The fallback therefore ended on a page
-                 saying "help us fight spam" above a box that could not appear,
-                 with no way forward. The fallback for people without
-                 JavaScript cannot itself require JavaScript. -->
+            <!-- Disable FormSubmit's own CAPTCHA. It is reCAPTCHA, which needs
+                 JavaScript to render, and every visitor who reaches FormSubmit
+                 does so because JavaScript is unavailable — leaving it on would
+                 dead-end the fallback on a challenge that cannot appear. -->
             <input type="hidden" name="_captcha" value="false">
 
             <div class="form-honeypot" aria-hidden="true">
               <label for="company-website">Leave this field empty</label>
               <input type="text" id="company-website" name="company-website" tabindex="-1" autocomplete="off">
-              <!-- Two honeypots because two different services read them.
-                   `company-website` is checked by our own Function; `_honey` is
-                   the name FormSubmit looks for. Both stay empty for a person
-                   and get filled by a bot that completes every field, which is
-                   what replaces the CAPTCHA disabled above. -->
+              <!-- Two honeypots because two services read different names:
+                   `company-website` is checked by the inquiry Function, `_honey`
+                   by FormSubmit. Both replace the CAPTCHA disabled above. -->
               <input type="text" name="_honey" tabindex="-1" autocomplete="off">
             </div>
 
@@ -235,7 +230,7 @@
             <div class="booking-step-actions" data-booking-actions="2">
               <!-- Turnstile mounts here only when a site key is injected at
                    build time. It stays empty and inert otherwise, so the
-                   GitHub Pages fallback loads no third-party script. -->
+                   deployment without one loads no third-party script. -->
               <div class="booking-turnstile" data-turnstile></div>
               <p class="form-error" role="alert"></p>
               <div class="booking-final-actions">

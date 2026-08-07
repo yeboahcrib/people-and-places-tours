@@ -30,9 +30,9 @@ assert.equal(response.status, 405);
 response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'not-an-email'});
 assert.equal(response.status, 400);
 
-// With no Turnstile secret configured, the honeypot is the only bot defence
-// left, so a filled trap is still discarded — quietly, and with no reference,
-// so a bot learns nothing from the response.
+// With no Turnstile secret configured the honeypot is the only bot defence, so
+// a filled trap is discarded — with no reference, so the response tells a bot
+// nothing.
 response = await invoke({
   'first-name': 'Bot',
   'last-name': 'Submission',
@@ -123,12 +123,10 @@ try {
 } finally { restore(); }
 assert.equal(response.status, 403);
 
-// The honeypot used to short-circuit before verification, to save a siteverify
-// call on obvious bots. That saving is not worth what it cost: browsers
-// autofill hidden fields, so it silently discarded real enquiries from people
-// whose browser filled the trap — success on screen, nothing delivered, no
-// error anywhere. Turnstile now runs first and, once it has confirmed a human,
-// a filled trap is treated as autofill rather than a bot.
+// Turnstile must be consulted before the honeypot. Short-circuiting on the
+// trap first saves a siteverify call on obvious bots, but browsers autofill
+// hidden fields, so it also discards genuine enquiries with no error raised.
+// Once Turnstile has confirmed a human, a filled trap indicates autofill.
 let siteverifyCalls = 0;
 restore = stubFetch(async url => {
   if (String(url) === siteverify) siteverifyCalls += 1;
@@ -177,11 +175,9 @@ assert(!email.html.includes('<script>'));
 assert(!email.html.includes('<img src=x'));
 assert(email.html.includes('&lt;script&gt;'));
 
-// A real person whose browser autofilled the hidden trap must still get
-// through. This is the bug that lost a live enquiry: the honeypot ran first and
-// unconditionally, so an autofilled field discarded the message before Turnstile
-// was ever consulted. The visitor saw success, nothing arrived, and no error was
-// recorded. Once Turnstile has confirmed a human, a filled trap is autofill.
+// A verified human whose browser autofilled the hidden trap must still be
+// delivered. Running the honeypot unconditionally discards the message before
+// Turnstile is consulted, and the visitor sees success either way.
 {
   const realFetch = globalThis.fetch;
   let sent = null;
@@ -213,11 +209,9 @@ assert(email.html.includes('&lt;script&gt;'));
     'a delivered enquiry must return a real reference, not fall back to "sent"');
 }
 
-// The booking reference is read aloud down a phone line, so its shape is a
-// promise to guests rather than an implementation detail. Guard all three
-// properties: the brand prefix, the fixed length, and — the one most likely to
-// be undone by someone "simplifying" the alphabet later — the absence of the
-// character pairs people mishear.
+// The booking reference is read aloud over the phone, so its shape is part of
+// the contract with guests: the prefix, the fixed length, and the absence of
+// characters that are commonly misheard.
 const {reference} = JSON.parse(await response.clone().text());
 assert.match(reference, /^PP-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$/,
   `booking reference should look like PP-K7M2QX, got ${reference}`);
@@ -229,9 +223,8 @@ assert(!/[0O1IL]/.test(reference.slice(3)),
 assert(email.html.includes(reference), 'email should carry the guest-facing reference');
 assert(email.text.includes(reference), 'plain-text email should carry the reference too');
 
-// The idempotency key is deliberately NOT the guest reference: it guards
-// against a duplicate send, so it must stay a full UUID even though the
-// reference beside it is short.
+// The idempotency key is deliberately not the guest reference: it guards
+// against duplicate sends and must stay a full UUID.
 assert.match(providerRequest.init.headers['Idempotency-Key'],
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
   'idempotency key must remain a UUID, separate from the short reference');

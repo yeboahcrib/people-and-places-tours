@@ -2,35 +2,28 @@
    PEOPLE & PLACES TOURS — Main JavaScript
    ============================================================ */
 
-/* Identify a page by name, whatever shape its URL happens to take.
+/* Identify a page by name, independent of how its URL is written.
  *
- * Cloudflare Pages serves clean URLs: the About page is /about, not
- * /about.html. Several things here identified the current page by comparing
- * raw strings — `location.pathname.split('/').pop()` against hrefs like
- * "about.html" — which matched on GitHub Pages and stopped matching the day
- * the custom domain went live. Two visible consequences: no navigation link
- * was ever highlighted as current, and tour detail pages silently stopped
- * picking up their price and duration from the catalogue.
+ * Cloudflare Pages serves clean URLs, so the About page is /about while links
+ * and catalogue data may still say "about.html". Comparing raw strings fails
+ * across that difference. Normalising both sides accepts "about.html",
+ * "/about", "about", "/about?x=1#y" and a trailing slash alike; "" and "/"
+ * both mean the homepage.
  *
- * Normalising both sides is deliberately more forgiving than switching every
- * link to one style. It holds for "about.html", "/about", "about",
- * "/about?x=1#y" and a trailing slash alike, so no future change to how links
- * are written can break it again. "" and "/" both mean the homepage.
+ * Used for the active navigation link and for matching a tour detail page to
+ * its catalogue entry.
  */
-/* The address to link to, for a page name that may still carry .html.
+/* Convert a page name that may carry .html into the address to link to.
  *
- * Tour data stores detailUrl as the real filename ("cape-coast-tour.html"),
- * which is correct — that is the file. But Cloudflare serves it at
- * /cape-coast-tour and redirects the other form, and these links are built in
- * the browser after the build's link rewriting has already run. Without this
- * the tour grid and the search palette were the only places on the site still
- * costing a redirect on every click.
+ * Tour data stores detailUrl as the real filename; Cloudflare serves it
+ * without the extension and redirects the other form. These links are built
+ * in the browser, after the build's link rewriting has run, so they need
+ * converting here to avoid a redirect on every click.
  */
-/* Named hrefForPage, not pageHref: a local `const pageHref` already exists in
- * the navigation block below, in the same scope as the callers. Declaring this
- * as pageHref put every call in that const's temporal dead zone, so the first
- * one threw on load and took the rest of the page's JavaScript with it — the
- * search palette rendered nothing. Caught by the smoke suite. */
+/* Named hrefForPage rather than pageHref: a local `const pageHref` exists in
+ * the navigation block below, in the same scope as this function's callers.
+ * Reusing that name places every call in the constant's temporal dead zone,
+ * which throws on load and halts the rest of the script. */
 function hrefForPage(value) {
   const raw = String(value || '');
   const [path, suffix = ''] = [raw.split(/(?=[?#])/)[0], raw.slice(raw.split(/(?=[?#])/)[0].length)];
@@ -69,16 +62,13 @@ function pageKey(value) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* Keep the cinematic hero efficient and respectful of motion preferences.
-     The background video stops whenever it is offscreen or the tab is hidden.
+  /* Keep the hero efficient and respectful of motion preferences: the
+     background video pauses whenever it is offscreen or the tab is hidden.
 
-     The hero can be a still image instead of a video — it is one today, while
-     the borrowed footage is out and People & Places' own is not yet shot — and
-     an <img> has no play() or pause(). Checking the tag rather than assuming
-     matters more than it looks: when this ran unguarded it threw on the first
-     line of DOMContentLoaded and took every later feature on the page down
-     with it, including the search palette. One unguarded assumption about the
-     hero was enough to break the whole homepage. */
+     The selector is tag-qualified because the hero may hold a still image
+     instead, and an <img> has no play() or pause(). An unguarded call here
+     throws on the first line of DOMContentLoaded and stops every later
+     feature on the page from initialising. */
   const homepageHeroVideo = document.querySelector('video.v-hero-video');
   if (homepageHeroVideo) {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -737,32 +727,26 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── CONTACT FORM ── */
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
-    // Turn the browser's own validation off here rather than in the markup.
+    // Disable native validation from script rather than with a `novalidate`
+    // attribute in the markup.
     //
-    // `novalidate` used to be an attribute on the <form>, which meant it
-    // applied even when this script never ran — and this script is the only
-    // other thing validating. A visitor whose JavaScript failed could submit
-    // the form with no email address in it, and the enquiry would arrive with
-    // no way to reply to it. The attribute was there to stop the browser
-    // interrupting the step-by-step flow, which is a reason that only exists
-    // when the flow exists.
-    //
-    // Setting it from script means the browser enforces the required fields
-    // for anyone without JavaScript, and hands over to our own validation for
-    // everyone else.
+    // The attribute exists to stop the browser interrupting the step-by-step
+    // flow, which only runs when this script does. In the markup it would also
+    // apply when the script fails to load, leaving nothing validating at all —
+    // an enquiry could then be submitted without an email address to reply to.
+    // Setting it here means the browser enforces the required fields for
+    // visitors without JavaScript.
     contactForm.noValidate = true;
 
-    // `data-inquiry-mode` is written by the build, which knows whether it is
-    // producing a deployment that has a Function behind it. That is the source
-    // of truth.
+    // `data-inquiry-mode` is written by the build, which knows whether the
+    // deployment it is producing has a Function behind it. That is the source
+    // of truth; the hostname check below is only a fallback for *.pages.dev
+    // previews.
     //
-    // The hostname check is kept only as a safety net for a preview served
-    // from *.pages.dev. It used to be the *primary* test, which worked right
-    // up until the custom domain went live: peopleplacesgh.com does not end in
-    // .pages.dev, so every enquiry quietly began going to FormSubmit instead of
-    // our own endpoint — skipping Turnstile and Resend, and landing in a
-    // different inbox. Nothing errored, which is why it took a person noticing
-    // the wrong page to find it. Do not infer environment from the hostname.
+    // Do not infer the environment from the hostname alone. A hostname test
+    // cannot distinguish a custom domain with a Function from one without, and
+    // getting it wrong sends enquiries to the fallback endpoint — bypassing
+    // Turnstile and the configured delivery address, with no error raised.
     const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
 
     // FormSubmit needs an absolute redirect target, and a hard-coded one 404s
@@ -974,10 +958,9 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Sending…';
       btn.disabled = true;
 
-      // GitHub Pages cannot execute server code. Until Cloudflare cutover, keep
-      // the form's native FormSubmit action as a working fallback. A pages.dev
-      // preview (or explicit data-inquiry-mode="cloudflare") uses our same-origin
-      // Pages Function instead.
+      // A deployment without a Pages Function keeps the form's native
+      // FormSubmit action as a working fallback. Where a Function is available
+      // the submission is sent to the same-origin endpoint instead.
       if (!useCloudflareInquiry) return;
       e.preventDefault();
 

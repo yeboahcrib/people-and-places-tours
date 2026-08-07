@@ -1,24 +1,17 @@
 ## Cloudflare Pages deployment headers.
-## GitHub Pages ignores this file while the site is hosted there.
 ##
-## Three hosts in the policy exist for a specific reason and must not be
-## trimmed as "unused" — nothing on the page references them in markup:
-##   challenges.cloudflare.com  Turnstile. Loads a script AND renders inside an
+## These hosts are required by the live site but appear nowhere in the page
+## markup, so they must not be trimmed as unused:
+##   challenges.cloudflare.com  Turnstile. Loads a script and renders inside an
 ##                              iframe, so it needs script-src, frame-src and
-##                              connect-src. frame-src was 'none' and would
-##                              have silently broken the booking form.
-##   cdn.sanity.io              Where photographs uploaded to the CMS are
-##                              served from. Blocked here means every real
-##                              photograph fails to load once Sanity is on.
-##   images.unsplash.com        The stock placeholders, until the shoot lands.
-##   *.cloudflareinsights.com   Cloudflare Web Analytics, which Cloudflare
-##                              injects into every page automatically. It was
-##                              being injected and then blocked, so the site
-##                              paid for the request and recorded nothing. The
-##                              script loads from static.cloudflareinsights.com
-##                              and reports to cloudflareinsights.com, so it
-##                              needs both script-src and connect-src. No
-##                              cookies, so no consent banner is required.
+##                              connect-src.
+##   cdn.sanity.io              Serves photographs uploaded to the CMS.
+##   images.unsplash.com        Stock placeholder imagery.
+##   *.cloudflareinsights.com   Web Analytics, injected automatically by
+##                              Cloudflare. The script loads from
+##                              static.cloudflareinsights.com and reports to
+##                              cloudflareinsights.com, so it needs both
+##                              script-src and connect-src. Sets no cookies.
 /*
   Strict-Transport-Security: max-age=31536000
   X-Frame-Options: DENY

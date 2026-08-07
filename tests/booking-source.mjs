@@ -111,7 +111,7 @@ assert(injectSiteContact(contactHtml, {email: '<script>x</script>'}).includes('&
 assert.equal(injectSiteContact('<p>no bindings</p>', settings), '<p>no bindings</p>');
 
 // ── Turnstile site key injection ──
-// Absent by default so the GitHub Pages build loads no challenge script.
+// Absent by default so a build with no Function loads no challenge script.
 const noKey = injectTurnstileSiteKey(contactHtml, undefined);
 assert(noKey.includes('data-turnstile-sitekey=""'), 'missing key should leave the attribute empty');
 

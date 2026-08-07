@@ -1,5 +1,5 @@
 (function () {
-  // Claude Code handoff: edit homepage copy, links, image URLs, and section ordering here.
+  // Homepage copy, links, image URLs and section ordering are edited here.
   // Keep visual class names in homepage-sections.js unless you are intentionally changing CSS.
   // Section keys match the approved 7-section homepage architecture in
   // docs/homepage-messaging-brief.md / studio/schemaTypes/documents/homepageSection.ts.

@@ -43,7 +43,7 @@ export const tour = defineType({
       type: 'boolean',
       group: 'catalogue',
       initialValue: true,
-      description: 'All 15 current tours confirmed active 2026-07-25 — see Sprint 1 Tour Inventory.',
+      description: 'All 15 current tours confirmed active 2026-07-25.',
     }),
     defineField({name: 'duration', title: 'Duration', type: 'string', group: 'catalogue', validation: (Rule) => Rule.required()}),
     defineField({name: 'locations', title: 'Locations', type: 'array', of: [{type: 'string'}], group: 'catalogue'}),
@@ -53,7 +53,7 @@ export const tour = defineType({
       type: 'string',
       group: 'catalogue',
       initialValue: 'Pickup and drop-off from Accra or your hotel, unless a different arrangement is requested.',
-      description: 'Standard policy confirmed 2026-07-25 — see Sprint 1 Tour Inventory. Override only for a genuine exception.',
+      description: 'Standard policy confirmed 2026-07-25. Override only for a genuine exception.',
     }),
     defineField({
       name: 'groupSizeMin',

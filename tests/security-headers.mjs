@@ -19,10 +19,10 @@ for (const directive of [
 const scriptDirective = cspLine.match(/script-src ([^;]+)/)?.[1] || '';
 assert(!scriptDirective.includes("'unsafe-inline'"), 'script-src must not allow unsafe-inline');
 
-// frame-src used to be 'none', which silently broke Turnstile: it renders in
-// an iframe, so the booking form's spam check would never appear. It is now an
-// allow-list of one. The protection that actually matters against clickjacking
-// is frame-ancestors, asserted above and still 'none'.
+// frame-src is an allow-list of one: Turnstile renders in an iframe, so
+// 'none' prevents the booking form's spam check from appearing at all. The
+// directive that guards against clickjacking is frame-ancestors, asserted
+// above and still 'none'.
 const frameDirective = cspLine.match(/frame-src ([^;]+)/)?.[1]?.trim() || '';
 assert.equal(frameDirective, 'https://challenges.cloudflare.com',
   'frame-src must allow Turnstile and nothing else');
@@ -34,9 +34,9 @@ for (const [host, directive] of [
   ['https://challenges.cloudflare.com', 'script-src'],
   ['https://cdn.sanity.io', 'img-src'],
   // Cloudflare injects the analytics beacon whether or not the policy allows
-  // it. Blocked, the page pays for the request and records nothing — so either
-  // both of these are present, or Web Analytics should be switched off in the
-  // dashboard. The half-state is the one thing that is never right.
+  // it. If blocked, the page pays for the request and records nothing, so
+  // either both hosts are allowed or Web Analytics is switched off in the
+  // dashboard.
   ['https://static.cloudflareinsights.com', 'script-src'],
   ['https://cloudflareinsights.com', 'connect-src'],
 ]) {

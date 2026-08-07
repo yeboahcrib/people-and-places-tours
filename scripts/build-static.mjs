@@ -62,10 +62,8 @@ const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent)
 // does not exist — an unstyled page with a broken menu, shown to someone who
 // is already lost.
 //
-// Nothing on the site links that deep today, so this is insurance rather than
-// a fix for a known bad link: mistyped URLs, truncated shares, and any future
-// move to nested paths. It costs one build step and removes a whole class of
-// failure at the least forgiving moment.
+// Nothing links that deep today, so this is insurance against mistyped URLs,
+// truncated shares and any future move to nested paths.
 //
 // Rewriting to root-absolute fixes it at any depth. A <base href="/"> tag
 // would be one line, but it also rewrites fragment links, sending the skip
@@ -80,31 +78,24 @@ const rootRelativeUrls = html => html.replace(
 // FormSubmit's _next is where a visitor lands after submitting, and it has to
 // be an absolute URL because the redirect happens on FormSubmit's servers.
 //
-// It was hardcoded to the GitHub Pages address. script.js rewrites it on load,
-// so this was invisible in testing — but the only people who reach FormSubmit
-// at all are the ones without JavaScript, which is precisely the group that
-// rewrite never runs for. They would have submitted an enquiry and been sent
-// to a different domain to read the thank-you page. Deriving it from siteUrl
-// means it follows the site wherever it is deployed.
+// It must be derived from siteUrl rather than hardcoded. script.js rewrites
+// this value on load, but the only visitors who reach FormSubmit are those
+// without JavaScript — precisely the group that rewrite never runs for.
 const injectFormNext = (html, site) => html.replace(
   /(<input[^>]*name="_next"[^>]*value=")[^"]*(")/g,
   (_match, before, after) => `${before}${site}/thanks${after}`,
 );
 
 // Cloudflare Pages serves clean URLs: /about is the real address and
-// /about.html 308-redirects to it. Every internal link on the site was written
-// with the extension, so every click cost a redirect round trip before the page
-// even started loading — 546 of them across 21 pages, on a site whose audience
-// is mostly on mobile data.
+// /about.html 308-redirects to it, so a link written with the extension costs
+// a redirect round trip before the page starts loading.
 //
 // The pattern is deliberately narrow: an attribute value that is a bare page
-// name and nothing else. It cannot match an absolute URL (those contain "://",
-// which the character class excludes) or a path into a directory, so it will
-// not touch assets. Attribute-scoped, so it cannot disturb element structure —
-// the failure mode that broke this site three times before.
+// name and nothing else. It cannot match an absolute URL or a path into a
+// directory, so it will not touch assets, and being attribute-scoped it cannot
+// disturb element structure.
 //
-// index.html becomes "/" rather than "index", because that is the address
-// Cloudflare actually serves the homepage at.
+// index.html becomes "/", the address Cloudflare serves the homepage at.
 const cleanInternalUrls = html => html.replace(
   /\b(href|src)="([a-z0-9][a-z0-9-]*)\.html((?:[?#][^"]*)?)"/g,
   (_match, attr, name, suffix) => `${attr}="${name === 'index' ? '/' : name}${suffix}"`,
@@ -113,20 +104,14 @@ const cleanInternalUrls = html => html.replace(
 /**
  * Stamp every stylesheet and script reference with a hash of its contents.
  *
- * Cloudflare serves assets with a four-hour cache, and the `_headers` rule
- * meant to shorten that is not being applied — the response carries
- * max-age=14400 regardless. So after a deploy, a returning visitor received the
- * new HTML (which revalidates on every request) alongside JavaScript up to four
- * hours old. Two versions of the site running against each other, which is the
- * same silent-mismatch shape as every other bug found today: nothing errors,
- * behaviour is just quietly missing. It was measured, not assumed —
- * `cf-cache-status: HIT, age: 1151` on a script that lacked a function added in
- * the deploy that had already gone live.
+ * Cloudflare serves CSS and JS with a four-hour cache and the `_headers` rule
+ * intended to shorten it is not applied — responses carry max-age=14400
+ * regardless. HTML revalidates on every request, so without a changing URL a
+ * returning visitor runs new HTML against stale JavaScript after a deploy.
  *
- * Hashing contents rather than stamping the commit means an asset that did not
- * change keeps its URL, and therefore keeps its cache, across deploys. Only
- * what actually changed is fetched again. Any existing `?v=` is replaced, so
- * the hand-maintained one on index.html stops needing to be remembered.
+ * Hashing contents rather than stamping the commit means an unchanged asset
+ * keeps its URL, and therefore its cache, across deploys. Any existing `?v=`
+ * is replaced so it cannot be maintained by hand and drift.
  */
 const assetHashes = new Map();
 for (const entry of await readdir(projectRoot, {withFileTypes: true})) {

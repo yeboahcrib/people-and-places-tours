@@ -100,16 +100,15 @@ function validate(payload) {
   return null;
 }
 
-// A booking reference a person can say out loud: "P P dash K 7 M 2 Q X".
+// A booking reference that can be read aloud: "PP-K7M2QX".
 //
-// The alphabet leaves out 0, O, 1, I and L on purpose. Those are the pairs
-// people mishear and mistype, and this string's whole job is to survive being
-// read down a phone line, written on paper, and typed back into an email by
-// somebody who is excited about a trip rather than concentrating.
+// The alphabet omits 0, O, 1, I and L because those are the characters most
+// often misheard or mistyped when a reference is read over the phone or copied
+// by hand.
 //
-// Thirty-one characters to the power of six is about 890 million
-// combinations, which is far past what this company will ever issue. Uniqueness
-// that actually matters is handled by the idempotency key, not by this.
+// Thirty-one characters to the power of six is roughly 890 million
+// combinations, far beyond what this company will issue. Uniqueness that
+// matters for delivery is handled by the idempotency key, not by this.
 const REFERENCE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 
 function bookingReference() {
@@ -197,22 +196,15 @@ async function handlePost({request, env}) {
     return json(403, {error: 'We could not confirm this was submitted by a person. Please reload the page and try again.'});
   }
 
-  // The honeypot now only applies when Turnstile did not actually verify this
-  // request — that is, on a deployment with no secret configured.
+  // The honeypot applies only when Turnstile could not verify the request —
+  // that is, on a deployment with no secret configured.
   //
-  // It used to run first and unconditionally, and it silently discarded real
-  // enquiries. Browsers autofill hidden fields: the trap was named
-  // `company-website`, which Chrome happily fills from a saved profile, and
-  // anyone whose browser did so had their enquiry dropped. They saw a success
-  // message, we received nothing, and no error was recorded anywhere. That is
-  // the worst failure this endpoint can have — a lost customer that neither
-  // side can detect. It is how this was found: an enquiry that "sent" but
-  // showed no reference number and never arrived.
-  //
-  // Ordering it after Turnstile fixes it properly rather than by renaming the
-  // field. Turnstile is a far stronger signal than a hidden input; once it has
-  // confirmed a human, a filled trap is autofill, not a bot, and deleting that
-  // person's message is plainly the wrong call.
+  // It must not run before Turnstile. Browsers autofill hidden fields, and a
+  // field named `company-website` is filled from a saved profile by some
+  // browsers, so an unconditional check discards genuine enquiries: the
+  // visitor sees success, nothing is delivered, and no error is recorded.
+  // Turnstile is a far stronger signal than a hidden input, so once it has
+  // confirmed a human a filled trap indicates autofill rather than a bot.
   if (!isTurnstileConfigured(env) && clean(input['company-website'], 200)) {
     // Return a normal success response so a bot does not learn how the filter
     // works.
@@ -227,16 +219,14 @@ async function handlePost({request, env}) {
     return json(503, {error: 'Inquiry delivery is not configured.'});
   }
 
-  // Two different identifiers, because they are asked to do opposite things.
+  // Two identifiers, because they have opposing requirements.
   //
-  // requestId is the idempotency key. Nobody ever sees it, so it should be as
-  // close to impossible to repeat as we can make it — a repeat would make
-  // Resend treat a second, genuine enquiry as a duplicate and silently drop it.
-  // A full UUID it stays.
+  // requestId is the idempotency key. It is never shown, and a repeat would
+  // make Resend treat a second genuine enquiry as a duplicate and drop it, so
+  // it stays a full UUID.
   //
-  // reference is what a guest reads back over the phone. It was the UUID too,
-  // which meant quoting thirty-six characters of hexadecimal to someone in
-  // Accra.
+  // reference is quoted by guests over the phone, so it optimises for being
+  // read aloud instead. A collision there is harmless.
   const requestId = crypto.randomUUID();
   const reference = bookingReference();
   const emailResponse = await fetch('https://api.resend.com/emails', {

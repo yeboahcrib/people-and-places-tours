@@ -1,6 +1,8 @@
 .DS_Store
-next-app/
 node_modules/
 dist/
 tests/visual-baseline/
 tests/visual-diffs/
+.claude/
+*.log
+studio/.sanity/

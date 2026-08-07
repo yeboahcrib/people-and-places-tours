@@ -7,15 +7,12 @@
  * tours.js holds presentation: images, alt text, detail page URL, card order.
  * scripts/tour-source.mjs joins them. This script writes only the Sanity half.
  *
- * It exists because all fifteen tours had drifted. Sanity was still holding
- * descriptions and prices from months ago, so switching the build to read from
- * it would have quietly rewritten the whole catalogue with older copy. That was
- * found by building the site both ways and comparing, not by looking at Sanity.
+ * Uses patch().set() rather than createOrReplace: an editor may have uploaded
+ * photographs or filled fields the website does not read yet, and replacing a
+ * document would delete them. Only the fields listed below are touched.
  *
- * Deliberately uses patch().set() rather than createOrReplace: an editor may
- * have uploaded photographs or filled in fields the website does not read yet,
- * and replacing the document would silently delete them. Only the fields listed
- * below are touched.
+ * Verify a change by building the site with and without SANITY_STUDIO_PROJECT_ID
+ * and diffing the output; the two should be identical.
  *
  * Run from studio/:  npx sanity exec scripts/sync-tours.ts --with-user-token
  */
@@ -81,15 +78,11 @@ async function run() {
       ...parseGroupSize(tour.groupSize),
     }
 
-    // Setting a field to undefined does not remove it — Sanity simply ignores
-    // that key and the old value survives. It has to be unset explicitly.
-    //
-    // This mattered for group size. "Just Go Ghana" reads "1–12 (larger by
-    // arrangement)", which is a note rather than a range, so the sync wrote the
-    // note but left groupSizeMax: 12 in place from before. tour-source.mjs
-    // prefers a max when it finds one, so the site kept printing "1-12 People"
-    // and ignored the note entirely — a difference that survived the first sync
-    // and only showed up in the build diff.
+    // Setting a field to undefined does not remove it: Sanity ignores the key
+    // and the previous value survives, so fields that should be absent must be
+    // unset explicitly. This matters for group size, where a tour carrying a
+    // note rather than a range must not keep a stale groupSizeMax —
+    // tour-source.mjs prefers a max whenever it finds one.
     const present = Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined))
     const absent = Object.entries(fields).filter(([, value]) => value === undefined).map(([key]) => key)
     transaction = transaction.patch(`tour-${tour.slug}`, patch =>
