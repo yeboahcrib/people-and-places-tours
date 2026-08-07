@@ -15,7 +15,9 @@
     "test:resilience": "node tests/resilient-rendering.js",
     "test:smoke": "node tests/smoke.js",
     "test:visual": "node tests/visual-regression.js",
-    "test:visual:baseline": "node tests/visual-regression.js --baseline"
+    "test:visual:baseline": "node tests/visual-regression.js --baseline",
+    "sync:sanity": "cd studio && npx sanity exec scripts/seed-pages.ts --with-user-token && npx sanity exec scripts/sync-tours.ts --with-user-token",
+    "check:sanity": "node scripts/check-sanity-drift.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1"
