@@ -11,6 +11,14 @@
 ##                              served from. Blocked here means every real
 ##                              photograph fails to load once Sanity is on.
 ##   images.unsplash.com        The stock placeholders, until the shoot lands.
+##   *.cloudflareinsights.com   Cloudflare Web Analytics, which Cloudflare
+##                              injects into every page automatically. It was
+##                              being injected and then blocked, so the site
+##                              paid for the request and recorded nothing. The
+##                              script loads from static.cloudflareinsights.com
+##                              and reports to cloudflareinsights.com, so it
+##                              needs both script-src and connect-src. No
+##                              cookies, so no consent banner is required.
 /*
   Strict-Transport-Security: max-age=31536000
   X-Frame-Options: DENY
@@ -19,7 +27,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; img-src 'self' https://images.unsplash.com https://cdn.sanity.io data:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://challenges.cloudflare.com; script-src-attr 'none'; connect-src 'self' https://challenges.cloudflare.com; media-src 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests;
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; img-src 'self' https://images.unsplash.com https://cdn.sanity.io data:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; script-src-attr 'none'; connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com; media-src 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests;
   Cache-Control: public, max-age=0, must-revalidate
 
 /assets/*

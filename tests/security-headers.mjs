@@ -33,6 +33,12 @@ assert.equal(frameDirective, 'https://challenges.cloudflare.com',
 for (const [host, directive] of [
   ['https://challenges.cloudflare.com', 'script-src'],
   ['https://cdn.sanity.io', 'img-src'],
+  // Cloudflare injects the analytics beacon whether or not the policy allows
+  // it. Blocked, the page pays for the request and records nothing — so either
+  // both of these are present, or Web Analytics should be switched off in the
+  // dashboard. The half-state is the one thing that is never right.
+  ['https://static.cloudflareinsights.com', 'script-src'],
+  ['https://cloudflareinsights.com', 'connect-src'],
 ]) {
   const value = cspLine.match(new RegExp(`${directive} ([^;]+)`))?.[1] || '';
   assert(value.includes(host), `${directive} must allow ${host}`);
