@@ -95,6 +95,50 @@ function serveDist() {
   assert(packageState.inquiryLinks === 15, 'JavaScript-free inquiry links are incomplete');
   assert(packageState.width <= packageState.viewport + 1, `JavaScript-free packages page overflows horizontally: ${JSON.stringify(packageState.overflowing)}`);
 
+  // The contact form is the only page on the site where a JavaScript failure
+  // costs money rather than polish, and it was the one page this suite never
+  // opened. Everything above checks that content still renders; these check
+  // that a visitor can still actually reach the team.
+  const contact = await context.newPage();
+  await contact.goto(`${BASE_URL}/contact.html`, {waitUntil: 'load'});
+  const formState = await contact.evaluate(() => {
+    const form = document.querySelector('.contact-form');
+    if (!form) return null;
+    return {
+      action: form.getAttribute('action') || '',
+      method: (form.getAttribute('method') || '').toUpperCase(),
+      // Read the attribute, not the property: this test exists to prove the
+      // markup does not carry it, since script.js sets the property instead.
+      hasNoValidateAttribute: form.hasAttribute('novalidate'),
+      requiredFields: [...form.querySelectorAll('[required]')].map(field => field.name),
+      // Without JavaScript there is no step-by-step flow, so every field the
+      // visitor must fill has to be on screen and reachable at once.
+      visibleInputs: [...form.querySelectorAll('input, textarea, select')]
+        .filter(field => field.type !== 'hidden' && field.offsetParent !== null).length,
+      redirectTarget: form.querySelector('input[name="_next"]')?.value || '',
+    };
+  });
+
+  assert(formState, 'JavaScript-free contact page has no contact form at all');
+  assert(formState.action.startsWith('http'), 'JavaScript-free form has no absolute action to post to');
+  assert(formState.method === 'POST', `JavaScript-free form method is ${formState.method}`);
+
+  // The bug this was written for: with the attribute in the markup, nothing
+  // validated the form when the script was absent, so an enquiry could arrive
+  // with no email address on it and no way to answer it.
+  assert(!formState.hasNoValidateAttribute,
+    'contact form carries novalidate in the markup, so a visitor without JavaScript gets no validation at all');
+
+  for (const field of ['first-name', 'last-name', 'email']) {
+    assert(formState.requiredFields.includes(field),
+      `JavaScript-free form does not require ${field}, so an unanswerable enquiry can be sent`);
+  }
+
+  assert(formState.visibleInputs >= 5,
+    `JavaScript-free form shows only ${formState.visibleInputs} fields; the step flow may be hiding them`);
+  assert(formState.redirectTarget.startsWith('http'),
+    'JavaScript-free form has no absolute redirect target, so the visitor lands nowhere after submitting');
+
   await context.close();
   await browser.close();
   if (hosted) hosted.server.close();

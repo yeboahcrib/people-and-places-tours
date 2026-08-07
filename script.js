@@ -695,6 +695,21 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── CONTACT FORM ── */
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
+    // Turn the browser's own validation off here rather than in the markup.
+    //
+    // `novalidate` used to be an attribute on the <form>, which meant it
+    // applied even when this script never ran — and this script is the only
+    // other thing validating. A visitor whose JavaScript failed could submit
+    // the form with no email address in it, and the enquiry would arrive with
+    // no way to reply to it. The attribute was there to stop the browser
+    // interrupting the step-by-step flow, which is a reason that only exists
+    // when the flow exists.
+    //
+    // Setting it from script means the browser enforces the required fields
+    // for anyone without JavaScript, and hands over to our own validation for
+    // everyone else.
+    contactForm.noValidate = true;
+
     const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
 
     // FormSubmit needs an absolute redirect target, and a hard-coded one 404s
