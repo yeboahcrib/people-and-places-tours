@@ -710,6 +710,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // everyone else.
     contactForm.noValidate = true;
 
+    // `data-inquiry-mode` is written by the build, which knows whether it is
+    // producing a deployment that has a Function behind it. That is the source
+    // of truth.
+    //
+    // The hostname check is kept only as a safety net for a preview served
+    // from *.pages.dev. It used to be the *primary* test, which worked right
+    // up until the custom domain went live: peopleplacesgh.com does not end in
+    // .pages.dev, so every enquiry quietly began going to FormSubmit instead of
+    // our own endpoint — skipping Turnstile and Resend, and landing in a
+    // different inbox. Nothing errored, which is why it took a person noticing
+    // the wrong page to find it. Do not infer environment from the hostname.
     const useCloudflareInquiry = contactForm.dataset.inquiryMode === 'cloudflare' || location.hostname.endsWith('.pages.dev');
 
     // FormSubmit needs an absolute redirect target, and a hard-coded one 404s

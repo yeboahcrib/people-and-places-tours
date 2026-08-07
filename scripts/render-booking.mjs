@@ -69,6 +69,27 @@ export function injectTurnstileSiteKey(html, siteKey) {
   return html.replace(/data-turnstile-sitekey="[^"]*"/, `data-turnstile-sitekey="${key}"`);
 }
 
+/**
+ * Decide at build time whether the booking form posts to our own Function or
+ * falls back to FormSubmit.
+ *
+ * script.js used to work this out at runtime with
+ * `location.hostname.endsWith('.pages.dev')`, which was true for the preview
+ * address and false for the real domain. The day peopleplacesgh.com went live,
+ * every enquiry with JavaScript silently started going to FormSubmit instead —
+ * no Turnstile, no Resend, arriving in a different inbox. Nothing failed; it
+ * just quietly stopped using the thing we built.
+ *
+ * The build knows which host it is producing for, and the runtime does not, so
+ * the decision belongs here. `CF_PAGES` is set by Cloudflare Pages during its
+ * builds and by nothing else, so a local or GitHub Pages build still gets the
+ * fallback — correct, because neither can run a Function.
+ */
+export function injectInquiryMode(html, isCloudflareBuild) {
+  if (!html.includes('data-inquiry-mode')) return html;
+  return html.replace(/data-inquiry-mode="[^"]*"/, `data-inquiry-mode="${isCloudflareBuild ? 'cloudflare' : 'fallback'}"`);
+}
+
 // Contact details already live in siteSettings (and in Sanity behind it), but
 // contact.html had them typed in by hand. Bind them so the phone number,
 // hours and response promise have one source of truth rather than four.

@@ -7,7 +7,7 @@ import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs
 import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
-import {injectBookingContent, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
+import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
 import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
 import {loadAboutContent, loadLocalAboutContent} from './about-source.mjs';
 import {injectAboutContent} from './render-about.mjs';
@@ -114,7 +114,8 @@ for (const entry of rootEntries) {
     const withBooking = injectBookingContent(withAbout, bookingContent);
     const withContact = injectSiteContact(withBooking, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
-    const withTourCards = injectTourCards(withTurnstile, tours);
+    const withInquiryMode = injectInquiryMode(withTurnstile, Boolean(process.env.CF_PAGES));
+    const withTourCards = injectTourCards(withInquiryMode, tours);
     const rendered = injectContactTourOptions(withTourCards, tours);
     const withMeta = injectPageMeta(rendered, {
       file: entry.name,

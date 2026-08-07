@@ -44,6 +44,17 @@ for (const file of generatedHtmlFiles) {
   // flush against the left edge of the window — on 404 that had gone unnoticed
   // entirely. It is a class on an element rather than a rule in the stylesheet,
   // so nothing else can catch it going missing.
+  // The booking form must post to our own Function on any build that has one.
+  // This was decided at runtime from the hostname, which silently stopped being
+  // true the moment the custom domain went live — enquiries went to FormSubmit
+  // instead, bypassing Turnstile and Resend, with nothing reporting an error.
+  const inquiryMode = html.match(/data-inquiry-mode="([^"]*)"/)?.[1];
+  if (inquiryMode !== undefined) {
+    const expected = process.env.CF_PAGES ? 'cloudflare' : 'fallback';
+    assert.equal(inquiryMode, expected,
+      `${file} has inquiry mode "${inquiryMode}" but this build should produce "${expected}"`);
+  }
+
   for (const heroContent of html.match(/<div class="page-hero-content[^"]*"/g) || []) {
     assert(/\bcontainer\b/.test(heroContent),
       `${file} has a page hero without the container class, so its content will touch the window edge: ${heroContent}`);
