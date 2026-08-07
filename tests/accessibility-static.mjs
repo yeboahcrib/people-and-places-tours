@@ -15,7 +15,14 @@ const VOID_ELEMENTS = new Set([
  * walks the tag stack and fails on the first mismatch.
  */
 function findNestingError(html) {
-  const withoutSvg = html.replace(/<svg\b[\s\S]*?<\/svg>/gi, '');
+  // Comments are stripped before the tag stack is walked, because their
+  // contents are not markup. Without this, a comment that mentions an element
+  // by name — which is the natural way to write "the build replaces this
+  // <footer> with the shared one" — is read as a real opening tag and fails
+  // the build with a nesting error that does not exist. The comment is then
+  // the bug, which is a confusing place to end up.
+  const withoutComments = html.replace(/<!--[\s\S]*?-->/g, '');
+  const withoutSvg = withoutComments.replace(/<svg\b[\s\S]*?<\/svg>/gi, '');
   const stack = [];
   for (const match of withoutSvg.matchAll(/<(\/?)([a-zA-Z][a-zA-Z0-9-]*)\b([^>]*)>/g)) {
     const [tag, closing, name, attributes] = match;

@@ -45,7 +45,10 @@
   <section class="page-hero" aria-label="Thank you">
     <img class="page-hero-bg" src="https://images.unsplash.com/photo-1740447605529-67cf861116ba?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" />
     <div class="page-hero-overlay"></div>
-    <div class="page-hero-content">
+    <!-- `container` is what keeps this inside the site's column. Without it the
+         heading and buttons sat flush against the left edge of the window;
+         about, contact and packages all carry it on the same element. -->
+    <div class="page-hero-content container">
       <div class="eyebrow">Message Received</div>
       <h1 class="page-hero-title">Thank<br><span style="color:var(--yellow);">You</span></h1>
       <p class="page-hero-subtitle">We have received your message and will follow up soon.</p>
@@ -56,6 +59,17 @@
     </div>
   </section>
 </main>
+
+<!-- The build replaces this with the shared footer (scripts/shared-shell.mjs).
+     The element has to exist first: replaceFooter swaps one that is already
+     there and quietly does nothing when the page has none. That is why this
+     page shipped with no footer while every other page had one — it simply
+     stopped below the hero, leaving a band of empty white on the screen
+     someone sees immediately after trusting us with their details.
+     Do not write element names in angle brackets in comments here; both this
+     replacement and the markup checker search the raw HTML and will match the
+     example instead of the real thing. -->
+<footer class="footer" role="contentinfo"></footer>
 
 <script src="tours.js"></script>
 <script src="script.js"></script>

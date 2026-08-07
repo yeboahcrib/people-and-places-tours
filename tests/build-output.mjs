@@ -29,9 +29,25 @@ for (const file of generatedHtmlFiles) {
   assert.equal((html.match(/<!-- shared: navigation -->/g) || []).length, 1, `${file} should contain one shared navigation`);
   assert(html.includes('href="tel:+233503673473"'), `${file} did not render site settings into navigation`);
   assert(!html.includes('{{'), `${file} contains an unresolved template token`);
+  // thanks.html used to be excluded here as "intentionally has no footer". That
+  // decision was reversed on 6 August 2026 after seeing the page in a browser:
+  // the hero ends partway down the viewport and, with nothing beneath it, the
+  // page reads as broken — the owner's first reaction was that it was "cut off
+  // to half". A distraction-free confirmation page is a legitimate design, but
+  // this is not one: it already carries the full navigation and two onward
+  // links, so removing only the footer bought no focus and cost the ending.
   const footerCount = (html.match(/<!-- shared: footer -->/g) || []).length;
-  if (file === 'thanks.html') assert.equal(footerCount, 0, 'thanks.html intentionally has no footer');
-  else assert.equal(footerCount, 1, `${file} should contain one canonical shared footer`);
+  assert.equal(footerCount, 1, `${file} should contain one canonical shared footer`);
+
+  // `container` is what holds hero content inside the site's column. thanks.html
+  // and 404.html were both missing it and rendered with the heading and buttons
+  // flush against the left edge of the window — on 404 that had gone unnoticed
+  // entirely. It is a class on an element rather than a rule in the stylesheet,
+  // so nothing else can catch it going missing.
+  for (const heroContent of html.match(/<div class="page-hero-content[^"]*"/g) || []) {
+    assert(/\bcontainer\b/.test(heroContent),
+      `${file} has a page hero without the container class, so its content will touch the window edge: ${heroContent}`);
+  }
 }
 
 const health = JSON.parse(await readFile(join(outputPath, 'health.json'), 'utf8'));
