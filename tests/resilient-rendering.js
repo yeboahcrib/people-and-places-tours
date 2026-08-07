@@ -116,6 +116,8 @@ function serveDist() {
       visibleInputs: [...form.querySelectorAll('input, textarea, select')]
         .filter(field => field.type !== 'hidden' && field.offsetParent !== null).length,
       redirectTarget: form.querySelector('input[name="_next"]')?.value || '',
+      captchaDisabled: form.querySelector('input[name="_captcha"]')?.value === 'false',
+      formSubmitHoneypot: Boolean(form.querySelector('input[name="_honey"]')),
       tourOptions: form.querySelectorAll('#tour-interest option').length,
       tourOptionLabels: [...form.querySelectorAll('#tour-interest option')].map(option => option.textContent.trim()),
     };
@@ -135,6 +137,16 @@ function serveDist() {
     assert(formState.requiredFields.includes(field),
       `JavaScript-free form does not require ${field}, so an unanswerable enquiry can be sent`);
   }
+
+  // FormSubmit's built-in CAPTCHA is reCAPTCHA, which needs JavaScript to draw
+  // its checkbox — and everyone who reaches FormSubmit got there by not having
+  // JavaScript. Leaving it on ended the fallback on "help us fight spam" above
+  // a box that could never render, with no way to continue. A fallback for
+  // people without JavaScript must not itself require JavaScript.
+  assert(formState.captchaDisabled,
+    'FormSubmit CAPTCHA is not disabled; the no-JavaScript path ends on a challenge that cannot render without JavaScript');
+  assert(formState.formSubmitHoneypot,
+    'FormSubmit honeypot (_honey) is missing, so nothing replaces the CAPTCHA that was turned off');
 
   // The experience dropdown was built only by script.js, so without JavaScript
   // it offered one choice — "I'm open to ideas" — and a visitor had no way to

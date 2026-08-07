@@ -121,9 +121,24 @@
             <input type="hidden" name="_next" value="https://yeboahcrib.github.io/people-and-places-tours/thanks.html">
             <input type="hidden" name="source" value="Contact page inquiry">
             <input type="hidden" id="tour-name" name="tour-name" value="">
+            <!-- Turn off FormSubmit's own CAPTCHA.
+                 It is reCAPTCHA, which needs JavaScript to draw its checkbox —
+                 and the only people who ever reach FormSubmit are the ones
+                 without JavaScript. The fallback therefore ended on a page
+                 saying "help us fight spam" above a box that could not appear,
+                 with no way forward. The fallback for people without
+                 JavaScript cannot itself require JavaScript. -->
+            <input type="hidden" name="_captcha" value="false">
+
             <div class="form-honeypot" aria-hidden="true">
               <label for="company-website">Leave this field empty</label>
               <input type="text" id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+              <!-- Two honeypots because two different services read them.
+                   `company-website` is checked by our own Function; `_honey` is
+                   the name FormSubmit looks for. Both stay empty for a person
+                   and get filled by a bot that completes every field, which is
+                   what replaces the CAPTCHA disabled above. -->
+              <input type="text" name="_honey" tabindex="-1" autocomplete="off">
             </div>
 
             <!-- Progress: tells people where they are and how much is left.
