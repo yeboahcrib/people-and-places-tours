@@ -124,10 +124,34 @@ async function run() {
   await transaction.commit()
   console.log('  written')
 
-  console.log('\nPatching navigation...')
-  const tagline = readJson('src/content/site.json').navigation.footerTagline
-  await client.patch('navigation').set({footerTagline: tagline}).commit()
-  console.log(`  footerTagline set to "${tagline}"`)
+  // The menu, the footer columns and the contact details are synced in full,
+  // not just the tagline.
+  //
+  // Only footerTagline used to be patched here, so everything else in these two
+  // documents kept whatever it was first given. By the time the site was ready
+  // to read from Sanity they had drifted badly: the menu still said "Packages"
+  // where the site says "Experiences", the footer listed "About Us" and "All
+  // Packages", and the international phone number was missing entirely.
+  // Switching the build over would have silently reverted all of it — caught
+  // only by diffing a Sanity build against a local one before flipping.
+  //
+  // src/content/site.json is what the live site renders today, so it is the
+  // truth this restores. After the switch, Sanity becomes the source and this
+  // script is for repair rather than routine use.
+  console.log('\nSyncing navigation and contact details...')
+  const site = readJson('src/content/site.json')
+  await client
+    .patch('navigation')
+    .set({
+      navLinks: site.navigation.navLinks,
+      footerTagline: site.navigation.footerTagline,
+      footerColumns: site.navigation.footerColumns,
+    })
+    .commit()
+  console.log(`  navigation: ${site.navigation.navLinks.length} menu links, ${site.navigation.footerColumns.length} footer columns`)
+
+  await client.patch('siteSettings').set(site.siteSettings).commit()
+  console.log(`  siteSettings: ${Object.keys(site.siteSettings).length} fields including the international number`)
 
   console.log('\nClearing hidden documents from the first run...')
   const removed = await removeHiddenSections()
