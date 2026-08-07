@@ -17,6 +17,27 @@
  * "/about?x=1#y" and a trailing slash alike, so no future change to how links
  * are written can break it again. "" and "/" both mean the homepage.
  */
+/* The address to link to, for a page name that may still carry .html.
+ *
+ * Tour data stores detailUrl as the real filename ("cape-coast-tour.html"),
+ * which is correct — that is the file. But Cloudflare serves it at
+ * /cape-coast-tour and redirects the other form, and these links are built in
+ * the browser after the build's link rewriting has already run. Without this
+ * the tour grid and the search palette were the only places on the site still
+ * costing a redirect on every click.
+ */
+/* Named hrefForPage, not pageHref: a local `const pageHref` already exists in
+ * the navigation block below, in the same scope as the callers. Declaring this
+ * as pageHref put every call in that const's temporal dead zone, so the first
+ * one threw on load and took the rest of the page's JavaScript with it — the
+ * search palette rendered nothing. Caught by the smoke suite. */
+function hrefForPage(value) {
+  const raw = String(value || '');
+  const [path, suffix = ''] = [raw.split(/(?=[?#])/)[0], raw.slice(raw.split(/(?=[?#])/)[0].length)];
+  const cleaned = path.replace(/\.html$/i, '');
+  return (cleaned === 'index' ? '/' : cleaned) + suffix;
+}
+
 function pageKey(value) {
   const withoutQuery = String(value || '').split(/[?#]/)[0];
   const last = withoutQuery.split('/').filter(Boolean).pop() || '';
@@ -91,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tours = Array.isArray(window.PEOPLE_PLACES_TOURS) ? window.PEOPLE_PLACES_TOURS : [];
   const bySlug = new Map(tours.map(tour => [tour.slug, tour]));
-  const bookingUrl = slug => `contact.html?tour=${encodeURIComponent(slug)}#booking-flow`;
+  const bookingUrl = slug => `${hrefForPage('contact.html')}?tour=${encodeURIComponent(slug)}#booking-flow`;
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;',
     '<': '&lt;',
@@ -128,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="tour-vibe-tags">${tags}</div>
           </div>
           <div class="tour-card-body">
-            <h3 class="tour-card-title"><a href="${escapeHtml(tour.detailUrl)}" class="tour-card-stretched-link">${escapeHtml(tour.title)}</a></h3>
+            <h3 class="tour-card-title"><a href="${escapeHtml(hrefForPage(tour.detailUrl))}" class="tour-card-stretched-link">${escapeHtml(tour.title)}</a></h3>
             <p class="tour-card-desc">${escapeHtml(tour.packageDescription || tour.description)}</p>
             <div class="tour-card-meta">
               <span class="tour-meta-item">${clockIcon}${escapeHtml(tour.duration)}</span>
@@ -138,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${highlight}
             <div class="tour-card-footer">
               <div class="tour-card-price"><span>From</span>${escapeHtml(tour.price)} <small>${escapeHtml(tour.priceUnit || '')}</small></div>
-              <a href="${escapeHtml(tour.detailUrl)}" class="tour-card-book-btn">View Experience</a>
+              <a href="${escapeHtml(hrefForPage(tour.detailUrl))}" class="tour-card-book-btn">View Experience</a>
             </div>
           </div>
         </article>`;
@@ -153,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .slice()
       .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999))
       .map(tour => `
-        <li><a class="cmd-item" href="${escapeHtml(tour.detailUrl)}">
+        <li><a class="cmd-item" href="${escapeHtml(hrefForPage(tour.detailUrl))}">
           <span class="cmd-item-icon">${escapeHtml(tourInitials(tour.title))}</span>
           <span class="cmd-item-text">
             <strong>${escapeHtml(tour.title)}</strong>
