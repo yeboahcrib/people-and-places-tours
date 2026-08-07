@@ -62,6 +62,19 @@ for (const file of generatedHtmlFiles) {
       `${file} declares a canonical URL that redirects: ${canonical}`);
   }
 
+  // Every stylesheet and script must carry a content hash.
+  //
+  // Cloudflare caches these for four hours and the _headers rule intended to
+  // shorten that is not applied, so without a hash in the URL a returning
+  // visitor runs old JavaScript against new HTML after every deploy — two
+  // versions of the site at once, with nothing reporting an error. Measured on
+  // the live site: cf-cache-status HIT, age 1151, serving a script that was
+  // missing a function the deployed commit had added.
+  for (const asset of html.match(/\b(?:href|src)="[a-z0-9][a-z0-9-]*\.(?:css|js)(?:\?[^"]*)?"/g) || []) {
+    assert.match(asset, /\?v=[a-f0-9]{10}"/,
+      `${file} references an asset with no content hash, so a cached copy can outlive a deploy: ${asset}`);
+  }
+
   // The booking form must post to our own Function on any build that has one.
   // This was decided at runtime from the hostname, which silently stopped being
   // true the moment the custom domain went live — enquiries went to FormSubmit

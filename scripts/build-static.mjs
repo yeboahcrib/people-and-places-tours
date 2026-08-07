@@ -1,5 +1,6 @@
 import {cp, mkdir, readFile, readdir, rm, writeFile} from 'node:fs/promises';
 import {extname, join} from 'node:path';
+import {createHash} from 'node:crypto';
 import {renderFooterTemplate, renderNavigationTemplate, replaceFooter, replacePrimaryNavigation} from './shared-shell.mjs';
 import {loadSiteContent} from './content-source.mjs';
 import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from './local-render-source.mjs';
@@ -109,6 +110,36 @@ const cleanInternalUrls = html => html.replace(
   (_match, attr, name, suffix) => `${attr}="${name === 'index' ? '/' : name}${suffix}"`,
 );
 
+/**
+ * Stamp every stylesheet and script reference with a hash of its contents.
+ *
+ * Cloudflare serves assets with a four-hour cache, and the `_headers` rule
+ * meant to shorten that is not being applied — the response carries
+ * max-age=14400 regardless. So after a deploy, a returning visitor received the
+ * new HTML (which revalidates on every request) alongside JavaScript up to four
+ * hours old. Two versions of the site running against each other, which is the
+ * same silent-mismatch shape as every other bug found today: nothing errors,
+ * behaviour is just quietly missing. It was measured, not assumed —
+ * `cf-cache-status: HIT, age: 1151` on a script that lacked a function added in
+ * the deploy that had already gone live.
+ *
+ * Hashing contents rather than stamping the commit means an asset that did not
+ * change keeps its URL, and therefore keeps its cache, across deploys. Only
+ * what actually changed is fetched again. Any existing `?v=` is replaced, so
+ * the hand-maintained one on index.html stops needing to be remembered.
+ */
+const assetHashes = new Map();
+for (const entry of await readdir(projectRoot, {withFileTypes: true})) {
+  if (!entry.isFile() || !['.css', '.js'].includes(extname(entry.name))) continue;
+  const contents = await readFile(join(projectRoot, entry.name));
+  assetHashes.set(entry.name, createHash('sha256').update(contents).digest('hex').slice(0, 10));
+}
+
+const stampAssets = html => html.replace(
+  /\b(href|src)="([a-z0-9][a-z0-9-]*\.(?:css|js))(?:\?[^"]*)?"/g,
+  (match, attr, file) => assetHashes.has(file) ? `${attr}="${file}?v=${assetHashes.get(file)}"` : match,
+);
+
 await rm(outputRoot, {recursive: true, force: true});
 await mkdir(outputRoot, {recursive: true});
 
@@ -147,7 +178,8 @@ for (const entry of rootEntries) {
     // Strip extensions before the 404 page's root-absolute rewrite, so that
     // pass sees "about" and produces "/about" rather than "/about.html".
     const withCleanUrls = cleanInternalUrls(withNext);
-    const final = entry.name === '404.html' ? rootRelativeUrls(withCleanUrls) : withCleanUrls;
+    const stamped = stampAssets(withCleanUrls);
+    const final = entry.name === '404.html' ? rootRelativeUrls(stamped) : stamped;
     await writeFile(join(outputRoot, entry.name), final, 'utf8');
   } else {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));
