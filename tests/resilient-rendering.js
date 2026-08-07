@@ -116,6 +116,8 @@ function serveDist() {
       visibleInputs: [...form.querySelectorAll('input, textarea, select')]
         .filter(field => field.type !== 'hidden' && field.offsetParent !== null).length,
       redirectTarget: form.querySelector('input[name="_next"]')?.value || '',
+      tourOptions: form.querySelectorAll('#tour-interest option').length,
+      tourOptionLabels: [...form.querySelectorAll('#tour-interest option')].map(option => option.textContent.trim()),
     };
   });
 
@@ -133,6 +135,17 @@ function serveDist() {
     assert(formState.requiredFields.includes(field),
       `JavaScript-free form does not require ${field}, so an unanswerable enquiry can be sent`);
   }
+
+  // The experience dropdown was built only by script.js, so without JavaScript
+  // it offered one choice — "I'm open to ideas" — and a visitor had no way to
+  // name the experience they were writing about. The enquiry still arrived; it
+  // just arrived missing the single detail that makes it answerable.
+  assert(formState.tourOptions > 5,
+    `JavaScript-free experience dropdown offers only ${formState.tourOptions} option(s); the tour list is not in the HTML`);
+  assert(formState.tourOptionLabels.includes("I'm open to ideas"),
+    'experience dropdown lost its default "open to ideas" choice');
+  assert(formState.tourOptionLabels.some(label => label.includes('Cape Coast')),
+    'experience dropdown does not list the actual experiences');
 
   assert(formState.visibleInputs >= 5,
     `JavaScript-free form shows only ${formState.visibleInputs} fields; the step flow may be hiding them`);

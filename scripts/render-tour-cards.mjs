@@ -58,3 +58,35 @@ export function injectTourCards(html, tours) {
   const packageMarker = '<div class="packages-grid" id="tours-grid" data-tour-source="catalog"></div>';
   return html.replace(packageMarker, `<div class="packages-grid" id="tours-grid" data-tour-source="catalog">${renderPackageTourCards(tours)}</div>`);
 }
+
+/**
+ * Fill the "Which experience is calling you?" dropdown at build time.
+ *
+ * The list was only ever built by script.js, so a visitor whose JavaScript did
+ * not run saw a single option — "I'm open to ideas" — and had no way to say
+ * which of the fifteen experiences they were writing about. The enquiry still
+ * arrived, but stripped of the one detail that makes it answerable.
+ *
+ * The markup here matches what script.js produces, ordering included, so the
+ * script re-rendering the same list over the top is a no-op rather than a
+ * visible flicker. Keep the two in step: script.js `renderContactTourOptions`.
+ */
+export function renderContactTourOptions(tours) {
+  return tours
+    .filter(tour => tour.packageOrder !== undefined)
+    .sort((a, b) => (a.packageOrder ?? 999) - (b.packageOrder ?? 999))
+    .map(tour => `<option value="${escapeHtml(tour.slug)}">${escapeHtml(tour.title)} - ${escapeHtml(tour.price)}</option>`)
+    .join('');
+}
+
+export function injectContactTourOptions(html, tours) {
+  const marker = `<select class="form-select" id="tour-interest" name="tour-interest">
+                    <option value="" selected>I'm open to ideas</option>
+                  </select>`;
+  if (!html.includes(marker)) return html;
+  return html.replace(marker, `<select class="form-select" id="tour-interest" name="tour-interest">
+                    <option value="" selected>I'm open to ideas</option>
+                    ${renderContactTourOptions(tours)}
+                    <option value="custom">Something made around me</option>
+                  </select>`);
+}

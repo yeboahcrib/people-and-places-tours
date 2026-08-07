@@ -3,7 +3,7 @@ import {extname, join} from 'node:path';
 import {renderFooterTemplate, renderNavigationTemplate, replaceFooter, replacePrimaryNavigation} from './shared-shell.mjs';
 import {loadSiteContent} from './content-source.mjs';
 import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from './local-render-source.mjs';
-import {injectTourCards} from './render-tour-cards.mjs';
+import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs';
 import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
@@ -114,7 +114,8 @@ for (const entry of rootEntries) {
     const withBooking = injectBookingContent(withAbout, bookingContent);
     const withContact = injectSiteContact(withBooking, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
-    const rendered = injectTourCards(withTurnstile, tours);
+    const withTourCards = injectTourCards(withTurnstile, tours);
+    const rendered = injectContactTourOptions(withTourCards, tours);
     const withMeta = injectPageMeta(rendered, {
       file: entry.name,
       siteUrl,
