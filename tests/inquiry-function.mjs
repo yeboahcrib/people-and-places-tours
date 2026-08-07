@@ -77,9 +77,10 @@ const stubFetch = handler => {
   return () => { globalThis.fetch = original; };
 };
 const siteverify = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const validChallenge = {success: true, action: 'inquiry', hostname: 'people-and-places.pages.dev'};
 
 // Configured but no token supplied.
-let restore = stubFetch(async () => new Response(JSON.stringify({success: true}), {status: 200}));
+let restore = stubFetch(async () => new Response(JSON.stringify(validChallenge), {status: 200}));
 try {
   response = await invoke(guest, {}, withTurnstile);
 } finally { restore(); }
@@ -105,7 +106,7 @@ assert(!sentEmail, 'a rejected challenge must not send an email');
 
 // Configured, token accepted.
 restore = stubFetch(async url => new Response(
-  JSON.stringify(String(url) === siteverify ? {success: true} : {id: 'email_123'}),
+  JSON.stringify(String(url) === siteverify ? validChallenge : {id: 'email_123'}),
   {status: 200},
 ));
 try {
@@ -130,7 +131,7 @@ assert.equal(response.status, 403);
 let siteverifyCalls = 0;
 restore = stubFetch(async url => {
   if (String(url) === siteverify) siteverifyCalls += 1;
-  return new Response(JSON.stringify({success: true}), {status: 200});
+  return new Response(JSON.stringify(validChallenge), {status: 200});
 });
 try {
   response = await invoke(
@@ -156,7 +157,8 @@ try {
     'first-name': 'Ada',
     'last-name': 'Guest',
     email: 'ada@example.com',
-    'tour-name': 'Cape Coast <script>alert(1)</script>',
+    'tour-interest': 'cape-coast',
+    'tour-name': 'Forged tour <script>alert(1)</script>',
     message: '<img src=x onerror=alert(1)>',
   }, {}, {
     RESEND_API_KEY: 'test-key',
@@ -173,7 +175,8 @@ const email = JSON.parse(providerRequest.init.body);
 assert.equal(email.reply_to, 'ada@example.com');
 assert(!email.html.includes('<script>'));
 assert(!email.html.includes('<img src=x'));
-assert(email.html.includes('&lt;script&gt;'));
+assert(!email.html.includes('Forged tour'), 'browser-supplied tour names must not be trusted');
+assert(email.html.includes('Cape Coast Ancestral Tour'));
 
 // A verified human whose browser autofilled the hidden trap must still be
 // delivered. Running the honeypot unconditionally discards the message before
@@ -182,7 +185,7 @@ assert(email.html.includes('&lt;script&gt;'));
   const realFetch = globalThis.fetch;
   let sent = null;
   globalThis.fetch = async (url, init) => {
-    if (String(url).includes('siteverify')) return new Response(JSON.stringify({success: true}), {status: 200});
+    if (String(url).includes('siteverify')) return new Response(JSON.stringify(validChallenge), {status: 200});
     sent = {url, init};
     return new Response(JSON.stringify({id: 'email_456'}), {status: 200});
   };
@@ -228,5 +231,63 @@ assert(email.text.includes(reference), 'plain-text email should carry the refere
 assert.match(providerRequest.init.headers['Idempotency-Key'],
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
   'idempotency key must remain a UUID, separate from the short reference');
+
+// An uncertain network response can prompt a manual retry. Reusing the
+// browser-generated UUID lets Resend suppress a duplicate delivery.
+const retryId = '123e4567-e89b-42d3-a456-426614174000';
+globalThis.fetch = async (_url, init) => {
+  providerRequest = {init};
+  return new Response(JSON.stringify({id: 'email_retry'}), {status: 200});
+};
+try {
+  response = await invoke({...guest, 'client-submission-id': retryId}, {}, delivery);
+} finally {
+  globalThis.fetch = originalFetch;
+}
+assert.equal(response.status, 200);
+assert.equal(providerRequest.init.headers['Idempotency-Key'], retryId);
+response = await invoke({...guest, 'client-submission-id': 'not-a-uuid'});
+assert.equal(response.status, 400);
+
+// Malformed JSON shapes and forged structured values must be rejected with a
+// controlled client error rather than reaching the provider or throwing 500.
+for (const malformed of [null, [], 'text', 42]) {
+  response = await invoke(malformed);
+  assert.equal(response.status, 400);
+}
+response = await invoke({...guest, unexpected: 'field'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'group-size': '999'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'tour-interest': 'forged-tour'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'travel-date': '2026-02-31'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, message: 'x'.repeat(5001)});
+assert.equal(response.status, 400);
+
+// A token from a different widget action or hostname is not valid for this
+// form even when Cloudflare reports the token itself as successful.
+for (const challenge of [
+  {...validChallenge, action: 'login'},
+  {...validChallenge, hostname: 'untrusted.example'},
+]) {
+  restore = stubFetch(async () => new Response(JSON.stringify(challenge), {status: 200}));
+  try {
+    response = await invoke({...guest, 'cf-turnstile-response': 'wrong-context'}, {}, withTurnstile);
+  } finally { restore(); }
+  assert.equal(response.status, 403);
+}
+
+// Provider network failures are mapped to a stable, non-disclosing response.
+restore = stubFetch(async url => {
+  if (String(url) === siteverify) return new Response(JSON.stringify(validChallenge), {status: 200});
+  throw new Error('provider unavailable');
+});
+try {
+  response = await invoke({...guest, 'cf-turnstile-response': 'good-token'}, {}, withTurnstile);
+} finally { restore(); }
+assert.equal(response.status, 502);
+assert.deepEqual(await response.json(), {error: 'Inquiry delivery could not be confirmed.'});
 
 console.log('Inquiry function tests passed.');

@@ -785,6 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.onBookingTurnstileLoad = () => {
         turnstileWidget = window.turnstile.render(turnstileMount, {
           sitekey: turnstileSiteKey,
+          action: 'inquiry',
           appearance: 'interaction-only',
           execution: 'execute',
           callback: token => settleTurnstile(token),
@@ -847,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalSteps = bookingSteps.length;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let currentBookingStep = 1;
+    let inquirySubmissionId = '';
     let showBookingStep = () => {};
 
     const requiredFields = () => [
@@ -967,6 +969,8 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const endpoint = contactForm.dataset.cloudflareEndpoint || '/api/inquiry';
         const payload = Object.fromEntries(new FormData(contactForm).entries());
+        inquirySubmissionId ||= crypto.randomUUID();
+        payload['client-submission-id'] = inquirySubmissionId;
         payload['cf-turnstile-response'] = await requestTurnstileToken();
         const res = await fetch(endpoint, {
           method: 'POST',
@@ -986,6 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         contactForm.reset();
+        inquirySubmissionId = '';
         updateTourName();
         if (totalSteps > 1) showBookingStep(1);
         if (!showBookingSuccess(result.reference)) {

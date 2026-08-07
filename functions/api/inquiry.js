@@ -1,5 +1,26 @@
 const MAX_BODY_BYTES = 32_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001F\u007F]/;
+const GROUP_SIZES = new Set(['', 'solo', '2', '3-5', '6-10', '11-15', '15+']);
+const TOUR_NAMES = new Map([
+  ['', 'Not selected'],
+  ['custom', 'Custom tour request'],
+  ['just-go-ghana', 'Just Go Ghana'],
+  ['accra-city', 'Accra City Tour'],
+  ['jamestown', 'Jamestown Heritage Walk'],
+  ['accra-food', 'Accra After Dark Food Tour'],
+  ['cape-coast', 'Cape Coast Ancestral Tour'],
+  ['elmina', 'Elmina Castle & Fishing Village'],
+  ['kumasi', 'Kumasi Cultural Immersion'],
+  ['kente', 'Kente Weaving Village'],
+  ['ada-foah', 'Ada Foah Beach & Canoe Safari'],
+  ['quad-bike', 'Quad Bike & Waterfalls'],
+  ['volta', 'Wli Waterfalls Hike'],
+  ['shai-hills', 'Shai Hills & Boat Cruise'],
+  ['aburi', 'Aburi Day Tour'],
+  ['akosombo', 'Akosombo Dam & Lake Volta Cruise'],
+  ['batik-workshop', 'Batik & Pottery Workshop'],
+]);
 
 const limits = {
   'first-name': 80,
@@ -14,6 +35,12 @@ const limits = {
   message: 5000,
   source: 100,
 };
+
+const acceptedFields = new Set([
+  ...Object.keys(limits),
+  'company-website', '_honey', '_subject', '_template', '_next', '_captcha',
+  'cf-turnstile-response', 'client-submission-id',
+]);
 
 const responseHeaders = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -77,10 +104,12 @@ async function passedTurnstile(token, request, env) {
     const verification = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       body: form,
+      signal: AbortSignal.timeout(10_000),
     });
     if (!verification.ok) return false;
     const result = await verification.json();
-    return result.success === true;
+    const expectedHostname = new URL(request.headers.get('Origin')).hostname;
+    return result.success === true && result.action === 'inquiry' && result.hostname === expectedHostname;
   } catch {
     // A verification outage must not silently let unverified traffic through.
     return false;
@@ -88,15 +117,42 @@ async function passedTurnstile(token, request, env) {
 }
 
 function normalizePayload(input) {
-  return Object.fromEntries(
+  const payload = Object.fromEntries(
     Object.entries(limits).map(([field, max]) => [field, clean(input[field], max)]),
   );
+  payload['tour-name'] = TOUR_NAMES.get(payload['tour-interest']) || '';
+  payload.source = 'Website inquiry';
+  return payload;
+}
+
+function validateInputShape(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return 'Inquiry must be a JSON object.';
+  for (const [field, value] of Object.entries(input)) {
+    if (!acceptedFields.has(field)) return 'Inquiry contains an unexpected field.';
+    if (typeof value !== 'string') return 'Inquiry fields must contain text.';
+    const max = limits[field] || (field === 'cf-turnstile-response' ? 2048 : field === 'client-submission-id' ? 36 : 200);
+    if (new TextEncoder().encode(value).byteLength > max * 4 || value.length > max) {
+      return 'One or more inquiry fields are too long.';
+    }
+  }
+  return null;
 }
 
 function validate(payload) {
   if (!payload['first-name'] || !payload['last-name']) return 'Please provide your first and last name.';
   if (!EMAIL_PATTERN.test(payload.email)) return 'Please provide a valid email address.';
-  if (payload['travel-date'] && !/^\d{4}-\d{2}-\d{2}$/.test(payload['travel-date'])) return 'Please provide a valid travel date.';
+  if ([payload['first-name'], payload['last-name'], payload.email, payload.phone].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
+    return 'Inquiry contains invalid characters.';
+  }
+  if (!GROUP_SIZES.has(payload['group-size'])) return 'Please provide a valid group size.';
+  if (!TOUR_NAMES.has(payload['tour-interest'])) return 'Please select a valid tour.';
+  if (payload.phone && !/^[+()\d\s.-]+$/.test(payload.phone)) return 'Please provide a valid phone number.';
+  if (payload['travel-date']) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(payload['travel-date'])) return 'Please provide a valid travel date.';
+    const date = new Date(`${payload['travel-date']}T00:00:00Z`);
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== payload['travel-date']) return 'Please provide a valid travel date.';
+    if (payload['travel-date'] < new Date().toISOString().slice(0, 10)) return 'Please choose today or a future travel date.';
+  }
   return null;
 }
 
@@ -171,7 +227,7 @@ async function handlePost({request, env}) {
   if (!allowedOrigin(request, env)) return json(403, {error: 'Request origin is not allowed.'});
 
   const contentType = request.headers.get('Content-Type') || '';
-  if (!contentType.toLowerCase().includes('application/json')) {
+  if (contentType.split(';', 1)[0].trim().toLowerCase() !== 'application/json') {
     return json(415, {error: 'Expected a JSON request.'});
   }
 
@@ -188,6 +244,9 @@ async function handlePost({request, env}) {
   } catch {
     return json(400, {error: 'Inquiry could not be read.'});
   }
+
+  const shapeError = validateInputShape(input);
+  if (shapeError) return json(400, {error: shapeError});
 
   // Verified before any real work: a token that fails here should cost us
   // nothing beyond the check itself.
@@ -215,6 +274,11 @@ async function handlePost({request, env}) {
   const validationError = validate(payload);
   if (validationError) return json(400, {error: validationError});
 
+  const submittedId = clean(input['client-submission-id'], 36);
+  if (submittedId && !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submittedId)) {
+    return json(400, {error: 'Inquiry contains an invalid submission identifier.'});
+  }
+
   if (!env.RESEND_API_KEY || !env.INQUIRY_TO_EMAIL || !env.INQUIRY_FROM_EMAIL) {
     return json(503, {error: 'Inquiry delivery is not configured.'});
   }
@@ -227,29 +291,35 @@ async function handlePost({request, env}) {
   //
   // reference is quoted by guests over the phone, so it optimises for being
   // read aloud instead. A collision there is harmless.
-  const requestId = crypto.randomUUID();
+  const requestId = submittedId || crypto.randomUUID();
   const reference = bookingReference();
-  const emailResponse = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      'Idempotency-Key': requestId,
-    },
-    body: JSON.stringify({
-      from: env.INQUIRY_FROM_EMAIL,
-      to: [env.INQUIRY_TO_EMAIL],
-      reply_to: payload.email,
-      subject: `Tour inquiry: ${payload['tour-name'] || payload['tour-interest'] || 'General request'}`,
-      // The email carries the guest-facing reference, not the internal id —
-      // it has to be the string they will quote back when they reply.
-      text: inquiryText(payload, reference),
-      html: inquiryHtml(payload, reference),
-    }),
-  });
+  let emailResponse;
+  try {
+    emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Idempotency-Key': requestId,
+      },
+      body: JSON.stringify({
+        from: env.INQUIRY_FROM_EMAIL,
+        to: [env.INQUIRY_TO_EMAIL],
+        reply_to: payload.email,
+        subject: `Tour inquiry: ${payload['tour-name'] || 'General request'}`,
+        text: inquiryText(payload, reference),
+        html: inquiryHtml(payload, reference),
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    console.error('Inquiry provider request failed', {requestId});
+    return json(502, {error: 'Inquiry delivery could not be confirmed.'});
+  }
 
   if (!emailResponse.ok) {
     // Do not expose provider details or customer data to the browser.
+    console.error('Inquiry provider rejected request', {requestId, status: emailResponse.status});
     return json(502, {error: 'Inquiry delivery could not be confirmed.'});
   }
 
