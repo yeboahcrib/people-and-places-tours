@@ -15,7 +15,7 @@
  */
 const {chromium} = require('playwright');
 const http = require('node:http');
-const {createReadStream, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync} = require('node:fs');
+const {createReadStream, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync} = require('node:fs');
 const {extname, join} = require('node:path');
 const {PNG} = require('pngjs');
 // v7 ships ESM with a default export; unwrap it for CommonJS.
@@ -39,12 +39,34 @@ const MIME = {
   '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon',
 };
 
+/**
+ * Resolve a request path the way Cloudflare Pages does.
+ *
+ * Internal links are extensionless — /about, not /about.html — because that is
+ * the address Cloudflare actually serves and linking to the other form costs a
+ * redirect. A plain file server 404s on those, so this suite would have been
+ * testing a site whose every link was broken while production was fine.
+ *
+ * Deliberately shared shape with resilient-rendering.js: both must resolve the
+ * same way, or a page can pass one suite and fail the other for reasons that
+ * have nothing to do with the page.
+ */
+function resolveLikeCloudflare(root, urlPath) {
+  const relative = urlPath.replace(/^\/+/, '');
+  for (const candidate of [relative || 'index.html', `${relative}.html`, join(relative, 'index.html')]) {
+    if (!candidate || candidate.endsWith('/')) continue;
+    const file = join(root, candidate);
+    if (file.startsWith(root) && existsSync(file) && statSync(file).isFile()) return file;
+  }
+  return null;
+}
+
 function serve() {
   if (!existsSync(DIST)) throw new Error('dist/ is missing — run `npm run build` first.');
   const server = http.createServer((request, response) => {
     const path = decodeURIComponent(new URL(request.url, 'http://x').pathname);
-    const file = join(DIST, path.replace(/^\/+/, '') || 'index.html');
-    if (!file.startsWith(DIST) || !existsSync(file)) return response.writeHead(404).end();
+    const file = resolveLikeCloudflare(DIST, path);
+    if (!file || !file.startsWith(DIST)) return response.writeHead(404).end();
     response.writeHead(200, {'Content-Type': MIME[extname(file)] || 'application/octet-stream'});
     createReadStream(file).pipe(response);
   });

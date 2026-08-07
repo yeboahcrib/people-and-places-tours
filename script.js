@@ -2,6 +2,27 @@
    PEOPLE & PLACES TOURS — Main JavaScript
    ============================================================ */
 
+/* Identify a page by name, whatever shape its URL happens to take.
+ *
+ * Cloudflare Pages serves clean URLs: the About page is /about, not
+ * /about.html. Several things here identified the current page by comparing
+ * raw strings — `location.pathname.split('/').pop()` against hrefs like
+ * "about.html" — which matched on GitHub Pages and stopped matching the day
+ * the custom domain went live. Two visible consequences: no navigation link
+ * was ever highlighted as current, and tour detail pages silently stopped
+ * picking up their price and duration from the catalogue.
+ *
+ * Normalising both sides is deliberately more forgiving than switching every
+ * link to one style. It holds for "about.html", "/about", "about",
+ * "/about?x=1#y" and a trailing slash alike, so no future change to how links
+ * are written can break it again. "" and "/" both mean the homepage.
+ */
+function pageKey(value) {
+  const withoutQuery = String(value || '').split(/[?#]/)[0];
+  const last = withoutQuery.split('/').filter(Boolean).pop() || '';
+  return last.replace(/\.html$/i, '').toLowerCase() || 'index';
+}
+
 /* ── PAGE TRANSITION (runs before DOMContentLoaded) ── */
 (function () {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -160,8 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function hydrateTourDetailFromCatalog() {
     if (tours.length === 0) return;
-    const page = location.pathname.split('/').pop() || 'index.html';
-    const tour = tours.find(item => item.detailUrl === page);
+    const page = pageKey(location.pathname);
+    const tour = tours.find(item => pageKey(item.detailUrl) === page);
     if (!tour) return;
 
     document.querySelectorAll('.booking-card .big-price, .booking-card .price').forEach(el => {
@@ -243,8 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ── ACTIVE NAV LINK + HOMEPAGE STORY POSITION ── */
-  const currentPage = location.pathname.split('/').pop() || 'index.html';
-  const isTourDetail = tours.some(tour => tour.detailUrl === currentPage);
+  const currentPage = pageKey(location.pathname);
+  const isTourDetail = tours.some(tour => pageKey(tour.detailUrl) === currentPage);
   const desktopNavLinks = [...document.querySelectorAll('.nav-links a')];
   const mobileNavLinks = [...document.querySelectorAll('.nav-mobile a:not(.btn)')];
   const navLinks = [...desktopNavLinks, ...mobileNavLinks];
@@ -265,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const setActiveNav = (activeHref, storyPosition = false) => {
     navLinks.forEach(link => {
-      const active = link.getAttribute('href') === activeHref;
+      const active = pageKey(link.getAttribute('href')) === pageKey(activeHref);
       link.classList.toggle('active', active);
       if (active && !storyPosition) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
@@ -273,11 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(positionActivePill);
   };
 
-  const pageHref = isTourDetail ? 'packages.html' : currentPage || 'index.html';
+  const pageHref = isTourDetail ? 'packages' : currentPage;
   setActiveNav(pageHref);
 
   const homepageSections = [...document.querySelectorAll('[data-home-section]')];
-  if ((currentPage === 'index.html' || currentPage === '') && homepageSections.length) {
+  if (currentPage === 'index' && homepageSections.length) {
     const storyNavMap = {
       hero: 'index.html',
       founderStory: 'about.html',
@@ -290,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const storyObserver = new IntersectionObserver(entries => {
       const visible = entries.find(entry => entry.isIntersecting);
       const activeHref = visible && storyNavMap[visible.target.dataset.homeSection];
-      if (activeHref) setActiveNav(activeHref, activeHref !== 'index.html');
+      if (activeHref) setActiveNav(activeHref, pageKey(activeHref) !== 'index');
     }, {rootMargin: '-34% 0px -55% 0px', threshold: 0});
     homepageSections.forEach(section => storyObserver.observe(section));
   }

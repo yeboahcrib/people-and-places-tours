@@ -32,8 +32,13 @@ export function normaliseSiteUrl(value) {
   return url;
 }
 
+// Canonical tags, Open Graph URLs and the sitemap all come through here, so
+// the extension is stripped in one place. Cloudflare Pages serves /about and
+// 308-redirects /about.html to it — pointing our own canonical tags and sitemap
+// at the redirecting form told search engines the authoritative address was one
+// that immediately bounces somewhere else.
 export const pageUrl = (siteUrl, file) =>
-  file === 'index.html' ? `${siteUrl}/` : `${siteUrl}/${file}`;
+  file === 'index.html' ? `${siteUrl}/` : `${siteUrl}/${file.replace(/\.html$/i, '')}`;
 
 /**
  * Adds social and canonical metadata to one page. Pages that already declare

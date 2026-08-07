@@ -44,6 +44,24 @@ for (const file of generatedHtmlFiles) {
   // flush against the left edge of the window — on 404 that had gone unnoticed
   // entirely. It is a class on an element rather than a rule in the stylesheet,
   // so nothing else can catch it going missing.
+  // Cloudflare serves /about and 308-redirects /about.html to it, so an
+  // internal link written with the extension costs a redirect round trip before
+  // the page starts loading. There were 546 of them.
+  //
+  // This also guards something subtler that had already broken in production:
+  // script.js identifies the current page from the URL, and mixing the two
+  // forms is what killed the active navigation highlight and stopped tour pages
+  // reading their price from the catalogue. One consistent style, checked here.
+  const extensionLinks = (html.match(/\b(?:href|src)="[a-z0-9][a-z0-9-]*\.html(?:[?#][^"]*)?"/g) || []);
+  assert.equal(extensionLinks.length, 0,
+    `${file} still links to .html URLs, which redirect on Cloudflare: ${extensionLinks.slice(0, 3).join(', ')}`);
+
+  const canonical = html.match(/rel="canonical" href="([^"]*)"/)?.[1];
+  if (canonical) {
+    assert(!canonical.endsWith('.html'),
+      `${file} declares a canonical URL that redirects: ${canonical}`);
+  }
+
   // The booking form must post to our own Function on any build that has one.
   // This was decided at runtime from the hostname, which silently stopped being
   // true the moment the custom domain went live — enquiries went to FormSubmit

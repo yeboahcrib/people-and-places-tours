@@ -87,7 +87,26 @@ const rootRelativeUrls = html => html.replace(
 // means it follows the site wherever it is deployed.
 const injectFormNext = (html, site) => html.replace(
   /(<input[^>]*name="_next"[^>]*value=")[^"]*(")/g,
-  (_match, before, after) => `${before}${site}/thanks.html${after}`,
+  (_match, before, after) => `${before}${site}/thanks${after}`,
+);
+
+// Cloudflare Pages serves clean URLs: /about is the real address and
+// /about.html 308-redirects to it. Every internal link on the site was written
+// with the extension, so every click cost a redirect round trip before the page
+// even started loading — 546 of them across 21 pages, on a site whose audience
+// is mostly on mobile data.
+//
+// The pattern is deliberately narrow: an attribute value that is a bare page
+// name and nothing else. It cannot match an absolute URL (those contain "://",
+// which the character class excludes) or a path into a directory, so it will
+// not touch assets. Attribute-scoped, so it cannot disturb element structure —
+// the failure mode that broke this site three times before.
+//
+// index.html becomes "/" rather than "index", because that is the address
+// Cloudflare actually serves the homepage at.
+const cleanInternalUrls = html => html.replace(
+  /\b(href|src)="([a-z0-9][a-z0-9-]*)\.html((?:[?#][^"]*)?)"/g,
+  (_match, attr, name, suffix) => `${attr}="${name === 'index' ? '/' : name}${suffix}"`,
 );
 
 await rm(outputRoot, {recursive: true, force: true});
@@ -125,7 +144,10 @@ for (const entry of rootEntries) {
     });
     if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(entry.name);
     const withNext = injectFormNext(withMeta, siteUrl);
-    const final = entry.name === '404.html' ? rootRelativeUrls(withNext) : withNext;
+    // Strip extensions before the 404 page's root-absolute rewrite, so that
+    // pass sees "about" and produces "/about" rather than "/about.html".
+    const withCleanUrls = cleanInternalUrls(withNext);
+    const final = entry.name === '404.html' ? rootRelativeUrls(withCleanUrls) : withCleanUrls;
     await writeFile(join(outputRoot, entry.name), final, 'utf8');
   } else {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));

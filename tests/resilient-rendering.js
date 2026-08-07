@@ -34,8 +34,14 @@ function serveDist() {
   const server = http.createServer((request, response) => {
     const path = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const relative = normalize(path).replace(/^(\.\.[/\\])+/, '').replace(/^[/\\]+/, '');
-    const file = join(DIST_ROOT, relative || 'index.html');
-    if (!file.startsWith(DIST_ROOT) || !existsSync(file)) {
+    // Resolve extensionless URLs the way Cloudflare Pages does — /about serves
+    // about.html. Internal links carry no extension, so a plain file server
+    // would 404 on every one of them and this suite would be testing a site
+    // that does not match production.
+    const file = [relative || 'index.html', `${relative}.html`]
+      .map(candidate => join(DIST_ROOT, candidate))
+      .find(candidate => candidate.startsWith(DIST_ROOT) && existsSync(candidate)) || '';
+    if (!file || !file.startsWith(DIST_ROOT) || !existsSync(file)) {
       response.writeHead(404).end('Not found');
       return;
     }
