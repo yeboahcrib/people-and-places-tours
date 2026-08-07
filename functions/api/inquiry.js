@@ -55,6 +55,10 @@ function allowedOrigin(request, env) {
 // Turnstile runs inline on our own page and never navigates the visitor to a
 // challenge hosted elsewhere, which is the whole reason for preferring it to
 // the CAPTCHA interstitial the FormSubmit fallback can show.
+// Whether this deployment can actually verify a human. When it cannot, the
+// honeypot is the only bot defence left and has to stay switched on.
+const isTurnstileConfigured = env => Boolean(env.TURNSTILE_SECRET_KEY);
+
 async function passedTurnstile(token, request, env) {
   const secret = env.TURNSTILE_SECRET_KEY;
   // Not configured (local dev, early previews): the honeypot, origin check and
@@ -186,14 +190,33 @@ async function handlePost({request, env}) {
     return json(400, {error: 'Inquiry could not be read.'});
   }
 
-  // Bots commonly fill fields visually hidden from people. Return a normal
-  // success response so the bot does not learn how the filter works.
-  if (clean(input['company-website'], 200)) return json(200, {ok: true});
-
   // Verified before any real work: a token that fails here should cost us
   // nothing beyond the check itself.
-  if (!await passedTurnstile(clean(input['cf-turnstile-response'], 2048), request, env)) {
+  const turnstileVerified = await passedTurnstile(clean(input['cf-turnstile-response'], 2048), request, env);
+  if (!turnstileVerified) {
     return json(403, {error: 'We could not confirm this was submitted by a person. Please reload the page and try again.'});
+  }
+
+  // The honeypot now only applies when Turnstile did not actually verify this
+  // request — that is, on a deployment with no secret configured.
+  //
+  // It used to run first and unconditionally, and it silently discarded real
+  // enquiries. Browsers autofill hidden fields: the trap was named
+  // `company-website`, which Chrome happily fills from a saved profile, and
+  // anyone whose browser did so had their enquiry dropped. They saw a success
+  // message, we received nothing, and no error was recorded anywhere. That is
+  // the worst failure this endpoint can have — a lost customer that neither
+  // side can detect. It is how this was found: an enquiry that "sent" but
+  // showed no reference number and never arrived.
+  //
+  // Ordering it after Turnstile fixes it properly rather than by renaming the
+  // field. Turnstile is a far stronger signal than a hidden input; once it has
+  // confirmed a human, a filled trap is autofill, not a bot, and deleting that
+  // person's message is plainly the wrong call.
+  if (!isTurnstileConfigured(env) && clean(input['company-website'], 200)) {
+    // Return a normal success response so a bot does not learn how the filter
+    // works.
+    return json(200, {ok: true});
   }
 
   const payload = normalizePayload(input);

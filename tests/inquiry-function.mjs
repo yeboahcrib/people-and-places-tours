@@ -30,6 +30,9 @@ assert.equal(response.status, 405);
 response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'not-an-email'});
 assert.equal(response.status, 400);
 
+// With no Turnstile secret configured, the honeypot is the only bot defence
+// left, so a filled trap is still discarded — quietly, and with no reference,
+// so a bot learns nothing from the response.
 response = await invoke({
   'first-name': 'Bot',
   'last-name': 'Submission',
@@ -37,6 +40,8 @@ response = await invoke({
   'company-website': 'https://spam.example',
 });
 assert.equal(response.status, 200);
+assert.equal(JSON.parse(await response.clone().text()).reference, undefined,
+  'a discarded submission must not return a reference');
 
 response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com'});
 assert.equal(response.status, 503);
@@ -118,18 +123,28 @@ try {
 } finally { restore(); }
 assert.equal(response.status, 403);
 
-// The honeypot short-circuits before verification, so bots cost us no
-// siteverify calls at all.
+// The honeypot used to short-circuit before verification, to save a siteverify
+// call on obvious bots. That saving is not worth what it cost: browsers
+// autofill hidden fields, so it silently discarded real enquiries from people
+// whose browser filled the trap — success on screen, nothing delivered, no
+// error anywhere. Turnstile now runs first and, once it has confirmed a human,
+// a filled trap is treated as autofill rather than a bot.
 let siteverifyCalls = 0;
 restore = stubFetch(async url => {
   if (String(url) === siteverify) siteverifyCalls += 1;
   return new Response(JSON.stringify({success: true}), {status: 200});
 });
 try {
-  response = await invoke({...guest, 'company-website': 'https://spam.example'}, {}, withTurnstile);
+  response = await invoke(
+    {...guest, 'cf-turnstile-response': 'good-token', 'company-website': 'https://spam.example'},
+    {},
+    withTurnstile,
+  );
 } finally { restore(); }
 assert.equal(response.status, 200);
-assert.equal(siteverifyCalls, 0);
+assert.equal(siteverifyCalls, 1, 'Turnstile must be consulted before the honeypot is allowed to discard anything');
+assert.match(JSON.parse(await response.clone().text()).reference, /^PP-/,
+  'a verified human must be delivered even with the honeypot filled, and get a real reference');
 
 const originalFetch = globalThis.fetch;
 let providerRequest;
@@ -161,6 +176,42 @@ assert.equal(email.reply_to, 'ada@example.com');
 assert(!email.html.includes('<script>'));
 assert(!email.html.includes('<img src=x'));
 assert(email.html.includes('&lt;script&gt;'));
+
+// A real person whose browser autofilled the hidden trap must still get
+// through. This is the bug that lost a live enquiry: the honeypot ran first and
+// unconditionally, so an autofilled field discarded the message before Turnstile
+// was ever consulted. The visitor saw success, nothing arrived, and no error was
+// recorded. Once Turnstile has confirmed a human, a filled trap is autofill.
+{
+  const realFetch = globalThis.fetch;
+  let sent = null;
+  globalThis.fetch = async (url, init) => {
+    if (String(url).includes('siteverify')) return new Response(JSON.stringify({success: true}), {status: 200});
+    sent = {url, init};
+    return new Response(JSON.stringify({id: 'email_456'}), {status: 200});
+  };
+  let autofilled;
+  try {
+    autofilled = await invoke({
+      'first-name': 'Ada',
+      'last-name': 'Guest',
+      email: 'ada@example.com',
+      'cf-turnstile-response': 'a-valid-token',
+      'company-website': 'Ada Travel Ltd',
+    }, {}, {
+      TURNSTILE_SECRET_KEY: 'secret',
+      RESEND_API_KEY: 'test-key',
+      INQUIRY_TO_EMAIL: 'team@example.com',
+      INQUIRY_FROM_EMAIL: 'website@example.com',
+    });
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  assert.equal(autofilled.status, 200);
+  assert(sent, 'an autofilled honeypot must not stop the email being sent once Turnstile has passed');
+  assert.match(JSON.parse(await autofilled.clone().text()).reference, /^PP-/,
+    'a delivered enquiry must return a real reference, not fall back to "sent"');
+}
 
 // The booking reference is read aloud down a phone line, so its shape is a
 // promise to guests rather than an implementation detail. Guard all three
