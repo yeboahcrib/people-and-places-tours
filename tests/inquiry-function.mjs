@@ -157,7 +157,15 @@ try {
     'first-name': 'Ada',
     'last-name': 'Guest',
     email: 'ada@example.com',
+    country: 'United States',
     'tour-interest': 'cape-coast',
+    'travel-date': '2027-04-10',
+    'departure-date': '2027-04-17',
+    'date-flexibility': 'yes',
+    'traveling-with-children': 'yes',
+    'children-age-ranges': '4–7',
+    accommodation: 'family',
+    'contact-method': 'email',
     'tour-name': 'Forged tour <script>alert(1)</script>',
     message: '<img src=x onerror=alert(1)>',
   }, {}, {
@@ -177,6 +185,10 @@ assert(!email.html.includes('<script>'));
 assert(!email.html.includes('<img src=x'));
 assert(!email.html.includes('Forged tour'), 'browser-supplied tour names must not be trusted');
 assert(email.html.includes('Cape Coast Ancestral Tour'));
+assert(email.html.includes('United States'));
+assert(email.html.includes('2027-04-17'));
+assert(email.html.includes('4–7'));
+assert(email.text.includes('Accommodation: family'));
 
 // A verified human whose browser autofilled the hidden trap must still be
 // delivered. Running the honeypot unconditionally discards the message before
@@ -262,6 +274,18 @@ assert.equal(response.status, 400);
 response = await invoke({...guest, 'tour-interest': 'forged-tour'});
 assert.equal(response.status, 400);
 response = await invoke({...guest, 'travel-date': '2026-02-31'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'departure-date': 'not-a-date'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'travel-date': '2027-05-02', 'departure-date': '2027-05-01'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'date-flexibility': 'sometimes'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, accommodation: 'penthouse'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'traveling-with-children': 'no', 'children-age-ranges': '10'});
+assert.equal(response.status, 400);
+response = await invoke({...guest, 'contact-method': 'whatsapp'});
 assert.equal(response.status, 400);
 response = await invoke({...guest, message: 'x'.repeat(5001)});
 assert.equal(response.status, 400);

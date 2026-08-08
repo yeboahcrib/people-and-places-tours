@@ -123,6 +123,9 @@ function serveDist() {
       redirectTarget: form.querySelector('input[name="_next"]')?.value || '',
       captchaDisabled: form.querySelector('input[name="_captcha"]')?.value === 'false',
       formSubmitHoneypot: Boolean(form.querySelector('input[name="_honey"]')),
+      countryField: Boolean(form.querySelector('input[name="country"][maxlength="100"]')),
+      planningFields: ['departure-date', 'date-flexibility', 'traveling-with-children', 'children-age-ranges', 'accommodation', 'contact-method']
+        .every(name => Boolean(form.querySelector(`[name="${name}"]`))),
       tourOptions: form.querySelectorAll('#tour-interest option').length,
       tourOptionLabels: [...form.querySelectorAll('#tour-interest option')].map(option => option.textContent.trim()),
     };
@@ -141,6 +144,8 @@ function serveDist() {
     assert(formState.requiredFields.includes(field),
       `JavaScript-free form does not require ${field}, so an unanswerable enquiry can be sent`);
   }
+  assert(formState.countryField, 'JavaScript-free form is missing the optional country field');
+  assert(formState.planningFields, 'JavaScript-free form is missing one or more unified planning fields');
 
   // FormSubmit's built-in CAPTCHA is reCAPTCHA, which needs JavaScript to draw
   // its checkbox — and every visitor who reaches FormSubmit does so because

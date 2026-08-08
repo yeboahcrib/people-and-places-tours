@@ -2752,6 +2752,7 @@ body.page-entering {
 }
 .booking-flow [aria-invalid="true"] { border-color: var(--color-error); }
 .booking-flow [aria-invalid="true"]:focus { box-shadow: var(--ring-error); }
+.booking-flow-ready [data-conditional-hidden] { display: none; }
 
 /* ── Actions ──────────────────────────────────────────────────── */
 /* Default (no JS): the Continue button is meaningless, the submit

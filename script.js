@@ -815,6 +815,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
+    const overnightDetails = [...contactForm.querySelectorAll('[data-trip-detail="overnight"]')];
+    const childrenSelect = contactForm.querySelector('#traveling-with-children');
+    const childrenDetail = contactForm.querySelector('[data-children-detail]');
+    const childrenAges = contactForm.querySelector('#children-age-ranges');
+    const departureDate = contactForm.querySelector('#departure-date');
+    const contactMethod = contactForm.querySelector('#contact-method');
+    const phone = contactForm.querySelector('#phone');
+    const overnightTours = new Set(['custom', 'just-go-ghana']);
+    const setConditionalVisibility = (elements, visible) => {
+      elements.filter(Boolean).forEach(element => {
+        element.toggleAttribute('data-conditional-hidden', !visible);
+        element.querySelectorAll('input, select, textarea').forEach(field => { field.disabled = !visible; });
+      });
+    };
+    const updateTripDetails = () => {
+      // With no chosen experience we leave the planning questions available.
+      // A specific day tour hides fields that cannot affect that booking.
+      const showOvernight = !tourSelect?.value || overnightTours.has(tourSelect.value);
+      setConditionalVisibility(overnightDetails, showOvernight);
+      const showChildrenAges = childrenSelect?.value === 'yes';
+      setConditionalVisibility([childrenDetail], showChildrenAges);
+    };
     let updateTourName = () => {};
     if (tourSelect) {
       updateTourName = () => {
@@ -825,9 +847,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (requestedTour && [...tourSelect.options].some(option => option.value === requestedTour)) {
         tourSelect.value = requestedTour;
       }
-      tourSelect.addEventListener('change', updateTourName);
+      tourSelect.addEventListener('change', () => {
+        updateTourName();
+        updateTripDetails();
+      });
       updateTourName();
     }
+    childrenSelect?.addEventListener('change', updateTripDetails);
 
     /* ── Booking flow ──
        Two progressively disclosed steps. Visibility is driven by
@@ -855,6 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
       [contactForm.querySelector('#first-name'), value => Boolean(value)],
       [contactForm.querySelector('#last-name'), value => Boolean(value)],
       [contactForm.querySelector('#email'), value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)],
+      ...(contactMethod?.value === 'whatsapp' ? [[phone, value => Boolean(value)]] : []),
     ];
 
     const clearFieldError = field => {
@@ -867,9 +894,13 @@ document.addEventListener('DOMContentLoaded', () => {
     requiredFields().forEach(([field]) => {
       field?.addEventListener('input', () => clearFieldError(field));
     });
+    contactMethod?.addEventListener('change', () => {
+      if (phone) phone.setAttribute('aria-required', String(contactMethod.value === 'whatsapp'));
+    });
 
     if (totalSteps > 1) {
       contactForm.classList.add('booking-flow-ready');
+      updateTripDetails();
 
       showBookingStep = (step, moveFocus = false) => {
         currentBookingStep = Math.min(Math.max(step, 1), totalSteps);
@@ -914,6 +945,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (travelDate) {
       const now = new Date();
       travelDate.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      if (departureDate) departureDate.min = travelDate.min;
+      travelDate.addEventListener('change', () => {
+        if (departureDate) departureDate.min = travelDate.value || travelDate.min;
+      });
     }
 
     const showBookingSuccess = reference => {
@@ -949,7 +984,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (firstInvalid) {
         e.preventDefault();
-        if (errorEl) errorEl.textContent = 'Please share your name and a valid email so we know how to reach you.';
+        if (errorEl) errorEl.textContent = firstInvalid === phone
+          ? 'Please add a phone number so we can contact you on WhatsApp.'
+          : 'Please share your name and a valid email so we know how to reach you.';
         if (totalSteps > 1 && currentBookingStep !== totalSteps) showBookingStep(totalSteps);
         firstInvalid.focus();
         return;
@@ -992,6 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
         contactForm.reset();
         inquirySubmissionId = '';
         updateTourName();
+        updateTripDetails();
         if (totalSteps > 1) showBookingStep(1);
         if (!showBookingSuccess(result.reference)) {
           btn.textContent = 'Your Ghana journey has started.';

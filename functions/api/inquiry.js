@@ -2,6 +2,10 @@ const MAX_BODY_BYTES = 32_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001F\u007F]/;
 const GROUP_SIZES = new Set(['', 'solo', '2', '3-5', '6-10', '11-15', '15+']);
+const DATE_FLEXIBILITY = new Set(['', 'yes', 'no']);
+const CHILDREN_CHOICES = new Set(['', 'yes', 'no']);
+const ACCOMMODATION_CHOICES = new Set(['', 'shared', 'private', 'family']);
+const CONTACT_METHODS = new Set(['', 'email', 'whatsapp']);
 const TOUR_NAMES = new Map([
   ['', 'Not selected'],
   ['custom', 'Custom tour request'],
@@ -31,6 +35,12 @@ const limits = {
   'tour-name': 200,
   'group-size': 30,
   'travel-date': 10,
+  'departure-date': 10,
+  'date-flexibility': 3,
+  'traveling-with-children': 3,
+  'children-age-ranges': 120,
+  accommodation: 20,
+  'contact-method': 20,
   country: 100,
   message: 5000,
   source: 100,
@@ -141,17 +151,30 @@ function validateInputShape(input) {
 function validate(payload) {
   if (!payload['first-name'] || !payload['last-name']) return 'Please provide your first and last name.';
   if (!EMAIL_PATTERN.test(payload.email)) return 'Please provide a valid email address.';
-  if ([payload['first-name'], payload['last-name'], payload.email, payload.phone].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
+  if ([payload['first-name'], payload['last-name'], payload.email, payload.phone, payload.country, payload['children-age-ranges']].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
     return 'Inquiry contains invalid characters.';
   }
   if (!GROUP_SIZES.has(payload['group-size'])) return 'Please provide a valid group size.';
   if (!TOUR_NAMES.has(payload['tour-interest'])) return 'Please select a valid tour.';
+  if (!DATE_FLEXIBILITY.has(payload['date-flexibility'])) return 'Please provide a valid date-flexibility choice.';
+  if (!CHILDREN_CHOICES.has(payload['traveling-with-children'])) return 'Please provide a valid traveling-with-children choice.';
+  if (!ACCOMMODATION_CHOICES.has(payload.accommodation)) return 'Please provide a valid accommodation preference.';
+  if (!CONTACT_METHODS.has(payload['contact-method'])) return 'Please provide a valid contact preference.';
   if (payload.phone && !/^[+()\d\s.-]+$/.test(payload.phone)) return 'Please provide a valid phone number.';
+  if (payload['contact-method'] === 'whatsapp' && !payload.phone) return 'Please provide a phone number for WhatsApp contact.';
+  if (payload['traveling-with-children'] !== 'yes' && payload['children-age-ranges']) return 'Children age ranges require a traveling-with-children selection.';
   if (payload['travel-date']) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(payload['travel-date'])) return 'Please provide a valid travel date.';
     const date = new Date(`${payload['travel-date']}T00:00:00Z`);
     if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== payload['travel-date']) return 'Please provide a valid travel date.';
     if (payload['travel-date'] < new Date().toISOString().slice(0, 10)) return 'Please choose today or a future travel date.';
+  }
+  if (payload['departure-date']) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(payload['departure-date'])) return 'Please provide a valid departure date.';
+    const date = new Date(`${payload['departure-date']}T00:00:00Z`);
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== payload['departure-date']) return 'Please provide a valid departure date.';
+    if (payload['departure-date'] < new Date().toISOString().slice(0, 10)) return 'Please choose today or a future departure date.';
+    if (payload['travel-date'] && payload['departure-date'] < payload['travel-date']) return 'Departure date cannot be before arrival date.';
   }
   return null;
 }
@@ -195,7 +218,13 @@ function inquiryText(payload, requestId) {
     `Tour: ${payload['tour-name'] || payload['tour-interest'] || 'Not selected'}`,
     `Group size: ${payload['group-size'] || 'Not provided'}`,
     `Preferred date: ${payload['travel-date'] || 'Not provided'}`,
+    `Departure date: ${payload['departure-date'] || 'Not provided'}`,
+    `Dates flexible: ${payload['date-flexibility'] || 'Not provided'}`,
+    `Traveling with children: ${payload['traveling-with-children'] || 'Not provided'}`,
+    `Children's age ranges: ${payload['children-age-ranges'] || 'Not provided'}`,
+    `Accommodation: ${payload.accommodation || 'Not provided'}`,
     `Country: ${payload.country || 'Not provided'}`,
+    `Preferred contact: ${payload['contact-method'] || 'Not provided'}`,
     `Source: ${payload.source || 'Website inquiry'}`,
     '',
     'Message:',
@@ -215,7 +244,13 @@ function inquiryHtml(payload, requestId) {
       ${row('Tour', payload['tour-name'] || payload['tour-interest'])}
       ${row('Group size', payload['group-size'])}
       ${row('Preferred date', payload['travel-date'])}
+      ${row('Departure date', payload['departure-date'])}
+      ${row('Dates flexible', payload['date-flexibility'])}
+      ${row('Traveling with children', payload['traveling-with-children'])}
+      ${row("Children's age ranges", payload['children-age-ranges'])}
+      ${row('Accommodation', payload.accommodation)}
       ${row('Country', payload.country)}
+      ${row('Preferred contact', payload['contact-method'])}
       ${row('Source', payload.source || 'Website inquiry')}
     </table>
     <h2>Message</h2>
