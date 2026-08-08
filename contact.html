@@ -181,15 +181,58 @@
                 </div>
               </div>
 
-              <div class="form-group form-group-half">
-                <label class="form-label" for="travel-date">Roughly when would you like to come? <span class="form-optional">optional</span></label>
-                <input class="form-input" type="date" id="travel-date" name="travel-date" aria-describedby="travel-date-help" />
-                <p class="form-help" id="travel-date-help">An approximate date is enough. We'll confirm together.</p>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="travel-date">Preferred arrival date <span class="form-optional">optional</span></label>
+                  <input class="form-input" type="date" id="travel-date" name="travel-date" aria-describedby="travel-date-help" />
+                  <p class="form-help" id="travel-date-help">An approximate date is enough.</p>
+                </div>
+                <div class="form-group" data-trip-detail="overnight">
+                  <label class="form-label" for="departure-date">Preferred departure date <span class="form-optional">optional</span></label>
+                  <input class="form-input" type="date" id="departure-date" name="departure-date" aria-describedby="departure-date-help" />
+                  <p class="form-help" id="departure-date-help">Useful for multi-day and custom trips.</p>
+                </div>
+              </div>
+
+              <div class="form-row" data-trip-detail="overnight">
+                <div class="form-group">
+                  <label class="form-label" for="date-flexibility">Are your dates flexible? <span class="form-optional">optional</span></label>
+                  <select class="form-select" id="date-flexibility" name="date-flexibility">
+                    <option value="" selected>Not sure yet</option>
+                    <option value="yes">Yes, we can shift them</option>
+                    <option value="no">No, the dates are fixed</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="accommodation">Accommodation preference <span class="form-optional">optional</span></label>
+                  <select class="form-select" id="accommodation" name="accommodation">
+                    <option value="" selected>We'll decide together</option>
+                    <option value="shared">Shared / double occupancy</option>
+                    <option value="private">Private / single occupancy</option>
+                    <option value="family">Family or mixed configuration</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="traveling-with-children">Traveling with children? <span class="form-optional">optional</span></label>
+                  <select class="form-select" id="traveling-with-children" name="traveling-with-children">
+                    <option value="" selected>Not sure yet</option>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                  </select>
+                </div>
+                <div class="form-group" data-children-detail>
+                  <label class="form-label" for="children-age-ranges">Children's age ranges <span class="form-optional">optional</span></label>
+                  <input class="form-input" type="text" id="children-age-ranges" name="children-age-ranges" maxlength="120" placeholder="For example: 4–7 and 12–15" aria-describedby="children-age-help" />
+                  <p class="form-help" id="children-age-help">Age ranges only—please don't include children's names.</p>
+                </div>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="message">What would make this trip feel special? <span class="form-optional">optional</span></label>
-                <textarea class="form-textarea" id="message" name="message" maxlength="5000" placeholder="Food, history, family roots, nature, a celebration, a slower pace… as much or as little as you like."></textarea>
+                <textarea class="form-textarea" id="message" name="message" maxlength="5000" placeholder="Share your interests, the pace you enjoy, a celebration, family roots, or what your ideal Ghana experience feels like."></textarea>
               </div>
             </fieldset>
 
@@ -223,6 +266,22 @@
                   <label class="form-label" for="phone">Phone or WhatsApp <span class="form-optional">optional</span></label>
                   <input class="form-input" type="tel" id="phone" name="phone" placeholder="+1 234 567 8900" maxlength="40" autocomplete="tel" aria-describedby="phone-help" />
                   <p class="form-help" id="phone-help">Handy if you'd rather we voice-note than type.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="country">Country of residence <span class="form-optional">optional</span></label>
+                  <input class="form-input" type="text" id="country" name="country" placeholder="United States" maxlength="100" autocomplete="country-name" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="contact-method">How should we contact you? <span class="form-optional">optional</span></label>
+                  <select class="form-select" id="contact-method" name="contact-method" aria-describedby="contact-method-help">
+                    <option value="" selected>No preference</option>
+                    <option value="email">Email</option>
+                    <option value="whatsapp">WhatsApp</option>
+                  </select>
+                  <p class="form-help" id="contact-method-help">A phone number is required only when WhatsApp is selected.</p>
                 </div>
               </div>
             </fieldset>
