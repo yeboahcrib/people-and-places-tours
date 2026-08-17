@@ -1,7 +1,9 @@
 # Cloudflare Pages Functions
 
-These functions are part of the planned Cloudflare Pages deployment. GitHub
-Pages does not execute this directory.
+These functions are **live in production** on Cloudflare Pages at
+`https://peopleplacesgh.com`. They run only where a Pages Function runtime
+exists: a plain static host, and a local `python3 -m http.server`, will not
+execute this directory, which is why the contact form keeps a fallback path.
 
 ## Inquiry endpoint
 
@@ -27,19 +29,23 @@ injected into `contact.html`:
 
 - `TURNSTILE_SITE_KEY` — set in the Pages build environment. Left unset, the
   form carries an empty `data-turnstile-sitekey` and never loads the widget
-  script, which is what keeps the GitHub Pages fallback free of a challenge it
-  has no Function to verify against.
+  script, which keeps a build with no Function behind it free of a challenge it
+  could not verify against.
 
 A request with no `Origin` header is refused outright. Browsers always send it
 on a POST, so its absence means the caller is not a browser following our form.
 
-The contact form remains in `fallback` mode on GitHub Pages. It automatically
-uses this endpoint on a `*.pages.dev` preview. At custom-domain cutover, set
-`data-inquiry-mode="cloudflare"` on the form after the endpoint and delivery
-notifications pass end-to-end testing.
+Form mode is chosen at build time, not at runtime. `scripts/render-booking.mjs`
+writes `data-inquiry-mode="cloudflare"` when `CF_PAGES` is set and `fallback`
+otherwise, so Cloudflare production and `*.pages.dev` previews use this
+endpoint while any other build keeps FormSubmit. The `fallback` value committed
+in `contact.html` is correct and should be left alone.
 
-Cloudflare rate-limiting and Turnstile should be configured before the custom
-domain cutover. The honeypot is a low-cost first filter, not a complete bot
+Turnstile is configured and live (`/api/health` reports
+`botProtectionConfigured: true`). **Cloudflare rate limiting on
+`POST /api/inquiry` is still outstanding** and remains an open security
+sign-off blocker; it cannot be verified from HTTP responses and must be checked
+in the dashboard. The honeypot is a low-cost first filter, not a complete bot
 defense.
 
 ## Health endpoint

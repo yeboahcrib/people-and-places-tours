@@ -41,9 +41,13 @@ such as a founder email plus WhatsApp or SMS escalation.
 1. Check Cloudflare Pages deployment status.
 2. Confirm the latest build completed and `dist/health.json` exists.
 3. Roll back to the last known-good Cloudflare deployment if the latest release
-   caused the failure.
-4. If Cloudflare itself is impaired, keep the last GitHub Pages deployment
-   available during the initial migration period.
+   caused the failure. Either redeploy the previous build from the Cloudflare
+   dashboard or revert the offending commit on `main`, which triggers a new
+   build.
+4. There is no longer a second host to fall back to: GitHub Pages is switched
+   off, and it could not serve the inquiry Function or `_headers` even if it
+   were re-enabled. A Cloudflare-wide outage means directing guests to the
+   WhatsApp, phone, and email channels until service returns.
 
 ### Inquiry health is degraded
 

@@ -1,33 +1,54 @@
 # Hosting and Delivery Architecture
 
 **Status:** Active architecture record
-**Verified:** August 2, 2026
+**Verified:** August 17, 2026 (previous verification August 2, 2026, superseded)
 
 ## Current production state
 
-The public website is hosted on GitHub Pages:
+The public website is hosted on Cloudflare Pages:
 
 - Repository: `yeboahcrib/people-and-places-tours`
-- Public URL: `https://yeboahcrib.github.io/people-and-places-tours/`
-- Pages status: built and public
-- Source branch: `main`
-- Source path: repository root (`/`)
-- Build type: legacy branch deployment
+- Public URL: `https://peopleplacesgh.com`
+- Source branch: `main`, via Cloudflare's GitHub integration
+- Build command: `npm run build`
+- Publish directory: `dist/`
+- `_headers` applied: yes
+- Pages Functions active: yes (`/api/inquiry`, `/api/health`)
 - HTTPS: enforced
-- Custom domain: none
+- GitHub Pages: switched off; `https://yeboahcrib.github.io/people-and-places-tours/`
+  returns 404
 
-The active development work is on `codex/travel-site-starter`. GitHub Pages
-does not publish that branch, so its changes are not public until they are
-reviewed and reach `main`.
+Cloudflare builds the site itself. Merging to `main` is therefore the
+deployment action — there is no separate publish step. Pushing any other branch
+produces a `*.pages.dev` preview build, which is the intended place to verify a
+change before merging.
 
-GitHub Pages currently serves the repository root directly. It does not run
-`npm run build`, does not publish `dist/`, and does not apply the repository's
-Cloudflare-style `_headers` file.
+### How this was verified
+
+Re-checkable from outside the Cloudflare dashboard, which matters because the
+previous version of this document asserted a host that had already changed:
+
+- `GET /api/health` returns the deployed commit SHA. On August 17, 2026 it
+  returned `05bb776`, the merge of PR #1, a commit present only on `main`.
+- Production `/contact` carries `data-inquiry-mode="cloudflare"`.
+  `scripts/render-booking.mjs` emits that value only when `CF_PAGES` is set,
+  which Cloudflare sets during its own builds and nothing else does. A locally
+  built `dist/` uploaded by hand would read `fallback`, so this is positive
+  evidence that Cloudflare runs the build.
+- Production response headers carry the full `_headers` policy — CSP, HSTS,
+  `frame-ancestors 'none'` — which a static branch host cannot apply.
+
+### Remaining unknown
+
+Whether preview deployments are enabled for non-production branches cannot be
+observed from outside; confirm in the Cloudflare dashboard. Cloudflare rate
+limiting on `POST /api/inquiry` is likewise dashboard-only and is still an open
+security sign-off blocker.
 
 ## Approved target state
 
-Cloudflare Pages is the production hosting target. Sanity is the approved
-editorial CMS.
+Cloudflare Pages hosting is now in place. Sanity remains the approved editorial
+CMS and is **not yet the live content source**.
 
 ```text
 Sanity CMS
@@ -71,14 +92,14 @@ the page from an empty mount.
 
 ### Inquiry service
 
-During the Cloudflare phase, private inquiries should pass through a narrowly
-scoped Cloudflare Pages Function. That function will validate input, enforce
-size limits, apply bot/rate controls, send operational notifications, and avoid
-placing private inquiry data in Sanity.
+Private inquiries pass through a narrowly scoped Cloudflare Pages Function. It
+validates input, enforces size limits, applies bot controls, sends operational
+notifications, and keeps private inquiry data out of Sanity.
 
-Until that function is deployed, the current GitHub Pages inquiry mechanism
-must remain operational. Migration must not silently replace it with an endpoint
-GitHub Pages cannot execute.
+The FormSubmit fallback remains in the committed source and stays operational
+for any build that cannot run a Function. This is not vestigial: it is what a
+non-Cloudflare build degrades to, and it must not be removed on the assumption
+that every build has a Function behind it.
 
 ## Build boundary
 
@@ -92,15 +113,19 @@ boundary: new internal directories are private by default.
 
 ## Host-specific behavior
 
-| Capability | GitHub Pages now | Cloudflare Pages target |
+| Capability | Cloudflare Pages (live) | GitHub Pages (retired) |
 | --- | --- | --- |
 | Static CDN | Yes | Yes |
-| Current publish input | Root of `main` | `dist/` |
-| Runs `npm run build` | No | Yes |
-| Applies `_headers` | No | Yes |
-| Server-side form code | No | Pages Functions |
-| Sanity build webhook | Not configured | Planned |
-| HTTPS | Enforced | Required at cutover |
+| Publish input | `dist/` | Root of `main` |
+| Runs `npm run build` | Yes | No |
+| Applies `_headers` | Yes | No |
+| Server-side form code | Pages Functions | No |
+| Sanity build webhook | Not configured | Not configured |
+| HTTPS | Enforced | Enforced |
+
+The GitHub Pages column is kept as the record of what was given up at cutover,
+not as an available fallback: Pages is switched off, and re-enabling it would
+serve a host that cannot run the inquiry Function or apply `_headers`.
 
 The Cloudflare `_headers` policy includes HTTPS enforcement, MIME-sniffing
 protection, clickjacking prevention, a restricted Permissions Policy, opener
@@ -111,18 +136,28 @@ exception is part of the later shared-component/style encapsulation phase.
 
 ## Migration sequence
 
-1. Keep the current GitHub Pages site operational while audit fixes are made.
-2. Harden the inquiry experience without removing its working static-host
-   fallback.
-3. Complete security, accessibility, responsive, rendering, and monitoring
-   improvements.
-4. Introduce shared templates/components and generate static pages from Sanity.
-5. Configure Cloudflare Pages with `npm run build` and output directory `dist`.
-6. Add a Sanity publish webhook that triggers a Cloudflare build.
-7. Add and verify the Cloudflare inquiry function, notification delivery,
-   rate controls, and privacy disclosures.
-8. Validate preview and production, then switch the public domain deliberately.
-9. Retain rollback capability until the Cloudflare deployment is proven stable.
+Steps 1–5, 7 and 8 are complete; the custom domain cutover to
+`https://peopleplacesgh.com` has happened and Cloudflare is the live host.
+
+1. ~~Keep the GitHub Pages site operational while audit fixes are made.~~ Done;
+   Pages has since been switched off.
+2. ~~Harden the inquiry experience without removing its working static-host
+   fallback.~~ Done; the fallback is retained by build-time mode selection.
+3. ~~Complete security, accessibility, responsive, rendering, and monitoring
+   improvements.~~ Done, with the open items tracked in the security audit.
+4. ~~Introduce shared templates/components and generate static pages.~~ Done for
+   templates and build-time rendering; Sanity is not yet the live source.
+5. ~~Configure Cloudflare Pages with `npm run build` and output directory
+   `dist`.~~ Done.
+6. Add a Sanity publish webhook that triggers a Cloudflare build. **Outstanding**
+   — required only when Sanity becomes the live content source.
+7. ~~Add and verify the Cloudflare inquiry function, notification delivery, and
+   privacy disclosures.~~ Done; `/api/health` reports delivery and bot
+   protection configured. **Rate limiting remains outstanding.**
+8. ~~Validate preview and production, then switch the public domain
+   deliberately.~~ Done.
+9. Rollback capability: no longer a GitHub Pages revert. Roll back by
+   redeploying a previous Cloudflare build or reverting the commit on `main`.
 
 Hosted payments or a separate transactional booking service are a later phase.
 They do not change the decision to keep public marketing and tour pages static.
@@ -136,9 +171,12 @@ browser-side web components: navigation is present in the delivered HTML even
 when JavaScript is unavailable. Active-page state is applied consistently by
 `script.js`, including mapping tour-detail pages back to Packages.
 
-Legacy page-level shell markup remains temporarily in the root HTML because the
-current GitHub Pages deployment still publishes those source files directly.
-It can be removed when Cloudflare `dist/` becomes the production artifact.
+Legacy page-level shell markup remains in the root HTML. The original reason —
+that GitHub Pages published those source files directly — no longer applies now
+that `dist/` is the production artifact, so this markup is a genuine cleanup
+opportunity rather than a constraint. Removing it is safe only for pages whose
+shell is fully build-generated; verify with `npm run test:resilience` and
+`npm run test:visual` before deleting any of it.
 
 The build also evaluates the existing homepage renderer in an isolated build
 context and injects the resulting ten sections into `dist/index.html`. Tour
@@ -166,13 +204,18 @@ markup; it renders the local fallback only when the legacy source page is empty.
 
 ## Inquiry transition implementation
 
-The repository contains `functions/api/inquiry.js` for Cloudflare Pages. It is
-deliberately dormant on the current GitHub Pages host. `contact.html` retains
-its working FormSubmit action and identifies that state with
-`data-inquiry-mode="fallback"`. Cloudflare `*.pages.dev` previews select the
-same-origin function automatically; a future custom domain requires switching
-the form mode only after email credentials, origin controls, notifications,
-rate limiting, and end-to-end delivery have been verified.
+The repository contains `functions/api/inquiry.js`, which is live and serving
+`POST /api/inquiry` in production.
+
+`contact.html` in the repository still carries `data-inquiry-mode="fallback"`
+alongside its FormSubmit action, and that is correct — the value is rewritten at
+build time. `scripts/render-booking.mjs` sets it to `cloudflare` when `CF_PAGES`
+is present and leaves it as `fallback` otherwise, so the host decides, not the
+browser. A runtime hostname test was rejected deliberately: it cannot tell a
+custom domain that has a Function from one that does not, and guessing wrong
+routes real enquiries to the fallback with no error raised. Do not "fix" the
+committed `fallback` value to `cloudflare`; that would break every non-Cloudflare
+build, including local ones.
 
 The function uses bounded server-side validation, a honeypot, same-origin or
 allow-listed origin checks, non-cacheable responses, provider idempotency, and
@@ -224,14 +267,20 @@ failure it produces is a confusing syntax error rather than a clear message.
 
 ### Order of operations
 
+**This checklist was executed at cutover and is retained as the launch record.**
+Steps 1–5 are complete: the domain is pointed, the Function is live, and
+`/api/health` reports delivery and bot protection configured. Re-run it only if
+the site is rebuilt on a new Cloudflare project or moved to another host.
+
 1. Deploy without `SANITY_STUDIO_PROJECT_ID` first. This isolates hosting
    problems from CMS problems; adding both at once means a failure could be
    either.
 2. Start Resend domain verification early — it waits on DNS propagation and is
    the most likely thing to hold up launch.
-3. Submit a real enquiry on the `.pages.dev` URL before pointing the domain.
-   **The Function has never executed** — GitHub Pages cannot run it — so this
-   is its first real test, and it is the one step with no prior evidence.
+3. Submit a real enquiry on the `.pages.dev` URL before pointing the domain. At
+   the time this was written the Function had never executed, because the
+   previous host could not run it, making this its first real test and the one
+   step with no prior evidence behind it.
 4. Test with JavaScript disabled too. That path goes to FormSubmit rather than
    the Function, and it is the only way to check the fallback still works.
 5. Point the domain last.
