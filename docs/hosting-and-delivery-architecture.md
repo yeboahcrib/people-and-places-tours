@@ -38,12 +38,39 @@ previous version of this document asserted a host that had already changed:
 - Production response headers carry the full `_headers` policy — CSP, HSTS,
   `frame-ancestors 'none'` — which a static branch host cannot apply.
 
+### Preview deployments
+
+Preview deployments **are** enabled. Pushing a branch produces
+`https://<branch>.people-and-places-tours.pages.dev` within roughly a minute,
+and `GET /api/health` on it reports the deployed commit, so a preview can be
+matched to a branch tip with certainty.
+
+**Previews do not have the inquiry secrets bound.** Verified 17 August 2026 on a
+branch preview: `/api/health` returned `status: degraded` with
+`deliveryConfigured: false` and `botProtectionConfigured: false`, while
+`/contact` still served `data-inquiry-mode="cloudflare"` because `CF_PAGES` is
+set there. The form on a preview therefore posts to a Function that cannot
+deliver, and Turnstile is absent.
+
+The consequence is worth stating plainly, because it contradicts the obvious
+reading of "test on preview, then merge": **the booking flow — the one path on
+this site that costs money when it breaks — cannot be verified end to end on a
+preview.** Layout, copy, navigation and rendering can. Delivery cannot.
+
+Two ways to close that gap, whichever suits:
+
+- Bind preview-scoped `RESEND_API_KEY`, `INQUIRY_TO_EMAIL`,
+  `INQUIRY_FROM_EMAIL` and `TURNSTILE_SECRET_KEY` (plus the
+  `TURNSTILE_SITE_KEY` build variable) in the Cloudflare preview environment,
+  ideally pointed at a test recipient. Previews then exercise the real path.
+- Or accept it, and treat any change touching the inquiry Function, the booking
+  form, or `render-booking.mjs` as requiring a real submission check in
+  production immediately after merge.
+
 ### Remaining unknown
 
-Whether preview deployments are enabled for non-production branches cannot be
-observed from outside; confirm in the Cloudflare dashboard. Cloudflare rate
-limiting on `POST /api/inquiry` is likewise dashboard-only and is still an open
-security sign-off blocker.
+Cloudflare rate limiting on `POST /api/inquiry` is dashboard-only, cannot be
+proven from HTTP responses, and is still an open security sign-off blocker.
 
 ## Approved target state
 
