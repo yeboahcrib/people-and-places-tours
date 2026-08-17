@@ -5,4 +5,9 @@ tests/visual-baseline/
 tests/visual-diffs/
 .claude/
 *.log
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
 studio/.sanity/

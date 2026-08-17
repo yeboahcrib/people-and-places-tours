@@ -59,10 +59,9 @@ project ID and dataset to point our existing config at:
 
 ## How the website will publish this content
 
-Per the verified hosting decision (GitHub Pages from the root of `main` now,
-Cloudflare Pages at cutover), the website does **not** need a server-rendered
-framework. The preferred production integration is to query Sanity during the
-Cloudflare build and generate static HTML into `dist/`. This keeps published
+The website is hosted on Cloudflare Pages, built from `main`, and does **not**
+need a server-rendered framework. The production integration is to query Sanity
+during the Cloudflare build and generate static HTML into `dist/`. This keeps published
 pages available even if Sanity is temporarily unavailable and ensures essential
 content exists before browser JavaScript runs.
 

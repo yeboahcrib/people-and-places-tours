@@ -7,13 +7,24 @@ build validates browser JavaScript and copies approved public files into
 `homepage-content.js` + `homepage-sections.js` (data + renderer) and `tours.js`
 (the tour catalog used across the site).
 
-Hosting is verified as GitHub Pages from the root of `main`; the current
-development branch is not the live source. Cloudflare Pages is the approved
-production target and Sanity is the approved editorial CMS. `npm run build`
-creates the allow-listed `dist/` output that Cloudflare will publish. GitHub
-Pages currently does not run that build or apply `_headers`. See
+The site is live at `https://peopleplacesgh.com` on **Cloudflare Pages, built
+from `main`**. Cloudflare is connected to the GitHub repository and runs
+`npm run build` itself, publishing the allow-listed `dist/` output and applying
+`_headers`. **Merging to `main` is the deploy** — there is no separate publish
+step. Pushing any other branch produces a `*.pages.dev` preview, which is where
+a change should be checked before it is merged. GitHub Pages is switched off;
+the old `yeboahcrib.github.io` URL returns 404. Sanity is the approved editorial
+CMS but is not yet the live content source. See
 `docs/hosting-and-delivery-architecture.md` before changing deployment, forms,
 headers, or CMS integration.
+
+Two consequences worth knowing before editing `contact.html` or the build:
+`scripts/render-booking.mjs` sets `data-inquiry-mode` to `cloudflare` only when
+`CF_PAGES` is present, so the `fallback` value in the committed source is
+correct and must stay — a build that cannot run a Function must not point at
+one. Likewise `scripts/render-meta.mjs` defaults `SITE_URL` to the live domain,
+so canonicals, `sitemap.xml`, and `robots.txt` are generated at build time; the
+copies in the repository root are inputs, not what ships.
 
 A more detailed architecture handoff lives at `docs/claude-homepage-handoff.md`.
 

@@ -118,6 +118,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const arrowIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
   const cardImageSizes = '(min-width: 1180px) 360px, (min-width: 760px) 45vw, 100vw';
 
+  /* ── HOMEPAGE PATHWAYS — SCROLL EXPANSION ──
+     The existing yellow section is the animated object. It starts as a
+     smaller framed composition, expands to its normal layout as it enters,
+     and reverses naturally when the visitor scrolls back above it. */
+  const pathwaySection = document.querySelector('[data-home-section="waysToExperience"]');
+  if (pathwaySection) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pathwayCards = [...pathwaySection.querySelectorAll('.pathway-card')];
+    const cardMotion = [
+      [-34, 24, -1.8], [28, 46, 1.5], [-24, 34, -1.1],
+      [36, 20, 1.7], [-30, 42, -1.4], [24, 28, 1.2],
+    ];
+    let pathwayFrame = 0;
+
+    const updatePathwayProgress = () => {
+      pathwayFrame = 0;
+      if (reducedMotion) {
+        pathwaySection.style.setProperty('--pathway-progress', '1');
+        pathwaySection.style.setProperty('--pathway-scale', '1');
+        return;
+      }
+      const rect = pathwaySection.getBoundingClientRect();
+      const start = window.innerHeight * 0.94;
+      const distance = Math.max(window.innerHeight * 0.72, 520);
+      const progress = Math.max(0, Math.min(1, (start - rect.top) / distance));
+      const inverse = 1 - progress;
+      pathwaySection.style.setProperty('--pathway-progress', progress.toFixed(4));
+      pathwaySection.style.setProperty('--pathway-scale', (0.86 + (progress * 0.14)).toFixed(4));
+      pathwayCards.forEach((card, index) => {
+        const [x, y, rotation] = cardMotion[index] || [0, 24, 0];
+        card.style.setProperty('--pathway-card-x', `${(x * inverse).toFixed(2)}px`);
+        card.style.setProperty('--pathway-card-y', `${(y * inverse).toFixed(2)}px`);
+        card.style.setProperty('--pathway-card-rotation', `${(rotation * inverse).toFixed(2)}deg`);
+      });
+      pathwaySection.classList.toggle('is-pathway-expanded', progress > 0.98);
+    };
+
+    const requestPathwayUpdate = () => {
+      if (!pathwayFrame) pathwayFrame = requestAnimationFrame(updatePathwayProgress);
+    };
+
+    window.addEventListener('scroll', requestPathwayUpdate, {passive: true});
+    window.addEventListener('resize', requestPathwayUpdate, {passive: true});
+    requestAnimationFrame(updatePathwayProgress);
+  }
+
   function renderPackageTours() {
     const grid = document.getElementById('tours-grid');
     if (!grid || tours.length === 0) return;

@@ -12,6 +12,7 @@
     "test:headers": "node tests/security-headers.mjs",
     "test:inquiry": "node tests/inquiry-function.mjs",
     "test:responsive": "node tests/responsive.js",
+    "test:pathway-spotlight": "node tests/pathway-spotlight.js",
     "test:resilience": "node tests/resilient-rendering.js",
     "test:smoke": "node tests/smoke.js",
     "test:visual": "node tests/visual-regression.js",
