@@ -133,6 +133,9 @@
   }
 
   function renderWaysToExperienceSection(data) {
+    // An editor who removes every pathway means it: leave the section out
+    // rather than printing a heading over an empty grid.
+    if (!(data.pathways || []).length) return '';
     return `
 <!-- Experience-style gateways into the filtered catalogue. -->
 <section class="pathways-section white-lift section-pad" aria-label="Ways to experience Ghana" data-home-section="waysToExperience">
@@ -161,6 +164,7 @@
   }
 
   function renderHowHostedSection(data) {
+    if (!(data.principles || []).length) return '';
     return `
 <!-- Hosting principles, each backed by a real, unedited review excerpt. -->
 <section class="why-section" aria-label="How you're hosted" data-home-section="howHosted">
@@ -192,6 +196,7 @@
   }
 
   function renderBookingStepsSection(data) {
+    if (!(data.steps || []).length) return '';
     return `
 <!-- Booking steps are content-driven and can be redesigned without touching form logic. -->
 <section class="process-section white-lift section-pad" aria-label="How it works" data-home-section="planningProcess">
@@ -255,6 +260,7 @@
       </div>`).join('')}
     </div>` : ''}
 
+    ${(data.items || []).length ? `
     <div class="testimonials-wrap reveal reveal-delay-3">
       <div class="testimonials-track" role="region" aria-label="Traveler reviews carousel" tabindex="0">
         ${(data.items || []).map((item, idx) => `
@@ -277,7 +283,7 @@
       <div class="testimonials-dots" aria-label="Testimonial navigation">
         ${(data.items || []).map((_, index) => `<button type="button" class="testimonials-dot${index === 0 ? ' active' : ''}" aria-label="Show testimonial ${index + 1}" aria-pressed="${index === 0 ? 'true' : 'false'}"></button>`).join('\n        ')}
       </div>
-    </div>
+    </div>` : ''}
   </div>
 </section>`;
   }
@@ -307,18 +313,158 @@
 </section>`;
   }
 
+  // ── Sections an editor can add ───────────────────────────────────────────
+  //
+  // The seven sections above are bespoke: each has its own markup because each
+  // does something the others do not. That is right for the narrative spine of
+  // the homepage, and wrong for everything after it — it means adding an
+  // eighth section requires writing one.
+  //
+  // These four layouts exist so someone who cannot write code can add a
+  // section. They are deliberately built from the same vocabulary the fixed
+  // sections use — `container`, `section-pad`, `white-lift`, `eyebrow`,
+  // `section-title`, `btn`, `reveal` — so a new section inherits the site's
+  // type, colour, spacing and motion instead of carrying its own. That is what
+  // keeps an added section looking like it belongs rather than like it was
+  // pasted in.
+  //
+  // Adding a fifth layout means adding a renderer here and an option to the
+  // `layout` list in studio/schemaTypes/documents/flexibleSection.ts. The
+  // contract between the two is asserted by tests/homepage-layouts.mjs.
+
+  const flexSecondaryButton = data => data.tone === 'dark' ? 'btn-ghost' : 'btn-outline-dark';
+
+  const flexShell = (data, layout, inner) => {
+    const label = data.headline || data.title || 'More about People & Places';
+    return `
+<!-- Editor-added section (${escapeHtml(layout)}). -->
+<section class="flex-section flex-section--${escapeHtml(layout)}${data.tone === 'dark' ? '' : ' white-lift'} section-pad" aria-label="${escapeHtml(label)}" data-home-section="flexible" data-flex-layout="${escapeHtml(layout)}">
+  <div class="container">${inner}
+  </div>
+</section>`;
+  };
+
+  const flexHeading = data => `
+    ${data.eyebrow ? `<div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>` : ''}
+    ${data.headline ? `<h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.headline)}</h2>` : ''}
+    ${data.body ? `<div class="flex-body section-sub reveal reveal-delay-2">${renderLines(String(data.body).split(/\n\s*\n/))}</div>` : ''}`;
+
+  const flexActions = (data, delay) => {
+    const ctas = (data.ctas || []).filter(cta => cta?.label && cta?.href);
+    if (!ctas.length) return '';
+    return `
+    <div class="flex-actions reveal reveal-delay-${delay}">
+      ${ctas.map((cta, index) => `<a href="${escapeHtml(cta.href)}" class="btn ${index === 0 ? 'btn-primary' : flexSecondaryButton(data)}"${externalAttrs(cta)}>${escapeHtml(cta.label)}</a>`).join('\n      ')}
+    </div>`;
+  };
+
+  function renderFlexPhotoBeside(data) {
+    if (!data.headline && !data.image?.src) return '';
+    const figure = data.image?.src
+      ? `
+      <div class="flex-split-figure reveal reveal-delay-2">${renderImage(data.image, 'flex-split-img', 'loading="lazy" sizes="(min-width: 900px) 45vw, calc(100vw - 48px)"')}</div>`
+      : '';
+    return flexShell(data, 'photo-beside', `
+    <div class="flex-split${data.imageSide === 'left' ? ' flex-split--flip' : ''}">
+      <div class="flex-split-text">${flexHeading(data)}${flexActions(data, 3)}
+      </div>${figure}
+    </div>`);
+  }
+
+  function renderFlexCards(data) {
+    const cards = (data.cards || []).filter(card => card?.title);
+    if (!cards.length) return '';
+    return flexShell(data, 'cards', `${flexHeading(data)}
+    <div class="flex-card-grid">
+      ${cards.map((card, index) => {
+        const inner = `${card.image?.src ? `
+        <div class="flex-card-figure">${renderImage(card.image, 'flex-card-img', 'loading="lazy" sizes="(min-width: 900px) 30vw, calc(100vw - 48px)"')}</div>` : ''}
+        <div class="flex-card-body">
+          <h3 class="flex-card-title">${escapeHtml(card.title)}</h3>
+          ${card.text ? `<p class="flex-card-text">${escapeHtml(card.text)}</p>` : ''}
+        </div>`;
+        return card.href
+          ? `<a class="flex-card reveal${revealClass(index)}" href="${escapeHtml(card.href)}">${inner}
+      </a>`
+          : `<div class="flex-card reveal${revealClass(index)}">${inner}
+      </div>`;
+      }).join('\n      ')}
+    </div>${flexActions(data, 4)}`);
+  }
+
+  function renderFlexQuote(data) {
+    if (!data.quote) return '';
+    return flexShell(data, 'quote', `
+    <figure class="flex-quote reveal">
+      ${data.eyebrow ? `<div class="eyebrow">${escapeHtml(data.eyebrow)}</div>` : ''}
+      <blockquote class="flex-quote-text">${escapeHtml(data.quote)}</blockquote>
+      ${data.attribution ? `<figcaption class="flex-quote-source">${escapeHtml(data.attribution)}</figcaption>` : ''}
+    </figure>${flexActions(data, 2)}`);
+  }
+
+  function renderFlexInvitation(data) {
+    if (!data.headline) return '';
+    return flexShell(data, 'invitation', `
+    <div class="flex-invitation">${flexHeading(data)}${flexActions(data, 3)}
+      ${data.reassurance ? `<p class="flex-invitation-note reveal reveal-delay-4">${escapeHtml(data.reassurance)}</p>` : ''}
+    </div>`);
+  }
+
+  // The narrative spine. Each key is a section only this site has, so each has
+  // its own renderer; the order here is the order they were designed in.
+  const BUILT_IN_SECTIONS = {
+    hero: renderHeroSection,
+    founderStory: renderFounderStorySection,
+    waysToExperience: renderWaysToExperienceSection,
+    howHosted: renderHowHostedSection,
+    reviewsAndTrust: renderReviewsAndTrustSection,
+    planningProcess: renderBookingStepsSection,
+    finalInvitation: renderFinalInvitationSection,
+  };
+
+  const FLEX_LAYOUTS = {
+    photoBeside: renderFlexPhotoBeside,
+    cards: renderFlexCards,
+    quote: renderFlexQuote,
+    invitation: renderFlexInvitation,
+  };
+
+  const DEFAULT_SECTION_ORDER = Object.keys(BUILT_IN_SECTIONS);
+
+  /**
+   * Render the homepage from a plan rather than a fixed sequence of calls.
+   *
+   * `sectionOrder` is a list of entries, each either `{key}` for one of the
+   * seven built-in sections or `{layout, ...content}` for a section an editor
+   * added. Content with no plan falls back to the seven in their designed
+   * order, which is what the committed homepage does today.
+   *
+   * An entry naming a layout or key that does not exist renders nothing rather
+   * than throwing: a section removed from the code should not take the whole
+   * homepage down with it.
+   */
   function renderHomepageMarkup(homeContent = content) {
     if (!homeContent) return '';
-    return [
-      renderHeroSection(homeContent.hero),
-      renderFounderStorySection(homeContent.founderStory),
-      renderWaysToExperienceSection(homeContent.waysToExperience),
-      renderHowHostedSection(homeContent.howHosted),
-      renderReviewsAndTrustSection(homeContent.reviewsAndTrust),
-      renderBookingStepsSection(homeContent.planningProcess),
-      renderFinalInvitationSection(homeContent.finalInvitation),
-    ].join('\n');
+    const plan = Array.isArray(homeContent.sectionOrder) && homeContent.sectionOrder.length
+      ? homeContent.sectionOrder
+      : DEFAULT_SECTION_ORDER.map(key => ({key}));
+    return plan
+      .map(entry => {
+        if (entry?.layout) {
+          const render = FLEX_LAYOUTS[entry.layout];
+          return render ? render(entry) : '';
+        }
+        const render = BUILT_IN_SECTIONS[entry?.key];
+        return render ? render(homeContent[entry.key]) : '';
+      })
+      .filter(Boolean)
+      .join('\n');
   }
+
+  // Exposed so a test can assert the Studio's layout list and the renderers
+  // here have not drifted apart.
+  window.PEOPLE_PLACES_HOMEPAGE_LAYOUTS = Object.keys(FLEX_LAYOUTS);
+  window.PEOPLE_PLACES_HOMEPAGE_SECTIONS = DEFAULT_SECTION_ORDER;
 
   // The static build evaluates this renderer in an isolated context so the
   // deployed homepage contains meaningful HTML before browser JavaScript runs.

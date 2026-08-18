@@ -4,6 +4,7 @@ import {mediaAsset} from './objects/mediaAsset'
 import {siteSettings} from './documents/siteSettings'
 import {navigation} from './documents/navigation'
 import {homepageSection} from './documents/homepageSection'
+import {flexibleSection} from './documents/flexibleSection'
 import {founderProfile} from './documents/founderProfile'
 import {originStory} from './documents/originStory'
 import {experiencePathway} from './documents/experiencePathway'
@@ -29,6 +30,7 @@ export const schemaTypes = [
   siteSettings,
   navigation,
   homepageSection,
+  flexibleSection,
   founderProfile,
   originStory,
   experiencePathway,

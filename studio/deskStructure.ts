@@ -43,9 +43,32 @@ export const structure: StructureResolver = (S) =>
                 .title('Homepage')
                 .id('homepage')
                 .child(
-                  S.documentTypeList('homepageSection')
-                    .title('Homepage sections')
-                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                  S.list()
+                    .title('Homepage')
+                    .items([
+                      S.listItem()
+                        .title('The seven main sections')
+                        .id('homepage-core')
+                        .child(
+                          S.documentTypeList('homepageSection')
+                            .title('Homepage sections')
+                            .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                        ),
+                      // Kept separate from the seven above because it is a
+                      // different kind of thing: those are the page's fixed
+                      // narrative, this is anything else somebody wants to add.
+                      S.listItem()
+                        .title('Extra sections you can add')
+                        .id('homepage-extra')
+                        .child(
+                          S.documentTypeList('flexibleSection')
+                            .title('Extra homepage sections')
+                            .defaultOrdering([
+                              {field: 'placement', direction: 'asc'},
+                              {field: 'positionWithinPlacement', direction: 'asc'},
+                            ]),
+                        ),
+                    ]),
                 ),
               single(S, 'aboutPage', 'About', 'About page'),
               single(S, 'bookingFlow', 'Contact & Booking', 'Contact and booking copy'),

@@ -4315,3 +4315,106 @@ a.trust-rating:focus-visible .trust-rating-source {
     --home-support-secondary: 1rem;
   }
 }
+
+/* ── EDITOR-ADDED SECTIONS ───────────────────────────────────────
+   Layouts available to whoever edits the site in Sanity. Everything
+   here is expressed in design tokens and reuses the shared section
+   vocabulary (.container, .section-pad, .white-lift, .eyebrow,
+   .section-title, .btn), so a section added from the Studio inherits
+   the site's type, colour, spacing and motion rather than defining
+   its own. See homepage-sections.js "Sections an editor can add". */
+
+.flex-body { margin-top: var(--sp-3); max-width: 62ch; }
+.flex-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+/* Photo beside text */
+.flex-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-8);
+  align-items: center;
+}
+.flex-split--flip .flex-split-figure { order: -1; }
+.flex-split-figure { border-radius: var(--radius-lg); overflow: hidden; }
+.flex-split-img { display: block; width: 100%; height: auto; }
+
+/* Row of cards */
+.flex-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+.flex-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  background: var(--light-surface);
+  border: 1px solid var(--light-surface-alt);
+  border-radius: var(--radius-lg);
+  transition: transform var(--motion-base), box-shadow var(--motion-base);
+}
+a.flex-card:hover,
+a.flex-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--elevation-light-2);
+}
+.flex-card-figure { aspect-ratio: 4 / 3; overflow: hidden; }
+.flex-card-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.flex-card-body { padding: var(--sp-4); }
+/* Cards in a row share a height. A card with no photo beside cards that have
+   one would otherwise sit against the top with a void beneath it, which reads
+   as a broken image rather than a deliberate choice. */
+.flex-card:not(:has(.flex-card-figure)) .flex-card-body { margin-block: auto; }
+.flex-card-title { font-size: var(--text-xl); margin-bottom: var(--sp-2); }
+.flex-card-text { color: var(--light-text-subtle); line-height: 1.7; }
+
+/* Quote band */
+.flex-quote { max-width: 46ch; margin: 0 auto; text-align: center; }
+.flex-quote-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.4vw, var(--text-2xl));
+  line-height: 1.35;
+  margin: 0;
+}
+.flex-quote-source {
+  margin-top: var(--sp-4);
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--light-text-subtle);
+}
+.flex-section--quote .flex-actions { justify-content: center; }
+
+/* Invitation band */
+.flex-invitation { max-width: 60ch; margin: 0 auto; text-align: center; }
+.flex-invitation .flex-body,
+.flex-invitation .section-sub { margin-left: auto; margin-right: auto; }
+.flex-invitation .flex-actions { justify-content: center; }
+.flex-invitation-note {
+  margin-top: var(--sp-4);
+  color: var(--light-text-subtle);
+  font-size: var(--text-sm);
+}
+
+/* Dark-toned variants read on the site's charcoal, not on white. */
+.flex-section:not(.white-lift) { background: var(--pap-charcoal); color: var(--white); }
+.flex-section:not(.white-lift) .flex-card {
+  background: color-mix(in srgb, var(--white) 6%, transparent);
+  border-color: color-mix(in srgb, var(--white) 14%, transparent);
+}
+.flex-section:not(.white-lift) .flex-card-text,
+.flex-section:not(.white-lift) .flex-quote-source,
+.flex-section:not(.white-lift) .flex-invitation-note { color: var(--muted); }
+
+@media (max-width: 900px) {
+  .flex-split { grid-template-columns: 1fr; gap: var(--sp-5); }
+  .flex-split--flip .flex-split-figure { order: 0; }
+}

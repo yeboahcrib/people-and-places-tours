@@ -96,6 +96,7 @@ If a breakpoint can't be checked in your current environment, say so explicitly 
 
 ## Other repo-wide conventions worth knowing
 
+- **The homepage renders from a plan, not a fixed sequence.** `renderHomepageMarkup()` in `homepage-sections.js` walks `content.sectionOrder`, where each entry is `{key}` for one of the seven built-in sections or `{layout, ...}` for a section an editor added in Sanity. With no plan it falls back to the seven in their designed order. Four editor-facing layouts exist (`photoBeside`, `cards`, `quote`, `invitation`); adding a fifth means touching three files, and `tests/homepage-layouts.mjs` fails if they drift apart. See `docs/adding-homepage-sections.md`.
 - Nav markup is duplicated across all 20 HTML pages (no SSI / template engine). Style changes go in `style.css`. Markup changes need to be propagated across all 20 files — keep them identical so a single Python pass can update them in future. Header comment in `style.css` explains this.
 - Active-page highlight on the nav is set two ways: JS (`script.js` matches `location.pathname` against link hrefs) handles top-level pages; tour-detail pages get a static `class="active"` on the Packages link in markup because their URLs don't match a nav item.
 - The booking sidebar on tour-detail pages, the day-by-day accordion itinerary, and the included/not-included checklist are **off-limits** for redesign unless explicitly requested — those work well functionally.
