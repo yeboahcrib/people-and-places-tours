@@ -15,6 +15,79 @@ function safeCta(cta, sectionKey) {
   return {label: cta.label, href, external: Boolean(cta.external)};
 }
 
+/**
+ * Copy the fields an editor actually filled in over the committed ones.
+ *
+ * A blank field in the Studio means "I have not written this yet", never "make
+ * this empty on the website". Only defined, non-empty values are copied, so a
+ * half-finished entry keeps the rest of its committed text.
+ */
+function overlay(base, fields) {
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === undefined || value === null || value === '') continue;
+    base[key] = value;
+  }
+  return base;
+}
+
+/**
+ * A photo is only usable once the editor has confirmed it is real and approved
+ * for the website. Anything else returns undefined, which `overlay` skips —
+ * so the committed photo stays until the new one is ready.
+ */
+function usablePhoto(image) {
+  if (!image?.src) return undefined;
+  if (image.publicApprovalState !== 'approved') return undefined;
+  if (image.placeholderState !== 'approved') return undefined;
+  return image;
+}
+
+/**
+ * Build a list from Sanity, using the committed list to fill in the gaps.
+ *
+ * The editor decides which items exist and what order they are in — this is a
+ * CMS, so removing an item in the Studio removes it from the page, and adding
+ * one adds it. The committed list is not a floor; it is a source of detail for
+ * items the editor has not finished.
+ *
+ * Each Sanity entry is matched to a committed one by a stable key — the
+ * pathway's category, the principle's icon, the reviewer's name, the step's
+ * number. The committed values are the starting point, and only the fields the
+ * editor actually filled in are written over them. So an entry can be renamed
+ * without losing its photograph, or have its photograph swapped without losing
+ * its words.
+ *
+ * Callers only reach this function when Sanity actually has the list. A list
+ * the editor has never touched is absent from the query result, not empty, and
+ * keeps its committed content untouched — see `mergeHomepage`.
+ *
+ * An entry still missing something it cannot be rendered without is left off
+ * the page and reported, rather than published half built. The rest of the list
+ * is unaffected.
+ */
+function mergeList(committed, incoming, config) {
+  const byKey = new Map();
+  for (const item of committed || []) {
+    const key = config.committedKey(item);
+    if (key !== undefined && key !== '' && !byKey.has(key)) byKey.set(key, item);
+  }
+
+  const ordered = config.orderOf
+    ? [...incoming].sort((a, b) => (config.orderOf(a) ?? Number.MAX_SAFE_INTEGER) - (config.orderOf(b) ?? Number.MAX_SAFE_INTEGER))
+    : [...incoming];
+
+  const merged = [];
+  for (const entry of ordered) {
+    const key = config.incomingKey(entry);
+    const existing = key !== undefined && key !== '' ? byKey.get(key) : undefined;
+    const item = overlay(existing ? clone(existing) : {...config.defaults}, config.patch(entry));
+    if (config.isRenderable(item)) merged.push(item);
+    else console.warn(`Sanity ${config.label} "${config.describe(entry)}" is not on the page yet. ${config.needs}`);
+  }
+
+  return config.limit ? merged.slice(0, config.limit) : merged;
+}
+
 function applyPrimaryCopy(target, section) {
   const {sectionKey, eyebrow, headline, body, reassurance, trustMessage} = section;
   if (eyebrow) target.eyebrow = eyebrow;
@@ -63,78 +136,214 @@ function applyPrimaryCopy(target, section) {
       return profile;
     });
   }
-  if (sectionKey === 'waysToExperience' && Array.isArray(section.pathways) && section.pathways.length) {
-    target.pathways = section.pathways
-      .filter(pathway => pathway?.title && pathway?.filterKey && pathway?.image?.src && pathway.image.publicApprovalState === 'approved' && pathway.image.placeholderState === 'approved')
-      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-      .map(pathway => ({
-        title: pathway.title,
-        text: pathway.description || '',
-        href: `packages.html?category=${encodeURIComponent(pathway.filterKey)}`,
-        image: pathway.image,
-      }));
+  if (sectionKey === 'waysToExperience' && Array.isArray(section.pathways)) {
+    target.pathways = mergeList(target.pathways, section.pathways, {
+      label: 'pathway',
+      needs: 'It needs a title, a category and an approved photo.',
+      describe: entry => entry?.title || entry?.filterKey || 'untitled',
+      orderOf: entry => entry?.order,
+      defaults: {text: ''},
+      // The committed href encodes the category it links to.
+      committedKey: item => String(item?.href || '').split('category=')[1],
+      incomingKey: entry => entry?.filterKey,
+      patch: entry => ({
+        title: entry?.title,
+        text: entry?.description,
+        href: entry?.filterKey ? `packages.html?category=${encodeURIComponent(entry.filterKey)}` : undefined,
+        image: usablePhoto(entry?.image),
+      }),
+      isRenderable: item => Boolean(item.title && item.href && item.image?.src),
+    });
   }
-  if (sectionKey === 'howHosted' && Array.isArray(section.hostingPrinciples) && section.hostingPrinciples.length) {
-    target.principles = section.hostingPrinciples
-      .filter(principle => principle?.title && principle?.description && principle?.icon)
-      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-      .map(principle => ({
-        icon: principle.icon,
-        title: principle.title,
-        text: principle.description,
-        proofQuote: principle.proofReview?.selectedExcerpt || '',
-        proofAuthor: principle.proofReview?.reviewerName || '',
-      }));
+  if (sectionKey === 'howHosted' && Array.isArray(section.hostingPrinciples)) {
+    target.principles = mergeList(target.principles, section.hostingPrinciples, {
+      label: 'hosting principle',
+      needs: 'It needs an icon, a title and a description.',
+      describe: entry => entry?.title || entry?.icon || 'untitled',
+      orderOf: entry => entry?.order,
+      defaults: {proofQuote: '', proofAuthor: ''},
+      committedKey: item => item?.icon,
+      incomingKey: entry => entry?.icon,
+      patch: entry => ({
+        icon: entry?.icon,
+        title: entry?.title,
+        text: entry?.description,
+        proofQuote: entry?.proofReview?.selectedExcerpt,
+        proofAuthor: entry?.proofReview?.reviewerName,
+      }),
+      isRenderable: item => Boolean(item.icon && item.title && item.text),
+    });
   }
-  if (sectionKey === 'reviewsAndTrust' && Array.isArray(section.featuredReviews) && section.featuredReviews.length) {
-    target.items = section.featuredReviews
-      .filter(review => review?.reviewerName && review?.selectedExcerpt)
-      .map(review => {
-        const item = {
-          quote: review.selectedExcerpt,
-          author: review.reviewerName,
-          location: review.country || `Verified ${review.platform || 'traveler'} review`,
-          rating: review.rating || 5,
-          sourceUrl: review.sourceUrl || undefined,
-        };
-        if (review.image?.src && review.image.publicApprovalState === 'approved' && review.image.placeholderState === 'approved') item.image = review.image;
-        return item;
-      });
+  if (sectionKey === 'reviewsAndTrust' && Array.isArray(section.featuredReviews)) {
+    target.items = mergeList(target.items, section.featuredReviews, {
+      label: 'review',
+      needs: 'It needs a reviewer name and an excerpt.',
+      describe: entry => entry?.reviewerName || 'unnamed',
+      committedKey: item => String(item?.author || '').trim().toLowerCase(),
+      incomingKey: entry => String(entry?.reviewerName || '').trim().toLowerCase(),
+      patch: entry => ({
+        quote: entry?.selectedExcerpt,
+        author: entry?.reviewerName,
+        location: entry?.country || (entry?.platform ? `Verified ${entry.platform} review` : undefined),
+        rating: entry?.rating,
+        sourceUrl: entry?.sourceUrl,
+        image: usablePhoto(entry?.image),
+      }),
+      defaults: {rating: 5, location: 'Verified traveler review'},
+      isRenderable: item => Boolean(item.quote && item.author),
+    });
   }
-  if (sectionKey === 'planningProcess' && Array.isArray(section.planningSteps) && section.planningSteps.length) {
+  if (sectionKey === 'planningProcess' && Array.isArray(section.planningSteps)) {
     const defaultIcons = ['search', 'chat', 'play'];
-    target.steps = section.planningSteps
-      .filter(step => step?.stepNumber && step?.title && step?.description)
-      .sort((a, b) => a.stepNumber - b.stepNumber)
-      .slice(0, 3)
-      .map((step, index) => ({
-        icon: defaultIcons[index],
-        number: String(step.stepNumber).padStart(2, '0'),
-        title: step.title,
-        text: step.description,
-        cta: safeCta(step.cta, sectionKey),
-      }));
+    target.steps = mergeList(target.steps, section.planningSteps, {
+      label: 'planning step',
+      needs: 'It needs a step number, a title and a description.',
+      describe: entry => entry?.title || `step ${entry?.stepNumber ?? '?'}`,
+      // The design is a fixed three-step process; a fourth would not render.
+      limit: 3,
+      orderOf: entry => Number(entry?.stepNumber),
+      committedKey: item => Number(item?.number),
+      incomingKey: entry => Number(entry?.stepNumber),
+      patch: entry => ({
+        icon: defaultIcons[Math.min(Math.max(Number(entry?.stepNumber) - 1, 0), defaultIcons.length - 1)],
+        number: entry?.stepNumber ? String(entry.stepNumber).padStart(2, '0') : undefined,
+        title: entry?.title,
+        text: entry?.description,
+        cta: safeCta(entry?.cta, sectionKey),
+      }),
+      isRenderable: item => Boolean(item.number && item.title && item.text),
+    });
   }
 }
 
+/**
+ * Build the homepage from the committed content, letting Sanity edit it.
+ *
+ * Sections are optional and independent. A section the editor has not created
+ * yet, or has deleted, keeps its committed content — the homepage is never
+ * short a section, and the build is never blocked by one. This is what makes it
+ * safe to move the homepage into the Studio a section at a time.
+ *
+ * A section arriving twice is the one case with no safe reading, so the first
+ * by `order` wins and the duplicate is reported rather than silently picked.
+ */
 function mergeHomepage(localContent, sections) {
-  if (!Array.isArray(sections) || sections.length !== SECTION_KEYS.length) {
-    throw new Error(`Sanity homepage must contain exactly ${SECTION_KEYS.length} sections`);
-  }
+  if (!Array.isArray(sections)) throw new Error('Sanity homepage sections were not a list');
+
   const byKey = new Map();
   for (const section of sections) {
-    if (!SECTION_KEYS.includes(section?.sectionKey) || byKey.has(section.sectionKey)) {
-      throw new Error(`Sanity homepage has an invalid or duplicate section: ${section?.sectionKey || '(missing)'}`);
+    const key = section?.sectionKey;
+    if (!SECTION_KEYS.includes(key)) {
+      console.warn(`Sanity homepage has a section this site does not render (${key || 'unnamed'}) — ignoring it.`);
+      continue;
     }
-    byKey.set(section.sectionKey, section);
+    if (byKey.has(key)) {
+      console.warn(`Sanity homepage has more than one "${key}" section — using the first and ignoring the rest.`);
+      continue;
+    }
+    byKey.set(key, section);
   }
-  SECTION_KEYS.forEach(key => {
-    if (!byKey.has(key)) throw new Error(`Sanity homepage is missing section ${key}`);
-  });
 
   const content = clone(localContent);
-  for (const key of SECTION_KEYS) applyPrimaryCopy(content[key], byKey.get(key));
+  for (const key of SECTION_KEYS) {
+    const section = byKey.get(key);
+    if (section) applyPrimaryCopy(content[key], section);
+    else console.warn(`Sanity homepage has no "${key}" section — keeping the committed content for it.`);
+  }
   return content;
+}
+
+export const FLEX_LAYOUTS = ['photoBeside', 'cards', 'quote', 'invitation'];
+
+/**
+ * Turn the sections an editor added into the homepage's render plan.
+ *
+ * The seven built-in sections are fixed and ordered; an added section says
+ * where it goes relative to them ("top", or "after:howHosted"). Two sections
+ * claiming the same slot are separated by `positionWithinPlacement`, and then
+ * by name, so the order is always deterministic rather than dependent on the
+ * order Sanity happened to return them in.
+ *
+ * A section is only planned in if it is switched on, uses a layout this site
+ * can render, and has the content that layout needs — an editor part-way
+ * through writing one has it invisible rather than half-published.
+ */
+function planSections(flexible) {
+  const bySlot = new Map([['top', []], ...SECTION_KEYS.map(key => [`after:${key}`, []])]);
+
+  for (const entry of flexible || []) {
+    if (!entry?.visible) continue;
+    if (!FLEX_LAYOUTS.includes(entry.layout)) {
+      console.warn(`Extra homepage section "${entry?.title || 'untitled'}" uses a layout this site cannot render (${entry?.layout || 'none'}) — leaving it off.`);
+      continue;
+    }
+    const slot = bySlot.get(entry.placement);
+    if (!slot) {
+      console.warn(`Extra homepage section "${entry.title}" has no valid position on the page — leaving it off.`);
+      continue;
+    }
+    const section = {
+      layout: entry.layout,
+      title: entry.title,
+      tone: entry.tone === 'dark' ? 'dark' : 'light',
+      eyebrow: entry.eyebrow || undefined,
+      headline: entry.headline || undefined,
+      body: entry.body || undefined,
+      image: usablePhoto(entry.image),
+      imageSide: entry.imageSide === 'left' ? 'left' : 'right',
+      quote: entry.quote || undefined,
+      attribution: entry.attribution || undefined,
+      reassurance: entry.reassurance || undefined,
+      cards: (entry.cards || [])
+        .filter(card => card?.title)
+        .map(card => ({title: card.title, text: card.text || '', href: card.href || undefined, image: usablePhoto(card.image)})),
+      // A malformed button is the editor's mistake to fix, not a reason to
+      // fail the deploy — drop the button, keep the section, say so.
+      ctas: (entry.ctas || []).map(cta => {
+        try {
+          return safeCta(cta, `extra section "${entry.title}"`);
+        } catch {
+          console.warn(`Extra homepage section "${entry.title}" has a button with an invalid link — leaving that button off.`);
+          return undefined;
+        }
+      }).filter(Boolean),
+    };
+    if (!isFlexSectionRenderable(section)) {
+      console.warn(`Extra homepage section "${entry.title}" is switched on but has nothing to show yet — leaving it off. ${FLEX_NEEDS[section.layout]}`);
+      continue;
+    }
+    slot.push({...section, sortKey: [entry.positionWithinPlacement ?? 1, entry.title || '']});
+  }
+
+  const plan = [];
+  const drain = slot => {
+    for (const section of (bySlot.get(slot) || []).sort((a, b) =>
+      a.sortKey[0] - b.sortKey[0] || String(a.sortKey[1]).localeCompare(String(b.sortKey[1])))) {
+      const {sortKey, ...rest} = section;
+      plan.push(rest);
+    }
+  };
+  drain('top');
+  for (const key of SECTION_KEYS) {
+    plan.push({key});
+    drain(`after:${key}`);
+  }
+  return plan;
+}
+
+const FLEX_NEEDS = {
+  photoBeside: 'It needs a heading or an approved photo.',
+  cards: 'It needs at least one card with a heading.',
+  quote: 'It needs the quote itself.',
+  invitation: 'It needs a heading.',
+};
+
+function isFlexSectionRenderable(section) {
+  if (section.layout === 'photoBeside') return Boolean(section.headline || section.image?.src);
+  if (section.layout === 'cards') return section.cards.length > 0;
+  if (section.layout === 'quote') return Boolean(section.quote);
+  if (section.layout === 'invitation') return Boolean(section.headline);
+  return false;
 }
 
 export async function loadHomepageContent({localContent, env = process.env, fetchImpl = fetch}) {
@@ -201,10 +410,32 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
       "cta": cta->{label, destination, external}
     }
   }`;
-  const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
+
+  // Sections an editor added, fetched alongside the built-in seven so the whole
+  // homepage still costs one request.
+  const photoProjection = `{
+    "src": image.asset->url,
+    "alt": altText,
+    "width": image.asset->metadata.dimensions.width,
+    "height": image.asset->metadata.dimensions.height,
+    publicApprovalState, placeholderState
+  }`;
+  const flexQuery = `*[_type == "flexibleSection"] | order(placement asc, positionWithinPlacement asc){
+    title, layout, placement, positionWithinPlacement, visible, tone,
+    eyebrow, headline, body, imageSide, quote, attribution, reassurance,
+    "image": image${photoProjection},
+    "cards": cards[]{title, text, href, "image": image${photoProjection}},
+    "ctas": ctas[]->{label, destination, external}
+  }`;
+
+  const combined = `{"sections": ${query}, "flexible": ${flexQuery}}`;
+  const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(combined)}`;
   const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
   if (!response.ok) throw new Error(`Sanity homepage request failed with HTTP ${response.status}`);
   const body = await response.json();
   if (body.error) throw new Error(`Sanity homepage request failed: ${body.error.description || body.error.type}`);
-  return {content: mergeHomepage(localContent, body.result), source: 'sanity'};
+
+  const content = mergeHomepage(localContent, body.result?.sections);
+  content.sectionOrder = planSections(body.result?.flexible);
+  return {content, source: 'sanity'};
 }
