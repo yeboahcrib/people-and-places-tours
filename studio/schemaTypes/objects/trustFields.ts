@@ -8,34 +8,38 @@ import {defineField, defineType} from 'sanity'
  * Publish-blocking rules for specific types (e.g. reviews needing source +
  * sourceUrl + rating + date) are enforced per-document, not here — this
  * object just holds the shared shape.
+ *
+ * This block appears inside several documents, so its labels are the ones an
+ * editor meets most often. They are written as plain questions rather than as
+ * state names; the stored values are unchanged.
  */
 export const trustFields = defineType({
   name: 'trustFields',
-  title: 'Trust & provenance',
+  title: 'Where this came from',
   type: 'object',
+  description: 'How you know this is true, and whether you are allowed to publish it.',
   fields: [
     defineField({
       name: 'source',
-      title: 'Source',
+      title: 'Where did it come from?',
       type: 'string',
-      description: 'Where this claim/quote/image actually comes from (e.g. "Google Business Profile export, reviews.json").',
+      description: 'Be specific enough that someone else could find it again — for example "Google reviews export, July 2026".',
     }),
     defineField({
       name: 'verificationDate',
-      title: 'Verification date',
+      title: 'When did you last check it was still true?',
       type: 'date',
-      description: 'When someone last confirmed this is still true.',
     }),
     defineField({
       name: 'permissionState',
-      title: 'Permission state',
+      title: 'Do you have permission to use it?',
       type: 'string',
       options: {
         list: [
-          {title: 'None', value: 'none'},
-          {title: 'Requested', value: 'requested'},
-          {title: 'Granted', value: 'granted'},
-          {title: 'Not required', value: 'notRequired'},
+          {title: 'Not asked yet', value: 'none'},
+          {title: 'Asked, waiting to hear back', value: 'requested'},
+          {title: 'Yes, they agreed', value: 'granted'},
+          {title: 'No permission needed', value: 'notRequired'},
         ],
         layout: 'radio',
       },
@@ -43,13 +47,13 @@ export const trustFields = defineType({
     }),
     defineField({
       name: 'approvalState',
-      title: 'Approval state',
+      title: 'Have you approved it for the website?',
       type: 'string',
       options: {
         list: [
-          {title: 'Draft', value: 'draft'},
-          {title: 'Approved', value: 'approved'},
-          {title: 'Rejected', value: 'rejected'},
+          {title: 'Not yet — still checking', value: 'draft'},
+          {title: 'Yes, approved', value: 'approved'},
+          {title: 'No, do not use it', value: 'rejected'},
         ],
         layout: 'radio',
       },
@@ -57,14 +61,14 @@ export const trustFields = defineType({
     }),
     defineField({
       name: 'publicationState',
-      title: 'Publication state',
+      title: 'Is it in use right now?',
       type: 'string',
-      description: 'Sanity already tracks draft-vs-published natively; this field adds "archived", which Sanity has no built-in concept of.',
+      description: 'Use "Retired" for something that was true once but should no longer be shown.',
       options: {
         list: [
-          {title: 'Draft', value: 'draft'},
-          {title: 'Published', value: 'published'},
-          {title: 'Archived', value: 'archived'},
+          {title: 'Not published yet', value: 'draft'},
+          {title: 'In use on the site', value: 'published'},
+          {title: 'Retired', value: 'archived'},
         ],
         layout: 'radio',
       },
@@ -72,31 +76,31 @@ export const trustFields = defineType({
     }),
     defineField({
       name: 'owner',
-      title: 'Owner',
+      title: 'Who is responsible for keeping it accurate?',
       type: 'string',
-      description: 'Who is accountable for this record staying accurate.',
+      description: 'A name. Someone should own every public claim.',
     }),
     defineField({
       name: 'expiryOrReviewDate',
-      title: 'Expiry / review date',
+      title: 'When should it be checked again?',
       type: 'date',
-      description: 'When this should be re-checked (e.g. re-verify the Google rating quarterly).',
+      description: 'Anything that can go out of date — a rating, a guest count, a price — deserves a date here.',
     }),
     defineField({
       name: 'channelEligibility',
-      title: 'Channel eligibility',
+      title: 'Where are you allowed to use it?',
       type: 'array',
       of: [{type: 'string'}],
       options: {
         list: [
-          {title: 'Website', value: 'website'},
+          {title: 'The website', value: 'website'},
           {title: 'Instagram', value: 'instagram'},
           {title: 'Google', value: 'google'},
           {title: 'WhatsApp', value: 'whatsapp'},
           {title: 'Email', value: 'email'},
         ],
       },
-      description: 'Not every approved fact is approved for every channel.',
+      description: 'Someone may be happy to be quoted on the website but not on social media. Tick only what they agreed to.',
     }),
   ],
 })

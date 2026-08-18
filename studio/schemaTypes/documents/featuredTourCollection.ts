@@ -8,30 +8,30 @@ import {defineField, defineType} from 'sanity'
  */
 export const featuredTourCollection = defineType({
   name: 'featuredTourCollection',
-  title: 'Featured Tour Collection',
+  title: 'Experiences featured on the homepage',
   type: 'document',
   // Singleton — the current homepage featured set.
   fields: [
     defineField({
       name: 'items',
-      title: 'Featured tours',
+      title: 'Which experiences to feature',
       type: 'array',
-      validation: (Rule) => Rule.min(3).max(5).error('Must be 3–5 tours, per the approved featured-tour range.'),
+      validation: (Rule) => Rule.min(3).max(5).error('Choose between 3 and 5 — fewer looks thin, and more stops feeling chosen.'),
       of: [
         {
           type: 'object',
           name: 'featuredItem',
           fields: [
-            defineField({name: 'tour', title: 'Tour', type: 'reference', to: [{type: 'tour'}], validation: (Rule) => Rule.required()}),
-            defineField({name: 'order', title: 'Order', type: 'number', validation: (Rule) => Rule.required()}),
+            defineField({name: 'tour', title: 'Experience', type: 'reference', to: [{type: 'tour'}], validation: (Rule) => Rule.required()}),
+            defineField({name: 'order', title: 'Position', type: 'number', description: '1 appears first.', validation: (Rule) => Rule.required()}),
             defineField({
               name: 'reasonForFeature',
-              title: 'Reason for feature',
+              title: 'Why this one?',
               type: 'string',
-              description: 'e.g. "Balances the set with a craft experience" — a short internal note so a future edit doesn\'t have to reverse-engineer why this was chosen.',
+              description: 'A short note to yourself, for example "Balances the set with a craft experience". Nobody else sees it, and it saves you guessing later.',
             }),
-            defineField({name: 'startDate', title: 'Start date (optional)', type: 'date'}),
-            defineField({name: 'endDate', title: 'End date (optional)', type: 'date'}),
+            defineField({name: 'startDate', title: 'Show from (optional)', type: 'date'}),
+            defineField({name: 'endDate', title: 'Show until (optional)', type: 'date'}),
           ],
           preview: {
             select: {tourTitle: 'tour.title', order: 'order'},
@@ -45,9 +45,9 @@ export const featuredTourCollection = defineType({
     }),
     defineField({
       name: 'motivationBalanceNote',
-      title: 'Motivation balance check',
+      title: 'Does the set feel balanced?',
       type: 'text',
-      description: 'A soft reminder, not an enforced rule: does the set span heritage, food/city, craft, nature, and tailored multi-day? (per the messaging brief)',
+      description: 'A reminder, not a rule. Between them, do these experiences cover history, food and city life, craft, nature, and a longer trip? A note here is just for you.',
     }),
   ],
 })
