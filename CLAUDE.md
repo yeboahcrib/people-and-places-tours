@@ -13,8 +13,11 @@ from `main`**. Cloudflare is connected to the GitHub repository and runs
 `_headers`. **Merging to `main` is the deploy** — there is no separate publish
 step. Pushing any other branch produces a `*.pages.dev` preview, which is where
 a change should be checked before it is merged. GitHub Pages is switched off;
-the old `yeboahcrib.github.io` URL returns 404. Sanity is the approved editorial
-CMS but is not yet the live content source. See
+the old `yeboahcrib.github.io` URL returns 404. **Sanity has been the live
+content source since 21 August 2026** — `SANITY_STUDIO_PROJECT_ID` is set in
+Cloudflare's Production scope, and a publish webhook rebuilds the site (~140s)
+without anyone touching the dashboard. Previews still build from the committed
+files. See
 `docs/hosting-and-delivery-architecture.md` before changing deployment, forms,
 headers, or CMS integration.
 

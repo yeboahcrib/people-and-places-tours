@@ -147,7 +147,7 @@ boundary: new internal directories are private by default.
 | Runs `npm run build` | Yes | No |
 | Applies `_headers` | Yes | No |
 | Server-side form code | Pages Functions | No |
-| Sanity build webhook | Not configured | Not configured |
+| Sanity build webhook | Configured | Not configured |
 | HTTPS | Enforced | Enforced |
 
 The GitHub Pages column is kept as the record of what was given up at cutover,
@@ -176,8 +176,9 @@ Steps 1–5, 7 and 8 are complete; the custom domain cutover to
    templates and build-time rendering; Sanity is not yet the live source.
 5. ~~Configure Cloudflare Pages with `npm run build` and output directory
    `dist`.~~ Done.
-6. Add a Sanity publish webhook that triggers a Cloudflare build. **Outstanding**
-   — required only when Sanity becomes the live content source.
+6. ~~Add a Sanity publish webhook that triggers a Cloudflare build.~~ Done on
+   21 August 2026, the same day Sanity became the live content source. See
+   "Publishing from Sanity" below.
 7. ~~Add and verify the Cloudflare inquiry function, notification delivery, and
    privacy disclosures.~~ Done; `/api/health` reports delivery and bot
    protection configured. **Rate limiting remains outstanding.**
@@ -319,3 +320,31 @@ produce one. A visitor without JavaScript therefore cannot use the Function at
 all — a submission would be rejected as unverified. FormSubmit remains their
 fallback for that reason, not through inertia. Removing it would silently drop
 those enquiries.
+
+## Publishing from Sanity
+
+Set up 21 August 2026. Two pieces, both configured through dashboards; there is
+nothing in this repository that implements them.
+
+**Cloudflare deploy hook** — Pages → Settings → Deploy Hooks, named
+`Sanity publish`, targeting `main`. It returns a URL that triggers a production
+build when anything POSTs to it. Treat that URL as a secret: possession of it
+is authority to rebuild the site.
+
+**Sanity webhook** — manage.sanity.io → API → Webhooks, named
+`Cloudflare deploy`, pointing at that URL, dataset `production`, firing on
+create, update and delete. **Drafts are excluded.** They must stay excluded:
+Sanity autosaves drafts continuously, so including them would trigger a build
+on roughly every keystroke.
+
+Measured end to end, a publish reaches the live site in about **140 seconds**.
+Cloudflare's Deployments list does not refresh on its own — a build that looks
+absent is usually a stale page.
+
+What this does not change: the site is still statically built and served. The
+webhook rebuilds it; it does not make page views query Sanity.
+
+`SANITY_STUDIO_PROJECT_ID=30a0uykw` is set in the Cloudflare **Production**
+scope only. Previews build from the committed content unless the same variable
+is added to the Preview scope.
+
