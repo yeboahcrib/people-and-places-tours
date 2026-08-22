@@ -96,7 +96,12 @@ const generatedHome = await readFile(join(outputPath, 'index.html'), 'utf8');
 assert.equal((generatedHome.match(/data-home-section=/g) || []).length, 7, 'Homepage was not statically rendered with 7 sections');
 assert.equal((generatedHome.match(/<article class="trip-card/g) || []).length, 0, 'Homepage still contains featured tour cards');
 const generatedPackages = await readFile(join(outputPath, 'packages.html'), 'utf8');
-assert.equal((generatedPackages.match(/<article class="tour-card/g) || []).length, 15, 'Packages page was not built with 15 tour cards');
+assert(Number.isInteger(health.tourCount) && health.tourCount > 0, 'health.json is missing a tour count');
+assert.equal(
+  (generatedPackages.match(/<article class="tour-card/g) || []).length,
+  health.tourCount,
+  `Packages page was not built with all ${health.tourCount} tour cards`,
+);
 
 const sitemap = await readFile(join(outputPath, 'sitemap.xml'), 'utf8');
 const locations = [...sitemap.matchAll(/<loc>https?:\/\/[^/]+\/people-and-places-tours\/(.*?)<\/loc>/g)]
