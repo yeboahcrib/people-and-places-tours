@@ -38,8 +38,13 @@ async function withPage(browser, path, callback) {
 
     const cards = await page.locator('.trip-card').count();
     const searchItems = await page.locator('.cmd-item').count();
+    // Derived from the catalog for the same reason as the craft filter below:
+    // switching a tour off in the CMS is an editor's decision and must not
+    // read as a broken build.
+    const catalogSize = await page.evaluate(() => (window.PEOPLE_PLACES_TOURS || []).length);
     assert(cards === 0, `expected no homepage trip cards, got ${cards}`);
-    assert(searchItems === 15, `expected 15 command palette items, got ${searchItems}`);
+    assert(catalogSize > 0, 'catalog is empty');
+    assert(searchItems === catalogSize, `expected ${catalogSize} command palette items, got ${searchItems}`);
 
     const pathwayLinks = await page.locator('.pathway-card[href*="packages.html?category="]').count();
     assert(pathwayLinks === 6, `expected 6 filtered experience links, got ${pathwayLinks}`);
@@ -58,8 +63,10 @@ async function withPage(browser, path, callback) {
     await expectPageHeroImage(page, 'packages page hero');
 
     await page.waitForSelector('.tour-card');
+    const catalogSize = await page.evaluate(() => (window.PEOPLE_PLACES_TOURS || []).length);
     const allCards = await page.locator('.tour-card').count();
-    assert(allCards === 15, `expected 15 package tour cards, got ${allCards}`);
+    assert(catalogSize > 0, 'catalog is empty');
+    assert(allCards === catalogSize, `expected ${catalogSize} package tour cards, got ${allCards}`);
 
     const firstCardImage = page.locator('.tour-card-img img').first();
     assert(await firstCardImage.getAttribute('width') === '800', 'package tour card image is missing width');
@@ -68,13 +75,16 @@ async function withPage(browser, path, callback) {
 
     await page.locator('[data-destination-filter]').selectOption('cape-coast');
     await page.waitForTimeout(250);
+    const expectedCapeCoast = await page.evaluate(() =>
+      (window.PEOPLE_PLACES_TOURS || []).filter(tour => tour.destination === 'cape-coast').length);
     const visibleCapeCoast = await page.locator('.tour-card:visible').count();
-    assert(visibleCapeCoast === 2, `expected 2 visible Cape Coast tours, got ${visibleCapeCoast}`);
+    assert(expectedCapeCoast > 0, 'catalog has no Cape Coast tours to filter');
+    assert(visibleCapeCoast === expectedCapeCoast, `expected ${expectedCapeCoast} visible Cape Coast tours, got ${visibleCapeCoast}`);
 
     await page.locator('[data-destination-filter]').selectOption('all');
     await page.waitForTimeout(250);
     const visibleAll = await page.locator('.tour-card:visible').count();
-    assert(visibleAll === 15, `expected 15 visible tours after reset, got ${visibleAll}`);
+    assert(visibleAll === catalogSize, `expected ${catalogSize} visible tours after reset, got ${visibleAll}`);
   });
 
   await withPage(browser, '/packages.html?category=craft', async page => {
