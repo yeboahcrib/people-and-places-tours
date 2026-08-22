@@ -10,6 +10,7 @@ const pages = [
   '/accra-city-tour.html',
   '/just-go-ghana.html',
   '/cancellation-refund-policy.html',
+  '/travel-insurance.html',
 ];
 
 function assert(condition, message) {

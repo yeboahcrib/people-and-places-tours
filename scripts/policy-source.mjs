@@ -35,12 +35,27 @@ function validatePolicy(policy, source) {
   return policy;
 }
 
-export async function loadLocalPolicyContent(projectRoot) {
+// Every policy page the site can publish: the key in policy.json, the
+// policyType a Sanity document must carry, and the page it renders into.
+export const POLICY_PAGES = [
+  {key: 'cancellationRefund', policyType: 'cancellation', file: 'cancellation-refund-policy.html'},
+  {key: 'travelInsurance', policyType: 'insurance', file: 'travel-insurance.html'},
+];
+
+export async function loadLocalPolicyContent(projectRoot, key = 'cancellationRefund') {
   const file = JSON.parse(await readFile(join(projectRoot, 'src/content/policy.json'), 'utf8'));
-  return validatePolicy(file?.cancellationRefund, 'Local policy content');
+  return validatePolicy(file?.[key], `Local policy content for "${key}"`);
 }
 
-export async function loadPolicyContent({localContent, env = process.env, fetchImpl = fetch}) {
+export async function loadLocalPolicies(projectRoot) {
+  const entries = await Promise.all(POLICY_PAGES.map(async page => [
+    page.key,
+    await loadLocalPolicyContent(projectRoot, page.key),
+  ]));
+  return Object.fromEntries(entries);
+}
+
+export async function loadPolicyContent({localContent, policyType = 'cancellation', env = process.env, fetchImpl = fetch}) {
   const projectId = env.SANITY_STUDIO_PROJECT_ID;
   const dataset = env.SANITY_STUDIO_DATASET || 'production';
 
@@ -51,7 +66,8 @@ export async function loadPolicyContent({localContent, env = process.env, fetchI
     throw new Error('Sanity project or dataset configuration is invalid');
   }
 
-  const query = `*[_type == "policy" && policyType == "cancellation"][0]{
+  if (!/^[a-z]+$/.test(policyType)) throw new Error(`Unsupported policy type: ${policyType}`);
+  const query = `*[_type == "policy" && policyType == "${policyType}"][0]{
     title, intro, contactIntro, closing, "lastUpdated": string(lastUpdated),
     sections[]{heading, intro, items[]{term, text}}
   }`;
@@ -66,5 +82,5 @@ export async function loadPolicyContent({localContent, env = process.env, fetchI
   // never be blended with the committed one — the result would be a document
   // nobody wrote and nobody agreed to.
   if (!body.result) return {content: localContent, source: 'local'};
-  return {content: validatePolicy(body.result, 'Sanity policy content'), source: 'sanity'};
+  return {content: validatePolicy(body.result, `Sanity policy content for "${policyType}"`), source: 'sanity'};
 }

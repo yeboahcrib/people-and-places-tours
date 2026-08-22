@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 import {readFile} from 'node:fs/promises';
-import {loadLocalPolicyContent, loadPolicyContent} from '../scripts/policy-source.mjs';
+import {loadLocalPolicies, loadLocalPolicyContent, loadPolicyContent, POLICY_PAGES} from '../scripts/policy-source.mjs';
 import {injectPolicyContent} from '../scripts/render-policy.mjs';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -48,19 +48,30 @@ assert.equal(content.title, local.title);
 // sections. Injecting twice must produce the same page: when it did not, the
 // second pass truncated the page's own <section> and the live page turned into
 // a white band with white text on it.
-const page = await readFile(new URL('../cancellation-refund-policy.html', import.meta.url), 'utf8');
 const settings = JSON.parse(await readFile(new URL('../src/content/site.json', import.meta.url), 'utf8')).siteSettings;
-const once = injectPolicyContent(page, local, settings);
-const twice = injectPolicyContent(once, local, settings);
-assert.equal(twice, once, 'rendering the policy page twice changes it, so the build corrupts the committed page');
+const all = await loadLocalPolicies(projectRoot);
 
-const body = once.slice(once.indexOf('<main'), once.indexOf('</main>'));
-for (const tag of ['section', 'div', 'dl']) {
-  assert.equal(
-    (body.match(new RegExp(`<${tag}[\\s>]`, 'g')) || []).length,
-    (body.match(new RegExp(`</${tag}>`, 'g')) || []).length,
-    `the rendered policy page has unbalanced <${tag}> tags`,
-  );
+for (const {key, file} of POLICY_PAGES) {
+  const policy = all[key];
+  const page = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
+  const once = injectPolicyContent(page, policy, settings, file);
+  const twice = injectPolicyContent(once, policy, settings, file);
+  assert.equal(twice, once, `${file} changes when rendered twice, so the build corrupts the committed page`);
+
+  const body = once.slice(once.indexOf('<main'), once.indexOf('</main>'));
+  for (const tag of ['section', 'div', 'dl']) {
+    assert.equal(
+      (body.match(new RegExp(`<${tag}[\\s>]`, 'g')) || []).length,
+      (body.match(new RegExp(`</${tag}>`, 'g')) || []).length,
+      `${file} has unbalanced <${tag}> tags`,
+    );
+  }
 }
+
+// Insurance is a requirement, not a suggestion, and the page has to say so.
+const insurance = all.travelInsurance;
+const insuranceText = JSON.stringify(insurance).toLowerCase();
+assert(insuranceText.includes('required'), 'the insurance page no longer states that cover is required');
+assert(insuranceText.includes('30 days'), 'the insurance page no longer states the proof deadline');
 
 console.log('Policy content contract tests passed.');

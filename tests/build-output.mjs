@@ -106,16 +106,18 @@ assert.equal(
 // Checked against the built page, not the source: the injectors run at build
 // time, so a truncating injector leaves the committed page intact and breaks
 // only what visitors see.
-const generatedPolicy = await readFile(join(outputPath, 'cancellation-refund-policy.html'), 'utf8');
-const policyBody = generatedPolicy.slice(generatedPolicy.indexOf('<main'), generatedPolicy.indexOf('</main>'));
-for (const tag of ['section', 'div', 'dl']) {
-  assert.equal(
-    (policyBody.match(new RegExp(`<${tag}[\\s>]`, 'g')) || []).length,
-    (policyBody.match(new RegExp(`</${tag}>`, 'g')) || []).length,
-    `the built policy page has unbalanced <${tag}> tags`,
-  );
+for (const file of ['cancellation-refund-policy.html', 'travel-insurance.html']) {
+  const generatedPolicy = await readFile(join(outputPath, file), 'utf8');
+  const policyBody = generatedPolicy.slice(generatedPolicy.indexOf('<main'), generatedPolicy.indexOf('</main>'));
+  for (const tag of ['section', 'div', 'dl']) {
+    assert.equal(
+      (policyBody.match(new RegExp(`<${tag}[\\s>]`, 'g')) || []).length,
+      (policyBody.match(new RegExp(`</${tag}>`, 'g')) || []).length,
+      `the built ${file} has unbalanced <${tag}> tags`,
+    );
+  }
+  assert(policyBody.includes('policy-term'), `the built ${file} lost its terms`);
 }
-assert(policyBody.includes('policy-term'), 'the built policy page lost its terms');
 
 const sitemap = await readFile(join(outputPath, 'sitemap.xml'), 'utf8');
 const locations = [...sitemap.matchAll(/<loc>https?:\/\/[^/]+\/people-and-places-tours\/(.*?)<\/loc>/g)]

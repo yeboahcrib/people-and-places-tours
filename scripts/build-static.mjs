@@ -8,7 +8,7 @@ import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs
 import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
-import {loadLocalPolicyContent, loadPolicyContent} from './policy-source.mjs';
+import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
 import {injectPolicyContent} from './render-policy.mjs';
 import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
@@ -42,21 +42,32 @@ const [localTours, localHomepageContent, localBookingContent, localAboutContent,
   loadLocalHomepageContent(projectRoot),
   loadLocalBookingContent(projectRoot),
   loadLocalAboutContent(projectRoot),
-  loadLocalPolicyContent(projectRoot),
+  loadLocalPolicies(projectRoot),
 ]);
 const [
   {tours, source: tourContentSource},
   {content: homepageContent, source: homepageContentSource},
   {content: bookingContent, source: bookingContentSource},
   {content: aboutContent, source: aboutContentSource},
-  {content: policyContent, source: policyContentSource},
 ] = await Promise.all([
   loadTourContent({localTours}),
   loadHomepageContent({localContent: localHomepageContent}),
   loadBookingContent({localContent: localBookingContent}),
   loadAboutContent({localContent: localAboutContent}),
-  loadPolicyContent({localContent: localPolicyContent}),
 ]);
+
+// One request per policy page. They are independent documents; a missing
+// insurance page must not take the cancellation page down with it.
+const policies = Object.fromEntries(await Promise.all(POLICY_PAGES.map(async page => {
+  const {content, source} = await loadPolicyContent({
+    localContent: localPolicyContent[page.key],
+    policyType: page.policyType,
+  });
+  return [page.file, {content, source}];
+})));
+const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source === 'sanity')
+  ? 'sanity'
+  : 'local';
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
 // 404.html only.
@@ -154,9 +165,9 @@ for (const entry of rootEntries) {
     const withAbout = injectAboutContent(withHomepage, aboutContent);
     const withBooking = injectBookingContent(withAbout, bookingContent);
     // Guarded by filename: the renderer throws when a binding is missing, which
-    // is what we want on the policy page and wrong everywhere else.
-    const withPolicy = entry.name === 'cancellation-refund-policy.html'
-      ? injectPolicyContent(withBooking, policyContent, siteContent.siteSettings)
+    // is what we want on a policy page and wrong everywhere else.
+    const withPolicy = policies[entry.name]
+      ? injectPolicyContent(withBooking, policies[entry.name].content, siteContent.siteSettings, entry.name)
       : withBooking;
     const withContact = injectSiteContact(withPolicy, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);

@@ -82,6 +82,15 @@ export const structure: StructureResolver = (S) =>
                     .documentId('policy-cancellation')
                     .title('Cancellation & Refund Policy'),
                 ),
+              S.listItem()
+                .title('Travel Insurance')
+                .id('policy-insurance')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-insurance')
+                    .title('Travel Insurance'),
+                ),
             ]),
         ),
 

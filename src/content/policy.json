@@ -82,5 +82,67 @@
     ],
     "contactIntro": "If you have any questions, or need to request a cancellation or a change, please contact us immediately in writing.",
     "closing": "By booking with People & Places, you acknowledge that you have read, understood, and agreed to this cancellation and refund policy."
+  },
+  "travelInsurance": {
+    "title": "Travel Insurance",
+    "lastUpdated": "2026-08-22",
+    "intro": "Travel insurance is required on every People & Places trip. We ask for proof of cover before you travel, and we will not be able to take you on the trip without it. This page explains exactly what your policy needs to include and when we need to see it.",
+    "sections": [
+      {
+        "heading": "What your policy must cover",
+        "intro": "Any comprehensive travel insurance policy will do, as long as it includes both of the following. Cover levels vary widely, so read your policy rather than assuming.",
+        "items": [
+          {
+            "term": "Medical emergency",
+            "text": "Emergency medical treatment, personal injury, hospital care, and the cost of medical evacuation or repatriation, including air ambulance. This is the part that matters most, and the part cheap policies most often leave out."
+          },
+          {
+            "term": "Trip cancellation and disruption",
+            "text": "Trip cancellation, trip delay, missed departures, and lost or delayed baggage. Cancellation cover is usually the only way to recover money you have already paid us that our own cancellation terms cannot refund."
+          },
+          {
+            "term": "The activities on your itinerary",
+            "text": "Check that your policy covers everything your trip includes. Hiking, boat and canoe trips, quad biking and similar activities are excluded by some policies unless you add them."
+          }
+        ]
+      },
+      {
+        "heading": "When we need to see it",
+        "items": [
+          {
+            "term": "Proof is due 30 days before you travel",
+            "text": "Send us your policy number, your insurer's name, and the dates your cover runs. Email or WhatsApp is fine. This is the same deadline as your final balance, so the two can be sent together."
+          },
+          {
+            "term": "Buy it when you book, not when it is due",
+            "text": "Cancellation cover only protects what you buy it before. A policy bought a month before departure will not cover something that has already happened."
+          },
+          {
+            "term": "If we do not receive it",
+            "text": "We will chase you for it. If we still do not have proof by your departure date, we cannot take you on the trip, and the cancellation terms apply as they would to any other cancellation."
+          }
+        ]
+      },
+      {
+        "heading": "What is your responsibility",
+        "intro": "We are not insurance brokers and we cannot advise you on which policy to buy. What we can tell you is what to check before you buy.",
+        "items": [
+          {
+            "term": "Reading your own policy",
+            "text": "Cover, exclusions and claim limits are set by your insurer, not by us. You are responsible for making sure the policy you buy actually covers your trip, your activities and any medical condition you already have."
+          },
+          {
+            "term": "Claiming",
+            "text": "Claims are made to your insurer, not to us. We will give you whatever documentation we hold, such as booking confirmations and written accounts of what happened, to support a claim."
+          },
+          {
+            "term": "Cover for people you book for",
+            "text": "If you are booking for a family or a group, everyone travelling needs their own cover, and you are responsible for confirming they have it."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "If you are unsure whether a policy meets these requirements, send us the details before you buy and we will tell you what looks missing.",
+    "closing": "Requiring insurance is not us being cautious on your behalf. Medical care and evacuation abroad are expensive, and the difference between an insured traveller and an uninsured one on a bad day is very large. We would rather have this conversation now than then."
   }
 }

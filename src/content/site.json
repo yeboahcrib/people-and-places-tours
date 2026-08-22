@@ -49,10 +49,6 @@
           {
             "label": "Contact",
             "href": "contact.html"
-          },
-          {
-            "label": "Cancellation & Refund Policy",
-            "href": "cancellation-refund-policy.html"
           }
         ]
       },
@@ -99,6 +95,19 @@
           {
             "label": "WhatsApp Us",
             "href": "https://wa.me/233503673473"
+          }
+        ]
+      },
+      {
+        "heading": "Legal",
+        "links": [
+          {
+            "label": "Cancellation & Refunds",
+            "href": "cancellation-refund-policy.html"
+          },
+          {
+            "label": "Travel Insurance",
+            "href": "travel-insurance.html"
           }
         ]
       }

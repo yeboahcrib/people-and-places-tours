@@ -1217,7 +1217,13 @@ body.page-entering {
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  /* Brand block, then one track per footer column. The columns come from the
+     CMS, so the count is not fixed: auto-fit re-flows the row instead of
+     dropping a new column onto a line of its own. The brand track is a
+     percentage rather than an fr because auto-fit is invalid beside a
+     flexible track, and an invalid track list collapses the whole footer
+     into a single column. */
+  grid-template-columns: 26% repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--sp-6);
   padding-bottom: var(--sp-6);
 }

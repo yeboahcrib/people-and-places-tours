@@ -23,12 +23,13 @@ export const policy = defineType({
       options: {
         list: [
           {title: 'Cancellation & refunds', value: 'cancellation'},
+          {title: 'Travel insurance', value: 'insurance'},
           {title: 'Privacy', value: 'privacy'},
           {title: 'Booking terms & conditions', value: 'terms'},
         ],
         layout: 'radio',
       },
-      description: 'Only the cancellation policy has a page on the website today. The others can be written now and published when their pages exist.',
+      description: 'Cancellation and travel insurance have pages on the website today. The others can be written now and published when their pages exist.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

@@ -10,13 +10,11 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[character]));
 
-const FILE = 'cancellation-refund-policy.html';
-
-function replaceCopy(html, key, value) {
+function replaceCopy(html, key, value, file) {
   const pattern = new RegExp(
     `(<([a-zA-Z0-9]+)(?=[^>]*\\sdata-policy-copy="${key}")[^>]*>)([\\s\\S]*?)(</\\2>)`,
   );
-  if (!pattern.test(html)) throw new Error(`${FILE} has no element bound to policy copy "${key}"`);
+  if (!pattern.test(html)) throw new Error(`${file} has no element bound to policy copy "${key}"`);
   return html.replace(pattern, (_match, open, _tag, _body, close) => `${open}${escapeHtml(value)}${close}`);
 }
 
@@ -25,10 +23,10 @@ function replaceCopy(html, key, value) {
 // their own elements of the same tag. A non-greedy match stops at the first
 // inner closing tag, silently truncating the page's own <section> — which
 // renders as a white band with white text on it.
-function replaceContainer(html, attribute, inner, label) {
+function replaceContainer(html, attribute, inner, label, file) {
   const opening = new RegExp(`<([a-zA-Z0-9]+)(?=[^>]*\\s${attribute}\\b)[^>]*>`);
   const match = opening.exec(html);
-  if (!match) throw new Error(`${FILE} has no ${label} container (${attribute})`);
+  if (!match) throw new Error(`${file} has no ${label} container (${attribute})`);
   const tag = match[1];
   const openEnd = match.index + match[0].length;
   const elementEnd = findBalancedElementEnd(html, match.index, tag);
@@ -63,18 +61,18 @@ const renderSections = sections => sections.map(section => {
     + `</section>`;
 }).join('');
 
-export function injectPolicyContent(html, policy, settings) {
+export function injectPolicyContent(html, policy, settings, file = 'a policy page') {
   let output = html;
   for (const key of ['title', 'intro', 'contactIntro', 'closing']) {
-    output = replaceCopy(output, key, policy[key]);
+    output = replaceCopy(output, key, policy[key], file);
   }
-  output = replaceCopy(output, 'lastUpdated', `Last updated ${formatPolicyDate(policy.lastUpdated)}`);
-  output = replaceContainer(output, 'data-policy-sections', renderSections(policy.sections), 'policy sections');
+  output = replaceCopy(output, 'lastUpdated', `Last updated ${formatPolicyDate(policy.lastUpdated)}`, file);
+  output = replaceContainer(output, 'data-policy-sections', renderSections(policy.sections), 'policy sections', file);
 
   const email = settings?.email;
   const phone = settings?.primaryPhone;
   if (!email || !phone) throw new Error('Policy page needs a contact email and phone from site settings');
   const contact = `<li><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></li>`
     + `<li><a href="https://wa.me/${escapeHtml(String(phone).replace(/[^0-9]/g, ''))}" target="_blank" rel="noopener">WhatsApp ${escapeHtml(phone)}</a></li>`;
-  return replaceContainer(output, 'data-policy-contact', contact, 'policy contact');
+  return replaceContainer(output, 'data-policy-contact', contact, 'policy contact', file);
 }
