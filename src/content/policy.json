@@ -316,15 +316,19 @@
       },
       {
         "heading": "Paying for your trip",
-        "intro": "What you pay up front depends on which kind of trip you book.",
+        "intro": "One figure secures any trip we run: $400 per person. What changes between trips is when the rest is due.",
         "items": [
           {
             "term": "The Just Go Ghana package",
-            "text": "A non-refundable deposit of $400 per person confirms your dates. It comes off your total. The balance is due 30 days before you arrive, and you can pay it in instalments across that time or settle it in full at any point."
+            "text": "A non-refundable payment of $400 per person confirms your dates and comes off your total. The balance is due 30 days before you arrive, and you can spread it across instalments in that time or settle it in full whenever you like."
           },
           {
-            "term": "Tailored and custom trips",
-            "text": "A deposit of 30% of the total confirms your booking, and the remaining 70% is due 30 days before your start date. The deposit is non-refundable once paid."
+            "term": "Custom and tailored trips — planning is free",
+            "text": "Tell us what you have in mind and we will design the itinerary, price it and send it to you. Nothing is due while we do that, and you are under no obligation once you have it."
+          },
+          {
+            "term": "Custom and tailored trips — securing your dates",
+            "text": "Once you are happy with the itinerary, a non-refundable payment of $400 per person confirms it and comes off your total, with the balance due 30 days before you arrive. If you cancel after that point, the securing payment is not returnable and neither is anything we have already paid to hotels or partners to hold your trip."
           },
           {
             "term": "Day tours",

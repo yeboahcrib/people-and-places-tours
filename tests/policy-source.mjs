@@ -87,13 +87,22 @@ for (const tracker of ['gtag(', 'googletagmanager', 'google-analytics', 'documen
   assert(!siteJs.includes(tracker), `the privacy policy promises no tracking but script.js uses ${tracker}`);
 }
 
-// The deposit figures are the site's oldest source of contradiction: the
-// package takes a flat $400 and bespoke trips take 30%, and the terms page
-// must not drift back into stating one rule for both.
+// The deposit was the site's oldest source of contradiction - a flat $400 in
+// one place and 30% of the trip price in another. One figure now secures
+// every trip, and a percentage reappearing anywhere means that drift has
+// started again.
 const bookingTermsText = JSON.stringify(all.bookingTerms);
-assert(bookingTermsText.includes('$400 per person'), 'the booking terms lost the package deposit');
-assert(bookingTermsText.includes('30% of the total'), 'the booking terms lost the tailored-trip deposit');
-assert(!/30%[^"]*Just Go Ghana|Just Go Ghana[^"]*30%/.test(bookingTermsText), 'the booking terms apply the 30% deposit to the package');
+assert(bookingTermsText.includes('$400 per person'), 'the booking terms lost the securing payment');
+assert(
+  !/\d+%/.test(bookingTermsText),
+  'a percentage deposit is back in the booking terms - the whole point is that one figure covers every trip',
+);
+// Free planning is the difference between this and every competitor checked,
+// so it is asserted rather than left to survive an edit by luck.
+assert(
+  /planning is free/i.test(bookingTermsText),
+  'the booking terms no longer say that planning a custom trip costs nothing',
+);
 
 // Insurance is a requirement, not a suggestion, and the page has to say so.
 const insurance = all.travelInsurance;
