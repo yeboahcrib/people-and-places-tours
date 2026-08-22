@@ -1,0 +1,12 @@
+# Tours folded into the day they belong to, 22 August 2026. Elmina is a stop on
+# the Cape Coast day, Kente Village on the Kumasi day, and Akosombo is the boat
+# cruise half of Shai Hills. Jamestown was withdrawn. These are permanent so the
+# old addresses keep whatever search ranking they earned.
+/elmina-tour.html    /cape-coast-tour.html   301
+/elmina-tour         /cape-coast-tour.html   301
+/kente-tour.html     /kumasi-tour.html       301
+/kente-tour          /kumasi-tour.html       301
+/akosombo-tour.html  /shai-hills-tour.html   301
+/akosombo-tour       /shai-hills-tour.html   301
+/jamestown-tour.html /packages.html          301
+/jamestown-tour      /packages.html          301

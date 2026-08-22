@@ -1,6 +1,6 @@
 const {chromium} = require('playwright');
 const http = require('node:http');
-const {createReadStream, existsSync} = require('node:fs');
+const {createReadStream, existsSync, readFileSync} = require('node:fs');
 const {extname, join, normalize} = require('node:path');
 
 // These checks only make sense against dist/. The homepage and the packages
@@ -96,9 +96,13 @@ function serveDist() {
       .filter(rect => rect.right > document.documentElement.clientWidth + 1 || rect.left < -1)
       .slice(0, 10),
   }));
-  assert(packageState.cards === 15, `JavaScript-free packages page has ${packageState.cards} tours`);
-  assert(packageState.detailLinks === 15, 'JavaScript-free tour detail links are incomplete');
-  assert(packageState.inquiryLinks === 15, 'JavaScript-free inquiry links are incomplete');
+  // The catalogue size is whatever the build rendered, not a number frozen
+  // here: an editor switching a tour off in Sanity must not fail this suite.
+  const expectedTours = JSON.parse(readFileSync(join(DIST_ROOT, 'health.json'), 'utf8')).tourCount;
+  assert(Number.isInteger(expectedTours) && expectedTours > 0, 'dist/health.json has no usable tour count');
+  assert(packageState.cards === expectedTours, `JavaScript-free packages page has ${packageState.cards} tours, expected ${expectedTours}`);
+  assert(packageState.detailLinks === expectedTours, 'JavaScript-free tour detail links are incomplete');
+  assert(packageState.inquiryLinks === expectedTours, 'JavaScript-free inquiry links are incomplete');
   assert(packageState.width <= packageState.viewport + 1, `JavaScript-free packages page overflows horizontally: ${JSON.stringify(packageState.overflowing)}`);
 
   // The contact form is the page where a JavaScript failure costs an enquiry

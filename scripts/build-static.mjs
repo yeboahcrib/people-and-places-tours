@@ -25,6 +25,7 @@ const outputRoot = join(projectRoot, 'dist');
 const publicRootExtensions = new Set(['.html', '.css', '.js']);
 const publicRootFiles = new Set([
   '_headers',
+  '_redirects',
   'robots.txt',
   'sitemap.xml',
 ]);
