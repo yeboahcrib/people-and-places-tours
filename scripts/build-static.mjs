@@ -190,6 +190,10 @@ const buildHealth = {
   builtAt: new Date().toISOString(),
   contentSource,
   tourContentSource,
+  // The packages grid is generated from this list, so recording its length
+  // lets tests/build-output.mjs check the grid against the catalogue that
+  // built it rather than against a number frozen into the test.
+  tourCount: tours.length,
   homepageContentSource,
   bookingContentSource,
   aboutContentSource,
