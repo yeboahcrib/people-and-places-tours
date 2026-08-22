@@ -1,0 +1,86 @@
+{
+  "cancellationRefund": {
+    "title": "Cancellation & Refund Policy",
+    "lastUpdated": "2026-08-22",
+    "intro": "At People & Places, we pride ourselves on curating immersive, high-quality experiences in Ghana. To ensure clarity and fairness to all our travelers and our local partners, we have established the following refunds and cancellation policy.",
+    "sections": [
+      {
+        "heading": "If you cancel",
+        "intro": "All bookings for our Just Go Ghana packages are subject to the following cancellation timeline. The initial $400 deposit is non-refundable and non-transferable in all cases.",
+        "items": [
+          {
+            "term": "60 or more days before the trip",
+            "text": "You will receive a full refund of all payments made, minus the $400 non-refundable deposit."
+          },
+          {
+            "term": "31 to 59 days before the trip",
+            "text": "You will receive a 50% refund of the total trip cost, excluding the deposit."
+          },
+          {
+            "term": "30 days or less before the trip",
+            "text": "No refund will be issued. A 100% cancellation fee applies."
+          },
+          {
+            "term": "No-shows",
+            "text": "Travelers who do not arrive for the trip, or who leave early for any reason, are not eligible for a refund."
+          }
+        ]
+      },
+      {
+        "heading": "Changing or rescheduling a booking",
+        "intro": "We understand that life happens. We offer the following options to help accommodate changes to your plans.",
+        "items": [
+          {
+            "term": "Rescheduling requests",
+            "text": "You may request to reschedule your trip dates up to 45 days before your scheduled arrival. Requests are subject to availability and current hotel rates."
+          },
+          {
+            "term": "Rescheduling fee",
+            "text": "A strictly administrative fee of $150 may apply to process date changes, plus any difference in package price for the new dates."
+          },
+          {
+            "term": "Last-minute changes",
+            "text": "Requests made less than 30 days before the arrival date generally cannot be accommodated, because of vendor contracts already in place."
+          }
+        ]
+      },
+      {
+        "heading": "If we cancel",
+        "intro": "In the unlikely event that People & Places must cancel a tour due to unforeseen circumstances such as political instability or natural disasters, or for reasons beyond our control, we will offer you the following options.",
+        "items": [
+          {
+            "term": "Reschedule",
+            "text": "Move your full credit to a future trip date or a different available package."
+          },
+          {
+            "term": "Refund",
+            "text": "Receive a full refund of all payments made, including the deposit."
+          }
+        ]
+      },
+      {
+        "heading": "Important information",
+        "items": [
+          {
+            "term": "Travel insurance",
+            "text": "We strongly recommend purchasing comprehensive travel insurance that includes Cancel For Any Reason (CFAR) coverage. This protects you against financial loss if you must cancel due to illness, flight delays, or work conflicts."
+          },
+          {
+            "term": "Itinerary changes",
+            "text": "People & Places reserves the right to slightly alter tour routes or accommodations without prior notice where necessary, for example due to weather or road maintenance. Any changes will be of equal or greater value."
+          },
+          {
+            "term": "Liability",
+            "text": "People & Places shall not be liable for any loss, damage, injury, or illness caused in any way to participants while using third-party services such as hotels, transport, and attractions."
+          },
+          {
+            "term": "Participant responsibility",
+            "text": "Guests are expected to conduct themselves respectfully toward staff, fellow travelers, and locals. Behavior deemed disruptive or disrespectful may result in removal from the tour without a refund."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "If you have any questions, or need to request a cancellation or a change, please contact us immediately in writing.",
+    "closing": "By booking with People & Places, you acknowledge that you have read, understood, and agreed to this cancellation and refund policy."
+  }
+}

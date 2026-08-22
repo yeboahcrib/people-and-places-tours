@@ -9,6 +9,7 @@ const pages = [
   '/contact.html',
   '/accra-city-tour.html',
   '/just-go-ghana.html',
+  '/cancellation-refund-policy.html',
 ];
 
 function assert(condition, message) {

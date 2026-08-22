@@ -73,6 +73,15 @@ export const structure: StructureResolver = (S) =>
               single(S, 'aboutPage', 'About', 'About page'),
               single(S, 'bookingFlow', 'Contact & Booking', 'Contact and booking copy'),
               single(S, 'originStory', 'Our Story', 'Origin story'),
+              S.listItem()
+                .title('Cancellation & Refund Policy')
+                .id('policy-cancellation')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-cancellation')
+                    .title('Cancellation & Refund Policy'),
+                ),
             ]),
         ),
 

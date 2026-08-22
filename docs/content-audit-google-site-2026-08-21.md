@@ -166,3 +166,55 @@ no page to render into. **The audit and that plan are the same piece of work**
    Site, or the Google Site names updated to the newer ones?
 6. **Should the cancellation policy be published as-is** pending a lawyer's
    review, or held back until reviewed?
+
+## 9. Decisions taken — 22 August 2026
+
+The founders answered §8's first, fifth and part of the second question, and
+the work below is done and live.
+
+| Question | Decision |
+| --- | --- |
+| The five unsourced tours | Jamestown **withdrawn**. Elmina folded into **Cape Coast** (it is the boat-ride stop). Kente Village folded into **Kumasi**. Akosombo folded into **Shai Hills** (the boat-cruise half). Accra After Dark Food Tour **kept** |
+| Accra After Dark price | **$90 per person for three or more**, which is the normal minimum; two travellers can be taken at $110 each |
+| Conflicting names | **Google Site names win** — Volta Day Tour, Ada Day Tour, Kumasi Cultural Tour, Quadbike & Waterfalls |
+| Kakum | Confirmed as part of the **Cape Coast** day. It appears nowhere on the Google Site, so this is founder testimony, not a migrated fact |
+| Homepage featured slot | Jamestown's slot went to the **Cape Coast Ancestral Tour** |
+
+The catalogue is now ten day tours plus the package, matching the Google Site
+plus the food tour. The four withdrawn pages redirect permanently to the tour
+that absorbed them.
+
+Two traps found while doing it, both fixed: four test assertions were frozen at
+fifteen tours, so an editor switching a tour off in the Studio broke the build;
+and `tours.js` ships to the browser unmodified, so anything rendered
+client-side kept the old names until the file itself was corrected.
+
+### Still open from §8
+
+- Is the package **$3,000 or $2,400**? The Google Site says both.
+- Is it **"Just Go Ghana" or "Feel'in Ghana"**?
+- Is the **$400 non-refundable deposit** current, and does it apply beyond the
+  package?
+- Should the **cancellation policy be published** before a lawyer sees it?
+
+### Done since
+
+**The cancellation and refund policy is published** at
+`/cancellation-refund-policy`, reproduced from the Google Site with no change
+of meaning — the refund ladder, the $400 non-refundable deposit, the $150
+rescheduling fee, the 45-day rescheduling deadline, liability and conduct
+terms all carry across. It is CMS-backed: `src/content/policy.json` is the
+committed source, `policy-cancellation` is the Sanity document behind it, and
+`tests/policy-source.mjs` fails the build if a section loses its terms or the
+page loses its date.
+
+**One gap the source itself has:** the policy is written for the Just Go Ghana
+package and says nothing about cancelling a **day tour**. That is a real
+question a customer will ask, and neither website answers it.
+
+### Not started
+
+The fourteen FAQs, the day-by-day itinerary
+as CMS content, #Connect4Change, the four services, and the Tamaro Diallo
+testimonial. The first three need schema that does not exist yet — Phase 1 of
+`docs/plan-cms-generated-tour-pages.md`.
