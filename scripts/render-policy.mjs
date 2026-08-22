@@ -63,8 +63,17 @@ const renderSections = sections => sections.map(section => {
 
 export function injectPolicyContent(html, policy, settings, file = 'a policy page') {
   let output = html;
-  for (const key of ['title', 'intro', 'contactIntro', 'closing']) {
+  for (const key of ['title', 'intro', 'contactIntro']) {
     output = replaceCopy(output, key, policy[key], file);
+  }
+  // The acknowledgement is optional in both directions: a policy may carry no
+  // closing statement, and a page may choose not to show one. Only the
+  // cancellation policy has a line that has to appear.
+  const closingBinding = /<p[^>]*\sdata-policy-copy="closing"[^>]*>[\s\S]*?<\/p>/;
+  if (policy.closing && closingBinding.test(output)) {
+    output = replaceCopy(output, 'closing', policy.closing, file);
+  } else if (!policy.closing) {
+    output = output.replace(new RegExp(`\\s*${closingBinding.source}`), '');
   }
   output = replaceCopy(output, 'lastUpdated', `Last updated ${formatPolicyDate(policy.lastUpdated)}`, file);
   output = replaceContainer(output, 'data-policy-sections', renderSections(policy.sections), 'policy sections', file);

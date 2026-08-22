@@ -48,13 +48,14 @@
     @media (max-width: 600px) {
       .page-hero .page-hero-title { font-size: clamp(2.25rem, 10vw, 3rem); }
     }
-    .policy-closing {
-      margin-top: var(--sp-6);
-      padding: var(--sp-3);
-      border-radius: var(--radius-md);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      color: var(--muted);
+    /* The acknowledgement is a legal line, not a callout. A boxed panel gave
+       it more weight than the terms above it. */
+    .policy-acknowledgement {
+      margin: var(--sp-5) 0 0;
+      padding-top: var(--sp-2);
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-subtle);
+      font-size: var(--text-md);
       line-height: 1.8;
     }
   </style>
@@ -117,8 +118,6 @@
 
         <div data-policy-sections><section class="policy-block"><h3 class="policy-block-title">What your policy must cover</h3><p class="policy-block-intro">Any comprehensive travel insurance policy will do, as long as it includes both of the following. Cover levels vary widely, so read your policy rather than assuming.</p><dl class="policy-terms"><div class="policy-term"><dt>Medical emergency</dt><dd>Emergency medical treatment, personal injury, hospital care, and the cost of medical evacuation or repatriation, including air ambulance. This is the part that matters most, and the part cheap policies most often leave out.</dd></div><div class="policy-term"><dt>Trip cancellation and disruption</dt><dd>Trip cancellation, trip delay, missed departures, and lost or delayed baggage. Cancellation cover is usually the only way to recover money you have already paid us that our own cancellation terms cannot refund.</dd></div><div class="policy-term"><dt>The activities on your itinerary</dt><dd>Check that your policy covers everything your trip includes. Hiking, boat and canoe trips, quad biking and similar activities are excluded by some policies unless you add them.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">When we need to see it</h3><dl class="policy-terms"><div class="policy-term"><dt>Proof is due 30 days before you travel</dt><dd>Send us your policy number, your insurer&#39;s name, and the dates your cover runs. Email or WhatsApp is fine. This is the same deadline as your final balance, so the two can be sent together.</dd></div><div class="policy-term"><dt>Buy it when you book, not when it is due</dt><dd>Cancellation cover only protects what you buy it before. A policy bought a month before departure will not cover something that has already happened.</dd></div><div class="policy-term"><dt>If we do not receive it</dt><dd>We will chase you for it. If we still do not have proof by your departure date, we cannot take you on the trip, and the cancellation terms apply as they would to any other cancellation.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">What is your responsibility</h3><p class="policy-block-intro">We are not insurance brokers and we cannot advise you on which policy to buy. What we can tell you is what to check before you buy.</p><dl class="policy-terms"><div class="policy-term"><dt>Reading your own policy</dt><dd>Cover, exclusions and claim limits are set by your insurer, not by us. You are responsible for making sure the policy you buy actually covers your trip, your activities and any medical condition you already have.</dd></div><div class="policy-term"><dt>Claiming</dt><dd>Claims are made to your insurer, not to us. We will give you whatever documentation we hold, such as booking confirmations and written accounts of what happened, to support a claim.</dd></div><div class="policy-term"><dt>Cover for people you book for</dt><dd>If you are booking for a family or a group, everyone travelling needs their own cover, and you are responsible for confirming they have it.</dd></div></dl></section></div>
       </div>
-
-      <p class="policy-closing" data-policy-copy="closing">Requiring insurance is not us being cautious on your behalf. Medical care and evacuation abroad are expensive, and the difference between an insured traveller and an uninsured one on a bad day is very large. We would rather have this conversation now than then.</p>
     </div>
   </section>
 </main>

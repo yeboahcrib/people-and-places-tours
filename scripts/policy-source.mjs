@@ -10,10 +10,15 @@ function validatePolicy(policy, source) {
   if (!policy || typeof policy !== 'object') {
     throw new Error(`${source} is missing the cancellation policy`);
   }
-  for (const key of ['title', 'intro', 'contactIntro', 'closing']) {
+  for (const key of ['title', 'intro', 'contactIntro']) {
     if (typeof policy[key] !== 'string' || !policy[key].trim()) {
       throw new Error(`${source} is missing policy copy for "${key}"`);
     }
+  }
+  // Optional: only the cancellation policy carries a legal acknowledgement.
+  // Anywhere else a closing paragraph is editorialising, not policy.
+  if (policy.closing !== undefined && !String(policy.closing).trim()) {
+    throw new Error(`${source} has an empty closing statement`);
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(policy.lastUpdated || '')) {
     throw new Error(`${source} needs a "last updated" date — a policy without one cannot be relied on`);
