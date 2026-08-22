@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
+import {readFile} from 'node:fs/promises';
 import {loadLocalPolicyContent, loadPolicyContent} from '../scripts/policy-source.mjs';
+import {injectPolicyContent} from '../scripts/render-policy.mjs';
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const local = await loadLocalPolicyContent(projectRoot);
@@ -41,5 +43,24 @@ const {content, source} = await loadPolicyContent({
 });
 assert.equal(source, 'local');
 assert.equal(content.title, local.title);
+
+// The build injects into the committed page, which already holds rendered
+// sections. Injecting twice must produce the same page: when it did not, the
+// second pass truncated the page's own <section> and the live page turned into
+// a white band with white text on it.
+const page = await readFile(new URL('../cancellation-refund-policy.html', import.meta.url), 'utf8');
+const settings = JSON.parse(await readFile(new URL('../src/content/site.json', import.meta.url), 'utf8')).siteSettings;
+const once = injectPolicyContent(page, local, settings);
+const twice = injectPolicyContent(once, local, settings);
+assert.equal(twice, once, 'rendering the policy page twice changes it, so the build corrupts the committed page');
+
+const body = once.slice(once.indexOf('<main'), once.indexOf('</main>'));
+for (const tag of ['section', 'div', 'dl']) {
+  assert.equal(
+    (body.match(new RegExp(`<${tag}[\\s>]`, 'g')) || []).length,
+    (body.match(new RegExp(`</${tag}>`, 'g')) || []).length,
+    `the rendered policy page has unbalanced <${tag}> tags`,
+  );
+}
 
 console.log('Policy content contract tests passed.');

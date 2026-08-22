@@ -4,6 +4,8 @@
 // readable even if this step never runs. When it does run, the copy and the
 // section list are replaced by whatever policy.json — or Sanity — holds.
 
+import {findBalancedElementEnd} from './shared-shell.mjs';
+
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[character]));
@@ -18,10 +20,20 @@ function replaceCopy(html, key, value) {
   return html.replace(pattern, (_match, open, _tag, _body, close) => `${open}${escapeHtml(value)}${close}`);
 }
 
+// Deliberately not a regex. This container already holds rendered sections by
+// the time the build runs over the committed page, and those sections nest
+// their own elements of the same tag. A non-greedy match stops at the first
+// inner closing tag, silently truncating the page's own <section> — which
+// renders as a white band with white text on it.
 function replaceContainer(html, attribute, inner, label) {
-  const pattern = new RegExp(`(<([a-zA-Z0-9]+)(?=[^>]*\\s${attribute}\\b)[^>]*>)([\\s\\S]*?)(</\\2>)`);
-  if (!pattern.test(html)) throw new Error(`${FILE} has no ${label} container (${attribute})`);
-  return html.replace(pattern, (_match, open, _tag, _body, close) => `${open}${inner}${close}`);
+  const opening = new RegExp(`<([a-zA-Z0-9]+)(?=[^>]*\\s${attribute}\\b)[^>]*>`);
+  const match = opening.exec(html);
+  if (!match) throw new Error(`${FILE} has no ${label} container (${attribute})`);
+  const tag = match[1];
+  const openEnd = match.index + match[0].length;
+  const elementEnd = findBalancedElementEnd(html, match.index, tag);
+  const closeStart = elementEnd - `</${tag}>`.length;
+  return `${html.slice(0, openEnd)}${inner}${html.slice(closeStart)}`;
 }
 
 // "2026-08-22" reads as a filing reference. Travellers deciding whether a
