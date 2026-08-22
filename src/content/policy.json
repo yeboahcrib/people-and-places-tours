@@ -5,7 +5,7 @@
     "intro": "At People & Places, we pride ourselves on curating immersive, high-quality experiences in Ghana. To ensure clarity and fairness to all our travelers and our local partners, we have established the following refunds and cancellation policy.",
     "sections": [
       {
-        "heading": "If you cancel",
+        "heading": "If you cancel a package trip",
         "intro": "All bookings for our Just Go Ghana packages are subject to the following cancellation timeline. The initial $400 deposit is non-refundable and non-transferable in all cases.",
         "items": [
           {
@@ -23,6 +23,24 @@
           {
             "term": "No-shows",
             "text": "Travelers who do not arrive for the trip, or who leave early for any reason, are not eligible for a refund."
+          }
+        ]
+      },
+      {
+        "heading": "If you cancel a day tour",
+        "intro": "Day tours are paid in full when you book, rather than with a deposit and a balance. They are shorter, lower-priced and often booked at short notice, so the timeline is simpler.",
+        "items": [
+          {
+            "term": "48 hours or more before the tour",
+            "text": "You will receive a full refund of everything you have paid."
+          },
+          {
+            "term": "Less than 48 hours before the tour",
+            "text": "No refund can be issued. By that point your guide is booked and your places at each site are held."
+          },
+          {
+            "term": "No-shows",
+            "text": "Travellers who do not arrive for a day tour are treated the same as a cancellation inside 48 hours."
           }
         ]
       },

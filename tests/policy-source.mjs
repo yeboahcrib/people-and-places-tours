@@ -7,12 +7,22 @@ import {injectPolicyContent} from '../scripts/render-policy.mjs';
 const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 const local = await loadLocalPolicyContent(projectRoot);
 
-assert(local.sections.length >= 4, 'the committed policy lost a section');
+assert(local.sections.length >= 5, 'the committed policy lost a section');
+
+// Day tours were the gap: until August 2026 a day-tour customer had no stated
+// terms at all. The 48-hour line is a founder decision from 25 July 2026,
+// recorded in docs/sprint-1-policy-payment-register.md.
+const daySection = local.sections.find(section => section.heading.includes('day tour'));
+assert(daySection, 'the policy no longer covers day-tour cancellations');
+assert(
+  daySection.items.some(item => item.term.includes('48 hours')),
+  'the day-tour section lost its 48-hour cut-off',
+);
 assert(/^\d{4}-\d{2}-\d{2}$/.test(local.lastUpdated), 'the committed policy has no usable date');
 
 // The refund ladder is the part a traveller argues with, so it is asserted
 // term by term rather than by counting.
-const cancelSection = local.sections[0];
+const cancelSection = local.sections.find(section => section.heading.includes('package trip'));
 const terms = cancelSection.items.map(item => item.term.toLowerCase());
 for (const expected of ['60 or more days', '31 to 59 days', '30 days or less', 'no-shows']) {
   assert(terms.some(term => term.includes(expected)), `the cancellation ladder is missing "${expected}"`);

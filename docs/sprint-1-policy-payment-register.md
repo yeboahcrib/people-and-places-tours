@@ -103,7 +103,7 @@ Register.
 | Policy area | Current site claim | Status |
 | --- | --- | --- |
 | Cancellation (Just Go Ghana) | "100% non-refundable" if cancelled <30 days before arrival (`just-go-ghana.html:403`) | Confirm applies uniformly or only to this offer |
-| Cancellation (day tours) | Not documented anywhere | **Open — P0 per roadmap** |
+| Cancellation (day tours) | `/cancellation-refund-policy` | **Published 22 August 2026** |
 | Rescheduling | Not documented anywhere on any tour page | Open |
 | Weather / operational changes | Not documented anywhere | Open |
 
@@ -131,7 +131,7 @@ reassurance language.
 - [ ] Deposit conflict resolved with one documented rule (or documented
       per-offer-type rules).
 - [ ] Payment methods and currency confirmed current.
-- [ ] Cancellation/refund policy documented for day tours, tailored tours
+- [x] Cancellation/refund policy documented for day tours — published 22 August 2026. Tailored tours still open.
       and custom tours (not just Just Go Ghana).
 - [ ] Rescheduling and weather-change policy documented.
 - [ ] Accessibility and health-conversation practice documented honestly
