@@ -11,6 +11,7 @@ const pages = [
   '/just-go-ghana.html',
   '/cancellation-refund-policy.html',
   '/travel-insurance.html',
+  '/privacy-policy.html',
 ];
 
 function assert(condition, message) {

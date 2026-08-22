@@ -108,6 +108,10 @@
           {
             "label": "Travel Insurance",
             "href": "travel-insurance.html"
+          },
+          {
+            "label": "Privacy Policy",
+            "href": "privacy-policy.html"
           }
         ]
       }

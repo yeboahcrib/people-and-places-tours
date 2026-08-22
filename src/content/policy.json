@@ -161,5 +161,135 @@
       }
     ],
     "contactIntro": "If you are unsure whether a policy meets these requirements, send us the details before you buy and we will tell you what looks missing."
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "2026-08-22",
+    "intro": "People & Places is a Ghana-founded tour company based in Accra. This explains what we learn about you when you visit this website, write to us, or book a trip, and what we do with it. It is written to be read, not to be survived.",
+    "sections": [
+      {
+        "heading": "What we collect",
+        "items": [
+          {
+            "term": "What you tell us",
+            "text": "Your name, email address, phone or WhatsApp number, and whatever you share about the trip you are planning — dates, group size, interests, questions. Nothing more than what you type into the form or send us in a message."
+          },
+          {
+            "term": "Proof of payment",
+            "text": "When you book, you send us a bank transfer or Mobile Money receipt. We hold that record so we can match your payment to your booking. We never see or store card numbers, because payments are arranged directly with our team rather than taken through this website."
+          },
+          {
+            "term": "Basic technical information",
+            "text": "Our host records ordinary request information such as your approximate location and browser type in order to serve pages and block attacks. We do not use it to build a profile of you."
+          }
+        ]
+      },
+      {
+        "heading": "Cookies and tracking",
+        "intro": "This is shorter than most privacy policies because there is genuinely less to say.",
+        "items": [
+          {
+            "term": "We run no analytics",
+            "text": "There is no Google Analytics, no advertising pixel, and no tracking script of any kind on this website. We do not know who you are until you write to us."
+          },
+          {
+            "term": "We set no cookies of our own",
+            "text": "The one exception is the spam check on our contact form, provided by Cloudflare Turnstile, which may store something in your browser to tell a person from a bot. It is not used to follow you."
+          }
+        ]
+      },
+      {
+        "heading": "What we use it for",
+        "items": [
+          {
+            "term": "Answering you and planning your trip",
+            "text": "Replying to your enquiry, working out your itinerary, confirming your booking, and sending you the details you need before you travel."
+          },
+          {
+            "term": "Running the business",
+            "text": "Matching payments to bookings, and keeping the records we need for tax and accounting."
+          },
+          {
+            "term": "What we never do",
+            "text": "We do not sell your information, and we do not add you to a marketing list because you asked a question."
+          }
+        ]
+      },
+      {
+        "heading": "Who else sees it",
+        "intro": "Only the services that make the website and your trip work. Each one sees the least it needs.",
+        "items": [
+          {
+            "term": "The services that run this website",
+            "text": "Cloudflare hosts the site and receives your enquiry, and Resend delivers that enquiry to our inbox. Our content system holds the words and pictures on these pages — it never holds anything about you."
+          },
+          {
+            "term": "Your bank or Mobile Money provider",
+            "text": "When you send us a payment directly. We do not route payments through a separate processor."
+          },
+          {
+            "term": "WhatsApp",
+            "text": "If you choose to contact us there, that conversation is subject to their terms as well as ours."
+          },
+          {
+            "term": "The people hosting your trip",
+            "text": "A driver or guide is given your name and pickup details, because they cannot collect you without them. Nothing else travels with it."
+          },
+          {
+            "term": "Nobody else",
+            "text": "We do not share your information with anyone else without asking you first, unless the law requires it."
+          }
+        ]
+      },
+      {
+        "heading": "How long we keep it",
+        "items": [
+          {
+            "term": "Enquiries that do not become bookings",
+            "text": "Kept while a conversation is live, and deleted once it clearly is not going anywhere."
+          },
+          {
+            "term": "Booking records",
+            "text": "Kept for as long as tax and accounting rules require, then deleted."
+          }
+        ]
+      },
+      {
+        "heading": "Your rights",
+        "intro": "Ghana's Data Protection Act, 2012 (Act 843) gives you rights over your own information, as may the law where you live. Write to us and we will act on any of these.",
+        "items": [
+          {
+            "term": "See what we hold",
+            "text": "Ask us what information we have about you, and we will tell you."
+          },
+          {
+            "term": "Correct it",
+            "text": "If something we hold about you is wrong, tell us and we will fix it."
+          },
+          {
+            "term": "Have it deleted",
+            "text": "Ask us to delete your information, and we will, unless we are required to keep it for tax or legal reasons."
+          },
+          {
+            "term": "Photographs of you",
+            "text": "If a photograph of you is on our website or social media and you would rather it were not, tell us and we will take it down. You do not have to give a reason."
+          }
+        ]
+      },
+      {
+        "heading": "Other things worth saying",
+        "items": [
+          {
+            "term": "Children",
+            "text": "Our trips are booked by adults. We do not knowingly collect information from anyone under 18 directly."
+          },
+          {
+            "term": "Changes to this policy",
+            "text": "If we change it, the date at the top of this page changes with it. We will not quietly rewrite it."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "For anything on this page — a question, a correction, or a request to delete something — write to us and a person will answer."
   }
 }

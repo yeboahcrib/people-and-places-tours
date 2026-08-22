@@ -61,7 +61,7 @@ a travel-insurance recommendation or requirement.
 | Cancellation by guest | Deposit is forfeited on any cancellation. If cancelled within 30 days of the tour/start date, the full amount (deposit + any balance paid) is non-refundable — matching the existing Just Go Ghana language, now applied universally |
 | Cancellation by People & Places | Reserved only for genuine operational necessity or force majeure (weather, safety, government restriction) — offer a reschedule or full refund in that case, never a guest-side penalty |
 | Payment methods | Bank transfer, Mobile Money (MTN, Vodafone Cash, AirtelTigo), major credit/debit cards — matches current site claim, still needs a yes/no confirmation that it's accurate |
-| Travel insurance | Recommend (not require) guests carry their own travel insurance — a lighter-touch version of what all three competitors do (TravelMo recommends, Buoyant Travel mandates proof of coverage) |
+| Travel insurance | **Superseded (2026-08-22): required, not recommended.** Every traveller must hold cover and send proof 30 days before departure, matching Buoyant Travel rather than TravelMo. Published at `/travel-insurance` |
 
 **Day-tour payment window — resolved (2026-07-25):** see the row above.
 Full payment at booking, full refund at 48+ hours out, non-refundable

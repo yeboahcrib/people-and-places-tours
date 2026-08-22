@@ -78,6 +78,15 @@ for (const {key, file} of POLICY_PAGES) {
   }
 }
 
+// The privacy policy claims no analytics and no tracking. That claim has to
+// stay true, so the test reads the site's own code rather than trusting it.
+const privacyText = JSON.stringify(all.privacyPolicy).toLowerCase();
+assert(privacyText.includes('no analytics'), 'the privacy policy no longer states that there is no analytics');
+const siteJs = await readFile(new URL('../script.js', import.meta.url), 'utf8');
+for (const tracker of ['gtag(', 'googletagmanager', 'google-analytics', 'document.cookie']) {
+  assert(!siteJs.includes(tracker), `the privacy policy promises no tracking but script.js uses ${tracker}`);
+}
+
 // Insurance is a requirement, not a suggestion, and the page has to say so.
 const insurance = all.travelInsurance;
 const insuranceText = JSON.stringify(insurance).toLowerCase();
