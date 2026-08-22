@@ -34,15 +34,18 @@ export function formatPolicyDate(value) {
   return `${day} ${months[month - 1]} ${year}`;
 }
 
+// Sections reuse the site's own rhythm: a display heading, a lead line, then
+// the terms as a definition list. No bespoke type scale — the policy should
+// read like the rest of the site, not like a document pasted into it.
 const renderSections = sections => sections.map(section => {
   const intro = section.intro
-    ? `<p class="policy-section-intro">${escapeHtml(section.intro)}</p>`
+    ? `<p class="policy-block-intro">${escapeHtml(section.intro)}</p>`
     : '';
   const items = section.items.map(item =>
     `<div class="policy-term"><dt>${escapeHtml(item.term)}</dt><dd>${escapeHtml(item.text)}</dd></div>`,
   ).join('');
-  return `<section class="policy-section">`
-    + `<h2>${escapeHtml(section.heading)}</h2>`
+  return `<section class="policy-block">`
+    + `<h3 class="policy-block-title">${escapeHtml(section.heading)}</h3>`
     + intro
     + `<dl class="policy-terms">${items}</dl>`
     + `</section>`;

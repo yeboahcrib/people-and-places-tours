@@ -10,24 +10,52 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <style>
-    .policy-page { padding: calc(var(--sp-12) + var(--sp-3)) 0 var(--sp-10); background: var(--black); }
-    .policy-wrap { max-width: 780px; }
-    .policy-title { font-size: var(--text-7xl); line-height: 1.15; margin: 0 0 var(--sp-1); color: var(--white); }
-    .policy-updated { font-size: var(--text-sm); color: var(--color-text-subtle); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 var(--sp-3); }
-    .policy-intro { font-size: var(--text-xl); line-height: 1.7; color: var(--color-text-muted); margin: 0 0 var(--sp-5); }
-    .policy-section { margin-bottom: var(--sp-5); }
-    .policy-section h2 { font-size: var(--text-4xl); margin: 0 0 var(--sp-2); color: var(--white); }
-    .policy-section-intro { color: var(--color-text-muted); line-height: 1.7; margin: 0 0 var(--sp-2); }
+    /* The policy borrows the site's FAQ layout: sticky context on the left,
+       the terms themselves on the right. Only the term list needs new rules. */
+    .policy-block { margin-bottom: var(--sp-6); }
+    .policy-block:last-child { margin-bottom: 0; }
+    .policy-block-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin: 0 0 var(--sp-1-5);
+    }
+    .policy-block-intro { color: var(--muted); line-height: 1.7; margin: 0 0 var(--sp-2); }
     .policy-terms { margin: 0; }
-    .policy-term { border-top: 1px solid rgba(255,255,255,0.1); padding: var(--sp-2) 0; }
-    .policy-term dt { font-weight: 600; color: var(--color-primary); margin-bottom: 4px; }
-    .policy-term dd { margin: 0; color: var(--color-text-muted); line-height: 1.7; }
-    .policy-contact { list-style: none; padding: 0; margin: var(--sp-2) 0 0; display: flex; flex-direction: column; gap: var(--sp-1); }
+    .policy-term { border-top: 1px solid var(--color-border); padding: var(--sp-2) 0; }
+    .policy-term dt {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: var(--sp-0-5, 4px);
+    }
+    .policy-term dd { margin: 0; color: var(--muted); line-height: 1.8; }
+    .policy-contact {
+      list-style: none;
+      padding: 0;
+      margin: var(--sp-2) 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+      font-size: var(--text-md);
+    }
     .policy-contact a { color: var(--color-primary); }
-    .policy-closing { margin-top: var(--sp-5); padding: var(--sp-3); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text-muted); line-height: 1.7; }
+    /* "Cancellation" is a long single word and the shared hero scale clips it
+       on narrow screens, where other pages break their titles with a <br>.
+       This title comes from the CMS, so it is sized down instead. */
     @media (max-width: 600px) {
-      .policy-page { padding: var(--sp-12) 0 var(--sp-6); }
-      .policy-title { font-size: var(--text-6xl); }
+      .page-hero .page-hero-title { font-size: clamp(2.25rem, 10vw, 3rem); }
+    }
+    .policy-closing {
+      margin-top: var(--sp-6);
+      padding: var(--sp-3);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--muted);
+      line-height: 1.8;
     }
   </style>
 </head>
@@ -62,19 +90,33 @@
 </nav>
 
 <main id="main-content">
-  <section class="policy-page" aria-labelledby="policy-heading">
-    <div class="container policy-wrap">
-      <h1 class="policy-title" id="policy-heading" data-policy-copy="title">Cancellation &amp; Refund Policy</h1>
-      <p class="policy-updated" data-policy-copy="lastUpdated">Last updated 22 August 2026</p>
-      <p class="policy-intro" data-policy-copy="intro">At People &amp; Places, we pride ourselves on curating immersive, high-quality experiences in Ghana. To ensure clarity and fairness to all our travelers and our local partners, we have established the following refunds and cancellation policy.</p>
+  <!-- ═══════════════ PAGE HERO ═══════════════ -->
+  <section class="page-hero" aria-label="Cancellation and refund policy">
+    <img class="page-hero-bg" src="https://images.unsplash.com/photo-1696343782507-a8188a2e4865?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" />
+    <div class="page-hero-content container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Cancellation &amp; Refunds</span>
+      </div>
+      <h1 class="page-hero-title" data-policy-copy="title">Cancellation &amp; Refund Policy</h1>
+      <p class="page-hero-subtitle" data-policy-copy="intro">At People &amp; Places, we pride ourselves on curating immersive, high-quality experiences in Ghana. To ensure clarity and fairness to all our travelers and our local partners, we have established the following refunds and cancellation policy.</p>
+    </div>
+  </section>
 
-      <div data-policy-sections><section class="policy-section"><h2>If you cancel</h2><p class="policy-section-intro">All bookings for our Just Go Ghana packages are subject to the following cancellation timeline. The initial $400 deposit is non-refundable and non-transferable in all cases.</p><dl class="policy-terms"><div class="policy-term"><dt>60 or more days before the trip</dt><dd>You will receive a full refund of all payments made, minus the $400 non-refundable deposit.</dd></div><div class="policy-term"><dt>31 to 59 days before the trip</dt><dd>You will receive a 50% refund of the total trip cost, excluding the deposit.</dd></div><div class="policy-term"><dt>30 days or less before the trip</dt><dd>No refund will be issued. A 100% cancellation fee applies.</dd></div><div class="policy-term"><dt>No-shows</dt><dd>Travelers who do not arrive for the trip, or who leave early for any reason, are not eligible for a refund.</dd></div></dl></section><section class="policy-section"><h2>Changing or rescheduling a booking</h2><p class="policy-section-intro">We understand that life happens. We offer the following options to help accommodate changes to your plans.</p><dl class="policy-terms"><div class="policy-term"><dt>Rescheduling requests</dt><dd>You may request to reschedule your trip dates up to 45 days before your scheduled arrival. Requests are subject to availability and current hotel rates.</dd></div><div class="policy-term"><dt>Rescheduling fee</dt><dd>A strictly administrative fee of $150 may apply to process date changes, plus any difference in package price for the new dates.</dd></div><div class="policy-term"><dt>Last-minute changes</dt><dd>Requests made less than 30 days before the arrival date generally cannot be accommodated, because of vendor contracts already in place.</dd></div></dl></section><section class="policy-section"><h2>If we cancel</h2><p class="policy-section-intro">In the unlikely event that People &amp; Places must cancel a tour due to unforeseen circumstances such as political instability or natural disasters, or for reasons beyond our control, we will offer you the following options.</p><dl class="policy-terms"><div class="policy-term"><dt>Reschedule</dt><dd>Move your full credit to a future trip date or a different available package.</dd></div><div class="policy-term"><dt>Refund</dt><dd>Receive a full refund of all payments made, including the deposit.</dd></div></dl></section><section class="policy-section"><h2>Important information</h2><dl class="policy-terms"><div class="policy-term"><dt>Travel insurance</dt><dd>We strongly recommend purchasing comprehensive travel insurance that includes Cancel For Any Reason (CFAR) coverage. This protects you against financial loss if you must cancel due to illness, flight delays, or work conflicts.</dd></div><div class="policy-term"><dt>Itinerary changes</dt><dd>People &amp; Places reserves the right to slightly alter tour routes or accommodations without prior notice where necessary, for example due to weather or road maintenance. Any changes will be of equal or greater value.</dd></div><div class="policy-term"><dt>Liability</dt><dd>People &amp; Places shall not be liable for any loss, damage, injury, or illness caused in any way to participants while using third-party services such as hotels, transport, and attractions.</dd></div><div class="policy-term"><dt>Participant responsibility</dt><dd>Guests are expected to conduct themselves respectfully toward staff, fellow travelers, and locals. Behavior deemed disruptive or disrespectful may result in removal from the tour without a refund.</dd></div></dl></section></div>
+  <!-- ═══════════════ THE TERMS ═══════════════ -->
+  <section class="faq-section section-pad" aria-label="Policy terms">
+    <div class="container">
+      <div class="faq-grid">
+        <div class="faq-sidebar">
+          <div class="eyebrow" data-policy-copy="lastUpdated">Last updated 22 August 2026</div>
+          <h2 class="section-title">If Plans<br>Change</h2>
+          <p class="section-subtitle" data-policy-copy="contactIntro">If you have any questions, or need to request a cancellation or a change, please contact us immediately in writing.</p>
+          <ul class="policy-contact" data-policy-contact><li><a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a></li><li><a href="https://wa.me/233503673473" target="_blank" rel="noopener">WhatsApp +233 50 367 3473</a></li></ul>
+        </div>
 
-      <section class="policy-section">
-        <h2>Contact us</h2>
-        <p class="policy-section-intro" data-policy-copy="contactIntro">If you have any questions, or need to request a cancellation or a change, please contact us immediately in writing.</p>
-        <ul class="policy-contact" data-policy-contact><li><a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a></li><li><a href="https://wa.me/233503673473" target="_blank" rel="noopener">WhatsApp +233 50 367 3473</a></li></ul>
-      </section>
+        <div data-policy-sections><section class="policy-block"><h3 class="policy-block-title">If you cancel</h3><p class="policy-block-intro">All bookings for our Just Go Ghana packages are subject to the following cancellation timeline. The initial $400 deposit is non-refundable and non-transferable in all cases.</p><dl class="policy-terms"><div class="policy-term"><dt>60 or more days before the trip</dt><dd>You will receive a full refund of all payments made, minus the $400 non-refundable deposit.</dd></div><div class="policy-term"><dt>31 to 59 days before the trip</dt><dd>You will receive a 50% refund of the total trip cost, excluding the deposit.</dd></div><div class="policy-term"><dt>30 days or less before the trip</dt><dd>No refund will be issued. A 100% cancellation fee applies.</dd></div><div class="policy-term"><dt>No-shows</dt><dd>Travelers who do not arrive for the trip, or who leave early for any reason, are not eligible for a refund.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">Changing or rescheduling a booking</h3><p class="policy-block-intro">We understand that life happens. We offer the following options to help accommodate changes to your plans.</p><dl class="policy-terms"><div class="policy-term"><dt>Rescheduling requests</dt><dd>You may request to reschedule your trip dates up to 45 days before your scheduled arrival. Requests are subject to availability and current hotel rates.</dd></div><div class="policy-term"><dt>Rescheduling fee</dt><dd>A strictly administrative fee of $150 may apply to process date changes, plus any difference in package price for the new dates.</dd></div><div class="policy-term"><dt>Last-minute changes</dt><dd>Requests made less than 30 days before the arrival date generally cannot be accommodated, because of vendor contracts already in place.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">If we cancel</h3><p class="policy-block-intro">In the unlikely event that People &amp; Places must cancel a tour due to unforeseen circumstances such as political instability or natural disasters, or for reasons beyond our control, we will offer you the following options.</p><dl class="policy-terms"><div class="policy-term"><dt>Reschedule</dt><dd>Move your full credit to a future trip date or a different available package.</dd></div><div class="policy-term"><dt>Refund</dt><dd>Receive a full refund of all payments made, including the deposit.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">Important information</h3><dl class="policy-terms"><div class="policy-term"><dt>Travel insurance</dt><dd>We strongly recommend purchasing comprehensive travel insurance that includes Cancel For Any Reason (CFAR) coverage. This protects you against financial loss if you must cancel due to illness, flight delays, or work conflicts.</dd></div><div class="policy-term"><dt>Itinerary changes</dt><dd>People &amp; Places reserves the right to slightly alter tour routes or accommodations without prior notice where necessary, for example due to weather or road maintenance. Any changes will be of equal or greater value.</dd></div><div class="policy-term"><dt>Liability</dt><dd>People &amp; Places shall not be liable for any loss, damage, injury, or illness caused in any way to participants while using third-party services such as hotels, transport, and attractions.</dd></div><div class="policy-term"><dt>Participant responsibility</dt><dd>Guests are expected to conduct themselves respectfully toward staff, fellow travelers, and locals. Behavior deemed disruptive or disrespectful may result in removal from the tour without a refund.</dd></div></dl></section></div>
+      </div>
 
       <p class="policy-closing" data-policy-copy="closing">By booking with People &amp; Places, you acknowledge that you have read, understood, and agreed to this cancellation and refund policy.</p>
     </div>
