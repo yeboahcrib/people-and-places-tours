@@ -92,6 +92,15 @@ export const structure: StructureResolver = (S) =>
                     .title('Travel Insurance'),
                 ),
               S.listItem()
+                .title('Booking Terms')
+                .id('policy-terms')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-terms')
+                    .title('Booking Terms'),
+                ),
+              S.listItem()
                 .title('Privacy Policy')
                 .id('policy-privacy')
                 .child(

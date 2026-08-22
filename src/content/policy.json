@@ -291,5 +291,169 @@
       }
     ],
     "contactIntro": "For anything on this page — a question, a correction, or a request to delete something — write to us and a person will answer."
+  },
+  "bookingTerms": {
+    "title": "Booking Terms",
+    "lastUpdated": "2026-08-22",
+    "intro": "These are the terms you agree to when you book a trip with People & Places. They are written plainly on purpose. If anything here is unclear, ask us before you pay rather than after.",
+    "sections": [
+      {
+        "heading": "Booking a trip",
+        "items": [
+          {
+            "term": "How a booking is made",
+            "text": "You send us an enquiry, we confirm what is available and agree the details with you, and we send you payment instructions with a booking reference. Your booking is confirmed once we have agreed the details and received your payment."
+          },
+          {
+            "term": "Availability",
+            "text": "Day tours can run on most days with advance notice. This is not a fixed daily departure schedule, so a date is only yours once we have confirmed it."
+          },
+          {
+            "term": "Prices",
+            "text": "Prices are shown in US dollars. On the multi-day package the final price per person depends on your group size and room occupancy, which we confirm with you before you pay."
+          }
+        ]
+      },
+      {
+        "heading": "Paying for your trip",
+        "intro": "What you pay up front depends on which kind of trip you book.",
+        "items": [
+          {
+            "term": "The Just Go Ghana package",
+            "text": "A non-refundable deposit of $400 per person confirms your dates. It comes off your total. The balance is due 30 days before you arrive, and you can pay it in instalments across that time or settle it in full at any point."
+          },
+          {
+            "term": "Tailored and custom trips",
+            "text": "A deposit of 30% of the total confirms your booking, and the remaining 70% is due 30 days before your start date. The deposit is non-refundable once paid."
+          },
+          {
+            "term": "Day tours",
+            "text": "Paid in full at the time of booking, with no deposit and balance split."
+          },
+          {
+            "term": "How to pay",
+            "text": "Bank transfer or Mobile Money direct to us, or by card through Taptap Send, a regulated money transfer app. However you pay, the money reaches us as a transfer and we never see or hold your card details."
+          },
+          {
+            "term": "Sending us proof",
+            "text": "Send us a screenshot or receipt with your booking reference so we can match your payment to your trip."
+          }
+        ]
+      },
+      {
+        "heading": "Changing or cancelling",
+        "intro": "Cancellations, refunds and rescheduling have their own page, because they are the terms people most need to find. Nothing here replaces them.",
+        "items": [
+          {
+            "term": "Where the terms are",
+            "text": "See our Cancellation & Refund Policy for the full timeline, the rescheduling fee, and what happens if we have to cancel."
+          },
+          {
+            "term": "Talk to us early",
+            "text": "If your plans change, tell us as soon as you know. Options that exist 45 days out often do not exist 10 days out."
+          }
+        ]
+      },
+      {
+        "heading": "What you are responsible for",
+        "items": [
+          {
+            "term": "Travel insurance",
+            "text": "Cover is required on every trip, and proof is due 30 days before you travel. See our Travel Insurance page for what your policy must include."
+          },
+          {
+            "term": "Passport and visa",
+            "text": "A valid passport and any visa you need are yours to arrange. We can share general guidance, but we are not a substitute for your embassy or high commission."
+          },
+          {
+            "term": "Vaccinations",
+            "text": "A yellow fever certificate is required to enter Ghana and you may be asked for it on arrival. Any other vaccinations are a conversation for you and your doctor."
+          },
+          {
+            "term": "Getting here",
+            "text": "International flights are not included in any of our prices. You book your own travel to Kotoka International Airport."
+          },
+          {
+            "term": "If you are turned away",
+            "text": "If you cannot travel because a document, certificate or flight was not in order, that is treated as a cancellation and the usual terms apply."
+          }
+        ]
+      },
+      {
+        "heading": "Health, access and comfort",
+        "items": [
+          {
+            "term": "Tell us early",
+            "text": "Let us know about any health condition, mobility need, dietary requirement or comfort preference when you book, so we can plan around it rather than improvise on the day."
+          },
+          {
+            "term": "What we cannot promise",
+            "text": "We will do everything we reasonably can, but some heritage sites have stairs, uneven ground and narrow passages that we cannot change. We will tell you honestly which parts of a trip may be difficult."
+          }
+        ]
+      },
+      {
+        "heading": "Photographs and video",
+        "intro": "We photograph our trips, and those pictures are how people who have never been to Ghana decide to come. We also know some of these places are deeply personal.",
+        "items": [
+          {
+            "term": "What booking means",
+            "text": "By booking you agree that we may use photographs and video taken during your trip on our website, our social media and our marketing."
+          },
+          {
+            "term": "Saying no",
+            "text": "Tell us at booking, or at any point during the trip, and we will not use pictures that show you. You do not need to give a reason and it changes nothing else about your trip."
+          },
+          {
+            "term": "Changing your mind later",
+            "text": "If something is already published and you want it taken down, write to us and we will remove it."
+          },
+          {
+            "term": "At the ancestral sites",
+            "text": "We do not photograph guests at Assin Manso, Cape Coast Castle or the Door of No Return for marketing without asking on the day. What happens there is yours."
+          }
+        ]
+      },
+      {
+        "heading": "On the trip",
+        "items": [
+          {
+            "term": "Your host decides",
+            "text": "Your tour host has final say on routes, timings and whether an activity can go ahead safely. It is their call on the day."
+          },
+          {
+            "term": "Changes we may make",
+            "text": "We may adjust a route, a site or an accommodation where weather, road conditions or safety require it. Any replacement will be of equal or greater value."
+          },
+          {
+            "term": "Conduct",
+            "text": "We expect guests to treat our team, other travellers and the people whose homes and workplaces we visit with respect. Behaviour that is disruptive or disrespectful can end a trip without a refund."
+          }
+        ]
+      },
+      {
+        "heading": "What we are and are not responsible for",
+        "items": [
+          {
+            "term": "The trip we run",
+            "text": "We are responsible for planning and running your trip with reasonable care, and for choosing our drivers, guides and partners carefully."
+          },
+          {
+            "term": "Third parties",
+            "text": "We are not responsible for the independent acts of hotels, airlines, restaurants and attractions that are outside our direct control."
+          },
+          {
+            "term": "What cannot be excluded",
+            "text": "Nothing in these terms limits any liability that Ghanaian law does not allow us to exclude."
+          },
+          {
+            "term": "Which law applies",
+            "text": "These terms are governed by the laws of Ghana."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "Questions about a booking or about these terms reach a person, not a queue.",
+    "closing": "By booking with People & Places you confirm that you have read and agreed to these terms, together with our Cancellation & Refund Policy and our travel insurance requirement."
   }
 }

@@ -87,6 +87,14 @@ for (const tracker of ['gtag(', 'googletagmanager', 'google-analytics', 'documen
   assert(!siteJs.includes(tracker), `the privacy policy promises no tracking but script.js uses ${tracker}`);
 }
 
+// The deposit figures are the site's oldest source of contradiction: the
+// package takes a flat $400 and bespoke trips take 30%, and the terms page
+// must not drift back into stating one rule for both.
+const bookingTermsText = JSON.stringify(all.bookingTerms);
+assert(bookingTermsText.includes('$400 per person'), 'the booking terms lost the package deposit');
+assert(bookingTermsText.includes('30% of the total'), 'the booking terms lost the tailored-trip deposit');
+assert(!/30%[^"]*Just Go Ghana|Just Go Ghana[^"]*30%/.test(bookingTermsText), 'the booking terms apply the 30% deposit to the package');
+
 // Insurance is a requirement, not a suggestion, and the page has to say so.
 const insurance = all.travelInsurance;
 const insuranceText = JSON.stringify(insurance).toLowerCase();

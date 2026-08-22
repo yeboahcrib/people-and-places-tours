@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  <title>Booking Terms | People &amp; Places Tours</title>
+  <meta name="description" content="What you agree to when you book with People &amp; Places: how bookings and payment work, what you are responsible for, and how we use photographs." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <style>
+    /* The policy borrows the site's FAQ layout: sticky context on the left,
+       the terms themselves on the right. Only the term list needs new rules. */
+    .policy-block { margin-bottom: var(--sp-6); }
+    .policy-block:last-child { margin-bottom: 0; }
+    .policy-block-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin: 0 0 var(--sp-1-5);
+    }
+    .policy-block-intro { color: var(--muted); line-height: 1.7; margin: 0 0 var(--sp-2); }
+    .policy-terms { margin: 0; }
+    .policy-term { border-top: 1px solid var(--color-border); padding: var(--sp-2) 0; }
+    .policy-term dt {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: var(--sp-0-5, 4px);
+    }
+    .policy-term dd { margin: 0; color: var(--muted); line-height: 1.8; }
+    .policy-contact {
+      list-style: none;
+      padding: 0;
+      margin: var(--sp-2) 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+      font-size: var(--text-md);
+    }
+    .policy-contact a { color: var(--color-primary); }
+    /* "Cancellation" is a long single word and the shared hero scale clips it
+       on narrow screens, where other pages break their titles with a <br>.
+       This title comes from the CMS, so it is sized down instead. */
+    @media (max-width: 600px) {
+      .page-hero .page-hero-title { font-size: clamp(2.25rem, 10vw, 3rem); }
+    }
+    /* The acknowledgement is a legal line, not a callout. A boxed panel gave
+       it more weight than the terms above it. */
+    .policy-acknowledgement {
+      margin: var(--sp-5) 0 0;
+      padding-top: var(--sp-2);
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-subtle);
+      font-size: var(--text-md);
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="People &amp; Places Tours - Home">
+      <img src="assets/logo-footer.svg" alt="People &amp; Places Tours" width="1510" height="640" decoding="async">
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="packages.html">Experiences</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="tel:+233503673473" class="nav-phone">+233 50 367 3473</a>
+      <a href="packages.html" class="btn btn-primary">Book a Tour</a>
+      <button class="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <nav class="nav-mobile" aria-label="Mobile navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="packages.html">Experiences</a>
+    <a href="contact.html">Contact</a>
+    <a href="packages.html" class="btn btn-primary" style="margin-top:8px;align-self:flex-start;">Book a Tour</a>
+  </nav>
+</nav>
+
+<main id="main-content">
+  <!-- ═══════════════ PAGE HERO ═══════════════ -->
+  <section class="page-hero" aria-label="Booking terms">
+    <img class="page-hero-bg" src="https://images.unsplash.com/photo-1696343782507-a8188a2e4865?auto=format&fit=crop&w=1920&q=80" alt="" width="1920" height="720" loading="eager" fetchpriority="high" decoding="async" />
+    <div class="page-hero-content container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Booking Terms</span>
+      </div>
+      <h1 class="page-hero-title" data-policy-copy="title">Booking Terms</h1>
+      <p class="page-hero-subtitle" data-policy-copy="intro">These are the terms you agree to when you book a trip with People &amp; Places. They are written plainly on purpose. If anything here is unclear, ask us before you pay rather than after.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════ THE TERMS ═══════════════ -->
+  <section class="faq-section section-pad" aria-label="Booking terms">
+    <div class="container">
+      <div class="faq-grid">
+        <div class="faq-sidebar">
+          <div class="eyebrow" data-policy-copy="lastUpdated">Last updated 22 August 2026</div>
+          <h2 class="section-title">Before You<br>Book</h2>
+          <p class="section-subtitle" data-policy-copy="contactIntro">Questions about a booking or about these terms reach a person, not a queue.</p>
+          <ul class="policy-contact" data-policy-contact><li><a href="mailto:peopandplaces@gmail.com">peopandplaces@gmail.com</a></li><li><a href="https://wa.me/233503673473" target="_blank" rel="noopener">WhatsApp +233 50 367 3473</a></li></ul>
+        </div>
+
+        <div data-policy-sections><section class="policy-block"><h3 class="policy-block-title">Booking a trip</h3><dl class="policy-terms"><div class="policy-term"><dt>How a booking is made</dt><dd>You send us an enquiry, we confirm what is available and agree the details with you, and we send you payment instructions with a booking reference. Your booking is confirmed once we have agreed the details and received your payment.</dd></div><div class="policy-term"><dt>Availability</dt><dd>Day tours can run on most days with advance notice. This is not a fixed daily departure schedule, so a date is only yours once we have confirmed it.</dd></div><div class="policy-term"><dt>Prices</dt><dd>Prices are shown in US dollars. On the multi-day package the final price per person depends on your group size and room occupancy, which we confirm with you before you pay.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">Paying for your trip</h3><p class="policy-block-intro">What you pay up front depends on which kind of trip you book.</p><dl class="policy-terms"><div class="policy-term"><dt>The Just Go Ghana package</dt><dd>A non-refundable deposit of $400 per person confirms your dates. It comes off your total. The balance is due 30 days before you arrive, and you can pay it in instalments across that time or settle it in full at any point.</dd></div><div class="policy-term"><dt>Tailored and custom trips</dt><dd>A deposit of 30% of the total confirms your booking, and the remaining 70% is due 30 days before your start date. The deposit is non-refundable once paid.</dd></div><div class="policy-term"><dt>Day tours</dt><dd>Paid in full at the time of booking, with no deposit and balance split.</dd></div><div class="policy-term"><dt>How to pay</dt><dd>Bank transfer or Mobile Money direct to us, or by card through Taptap Send, a regulated money transfer app. However you pay, the money reaches us as a transfer and we never see or hold your card details.</dd></div><div class="policy-term"><dt>Sending us proof</dt><dd>Send us a screenshot or receipt with your booking reference so we can match your payment to your trip.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">Changing or cancelling</h3><p class="policy-block-intro">Cancellations, refunds and rescheduling have their own page, because they are the terms people most need to find. Nothing here replaces them.</p><dl class="policy-terms"><div class="policy-term"><dt>Where the terms are</dt><dd>See our Cancellation &amp; Refund Policy for the full timeline, the rescheduling fee, and what happens if we have to cancel.</dd></div><div class="policy-term"><dt>Talk to us early</dt><dd>If your plans change, tell us as soon as you know. Options that exist 45 days out often do not exist 10 days out.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">What you are responsible for</h3><dl class="policy-terms"><div class="policy-term"><dt>Travel insurance</dt><dd>Cover is required on every trip, and proof is due 30 days before you travel. See our Travel Insurance page for what your policy must include.</dd></div><div class="policy-term"><dt>Passport and visa</dt><dd>A valid passport and any visa you need are yours to arrange. We can share general guidance, but we are not a substitute for your embassy or high commission.</dd></div><div class="policy-term"><dt>Vaccinations</dt><dd>A yellow fever certificate is required to enter Ghana and you may be asked for it on arrival. Any other vaccinations are a conversation for you and your doctor.</dd></div><div class="policy-term"><dt>Getting here</dt><dd>International flights are not included in any of our prices. You book your own travel to Kotoka International Airport.</dd></div><div class="policy-term"><dt>If you are turned away</dt><dd>If you cannot travel because a document, certificate or flight was not in order, that is treated as a cancellation and the usual terms apply.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">Health, access and comfort</h3><dl class="policy-terms"><div class="policy-term"><dt>Tell us early</dt><dd>Let us know about any health condition, mobility need, dietary requirement or comfort preference when you book, so we can plan around it rather than improvise on the day.</dd></div><div class="policy-term"><dt>What we cannot promise</dt><dd>We will do everything we reasonably can, but some heritage sites have stairs, uneven ground and narrow passages that we cannot change. We will tell you honestly which parts of a trip may be difficult.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">Photographs and video</h3><p class="policy-block-intro">We photograph our trips, and those pictures are how people who have never been to Ghana decide to come. We also know some of these places are deeply personal.</p><dl class="policy-terms"><div class="policy-term"><dt>What booking means</dt><dd>By booking you agree that we may use photographs and video taken during your trip on our website, our social media and our marketing.</dd></div><div class="policy-term"><dt>Saying no</dt><dd>Tell us at booking, or at any point during the trip, and we will not use pictures that show you. You do not need to give a reason and it changes nothing else about your trip.</dd></div><div class="policy-term"><dt>Changing your mind later</dt><dd>If something is already published and you want it taken down, write to us and we will remove it.</dd></div><div class="policy-term"><dt>At the ancestral sites</dt><dd>We do not photograph guests at Assin Manso, Cape Coast Castle or the Door of No Return for marketing without asking on the day. What happens there is yours.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">On the trip</h3><dl class="policy-terms"><div class="policy-term"><dt>Your host decides</dt><dd>Your tour host has final say on routes, timings and whether an activity can go ahead safely. It is their call on the day.</dd></div><div class="policy-term"><dt>Changes we may make</dt><dd>We may adjust a route, a site or an accommodation where weather, road conditions or safety require it. Any replacement will be of equal or greater value.</dd></div><div class="policy-term"><dt>Conduct</dt><dd>We expect guests to treat our team, other travellers and the people whose homes and workplaces we visit with respect. Behaviour that is disruptive or disrespectful can end a trip without a refund.</dd></div></dl></section><section class="policy-block"><h3 class="policy-block-title">What we are and are not responsible for</h3><dl class="policy-terms"><div class="policy-term"><dt>The trip we run</dt><dd>We are responsible for planning and running your trip with reasonable care, and for choosing our drivers, guides and partners carefully.</dd></div><div class="policy-term"><dt>Third parties</dt><dd>We are not responsible for the independent acts of hotels, airlines, restaurants and attractions that are outside our direct control.</dd></div><div class="policy-term"><dt>What cannot be excluded</dt><dd>Nothing in these terms limits any liability that Ghanaian law does not allow us to exclude.</dd></div><div class="policy-term"><dt>Which law applies</dt><dd>These terms are governed by the laws of Ghana.</dd></div></dl></section></div>
+      </div>
+
+      <p class="policy-acknowledgement" data-policy-copy="closing">By booking with People &amp; Places you confirm that you have read and agreed to these terms, together with our Cancellation &amp; Refund Policy and our travel insurance requirement.</p>
+    </div>
+  </section>
+</main>
+
+<!-- Replaced at build time with the shared footer (scripts/shared-shell.mjs).
+     The element must exist first: replaceFooter swaps an existing one and does
+     nothing when a page has none.
+     Avoid writing element names in angle brackets in comments on this page —
+     the footer replacement and the markup checker both scan the raw HTML and
+     would match the example rather than the real element. -->
+<footer class="footer" role="contentinfo"></footer>
+
+<script src="tours.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

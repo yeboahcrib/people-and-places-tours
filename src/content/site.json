@@ -102,6 +102,10 @@
         "heading": "Legal",
         "links": [
           {
+            "label": "Booking Terms",
+            "href": "booking-terms.html"
+          },
+          {
             "label": "Cancellation & Refunds",
             "href": "cancellation-refund-policy.html"
           },

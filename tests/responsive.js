@@ -12,6 +12,7 @@ const pages = [
   '/cancellation-refund-policy.html',
   '/travel-insurance.html',
   '/privacy-policy.html',
+  '/booking-terms.html',
 ];
 
 function assert(condition, message) {
