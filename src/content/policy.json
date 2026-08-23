@@ -294,7 +294,7 @@
   },
   "bookingTerms": {
     "title": "Booking Terms",
-    "lastUpdated": "2026-08-22",
+    "lastUpdated": "2026-08-23",
     "intro": "These are the terms you agree to when you book a trip with People & Places. They are written plainly on purpose. If anything here is unclear, ask us before you pay rather than after.",
     "sections": [
       {
@@ -341,6 +341,28 @@
           {
             "term": "Sending us proof",
             "text": "Send us a screenshot or receipt with your booking reference so we can match your payment to your trip."
+          }
+        ]
+      },
+      {
+        "heading": "Rooms and sharing",
+        "intro": "Hotel prices on our multi-day trips are based on two people sharing a room. If you are travelling alone, you have two choices and we will settle which one before you pay.",
+        "items": [
+          {
+            "term": "Sharing with another traveller",
+            "text": "We can pair you with another solo traveller of the same gender, and we tell you that you have been paired before you travel. A shared room is usually two beds, but in some hotels it is one large bed. We will tell you which."
+          },
+          {
+            "term": "Having your own room",
+            "text": "You can have a room to yourself for a single supplement. We quote that figure with your itinerary, before you pay anything, and it never appears later as an addition."
+          },
+          {
+            "term": "If we cannot find you a roommate",
+            "text": "You get the room to yourself and we do not charge you the supplement. Failing to find you a match is our problem, not your bill."
+          },
+          {
+            "term": "If sharing is not working out",
+            "text": "Tell your host. If the hotel has another room we will move you, and you cover the single rate for the nights that remain. If the problem is the other person's behaviour rather than a preference, we move you at our own cost and our conduct terms apply to them."
           }
         ]
       },

@@ -191,8 +191,12 @@ client-side kept the old names until the file itself was corrected.
 
 ### Still open from §8
 
-- Is the package **$3,000 or $2,400**? The Google Site says both.
-- Is it **"Just Go Ghana" or "Feel'in Ghana"**?
+- ~~Is the package **$3,000 or $2,400**?~~ **Answered 22 August 2026: $3,000.**
+  The Google Site's $2,400 card is stale and should be corrected or removed
+  there; the new site already says $3,000 and needs no change.
+- ~~Is it **"Just Go Ghana" or "Feel'in Ghana"**?~~ **Answered 22 August 2026:
+  Just Go Ghana.** The Google Site's `feelin-ghana-booking-form` URL is a
+  leftover.
 - Is the **$400 non-refundable deposit** current, and does it apply beyond the
   package?
 - Should the **cancellation policy be published** before a lawyer sees it?
