@@ -1,0 +1,535 @@
+{
+  "_comment": "Snapshot of the tour content that lives in Sanity: inclusions, exclusions, per-tour FAQs, the package itinerary and alternative prices. Written by hand-migration on 23 August 2026 so the content exists in version control as well as in the CMS. Phase 3 of docs/plan-cms-generated-tour-pages.md turns this into the committed fallback the generator reads when Sanity is unavailable.",
+  "tours": {
+    "aburi": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "We pick you up from your Accra accommodation around 7:00am to beat the heat and make the most of the day.",
+          "question": "What time does the tour depart?"
+        },
+        {
+          "answer": "Easy level. The botanical gardens and cocoa farm are flat, gentle walks. The waterfall trail is short and accessible for most fitness levels.",
+          "question": "Do I need to be fit for this tour?"
+        },
+        {
+          "answer": "No — lunch is at your own expense. We stop at Peduase Valley Resort, where there is a mini zoo and somewhere comfortable to sit, and you order what you like.",
+          "question": "Is lunch included?"
+        },
+        {
+          "answer": "About 1 hour each way. The mountain road winds through beautiful greenery — half the experience.",
+          "question": "How long is the drive from Accra?"
+        },
+        {
+          "answer": "Comfortable walking shoes, sunscreen, a light jacket (Aburi is noticeably cooler than Accra), and a camera.",
+          "question": "What should I bring?"
+        },
+        {
+          "answer": "Yes. The botanical gardens have a gift shop, and the town has local craft stalls with quality pieces.",
+          "question": "Can I buy souvenirs?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "title": "Aburi Day Tour"
+    },
+    "accra-city": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "The Art Centre for drumming and craft, Independence Square, the Kwame Nkrumah Memorial Park and the National Museum. We pick you up from your hotel or apartment and drop you back at the end.",
+          "question": "What will we see?"
+        },
+        {
+          "answer": "Pickup around 8am from your accommodation, before the Accra heat and traffic build up.",
+          "question": "What time does the tour start?"
+        },
+        {
+          "answer": "Absolutely — food stops are built into the experience. Your guide will introduce you to the real Accra street food circuit.",
+          "question": "Can we eat street food on the tour?"
+        },
+        {
+          "answer": "Moderate. You'll be on your feet exploring markets and sites. Comfortable shoes are a must.",
+          "question": "How much walking is involved?"
+        },
+        {
+          "answer": "To a degree. If there's a specific spot you want to prioritize, tell us when booking and we'll work it in.",
+          "question": "Is the tour customizable?"
+        },
+        {
+          "answer": "Yes. The Accra City Tour is family-friendly and works well across all ages.",
+          "question": "Is it suitable for families with children?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "title": "Accra City Tour"
+    },
+    "accra-food": {
+      "faqs": [
+        {
+          "answer": "Evening tour. We pick you up around 6:30–7pm, when Accra's night food scene starts coming alive.",
+          "question": "What time does this tour start?"
+        },
+        {
+          "answer": "Typically 4–6 stops — a mix of street stalls, chop bars, and local restaurants that Accra residents actually eat at, far from hotel buffets.",
+          "question": "How many food stops are there?"
+        },
+        {
+          "answer": "Plenty. You'll leave full. Each stop is a real portion, not a small bite.",
+          "question": "Will there be enough food?"
+        },
+        {
+          "answer": "Yes. Let us know when booking and we'll ensure each stop has solid vegetarian options ready.",
+          "question": "Are vegetarian options available?"
+        },
+        {
+          "answer": "Completely. Our guides take you only to vendors they know personally — high turnover, fresh ingredients, loyal local crowds.",
+          "question": "Is it safe to eat street food?"
+        },
+        {
+          "answer": "Casual and comfortable. This is a street crawl, not a sit-down dinner. Wear clothes you can move freely in.",
+          "question": "What should I wear?"
+        }
+      ],
+      "title": "Accra After Dark Food Tour"
+    },
+    "ada-foah": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch",
+        "Alcoholic drinks beyond the included tasting experience",
+        "Any items purchased from local artisans or communities"
+      ],
+      "faqs": [
+        {
+          "answer": "About 2–2.5 hours east of Accra. We travel in a comfortable air-conditioned vehicle with good company along the way.",
+          "question": "How far is Ada from Accra?"
+        },
+        {
+          "answer": "Yes. Boat transport around the Ada waterways is part of the tour. We stop at Coconut Island, where climbers cut fresh coconuts for you, Crocodile Island, and Rum Island, where a local family distils sugar-cane rum.",
+          "question": "Is the boat ride included?"
+        },
+        {
+          "answer": "No — lunch is at your own expense. There is fresh seafood to be had along the way, and your guide will point you at the good places.",
+          "question": "Is lunch included?"
+        },
+        {
+          "answer": "The waterways are calm, but this is a boat and island day rather than a beach day. Your guide will tell you what is sensible on the day.",
+          "question": "Is swimming safe at Ada?"
+        },
+        {
+          "answer": "Sun protection, a hat, something you do not mind getting a little wet, and a camera. You will be on and off a boat.",
+          "question": "What should I bring?"
+        },
+        {
+          "answer": "Yes. Ada has lovely beach resorts. Ask us about overnight arrangements when booking.",
+          "question": "Can I extend and stay overnight?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Private transportation and fuel surcharge",
+        "Professional tour guide",
+        "Local guide for the Ada island experience",
+        "Pottery and ceramic-making experience",
+        "Boat transportation for the Ada island tour",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all included sites and experiences",
+        "Applicable taxes"
+      ],
+      "title": "Ada Day Tour"
+    },
+    "batik-workshop": {
+      "faqs": [
+        {
+          "answer": "At an artisan compound in Accra where master batik and pottery craftspeople work, teach, and pass their skills to the next generation.",
+          "question": "Where does the workshop take place?"
+        },
+        {
+          "answer": "About 3–4 hours covering both batik fabric-making and pottery. You take everything you create home with you.",
+          "question": "How long is the workshop?"
+        },
+        {
+          "answer": "None at all. This is designed for complete beginners. The joy is in the doing, not the perfection.",
+          "question": "Do I need any artistic experience?"
+        },
+        {
+          "answer": "Yes. The workshop is family-friendly and children tend to love both activities. It's one of the best family experiences we offer.",
+          "question": "Can children join?"
+        },
+        {
+          "answer": "Yes — your batik piece and pottery creation are yours. Pottery needs to dry first; your guide will pack it safely for travel.",
+          "question": "Can I take my work home?"
+        },
+        {
+          "answer": "Clothes you don't mind getting dye or clay on. Aprons are provided but batik dye has a mind of its own.",
+          "question": "What should I wear?"
+        }
+      ],
+      "title": "Batik & Pottery Workshop"
+    },
+    "cape-coast": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch",
+        "Any items purchased from local artisans or communities"
+      ],
+      "faqs": [
+        {
+          "answer": "It is powerful and moving. The dungeons and the Door of No Return are solemn spaces. Your guide creates a respectful, informed environment and allows time for reflection.",
+          "question": "Is the Cape Coast tour emotionally heavy?"
+        },
+        {
+          "answer": "An early pickup from Accra, then Assin Manso and the Ancestral Slave River, where captives took their last bath on African soil. From there to Cape Coast Castle, its dungeons and the Door of No Return. The day ends with lunch on the coast at Elmina or Cape Coast.",
+          "question": "What's the order of the day?"
+        },
+        {
+          "answer": "About 3 hours each way. We leave early — expect a 5–6am pickup depending on your location.",
+          "question": "How long is the drive from Accra?"
+        },
+        {
+          "answer": "Yes. Entry to Assin Manso and Cape Coast Castle is covered, along with taxes. Lunch is at your own expense.",
+          "question": "Are entrance fees included?"
+        },
+        {
+          "answer": "Comfortable shoes, light layers, water and a camera. Out of respect, no flash photography inside the castle dungeons.",
+          "question": "What should I bring?"
+        },
+        {
+          "answer": "Yes. For an additional fee you can add a traditional Ghanaian naming ceremony, conducted by a traditional leader or Queen Mother, with a certificate and a ceremonial sash bearing your name.",
+          "question": "Can we add a naming ceremony?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Private transportation and fuel surcharge",
+        "Professional tour guide",
+        "Local guide for the included experiences",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all included sites and experiences",
+        "Applicable taxes"
+      ],
+      "priceOptions": [
+        {
+          "label": "With a traditional naming ceremony",
+          "price": 180
+        }
+      ],
+      "title": "Cape Coast Ancestral Tour"
+    },
+    "just-go-ghana": {
+      "excluded": [
+        "Round-trip airfare",
+        "Travel medical insurance",
+        "Passport and visa fees",
+        "Vaccinations",
+        "Personal expenses such as laundry and shopping",
+        "Anything not listed as included"
+      ],
+      "faqs": [
+        {
+          "answer": "A deposit reserves your dates and the balance is settled before you travel. We can spread it across monthly payments if that helps. We will go through the specifics with you directly, so nothing is decided before you have asked everything you want to ask.",
+          "question": "How does paying work?"
+        },
+        {
+          "answer": "Absolutely! Just Go Ghana is designed for solo travelers, couples, families and groups alike. Final price may vary depending on room occupancy selection.",
+          "question": "Is this good for solo travelers?"
+        },
+        {
+          "answer": "Moderate level. Expect walking during city tours, the cocoa farm, and Shai Hills hike. There's plenty of downtime including a designated free day on Day 5.",
+          "question": "How active is the trip?"
+        },
+        {
+          "answer": "Absolutely. Ghana is widely known as one of the friendliest and safest countries in Africa, especially for the diaspora. Our guides are with you throughout the scheduled itinerary.",
+          "question": "Is Ghana safe for tourists?"
+        }
+      ],
+      "included": [
+        "Airport pickup on arrival and departure",
+        "Ground transportation",
+        "A dedicated tour host",
+        "Local tour guides",
+        "Daily tours and experiences",
+        "Hotel accommodation",
+        "Daily breakfast and lunch on tour days",
+        "A welcome dinner",
+        "Entry fees to all sites, and taxes",
+        "Service charge",
+        "Tips for local guides"
+      ],
+      "itinerary": [
+        {
+          "day": 1,
+          "description": "Upon arrival at Kotoka International Airport, you will be met by a People & Places representative who will assist with your luggage and transfer you to your hotel. After checking in and freshening up, enjoy a welcome dinner at a fine dining restaurant in Accra, a chance to meet your tour guide and prepare for the exciting days ahead.",
+          "meals": [
+            "Dinner"
+          ],
+          "title": "Arrival, Airport Pickup & Welcome Dinner"
+        },
+        {
+          "day": 2,
+          "description": "Visit a batik-making center, learn the art of batik and create your own patterns and handmade clothes. Next, head to the Art Center for drum lessons and interaction with local artisans. Afternoon city tour of Accra visiting Kwame Nkrumah Park and Independence Square. Evening free for personal exploration.",
+          "meals": [
+            "Breakfast",
+            "Lunch"
+          ],
+          "title": "Batik Workshop, Drum Lessons & Accra City Tour"
+        },
+        {
+          "day": 3,
+          "description": "Journey into the lush Eastern Region for a day filled with nature and history. Visit Aburi Botanical Gardens, then Tetteh Quarshie's Cocoa Farm, the first cocoa farm in Ghana. Learn about Ghana's cocoa history and taste fresh cocoa beans when available. End at Asenema Waterfalls for photos and relaxation.",
+          "meals": [
+            "Breakfast",
+            "Lunch"
+          ],
+          "title": "Aburi Gardens, Cocoa Farm & Waterfalls"
+        },
+        {
+          "day": 4,
+          "description": "A deeply meaningful journey into history and heritage. Visit Assin Manso Ancestral Slave River, a sacred site where enslaved Africans took their last bath on African soil. Then continue to Cape Coast Castle, a UNESCO World Heritage Site. Optional evening boat cruise in Elmina. A reflective, educational and transformative day.",
+          "meals": [
+            "Breakfast",
+            "Lunch"
+          ],
+          "title": "Ancestral Trip to Cape Coast"
+        },
+        {
+          "day": 5,
+          "description": "A flexible day designed for rest and personal exploration. Relax and recharge or explore Accra at your own pace. Optional activities include shea butter making, pottery, candle making, beach visits and other cultural experiences. Our team is on standby with recommendations based on your interests.",
+          "meals": [
+            "Breakfast"
+          ],
+          "title": "Free Day"
+        },
+        {
+          "day": 6,
+          "description": "Depart for an exciting day of nature and adventure. Explore Shai Hills Resource Reserve on a guided walk, spotting antelopes, baboons and bird species. Continue to Akosombo for a relaxing boat cruise on the Volta River with optional kayaking for the adventurous.",
+          "meals": [
+            "Breakfast",
+            "Lunch"
+          ],
+          "title": "Shai Hills & Akosombo Boat Cruise"
+        },
+        {
+          "day": 7,
+          "description": "Full day at Safari Eco Park, welcomed with freshly squeezed juice, followed by a guided safari tour. Enjoy a farm-to-table meal of your choice. Recreational activities include swimming, horseback riding, animal feeding, golf, cycling, walking trails, indoor and outdoor games, and a children's amusement park.",
+          "meals": [
+            "Breakfast",
+            "Lunch"
+          ],
+          "title": "Safari Valley Day Experience"
+        },
+        {
+          "day": 8,
+          "description": "Time to say goodbye to Ghana. Last-minute shopping or exploration before your transfer to Kotoka International Airport. We'll miss you and hope to see you again soon!",
+          "meals": [
+            "Breakfast"
+          ],
+          "title": "Departure: See You Again!"
+        }
+      ],
+      "title": "Just Go Ghana"
+    },
+    "kumasi": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "Distance and time. Kumasi is 4–5 hours from Accra each way, making it a 12+ hour day. The price covers everything: guide, transport, all entrance fees, and meals.",
+          "question": "Why is the Kumasi tour more expensive than other day tours?"
+        },
+        {
+          "answer": "Adanwomase kente village, where the cloth is woven on looms in front of you; Ntonso, where adinkra symbols are hand-stamped and you can make your own sash; and Manhyia Palace, home of the Asantehene until 1974 and now a museum.",
+          "question": "What do we visit?"
+        },
+        {
+          "answer": "Yes — and we'd recommend it to avoid the very long return drive. We can arrange a one or two-night stay as an add-on. Ask when booking.",
+          "question": "Can I stay overnight in Kumasi?"
+        },
+        {
+          "answer": "4–5 hours each way. We depart very early (around 5am) to arrive when the markets and palace are at their best.",
+          "question": "How long is the drive from Accra?"
+        },
+        {
+          "answer": "The Ashanti Kingdom is still active — the Asantehene (king) resides at the new palace next door. The museum holds extraordinary artifacts and the story of a civilization that resisted European colonization longer than almost any other.",
+          "question": "What makes the Manhyia Palace visit special?"
+        },
+        {
+          "answer": "Comfortable shoes, a camera, and an appetite. Kumasi's food scene — kelewele, fufu, kontomire stew — is extraordinary.",
+          "question": "What should I bring?"
+        },
+        {
+          "answer": "Yes. There is a version of this tour with a domestic flight rather than the road, which turns a very long day into a manageable one. It is priced separately.",
+          "question": "Can we fly instead of driving?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "priceOptions": [
+        {
+          "label": "With a domestic flight instead of the road",
+          "price": 400
+        }
+      ],
+      "title": "Kumasi Cultural Tour"
+    },
+    "quad-bike": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "None at all. You'll receive a full safety briefing and practice time on a flat area before heading out on the trails.",
+          "question": "Do I need riding experience?"
+        },
+        {
+          "answer": "You must be at least 16 years old to ride solo. Younger participants or those who prefer can ride as a passenger behind a guide.",
+          "question": "What age is required?"
+        },
+        {
+          "answer": "No — lunch is at your own expense. We stop at Peduase Valley Resort with its mountain views and mini zoo, and you order what you like.",
+          "question": "Is lunch included?"
+        },
+        {
+          "answer": "Closed-toe shoes and long trousers. Helmets are provided. Wear clothes you don't mind getting dusty.",
+          "question": "What should I wear?"
+        },
+        {
+          "answer": "Scenic and refreshing. The trail leads to a natural waterfall in lush green terrain — perfect for a swim or cool-off after the ride.",
+          "question": "What are the waterfalls like?"
+        },
+        {
+          "answer": "Moderate. Steering on uneven terrain takes some arm strength, but most people find it completely manageable. It's fun from the first minute.",
+          "question": "Is the quad biking physically demanding?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "title": "Quadbike & Waterfalls"
+    },
+    "shai-hills": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "Baboons are almost guaranteed. You'll likely also spot antelopes, bushbucks, and a wide range of birds — over 175 species recorded at Shai Hills. Rock pythons are possible.",
+          "question": "What wildlife will we see?"
+        },
+        {
+          "answer": "Yes — we cruise the calm, scenic waters of the Volta near Akosombo. It's a peaceful end to a wildlife-packed morning.",
+          "question": "Is the boat cruise on Lake Volta?"
+        },
+        {
+          "answer": "Kayaking is an optional add-on at extra cost. Ask when booking and we'll arrange it.",
+          "question": "Is kayaking included?"
+        },
+        {
+          "answer": "Moderately active. The Shai Hills hike involves walking on rocky terrain. Good, closed-toe shoes are essential.",
+          "question": "How active is this tour?"
+        },
+        {
+          "answer": "Yes. All entrance fees for Shai Hills Reserve and the boat cruise are included in your tour price.",
+          "question": "Are entrance fees included?"
+        },
+        {
+          "answer": "Sturdy closed-toe shoes, binoculars if you have them (brilliant for the birds), sunscreen, a hat, and water.",
+          "question": "What should I bring?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "title": "Shai Hills & Boat Cruise"
+    },
+    "volta": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "Wli Falls — the highest waterfall in West Africa at over 80 metres. We hike to the beautiful lower falls, which is accessible to most fitness levels.",
+          "question": "Which waterfall do we visit?"
+        },
+        {
+          "answer": "The walk people remember is Mount Gemi at Amedzofe, high above the Volta Region with long views in every direction. We also stop at the Tafi Atome monkey sanctuary, where the mona monkeys come close enough to feed.",
+          "question": "What is the rope suspension bridge?"
+        },
+        {
+          "answer": "4–5 hours each way. We depart very early (around 4–5am) to make the most of daylight at the sites.",
+          "question": "How long is the drive from Accra?"
+        },
+        {
+          "answer": "Moderate. The lower falls trail takes about 30–45 minutes on a forest path. Regular fitness is fine. Slippery in wet season — hiking shoes or sturdy trainers recommended.",
+          "question": "Is the hike to the waterfall difficult?"
+        },
+        {
+          "answer": "No — lunch is at your own expense. We break at one of the mountain restaurants, which is a good moment to rest before the walk to the falls.",
+          "question": "Is lunch included?"
+        },
+        {
+          "answer": "Hiking shoes, a light rain jacket (the waterfall area is misty), swimwear if you want to swim in the pool at the base, and a change of clothes.",
+          "question": "What should I bring?"
+        }
+      ],
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "title": "Volta Day Tour"
+    }
+  }
+}
