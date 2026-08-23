@@ -9,6 +9,7 @@ import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
+import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
 import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
 import {injectPolicyContent} from './render-policy.mjs';
 import {loadExperienceContent, loadLocalExperienceContent} from './local-experience-source.mjs';
@@ -74,6 +75,29 @@ const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source
 const {content: experienceContent, source: experienceContentSource} =
   await loadExperienceContent({localContent: localExperienceContent});
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
+
+// Tour detail pages are generated from the CMS when GENERATE_TOUR_PAGES is set.
+// Off by default so the switch is deliberate: the hand-written pages remain the
+// published ones until the generated versions have been reviewed on a preview.
+const generateTourPages = process.env.GENERATE_TOUR_PAGES === 'true';
+const tourPageTemplate = generateTourPages ? await loadTourPageTemplate(projectRoot) : null;
+const tourPageContent = generateTourPages
+  ? JSON.parse(await readFile(join(projectRoot, 'src/content/tour-pages.json'), 'utf8')).tours
+  : {};
+const generatedTourPages = new Map();
+if (generateTourPages) {
+  for (const tour of tours) {
+    // The package page has an itinerary and its own template; not yet generated.
+    if (tour.slug === 'just-go-ghana') continue;
+    const extra = tourPageContent[tour.slug];
+    if (!extra) continue;
+    generatedTourPages.set(tour.detailUrl, renderTourPage({
+      template: tourPageTemplate,
+      tour: {...tour, ...extra},
+      catalogue: tours,
+    }));
+  }
+}
 
 // 404.html only.
 //
@@ -158,7 +182,8 @@ for (const entry of rootEntries) {
   if (!publicRootFiles.has(entry.name) && !publicRootExtensions.has(extname(entry.name))) continue;
 
   if (extname(entry.name) === '.html') {
-    const source = await readFile(join(projectRoot, entry.name), 'utf8');
+    const source = generatedTourPages.get(entry.name)
+      ?? await readFile(join(projectRoot, entry.name), 'utf8');
     const withNavigation = replacePrimaryNavigation(source, navigation, entry.name);
     const withFooter = replaceFooter(withNavigation, footer);
     const withHomepage = entry.name === 'index.html'

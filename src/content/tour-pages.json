@@ -33,6 +33,12 @@
           "question": "Can I buy souvenirs?"
         }
       ],
+      "funFacts": [
+        "Aburi Botanical Gardens was established in 1890 and spans over 64 acres of lush greenery.",
+        "Ghana was the world's largest cocoa producer for much of the 20th century.",
+        "Aburi sits at 450 meters elevation, offering refreshingly cool air compared to coastal Accra."
+      ],
+      "heroWatermark": "ABURI",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Transportation and fuel surcharge",
@@ -41,6 +47,8 @@
         "Entry fees to all sites and taxes",
         "Service fee"
       ],
+      "pageHeadline": "Into the Hills, Into the Cool",
+      "pageIntro": "Explore Aburi's world-famous botanical garden, visit the historic Tetteh Quarshie Cocoa Farm — the first cocoa farm in Ghana — walk to a natural waterfall, and break at Peduase Valley Resort surrounded by beautiful mountain scenery and cool fresh air.",
       "title": "Aburi Day Tour"
     },
     "accra-city": {
@@ -75,6 +83,12 @@
           "question": "Is it suitable for families with children?"
         }
       ],
+      "funFacts": [
+        "Accra has been Ghana's capital city since 1877.",
+        "The National Museum houses artifacts dating back centuries of Ghanaian history.",
+        "Independence Square holds the Black Star Gate, raised for Ghana's independence in 1957."
+      ],
+      "heroWatermark": "ACCRA",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Transportation and fuel surcharge",
@@ -83,9 +97,17 @@
         "Entry fees to all sites and taxes",
         "Service fee"
       ],
+      "pageHeadline": "The Capital, Unfiltered",
+      "pageIntro": "Walk Accra's culture, history and landmarks — from drumming at the Art Center to iconic museums and vibrant street food scenes. Experience the energy of Ghana's capital city with a passionate local expert by your side. This tour gives you a real feel for modern Accra while uncovering its deep historical roots.",
       "title": "Accra City Tour"
     },
     "accra-food": {
+      "excluded": [
+        "Alcoholic drinks",
+        "Additional food purchases beyond the tastings",
+        "Gratuities",
+        "Personal expenses"
+      ],
       "faqs": [
         {
           "answer": "Evening tour. We pick you up around 6:30–7pm, when Accra's night food scene starts coming alive.",
@@ -112,6 +134,21 @@
           "question": "What should I wear?"
         }
       ],
+      "funFacts": [
+        "Waakye — rice and beans cooked together — is one of Ghana's most beloved street foods. The reddish color comes from dried sorghum leaves added during cooking.",
+        "Kelewele (spiced fried plantain) is believed to have West African roots going back centuries, spiced with a blend that varies by vendor and family.",
+        "Accra's night food scene centers around neighborhoods like Osu, Labone, and Adabraka — each with its own street food identity and loyal local crowd."
+      ],
+      "heroWatermark": "ACCRA",
+      "included": [
+        "Professional local food guide",
+        "4–5 food tastings across stops",
+        "Local soft drinks or water",
+        "Transport between food stops",
+        "Chop bar experience"
+      ],
+      "pageHeadline": "The City's Best Flavours Come Out at Night",
+      "pageIntro": "When the sun sets over Accra, a different city wakes up — one lit by charcoal fires, sizzling woks, and the warm glow of chop bars. This evening food crawl takes you through the streets and local spots that Accra residents actually eat at, far from hotel buffets and tourist restaurants.\n\nFrom smoky grilled tilapia beside the lagoon to kelewele spiced with ginger and cloves, from cold Club beer at an open-air bar to freshly made waakye wrapped in banana leaf — every stop is an education in Ghanaian flavor. Your guide will narrate the food culture, share cooking secrets, and make introductions that turn a meal into a memory.",
       "title": "Accra After Dark Food Tour"
     },
     "ada-foah": {
@@ -148,6 +185,12 @@
           "question": "Can I extend and stay overnight?"
         }
       ],
+      "funFacts": [
+        "Ada Foah sits at the stunning point where the mighty Volta River meets the Atlantic Ocean.",
+        "Ada is known for some of Ghana's most beautiful, uncrowded, and pristine beaches.",
+        "The Ada estuary is a nesting ground for sea turtles and diverse coastal bird species."
+      ],
+      "heroWatermark": "ADA FOAH",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Private transportation and fuel surcharge",
@@ -159,9 +202,16 @@
         "Entry fees to all included sites and experiences",
         "Applicable taxes"
       ],
+      "pageHeadline": "Where the River Meets the Sea",
+      "pageIntro": "Head to beautiful Ada Foah at the dramatic meeting point of the Volta River and the Atlantic Ocean. Enjoy a scenic boat ride through the estuary, relax on pristine uncrowded beaches, savour fresh seafood, and experience total coastal relaxation away from the city buzz.",
       "title": "Ada Day Tour"
     },
     "batik-workshop": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
       "faqs": [
         {
           "answer": "At an artisan compound in Accra where master batik and pottery craftspeople work, teach, and pass their skills to the next generation.",
@@ -188,6 +238,21 @@
           "question": "What should I wear?"
         }
       ],
+      "funFacts": [
+        "Batik fabric making has been practiced across West Africa for centuries as a cultural art form.",
+        "Ghanaian pottery traditions date back thousands of years and vary across different ethnic groups.",
+        "The Art Center in Accra is one of West Africa's largest craft markets with over 200 artisans."
+      ],
+      "heroWatermark": "BATIK",
+      "included": [
+        "All craft materials provided",
+        "Professional artisan guides",
+        "Ground transportation",
+        "Your handmade creation to keep",
+        "Light refreshments"
+      ],
+      "pageHeadline": "Make Something With Your Hands. Take It Home Forever.",
+      "pageIntro": "Get hands-on with Ghana's rich craft traditions. Learn the ancient art of batik fabric making from master artisans, try your hand at traditional pottery techniques, and create your own unique piece to take home as a one-of-a-kind cultural souvenir. Perfect for families, groups and creative souls.",
       "title": "Batik & Pottery Workshop"
     },
     "cape-coast": {
@@ -223,6 +288,12 @@
           "question": "Can we add a naming ceremony?"
         }
       ],
+      "funFacts": [
+        "Cape Coast Castle was built in 1653 and is a UNESCO World Heritage Site.",
+        "At Assin Manso, the Ancestral Slave River is where enslaved Africans were bathed before the final march to the coast.",
+        "Elmina is one of the oldest European settlements in sub-Saharan Africa, founded in 1482."
+      ],
+      "heroWatermark": "CAPE COAST",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Private transportation and fuel surcharge",
@@ -232,6 +303,8 @@
         "Entry fees to all included sites and experiences",
         "Applicable taxes"
       ],
+      "pageHeadline": "Walk the Door of No Return.",
+      "pageIntro": "Cape Coast Castle, its dungeons and the Door of No Return, where captured Africans were held before being forced onto ships. The day begins at Assin Manso, where captives took their last bath on African soil, and ends with lunch on the coast, but the castle is the heart of it, and that part is never rushed.\n\nFor some who come, this is history. For others it is family. Your host will give you context before you go in and leave you room afterwards, for as long as you need it.",
       "priceOptions": [
         {
           "label": "With a traditional naming ceremony",
@@ -389,6 +462,12 @@
           "question": "Can we fly instead of driving?"
         }
       ],
+      "funFacts": [
+        "Kumasi is known as the Garden City of West Africa for its lush greenery and boulevards.",
+        "The Ashanti Kingdom is one of the most powerful and celebrated traditional empires in African history.",
+        "Kente cloth was originally woven exclusively for Ashanti royalty and is still prized worldwide."
+      ],
+      "heroWatermark": "KUMASI",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Transportation and fuel surcharge",
@@ -397,6 +476,8 @@
         "Entry fees to all sites and taxes",
         "Service fee"
       ],
+      "pageHeadline": "The Proud Heart of the Ashanti Kingdom",
+      "pageIntro": "Journey to Kumasi, the proud heart of the Ashanti Kingdom. Watch kente woven on looms at Adanwomase, stamp your own adinkra sash at Ntonso, and visit the Manhyia Palace Museum, seat of the Asantehene until 1974, immersing yourself in the rich cultural heritage of the Ashanti people — one of Africa's most celebrated civilizations.",
       "priceOptions": [
         {
           "label": "With a domestic flight instead of the road",
@@ -437,6 +518,12 @@
           "question": "Is the quad biking physically demanding?"
         }
       ],
+      "funFacts": [
+        "Peduase Lodge sits at 760 meters above sea level with panoramic mountain views.",
+        "The area receives some of Ghana's highest annual rainfall, creating stunning lush landscapes.",
+        "The scenic waterfall trail was historically used by colonial-era traders crossing the region."
+      ],
+      "heroWatermark": "QUAD BIKE",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Transportation and fuel surcharge",
@@ -445,6 +532,8 @@
         "Entry fees to all sites and taxes",
         "Service fee"
       ],
+      "pageHeadline": "Off-Road Thrills, Hidden Waterfalls, Mountain Air",
+      "pageIntro": "Experience the thrill of off-road quad biking through Ghana's scenic terrain, visit stunning natural waterfalls hidden in lush greenery, break at the beautiful Peduase Valley Resort, and explore a charming mini zoo. The ultimate adventure day for thrill-seekers.",
       "title": "Quadbike & Waterfalls"
     },
     "shai-hills": {
@@ -479,6 +568,12 @@
           "question": "What should I bring?"
         }
       ],
+      "funFacts": [
+        "Shai Hills is home to baboons, antelopes, and over 175 recorded bird species.",
+        "The Akosombo Dam created one of the world's largest man-made lakes by surface area.",
+        "The Volta Lake covers over 8,500 square kilometers of Ghana's eastern region."
+      ],
+      "heroWatermark": "SHAI HILLS",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Transportation and fuel surcharge",
@@ -487,6 +582,8 @@
         "Entry fees to all sites and taxes",
         "Service fee"
       ],
+      "pageHeadline": "Wildlife at Dawn. River at Dusk.",
+      "pageIntro": "Explore Ghana's wildlife at Shai Hills Resource Reserve spotting antelopes, baboons and over 175 bird species, then enjoy a relaxing Akosombo boat cruise and optional kayaking on the majestic Volta River. A perfect blend of wildlife adventure and river relaxation.",
       "title": "Shai Hills & Boat Cruise"
     },
     "volta": {
@@ -521,6 +618,12 @@
           "question": "What should I bring?"
         }
       ],
+      "funFacts": [
+        "The Wli Waterfalls are the highest waterfalls in West Africa, plunging over 80 meters.",
+        "The Volta Region's dramatic hills and valleys are unlike anywhere else in Ghana.",
+        "The area is home to one of Ghana's largest colonies of straw-colored fruit bats."
+      ],
+      "heroWatermark": "VOLTA",
       "included": [
         "Hotel or apartment pickup and drop-off in Accra",
         "Transportation and fuel surcharge",
@@ -529,6 +632,8 @@
         "Entry fees to all sites and taxes",
         "Service fee"
       ],
+      "pageHeadline": "West Africa's Tallest Waterfall. One Day You'll Never Forget.",
+      "pageIntro": "Journey through the breathtaking Volta Region — Ghana's most scenic landscape. Visit powerful waterfalls, cross the famous suspended rope bridge, explore traditional villages rich with history, and take in dramatic hills and valleys that make this one of Ghana's most unforgettable day trips.",
       "title": "Volta Day Tour"
     }
   }
