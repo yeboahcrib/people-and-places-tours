@@ -8,7 +8,7 @@
     "test:build": "node tests/build-output.mjs",
     "check:js": "node --check script.js && node --check tours.js && node --check homepage-content.js && node --check homepage-sections.js",
     "test:health": "node tests/health-function.mjs",
-    "test:content": "node tests/content-source.mjs && node tests/tour-source.mjs && node tests/homepage-source.mjs && node tests/booking-source.mjs && node tests/about-source.mjs && node tests/policy-source.mjs && node tests/homepage-layouts.mjs",
+    "test:content": "node tests/content-source.mjs && node tests/tour-source.mjs && node tests/homepage-source.mjs && node tests/booking-source.mjs && node tests/about-source.mjs && node tests/policy-source.mjs && node tests/tour-pages-content.mjs && node tests/homepage-layouts.mjs",
     "test:layouts": "node tests/homepage-layouts.mjs",
     "test:headers": "node tests/security-headers.mjs",
     "test:inquiry": "node tests/inquiry-function.mjs",
