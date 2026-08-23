@@ -47,6 +47,7 @@ export const POLICY_PAGES = [
   {key: 'travelInsurance', policyType: 'insurance', file: 'travel-insurance.html'},
   {key: 'privacyPolicy', policyType: 'privacy', file: 'privacy-policy.html'},
   {key: 'bookingTerms', policyType: 'terms', file: 'booking-terms.html'},
+  {key: 'travelInformation', policyType: 'travel', file: 'travel-information.html'},
 ];
 
 export async function loadLocalPolicyContent(projectRoot, key = 'cancellationRefund') {

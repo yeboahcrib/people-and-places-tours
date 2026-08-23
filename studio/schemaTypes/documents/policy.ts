@@ -12,7 +12,7 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
  */
 export const policy = defineType({
   name: 'policy',
-  title: 'Policy page',
+  title: 'Policy or information page',
   type: 'document',
   description: 'The cancellation, refund, privacy or booking terms a traveller can read before they pay you.',
   fields: [
@@ -23,6 +23,7 @@ export const policy = defineType({
       options: {
         list: [
           {title: 'Cancellation & refunds', value: 'cancellation'},
+          {title: 'Travelling to Ghana (practical information)', value: 'travel'},
           {title: 'Travel insurance', value: 'insurance'},
           {title: 'Privacy', value: 'privacy'},
           {title: 'Booking terms & conditions', value: 'terms'},

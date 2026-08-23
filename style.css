@@ -1387,6 +1387,14 @@ body.page-entering {
 /* ────────────────────────────────────────────────────────────── */
 /*  RESPONSIVE                                                    */
 /* ────────────────────────────────────────────────────────────── */
+/* Between the mobile drawer and full desktop the pill has to hold five links,
+   the phone number and the booking button. The phone is the one that can go:
+   it is in the footer, on the contact page and in the mobile drawer, while a
+   clipped "Book a Tour" costs a booking. */
+@media (max-width: 1180px) {
+  .nav-phone { display: none; }
+}
+
 @media (max-width: 1024px) {
   .why-grid { grid-template-columns: repeat(2, 1fr); }
   .why-grid:has(> .why-item) { grid-template-columns: repeat(2, 1fr) !important; }

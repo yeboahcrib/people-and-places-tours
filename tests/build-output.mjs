@@ -106,7 +106,7 @@ assert.equal(
 // Checked against the built page, not the source: the injectors run at build
 // time, so a truncating injector leaves the committed page intact and breaks
 // only what visitors see.
-for (const file of ['cancellation-refund-policy.html', 'travel-insurance.html', 'privacy-policy.html', 'booking-terms.html']) {
+for (const file of ['cancellation-refund-policy.html', 'travel-insurance.html', 'privacy-policy.html', 'booking-terms.html', 'travel-information.html']) {
   const generatedPolicy = await readFile(join(outputPath, file), 'utf8');
   const policyBody = generatedPolicy.slice(generatedPolicy.indexOf('<main'), generatedPolicy.indexOf('</main>'));
   for (const tag of ['section', 'div', 'dl']) {
