@@ -119,6 +119,31 @@ for (const file of ['cancellation-refund-policy.html', 'travel-insurance.html', 
   assert(policyBody.includes('policy-term'), `the built ${file} lost its terms`);
 }
 
+// A tour's price appears on its catalogue card and again on its own page, in
+// different files with different sources. They drifted twice in one day: once
+// when a CMS price change shipped ahead of the code, and once when a price was
+// changed everywhere except the page that quotes it loudest.
+const cardPrices = [...generatedPackages.matchAll(
+  /data-tour-slug="([a-z0-9-]+)"[\s\S]*?tour-card-price"[^>]*><span>From<\/span>(\$[0-9,]+)/g,
+)];
+assert(cardPrices.length > 0, 'no catalogue card prices found to check');
+for (const [, slug, cardPrice] of cardPrices) {
+  const detailFile = `${slug === 'just-go-ghana' ? slug : `${slug}-tour`}.html`;
+  let detail;
+  try {
+    detail = await readFile(join(outputPath, detailFile), 'utf8');
+  } catch {
+    continue; // A tour without its own page yet is Phase 3's problem, not a price bug.
+  }
+  const stated = detail.match(/class="big-price">(\$[0-9,]+)/);
+  if (!stated) continue;
+  assert.equal(
+    stated[1],
+    cardPrice,
+    `${detailFile} says ${stated[1]} but its catalogue card says ${cardPrice}`,
+  );
+}
+
 const sitemap = await readFile(join(outputPath, 'sitemap.xml'), 'utf8');
 const locations = [...sitemap.matchAll(/<loc>https?:\/\/[^/]+\/people-and-places-tours\/(.*?)<\/loc>/g)]
   .map(match => match[1] || 'index.html');
