@@ -71,10 +71,10 @@ const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source
   : 'local';
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
-// Tour detail pages are generated from the CMS when GENERATE_TOUR_PAGES is set.
-// Off by default so the switch is deliberate: the hand-written pages remain the
-// published ones until the generated versions have been reviewed on a preview.
-const generateTourPages = process.env.GENERATE_TOUR_PAGES === 'true';
+// REVIEW BRANCH ONLY — generation is on by default here so the Cloudflare
+// preview shows the generated pages without a dashboard variable. This branch
+// exists to be looked at and must not be merged; main keeps the opt-in switch.
+const generateTourPages = process.env.GENERATE_TOUR_PAGES !== 'false';
 const tourPageTemplate = generateTourPages ? await loadTourPageTemplate(projectRoot) : null;
 const tourPageContent = generateTourPages
   ? JSON.parse(await readFile(join(projectRoot, 'src/content/tour-pages.json'), 'utf8')).tours
