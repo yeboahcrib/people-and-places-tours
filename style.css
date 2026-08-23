@@ -2048,6 +2048,20 @@ body.page-entering {
   font-size: var(--text-md);
   line-height: 1.45;
 }
+
+/* Every catalogue price is a group-of-three price. Saying so here, before a
+   visitor reads a single card, is cheaper than saying it after they have
+   planned a trip around a figure they cannot get. Deliberately not set in the
+   subtle grey the rest of the fine print uses: a disclosure that changes the
+   price has to be legible. */
+.experience-price-note {
+  font-size: var(--text-md);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  max-width: 62ch;
+  margin: 0 auto var(--sp-3);
+  text-align: center;
+}
 .filter-tabs {
   display: flex;
   gap: 0.4rem;
