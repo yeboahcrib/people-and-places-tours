@@ -208,10 +208,11 @@ details along with a booking reference. Please include that reference with
 your payment and send us a confirmation (a screenshot or receipt works
 fine) so we can match it to your booking.
 
-- **Deposit:** 30% of the total tour price, due at booking to confirm your
-  reservation. This deposit is non-refundable once paid.
-- **Balance:** For tailored multi-day and custom tours, the remaining 70%
-  is due 30 days before your tour start date.
+- **Superseded 2026-08-22 — see `/booking-terms`, which is the published
+  version.** The deposit is **$400 per person on every trip**, not a
+  percentage. For custom trips the itinerary is planned free of charge and
+  the $400 is taken only once the traveller has approved it.
+- **Balance:** whatever remains, due 30 days before arrival.
 - **Day tours:** Full payment is due at the time of booking. If you need to
   cancel, you'll receive a full refund if you let us know at least 48 hours
   before your tour; cancellations inside 48 hours are non-refundable.

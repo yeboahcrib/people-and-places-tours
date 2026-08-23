@@ -78,6 +78,15 @@ for (const w of [375, 430, 768, 1024, 1440]) {
 }
 ```
 
+**`tests/responsive.js` reads the *source* pages by default, and the navigation
+and footer are injected from the CMS at build time.** So a change to either is
+invisible to it unless you point it at the build:
+`BASE_URL=http://127.0.0.1:8082 npm run test:responsive` against a server on
+`dist/`. Adding a fifth navigation link once pushed the "Book a Tour" button
+off screen between 1024px and 1180px and every check still passed, because
+`body { overflow-x: hidden }` hides a clipped control from a document-width
+test. The suite now measures that button directly.
+
 `tests/smoke.js` runs an end-to-end happy-path check across the main pages — run it (`node tests/smoke.js` with the server up) before declaring work done.
 
 `tests/resilient-rendering.js` is the exception to the "start a server first" rule: it checks what a visitor sees with JavaScript disabled, which is only meaningful against `dist/`, because the homepage sections and the packages grid are assembled at build time. It serves `dist/` itself on an ephemeral port, so run `npm run build` first and then `npm run test:resilience` with no server of your own. Setting `BASE_URL` overrides that and will point it at the raw source, where an empty homepage shell is expected and the failures are not real.

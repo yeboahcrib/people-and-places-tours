@@ -1,0 +1,597 @@
+{
+  "cancellationRefund": {
+    "title": "Cancellation & Refund Policy",
+    "lastUpdated": "2026-08-22",
+    "intro": "At People & Places, we pride ourselves on curating immersive, high-quality experiences in Ghana. To ensure clarity and fairness to all our travelers and our local partners, we have established the following refunds and cancellation policy.",
+    "sections": [
+      {
+        "heading": "If you cancel a package trip",
+        "intro": "All bookings for our Just Go Ghana packages are subject to the following cancellation timeline. The initial $400 deposit is non-refundable and non-transferable in all cases.",
+        "items": [
+          {
+            "term": "60 or more days before the trip",
+            "text": "You will receive a full refund of all payments made, minus the $400 non-refundable deposit."
+          },
+          {
+            "term": "31 to 59 days before the trip",
+            "text": "You will receive a 50% refund of the total trip cost, excluding the deposit."
+          },
+          {
+            "term": "30 days or less before the trip",
+            "text": "No refund will be issued. A 100% cancellation fee applies."
+          },
+          {
+            "term": "No-shows",
+            "text": "Travelers who do not arrive for the trip, or who leave early for any reason, are not eligible for a refund."
+          }
+        ]
+      },
+      {
+        "heading": "If you cancel a day tour",
+        "intro": "Day tours are paid in full when you book, rather than with a deposit and a balance. They are shorter, lower-priced and often booked at short notice, so the timeline is simpler.",
+        "items": [
+          {
+            "term": "48 hours or more before the tour",
+            "text": "You will receive a full refund of everything you have paid."
+          },
+          {
+            "term": "Less than 48 hours before the tour",
+            "text": "No refund can be issued. By that point your guide is booked and your places at each site are held."
+          },
+          {
+            "term": "No-shows",
+            "text": "Travellers who do not arrive for a day tour are treated the same as a cancellation inside 48 hours."
+          }
+        ]
+      },
+      {
+        "heading": "Changing or rescheduling a booking",
+        "intro": "We understand that life happens. We offer the following options to help accommodate changes to your plans.",
+        "items": [
+          {
+            "term": "Rescheduling requests",
+            "text": "You may request to reschedule your trip dates up to 45 days before your scheduled arrival. Requests are subject to availability and current hotel rates."
+          },
+          {
+            "term": "Rescheduling fee",
+            "text": "A strictly administrative fee of $150 may apply to process date changes, plus any difference in package price for the new dates."
+          },
+          {
+            "term": "Last-minute changes",
+            "text": "Requests made less than 30 days before the arrival date generally cannot be accommodated, because of vendor contracts already in place."
+          }
+        ]
+      },
+      {
+        "heading": "If we cancel",
+        "intro": "In the unlikely event that People & Places must cancel a tour due to unforeseen circumstances such as political instability or natural disasters, or for reasons beyond our control, we will offer you the following options.",
+        "items": [
+          {
+            "term": "Reschedule",
+            "text": "Move your full credit to a future trip date or a different available package."
+          },
+          {
+            "term": "Refund",
+            "text": "Receive a full refund of all payments made, including the deposit."
+          }
+        ]
+      },
+      {
+        "heading": "Important information",
+        "items": [
+          {
+            "term": "Travel insurance",
+            "text": "We strongly recommend purchasing comprehensive travel insurance that includes Cancel For Any Reason (CFAR) coverage. This protects you against financial loss if you must cancel due to illness, flight delays, or work conflicts."
+          },
+          {
+            "term": "Itinerary changes",
+            "text": "People & Places reserves the right to slightly alter tour routes or accommodations without prior notice where necessary, for example due to weather or road maintenance. Any changes will be of equal or greater value."
+          },
+          {
+            "term": "Liability",
+            "text": "People & Places shall not be liable for any loss, damage, injury, or illness caused in any way to participants while using third-party services such as hotels, transport, and attractions."
+          },
+          {
+            "term": "Participant responsibility",
+            "text": "Guests are expected to conduct themselves respectfully toward staff, fellow travelers, and locals. Behavior deemed disruptive or disrespectful may result in removal from the tour without a refund."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "If you have any questions, or need to request a cancellation or a change, please contact us immediately in writing.",
+    "closing": "By booking with People & Places, you acknowledge that you have read, understood, and agreed to this cancellation and refund policy."
+  },
+  "travelInsurance": {
+    "title": "Travel Insurance",
+    "lastUpdated": "2026-08-22",
+    "intro": "Travel insurance is required on every People & Places trip. We ask for proof of cover before you travel, and we will not be able to take you on the trip without it. This page explains exactly what your policy needs to include and when we need to see it.",
+    "sections": [
+      {
+        "heading": "What your policy must cover",
+        "intro": "Any comprehensive travel insurance policy will do, as long as it includes both of the following. Cover levels vary widely, so read your policy rather than assuming.",
+        "items": [
+          {
+            "term": "Medical emergency",
+            "text": "Emergency medical treatment, personal injury, hospital care, and the cost of medical evacuation or repatriation, including air ambulance. This is the part that matters most, and the part cheap policies most often leave out."
+          },
+          {
+            "term": "Trip cancellation and disruption",
+            "text": "Trip cancellation, trip delay, missed departures, and lost or delayed baggage. Cancellation cover is usually the only way to recover money you have already paid us that our own cancellation terms cannot refund."
+          },
+          {
+            "term": "The activities on your itinerary",
+            "text": "Check that your policy covers everything your trip includes. Hiking, boat and canoe trips, quad biking and similar activities are excluded by some policies unless you add them."
+          }
+        ]
+      },
+      {
+        "heading": "When we need to see it",
+        "items": [
+          {
+            "term": "Proof is due 30 days before you travel",
+            "text": "Send us your policy number, your insurer's name, and the dates your cover runs. Email or WhatsApp is fine. This is the same deadline as your final balance, so the two can be sent together."
+          },
+          {
+            "term": "Buy it when you book, not when it is due",
+            "text": "Cancellation cover only protects what you buy it before. A policy bought a month before departure will not cover something that has already happened."
+          },
+          {
+            "term": "If we do not receive it",
+            "text": "We will chase you for it. If we still do not have proof by your departure date, we cannot take you on the trip, and the cancellation terms apply as they would to any other cancellation."
+          }
+        ]
+      },
+      {
+        "heading": "What is your responsibility",
+        "intro": "We are not insurance brokers and we cannot advise you on which policy to buy. What we can tell you is what to check before you buy.",
+        "items": [
+          {
+            "term": "Reading your own policy",
+            "text": "Cover, exclusions and claim limits are set by your insurer, not by us. You are responsible for making sure the policy you buy actually covers your trip, your activities and any medical condition you already have."
+          },
+          {
+            "term": "Claiming",
+            "text": "Claims are made to your insurer, not to us. We will give you whatever documentation we hold, such as booking confirmations and written accounts of what happened, to support a claim."
+          },
+          {
+            "term": "Cover for people you book for",
+            "text": "If you are booking for a family or a group, everyone travelling needs their own cover, and you are responsible for confirming they have it."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "If you are unsure whether a policy meets these requirements, send us the details before you buy and we will tell you what looks missing."
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "2026-08-22",
+    "intro": "People & Places is a Ghana-founded tour company based in Accra. This explains what we learn about you when you visit this website, write to us, or book a trip, and what we do with it. It is written to be read, not to be survived.",
+    "sections": [
+      {
+        "heading": "What we collect",
+        "items": [
+          {
+            "term": "What you tell us",
+            "text": "Your name, email address, phone or WhatsApp number, and whatever you share about the trip you are planning — dates, group size, interests, questions. Nothing more than what you type into the form or send us in a message."
+          },
+          {
+            "term": "Proof of payment",
+            "text": "When you book, you send us a bank transfer or Mobile Money receipt. We hold that record so we can match your payment to your booking. We never see or store card numbers, because payments are arranged directly with our team rather than taken through this website."
+          },
+          {
+            "term": "Basic technical information",
+            "text": "Our host records ordinary request information such as your approximate location and browser type in order to serve pages and block attacks. We do not use it to build a profile of you."
+          }
+        ]
+      },
+      {
+        "heading": "Cookies and tracking",
+        "intro": "This is shorter than most privacy policies because there is genuinely less to say.",
+        "items": [
+          {
+            "term": "We run no analytics",
+            "text": "There is no Google Analytics, no advertising pixel, and no tracking script of any kind on this website. We do not know who you are until you write to us."
+          },
+          {
+            "term": "We set no cookies of our own",
+            "text": "The one exception is the spam check on our contact form, provided by Cloudflare Turnstile, which may store something in your browser to tell a person from a bot. It is not used to follow you."
+          }
+        ]
+      },
+      {
+        "heading": "What we use it for",
+        "items": [
+          {
+            "term": "Answering you and planning your trip",
+            "text": "Replying to your enquiry, working out your itinerary, confirming your booking, and sending you the details you need before you travel."
+          },
+          {
+            "term": "Running the business",
+            "text": "Matching payments to bookings, and keeping the records we need for tax and accounting."
+          },
+          {
+            "term": "What we never do",
+            "text": "We do not sell your information, and we do not add you to a marketing list because you asked a question."
+          }
+        ]
+      },
+      {
+        "heading": "Who else sees it",
+        "intro": "Only the services that make the website and your trip work. Each one sees the least it needs.",
+        "items": [
+          {
+            "term": "The services that run this website",
+            "text": "Cloudflare hosts the site and receives your enquiry, and Resend delivers that enquiry to our inbox. Our content system holds the words and pictures on these pages — it never holds anything about you."
+          },
+          {
+            "term": "Your bank or Mobile Money provider",
+            "text": "When you send us a payment directly. We do not route payments through a separate processor."
+          },
+          {
+            "term": "WhatsApp",
+            "text": "If you choose to contact us there, that conversation is subject to their terms as well as ours."
+          },
+          {
+            "term": "The people hosting your trip",
+            "text": "A driver or guide is given your name and pickup details, because they cannot collect you without them. Nothing else travels with it."
+          },
+          {
+            "term": "Nobody else",
+            "text": "We do not share your information with anyone else without asking you first, unless the law requires it."
+          }
+        ]
+      },
+      {
+        "heading": "How long we keep it",
+        "items": [
+          {
+            "term": "Enquiries that do not become bookings",
+            "text": "Kept while a conversation is live, and deleted once it clearly is not going anywhere."
+          },
+          {
+            "term": "Booking records",
+            "text": "Kept for as long as tax and accounting rules require, then deleted."
+          }
+        ]
+      },
+      {
+        "heading": "Your rights",
+        "intro": "Ghana's Data Protection Act, 2012 (Act 843) gives you rights over your own information, as may the law where you live. Write to us and we will act on any of these.",
+        "items": [
+          {
+            "term": "See what we hold",
+            "text": "Ask us what information we have about you, and we will tell you."
+          },
+          {
+            "term": "Correct it",
+            "text": "If something we hold about you is wrong, tell us and we will fix it."
+          },
+          {
+            "term": "Have it deleted",
+            "text": "Ask us to delete your information, and we will, unless we are required to keep it for tax or legal reasons."
+          },
+          {
+            "term": "Photographs of you",
+            "text": "If a photograph of you is on our website or social media and you would rather it were not, tell us and we will take it down. You do not have to give a reason."
+          }
+        ]
+      },
+      {
+        "heading": "Other things worth saying",
+        "items": [
+          {
+            "term": "Children",
+            "text": "Our trips are booked by adults. We do not knowingly collect information from anyone under 18 directly."
+          },
+          {
+            "term": "Changes to this policy",
+            "text": "If we change it, the date at the top of this page changes with it. We will not quietly rewrite it."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "For anything on this page — a question, a correction, or a request to delete something — write to us and a person will answer."
+  },
+  "bookingTerms": {
+    "title": "Booking Terms",
+    "lastUpdated": "2026-08-23",
+    "intro": "These are the terms you agree to when you book a trip with People & Places. They are written plainly on purpose. If anything here is unclear, ask us before you pay rather than after.",
+    "sections": [
+      {
+        "heading": "Booking a trip",
+        "items": [
+          {
+            "term": "How a booking is made",
+            "text": "You send us an enquiry, we confirm what is available and agree the details with you, and we send you payment instructions with a booking reference. Your booking is confirmed once we have agreed the details and received your payment."
+          },
+          {
+            "term": "Availability",
+            "text": "Day tours can run on most days with advance notice. This is not a fixed daily departure schedule, so a date is only yours once we have confirmed it."
+          },
+          {
+            "term": "Prices",
+            "text": "Prices are shown in US dollars. On the multi-day package the final price per person depends on your group size and room occupancy, which we confirm with you before you pay."
+          }
+        ]
+      },
+      {
+        "heading": "Paying for your trip",
+        "intro": "You pay $400 per person to secure your trip, and the balance before you travel. The rest of this section is the detail for each kind of trip.",
+        "items": [
+          {
+            "term": "The Just Go Ghana package",
+            "text": "A non-refundable payment of $400 per person confirms your dates and comes off your total. The balance is due 30 days before you arrive, and you can spread it across instalments in that time or settle it in full whenever you like."
+          },
+          {
+            "term": "Custom and tailored trips — planning is free",
+            "text": "Tell us what you have in mind and we will design the itinerary, price it and send it to you. Nothing is due while we do that, and you are under no obligation once you have it."
+          },
+          {
+            "term": "Custom and tailored trips — securing your dates",
+            "text": "Once you are happy with the itinerary, a non-refundable payment of $400 per person confirms it and comes off your total, with the balance due 30 days before you arrive. If you cancel after that point, the securing payment is not returnable and neither is anything we have already paid to hotels or partners to hold your trip."
+          },
+          {
+            "term": "Day tours",
+            "text": "Paid in full at the time of booking, with no deposit and balance split."
+          },
+          {
+            "term": "Day tour prices assume three travellers",
+            "text": "Every day tour price on this site is per person for a group of three or more. Travelling alone or as a pair adds $20 to $30 per person depending on the tour, and some tours only run with three. We confirm the exact figure with you before you pay anything."
+          },
+          {
+            "term": "How to pay",
+            "text": "Bank transfer or Mobile Money direct to us, or by card through Taptap Send, a regulated money transfer app. However you pay, the money reaches us as a transfer and we never see or hold your card details."
+          },
+          {
+            "term": "Sending us proof",
+            "text": "Send us a screenshot or receipt with your booking reference so we can match your payment to your trip."
+          }
+        ]
+      },
+      {
+        "heading": "Rooms and sharing",
+        "intro": "Hotel prices on our multi-day trips are based on two people sharing a room. If you are travelling alone, you have two choices and we will settle which one before you pay.",
+        "items": [
+          {
+            "term": "Sharing with another traveller",
+            "text": "We can pair you with another solo traveller of the same gender, and we tell you that you have been paired before you travel. A shared room is usually two beds, but in some hotels it is one large bed. We will tell you which."
+          },
+          {
+            "term": "Having your own room",
+            "text": "You can have a room to yourself for a single supplement. We quote that figure with your itinerary, before you pay anything, and it never appears later as an addition."
+          },
+          {
+            "term": "If we cannot find you a roommate",
+            "text": "You get the room to yourself and we do not charge you the supplement. Failing to find you a match is our problem, not your bill."
+          },
+          {
+            "term": "If sharing is not working out",
+            "text": "Tell your host. If the hotel has another room we will move you, and you cover the single rate for the nights that remain. If the problem is the other person's behaviour rather than a preference, we move you at our own cost and our conduct terms apply to them."
+          }
+        ]
+      },
+      {
+        "heading": "Changing or cancelling",
+        "intro": "Cancellations, refunds and rescheduling have their own page, because they are the terms people most need to find. Nothing here replaces them.",
+        "items": [
+          {
+            "term": "Where the terms are",
+            "text": "See our Cancellation & Refund Policy for the full timeline, the rescheduling fee, and what happens if we have to cancel."
+          },
+          {
+            "term": "Talk to us early",
+            "text": "If your plans change, tell us as soon as you know. Options that exist 45 days out often do not exist 10 days out."
+          }
+        ]
+      },
+      {
+        "heading": "What you are responsible for",
+        "items": [
+          {
+            "term": "Travel insurance",
+            "text": "Cover is required on every trip, and proof is due 30 days before you travel. See our Travel Insurance page for what your policy must include."
+          },
+          {
+            "term": "Passport and visa",
+            "text": "A valid passport and any visa you need are yours to arrange. We can share general guidance, but we are not a substitute for your embassy or high commission."
+          },
+          {
+            "term": "Vaccinations",
+            "text": "A yellow fever certificate is required to enter Ghana and you may be asked for it on arrival. Any other vaccinations are a conversation for you and your doctor."
+          },
+          {
+            "term": "Getting here",
+            "text": "International flights are not included in any of our prices. You book your own travel to Kotoka International Airport."
+          },
+          {
+            "term": "If you are turned away",
+            "text": "If you cannot travel because a document, certificate or flight was not in order, that is treated as a cancellation and the usual terms apply."
+          }
+        ]
+      },
+      {
+        "heading": "Health, access and comfort",
+        "items": [
+          {
+            "term": "Tell us early",
+            "text": "Let us know about any health condition, mobility need, dietary requirement or comfort preference when you book, so we can plan around it rather than improvise on the day."
+          },
+          {
+            "term": "What we cannot promise",
+            "text": "We will do everything we reasonably can, but some heritage sites have stairs, uneven ground and narrow passages that we cannot change. We will tell you honestly which parts of a trip may be difficult."
+          }
+        ]
+      },
+      {
+        "heading": "Photographs and video",
+        "intro": "We photograph our trips, and those pictures are how people who have never been to Ghana decide to come. We also know some of these places are deeply personal.",
+        "items": [
+          {
+            "term": "What booking means",
+            "text": "By booking you agree that we may use photographs and video taken during your trip on our website, our social media and our marketing."
+          },
+          {
+            "term": "Saying no",
+            "text": "Tell us at booking, or at any point during the trip, and we will not use pictures that show you. You do not need to give a reason and it changes nothing else about your trip."
+          },
+          {
+            "term": "Changing your mind later",
+            "text": "If something is already published and you want it taken down, write to us and we will remove it."
+          },
+          {
+            "term": "At the ancestral sites",
+            "text": "We do not photograph guests at Assin Manso, Cape Coast Castle or the Door of No Return for marketing without asking on the day. What happens there is yours."
+          }
+        ]
+      },
+      {
+        "heading": "On the trip",
+        "items": [
+          {
+            "term": "Your host decides",
+            "text": "Your tour host has final say on routes, timings and whether an activity can go ahead safely. It is their call on the day."
+          },
+          {
+            "term": "Changes we may make",
+            "text": "We may adjust a route, a site or an accommodation where weather, road conditions or safety require it. Any replacement will be of equal or greater value."
+          },
+          {
+            "term": "Conduct",
+            "text": "We expect guests to treat our team, other travellers and the people whose homes and workplaces we visit with respect. Behaviour that is disruptive or disrespectful can end a trip without a refund."
+          }
+        ]
+      },
+      {
+        "heading": "What we are and are not responsible for",
+        "items": [
+          {
+            "term": "The trip we run",
+            "text": "We are responsible for planning and running your trip with reasonable care, and for choosing our drivers, guides and partners carefully."
+          },
+          {
+            "term": "Third parties",
+            "text": "We are not responsible for the independent acts of hotels, airlines, restaurants and attractions that are outside our direct control."
+          },
+          {
+            "term": "What cannot be excluded",
+            "text": "Nothing in these terms limits any liability that Ghanaian law does not allow us to exclude."
+          },
+          {
+            "term": "Which law applies",
+            "text": "These terms are governed by the laws of Ghana."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "Questions about a booking or about these terms reach a person, not a queue.",
+    "closing": "By booking with People & Places you confirm that you have read and agreed to these terms, together with our Cancellation & Refund Policy and our travel insurance requirement."
+  },
+  "travelInformation": {
+    "title": "Travelling to Ghana",
+    "lastUpdated": "2026-08-23",
+    "intro": "The practical things people ask us before they fly. None of it is complicated, but it is easier to know it now than to work it out at the airport.",
+    "sections": [
+      {
+        "heading": "Arriving",
+        "items": [
+          {
+            "term": "Meeting you at the airport",
+            "text": "Someone from People & Places will be waiting for you in the arrivals hall at Kotoka International Airport in Accra, holding a sign with your name, and will take you straight to your hotel. This is included on the multi-day package."
+          },
+          {
+            "term": "Getting here",
+            "text": "International flights are not included in any of our prices. You book your own travel to Kotoka International Airport, code ACC. Booking early usually costs less."
+          }
+        ]
+      },
+      {
+        "heading": "Money",
+        "items": [
+          {
+            "term": "The currency",
+            "text": "Ghana uses the cedi (GHS). You will need some for markets, small purchases and tips."
+          },
+          {
+            "term": "Bringing cash",
+            "text": "US dollars in cash exchange easily at forex bureaus. Bring notes dated 2013 or newer, because older notes are often refused or exchanged at a poorer rate."
+          },
+          {
+            "term": "Cards and ATMs",
+            "text": "ATMs are widely available in Accra, and Visa and Mastercard are accepted at major hotels and larger restaurants. Local markets and small vendors are cash only."
+          }
+        ]
+      },
+      {
+        "heading": "Staying connected",
+        "items": [
+          {
+            "term": "Wi-Fi",
+            "text": "All the hotels we work with provide Wi-Fi."
+          },
+          {
+            "term": "A local SIM",
+            "text": "For data everywhere else, a local SIM card is cheap and the coverage is good. We can help you buy one when you arrive."
+          }
+        ]
+      },
+      {
+        "heading": "What to pack",
+        "intro": "Ghana is tropical and warm all year. Pack light, breathable clothing, and then these.",
+        "items": [
+          {
+            "term": "Comfortable walking shoes",
+            "text": "There is more walking than people expect, particularly on city tours, at the cocoa farm and around Shai Hills."
+          },
+          {
+            "term": "Something white",
+            "text": "A white outfit is often worn for the welcome dinner and for ancestral ceremonies. If you have one, bring it."
+          },
+          {
+            "term": "Swimwear",
+            "text": "For the beach and for hotel pools."
+          },
+          {
+            "term": "Sunscreen and insect repellent",
+            "text": "Both are available here, but bring what you know works for you."
+          },
+          {
+            "term": "A power adapter",
+            "text": "Ghana uses the three-pin British style plug, Type G, at 230 volts."
+          }
+        ]
+      },
+      {
+        "heading": "Eating",
+        "items": [
+          {
+            "term": "What you will eat",
+            "text": "Breakfast each day and lunches on tour days are included on the package, and they are Ghanaian: jollof, waakye, red red, grilled tilapia. Tasting the food is part of the point."
+          },
+          {
+            "term": "If that is not for you",
+            "text": "Continental options are available at most hotels and at the restaurants we visit. Tell us about allergies or dietary needs when you book and we will plan around them."
+          }
+        ]
+      },
+      {
+        "heading": "Before you travel",
+        "intro": "Three things are your responsibility rather than ours, and all three have their own page.",
+        "items": [
+          {
+            "term": "A visa",
+            "text": "Most visitors need one to enter Ghana. Apply through your nearest Ghanaian embassy or high commission, and apply early."
+          },
+          {
+            "term": "Yellow fever",
+            "text": "A yellow fever certificate is required to enter Ghana and you may be asked for it on arrival. Speak to your doctor about anything else, including malaria prevention."
+          },
+          {
+            "term": "Travel insurance",
+            "text": "Cover is required on every trip we run, and we need proof of it 30 days before you travel. Our Travel Insurance page sets out what your policy must include."
+          }
+        ]
+      }
+    ],
+    "contactIntro": "Anything here you would rather ask a person about, ask us. We answer these questions all week."
+  }
+}

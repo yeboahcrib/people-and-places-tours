@@ -54,14 +54,15 @@ a travel-insurance recommendation or requirement.
 
 | Element | Rule |
 | --- | --- |
-| Deposit | 30% of total tour price, due at booking to confirm the reservation |
+| Deposit | **Superseded (2026-08-22): $400 per person, on every trip we sell.** One figure, not a percentage. It is per person, so it already scales with the group size that drives what we commit to hotels and transport. Published at `/booking-terms` |
 | Deposit refundability | Non-refundable once paid — this matches the existing "100% non-refundable" language already on the Just Go Ghana page and the pattern at all three researched competitors |
-| Balance | Remaining 70% due 30 days before the tour/tour start date, for tailored multi-day and custom tours |
+| Balance | Whatever remains after the $400 per person, due 30 days before arrival, payable in instalments across that window |
 | Day tours | **Decided (2026-07-25):** full payment due at booking — no deposit/balance split. Day tours are lower-priced ($85–$250) and often booked with short advance notice, so a 30-day-out balance schedule doesn't fit. Cancellation: full refund if cancelled 48+ hours before the tour; non-refundable inside 48 hours of the tour |
+| Custom trips | **Added (2026-08-22):** planning and itinerary design are free and carry no obligation. The $400 per person is taken only once the traveller has seen and approved their itinerary. Any supplier deposits already paid on their behalf are also non-refundable |
 | Cancellation by guest | Deposit is forfeited on any cancellation. If cancelled within 30 days of the tour/start date, the full amount (deposit + any balance paid) is non-refundable — matching the existing Just Go Ghana language, now applied universally |
 | Cancellation by People & Places | Reserved only for genuine operational necessity or force majeure (weather, safety, government restriction) — offer a reschedule or full refund in that case, never a guest-side penalty |
-| Payment methods | Bank transfer, Mobile Money (MTN, Vodafone Cash, AirtelTigo), major credit/debit cards — matches current site claim, still needs a yes/no confirmation that it's accurate |
-| Travel insurance | Recommend (not require) guests carry their own travel insurance — a lighter-touch version of what all three competitors do (TravelMo recommends, Buoyant Travel mandates proof of coverage) |
+| Payment methods | **Confirmed (2026-08-22):** bank transfer, Mobile Money (MTN, Vodafone Cash, AirtelTigo), and card via **Taptap Send**, a regulated money transmitter. Cards are never handled by us or by this website |
+| Travel insurance | **Superseded (2026-08-22): required, not recommended.** Every traveller must hold cover and send proof 30 days before departure, matching Buoyant Travel rather than TravelMo. Published at `/travel-insurance` |
 
 **Day-tour payment window — resolved (2026-07-25):** see the row above.
 Full payment at booking, full refund at 48+ hours out, non-refundable
@@ -103,7 +104,7 @@ Register.
 | Policy area | Current site claim | Status |
 | --- | --- | --- |
 | Cancellation (Just Go Ghana) | "100% non-refundable" if cancelled <30 days before arrival (`just-go-ghana.html:403`) | Confirm applies uniformly or only to this offer |
-| Cancellation (day tours) | Not documented anywhere | **Open — P0 per roadmap** |
+| Cancellation (day tours) | `/cancellation-refund-policy` | **Published 22 August 2026** |
 | Rescheduling | Not documented anywhere on any tour page | Open |
 | Weather / operational changes | Not documented anywhere | Open |
 
@@ -131,7 +132,7 @@ reassurance language.
 - [ ] Deposit conflict resolved with one documented rule (or documented
       per-offer-type rules).
 - [ ] Payment methods and currency confirmed current.
-- [ ] Cancellation/refund policy documented for day tours, tailored tours
+- [x] Cancellation/refund policy documented for day tours — published 22 August 2026. Tailored tours still open.
       and custom tours (not just Just Go Ghana).
 - [ ] Rescheduling and weather-change policy documented.
 - [ ] Accessibility and health-conversation practice documented honestly

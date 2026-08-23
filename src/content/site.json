@@ -12,39 +12,115 @@
   },
   "navigation": {
     "navLinks": [
-      {"label": "Home", "href": "index.html"},
-      {"label": "About", "href": "about.html"},
-      {"label": "Experiences", "href": "packages.html"},
-      {"label": "Contact", "href": "contact.html"}
+      {
+        "label": "Home",
+        "href": "index.html"
+      },
+      {
+        "label": "About",
+        "href": "about.html"
+      },
+      {
+        "label": "Experiences",
+        "href": "packages.html"
+      },
+      {
+        "label": "Travel Info",
+        "href": "travel-information.html"
+      },
+      {
+        "label": "Contact",
+        "href": "contact.html"
+      }
     ],
     "footerTagline": "Ghana-founded, Ghana-led. Hosted by people who grew up here.",
     "footerColumns": [
       {
         "heading": "Quick Links",
         "links": [
-          {"label": "Home", "href": "index.html"},
-          {"label": "About", "href": "about.html"},
-          {"label": "Experiences", "href": "packages.html"},
-          {"label": "Contact", "href": "contact.html"}
+          {
+            "label": "Home",
+            "href": "index.html"
+          },
+          {
+            "label": "About",
+            "href": "about.html"
+          },
+          {
+            "label": "Experiences",
+            "href": "packages.html"
+          },
+          {
+            "label": "Contact",
+            "href": "contact.html"
+          }
         ]
       },
       {
         "heading": "Day Tours",
         "links": [
-          {"label": "Accra City Tour", "href": "accra-city-tour.html"},
-          {"label": "Cape Coast & Elmina", "href": "cape-coast-tour.html"},
-          {"label": "Kumasi Cultural Tour", "href": "kumasi-tour.html"},
-          {"label": "Volta River & Wli Falls", "href": "volta-tour.html"},
-          {"label": "Ada Foah Beach", "href": "ada-tour.html"}
+          {
+            "label": "Accra City Tour",
+            "href": "accra-city-tour.html"
+          },
+          {
+            "label": "Cape Coast & Elmina",
+            "href": "cape-coast-tour.html"
+          },
+          {
+            "label": "Kumasi Cultural Tour",
+            "href": "kumasi-tour.html"
+          },
+          {
+            "label": "Volta Day Tour",
+            "href": "volta-tour.html"
+          },
+          {
+            "label": "Ada Day Tour",
+            "href": "ada-tour.html"
+          }
         ]
       },
       {
         "heading": "Get in Touch",
         "links": [
-          {"label": "peopandplaces@gmail.com", "href": "mailto:peopandplaces@gmail.com"},
-          {"label": "+233 50 367 3473", "href": "tel:+233503673473"},
-          {"label": "+1 803 477 6489 (International)", "href": "tel:+18034776489"},
-          {"label": "WhatsApp Us", "href": "https://wa.me/233503673473"}
+          {
+            "label": "peopandplaces@gmail.com",
+            "href": "mailto:peopandplaces@gmail.com"
+          },
+          {
+            "label": "+233 50 367 3473",
+            "href": "tel:+233503673473"
+          },
+          {
+            "label": "+1 803 477 6489 (International)",
+            "href": "tel:+18034776489"
+          },
+          {
+            "label": "WhatsApp Us",
+            "href": "https://wa.me/233503673473"
+          }
+        ]
+      },
+      {
+        "heading": "Legal",
+        "links": [
+          {
+            "label": "Booking Terms",
+            "href": "booking-terms.html"
+          },
+          {
+            "label": "Cancellation & Refunds",
+            "href": "cancellation-refund-policy.html"
+          },
+          {
+            "label": "Travel Insurance",
+            "href": "travel-insurance.html"
+          },
+          {
+            "label": "Privacy Policy",
+            "href": "privacy-policy.html"
+          }
         ]
       }
     ]

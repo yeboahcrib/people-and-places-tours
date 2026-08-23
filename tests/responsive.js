@@ -9,6 +9,11 @@ const pages = [
   '/contact.html',
   '/accra-city-tour.html',
   '/just-go-ghana.html',
+  '/cancellation-refund-policy.html',
+  '/travel-insurance.html',
+  '/privacy-policy.html',
+  '/booking-terms.html',
+  '/travel-information.html',
 ];
 
 function assert(condition, message) {
@@ -55,9 +60,20 @@ function assert(condition, message) {
         const navLinks = document.querySelector('.nav-links');
         const navToggle = document.querySelector('.nav-toggle');
 
+        // `body { overflow-x: hidden }` hides anything that runs past the right
+        // edge, so document width alone cannot catch a clipped control. The
+        // booking button is measured directly: adding a fifth navigation link
+        // once pushed it off screen between 1024px and 1180px, and every
+        // existing check still passed.
+        const navCta = document.querySelector('.nav-cta .btn-primary');
+        const navCtaRect = navCta ? navCta.getBoundingClientRect() : null;
+
         return {
           documentWidth,
           viewportWidth: document.documentElement.clientWidth,
+          navCta: navCtaRect && visible(navCta)
+            ? {right: Math.round(navCtaRect.right), left: Math.round(navCtaRect.left)}
+            : null,
           navLinksVisible: navLinks ? visible(navLinks) : false,
           navToggleVisible: navToggle ? visible(navToggle) : false,
           criticalControls,
@@ -72,6 +88,13 @@ function assert(condition, message) {
 
       assert(audit.documentWidth <= audit.viewportWidth + 1, `${path} overflows horizontally at ${width}px (${audit.documentWidth}px document)`);
       assert(audit.h1Count === 1, `${path} should have exactly one h1 at ${width}px, got ${audit.h1Count}`);
+      if (audit.navCta) {
+        assert(
+          audit.navCta.right <= audit.viewportWidth,
+          `${path} clips the "Book a Tour" button at ${width}px (button ends at ${audit.navCta.right}px, viewport is ${audit.viewportWidth}px)`,
+        );
+        assert(audit.navCta.left >= 0, `${path} pushes the "Book a Tour" button off the left edge at ${width}px`);
+      }
       assert(audit.invisibleRevealCount === 0, `${path} hides reveal content with reduced motion at ${width}px: ${JSON.stringify(audit.invisibleReveals)}`);
 
       if (width <= 768) {

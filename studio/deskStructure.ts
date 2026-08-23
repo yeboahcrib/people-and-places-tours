@@ -73,6 +73,51 @@ export const structure: StructureResolver = (S) =>
               single(S, 'aboutPage', 'About', 'About page'),
               single(S, 'bookingFlow', 'Contact & Booking', 'Contact and booking copy'),
               single(S, 'originStory', 'Our Story', 'Origin story'),
+              S.listItem()
+                .title('Cancellation & Refund Policy')
+                .id('policy-cancellation')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-cancellation')
+                    .title('Cancellation & Refund Policy'),
+                ),
+              S.listItem()
+                .title('Travel Insurance')
+                .id('policy-insurance')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-insurance')
+                    .title('Travel Insurance'),
+                ),
+              S.listItem()
+                .title('Travelling to Ghana')
+                .id('policy-travel')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-travel')
+                    .title('Travelling to Ghana'),
+                ),
+              S.listItem()
+                .title('Booking Terms')
+                .id('policy-terms')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-terms')
+                    .title('Booking Terms'),
+                ),
+              S.listItem()
+                .title('Privacy Policy')
+                .id('policy-privacy')
+                .child(
+                  S.document()
+                    .schemaType('policy')
+                    .documentId('policy-privacy')
+                    .title('Privacy Policy'),
+                ),
             ]),
         ),
 

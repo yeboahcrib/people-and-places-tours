@@ -8,7 +8,9 @@ import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs
 import {loadTourContent} from './tour-source.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
+import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
+import {injectPolicyContent} from './render-policy.mjs';
 import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
 import {loadAboutContent, loadLocalAboutContent} from './about-source.mjs';
 import {injectAboutContent} from './render-about.mjs';
@@ -35,11 +37,12 @@ const footerTemplate = await readFile(join(projectRoot, 'src/partials/footer.htm
 const {content: siteContent, source: contentSource} = await loadSiteContent({projectRoot});
 const navigation = renderNavigationTemplate(navigationTemplate, siteContent);
 const footer = renderFooterTemplate(footerTemplate, siteContent);
-const [localTours, localHomepageContent, localBookingContent, localAboutContent] = await Promise.all([
+const [localTours, localHomepageContent, localBookingContent, localAboutContent, localPolicyContent] = await Promise.all([
   loadLocalTours(projectRoot),
   loadLocalHomepageContent(projectRoot),
   loadLocalBookingContent(projectRoot),
   loadLocalAboutContent(projectRoot),
+  loadLocalPolicies(projectRoot),
 ]);
 const [
   {tours, source: tourContentSource},
@@ -52,6 +55,19 @@ const [
   loadBookingContent({localContent: localBookingContent}),
   loadAboutContent({localContent: localAboutContent}),
 ]);
+
+// One request per policy page. They are independent documents; a missing
+// insurance page must not take the cancellation page down with it.
+const policies = Object.fromEntries(await Promise.all(POLICY_PAGES.map(async page => {
+  const {content, source} = await loadPolicyContent({
+    localContent: localPolicyContent[page.key],
+    policyType: page.policyType,
+  });
+  return [page.file, {content, source}];
+})));
+const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source === 'sanity')
+  ? 'sanity'
+  : 'local';
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
 // 404.html only.
@@ -148,7 +164,12 @@ for (const entry of rootEntries) {
       : withFooter;
     const withAbout = injectAboutContent(withHomepage, aboutContent);
     const withBooking = injectBookingContent(withAbout, bookingContent);
-    const withContact = injectSiteContact(withBooking, siteContent.siteSettings);
+    // Guarded by filename: the renderer throws when a binding is missing, which
+    // is what we want on a policy page and wrong everywhere else.
+    const withPolicy = policies[entry.name]
+      ? injectPolicyContent(withBooking, policies[entry.name].content, siteContent.siteSettings, entry.name)
+      : withBooking;
+    const withContact = injectSiteContact(withPolicy, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
     const withInquiryMode = injectInquiryMode(withTurnstile, Boolean(process.env.CF_PAGES));
     const withTourCards = injectTourCards(withInquiryMode, tours);
@@ -197,6 +218,7 @@ const buildHealth = {
   tourCount: tours.length,
   homepageContentSource,
   bookingContentSource,
+  policyContentSource,
   aboutContentSource,
   siteUrl,
   botProtection: process.env.TURNSTILE_SITE_KEY ? 'turnstile' : 'none',

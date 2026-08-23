@@ -150,6 +150,17 @@ function serve() {
       });
       await page.waitForTimeout(120);
 
+      // Wait for every image to finish decoding. The About page's caption sits
+      // on a backdrop-filter over a lazily-loaded photograph: if the photo
+      // paints a moment after the caption, the blur samples different pixels
+      // and the run differs from the last one by a couple of hundred pixels.
+      // That looked like a regression roughly one run in three.
+      await page.evaluate(async () => {
+        const images = [...document.images].filter(image => image.src);
+        await Promise.all(images.map(image => image.decode().catch(() => {})));
+      });
+      await page.waitForTimeout(120);
+
       const name = `${file.replace(/\.html$/, '')}-${width}.png`;
       const shot = await page.screenshot({fullPage: true});
       await page.close();

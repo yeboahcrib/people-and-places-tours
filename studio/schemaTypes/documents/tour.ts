@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 
 /**
  * An experience — see docs/sprint-2-tour-and-media-architecture.md Part 1.
@@ -23,6 +23,7 @@ export const tour = defineType({
     {name: 'pricing', title: 'Price'},
     {name: 'media', title: 'Photos & story'},
     {name: 'search', title: 'Finding it on the site'},
+    {name: 'page', title: "What's on this tour's page"},
   ],
   fields: [
     defineField({
@@ -55,7 +56,7 @@ export const tour = defineType({
         ],
         layout: 'radio',
       },
-      description: 'This also decides the payment terms shown to the guest — a day out is paid in full, longer trips take a 30% deposit. Do not write payment terms anywhere else.',
+      description: 'This also decides the payment terms shown to the guest — a day out is paid in full at booking, longer trips are secured with $400 per person. Do not write payment terms anywhere else.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -168,6 +169,91 @@ export const tour = defineType({
       description: 'Usually "Per Person". Change it if the price covers a whole group.',
     }),
 
+    defineField({
+      name: 'priceOptions',
+      title: 'Other ways to book this',
+      type: 'array',
+      group: 'pricing',
+      description: 'Only for a real alternative at a different price — Kumasi by road or by domestic flight, Cape Coast with the naming ceremony added. Leave empty when there is only one price.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'priceOption',
+          fields: [
+            defineField({name: 'label', title: 'What is different about it', type: 'string', description: 'For example "With a domestic flight" or "With the naming ceremony".', validation: (Rule) => Rule.required()}),
+            defineField({name: 'price', title: 'Price per person', type: 'number', validation: (Rule) => Rule.required().positive()}),
+          ],
+          preview: {select: {title: 'label', subtitle: 'price'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'smallGroupSupplement',
+      title: 'Extra per person for one or two travellers',
+      type: 'number',
+      group: 'pricing',
+      description: 'The site already tells everyone that prices assume three travellers and that smaller groups pay $20–30 more. Put the figure for this tour here so it can be stated exactly rather than as a range.',
+      validation: (Rule) => Rule.min(0),
+    }),
+    defineField({
+      name: 'highlights',
+      title: 'What people remember',
+      type: 'array',
+      group: 'page',
+      description: 'Five or so short lines, each one thing a guest actually sees or does. Not sales copy — the drumming lesson, the last bath at Assin Manso, the coconut cut in front of you.',
+      of: [{type: 'string'}],
+      validation: (Rule) => Rule.max(8),
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'Questions people ask about this tour',
+      type: 'array',
+      group: 'page',
+      description: 'Only questions specific to this tour. Visas, currency and what to pack are answered once on the Travelling to Ghana page — do not repeat them here.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'tourFaq',
+          fields: [
+            defineField({name: 'question', title: 'The question', type: 'string', validation: (Rule) => Rule.required()}),
+            defineField({name: 'answer', title: 'Your answer', type: 'text', rows: 4, validation: (Rule) => Rule.required()}),
+          ],
+          preview: {select: {title: 'question', subtitle: 'answer'}},
+        }),
+      ],
+    }),
+    defineField({
+      name: 'itinerary',
+      title: 'Day by day',
+      type: 'array',
+      group: 'page',
+      // A single day out has no day-by-day, so it is never asked for one.
+      hidden: ({document}: any) => document?.offerType === 'day',
+      description: 'One entry per day, in order. Only for trips that run over more than one day.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'itineraryDay',
+          fields: [
+            defineField({name: 'day', title: 'Day number', type: 'number', validation: (Rule) => Rule.required().integer().positive()}),
+            defineField({name: 'title', title: 'What happens that day', type: 'string', description: 'Short, like "Ancestral trip to Cape Coast".', validation: (Rule) => Rule.required()}),
+            defineField({name: 'description', title: 'The day in a paragraph or two', type: 'text', rows: 6, validation: (Rule) => Rule.required()}),
+            defineField({
+              name: 'meals',
+              title: 'Meals included that day',
+              type: 'array',
+              of: [{type: 'string'}],
+              options: {list: [
+                {title: 'Breakfast', value: 'Breakfast'},
+                {title: 'Lunch', value: 'Lunch'},
+                {title: 'Dinner', value: 'Dinner'},
+              ]},
+            }),
+          ],
+          preview: {select: {title: 'title', subtitle: 'day'}},
+        }),
+      ],
+    }),
     defineField({
       name: 'description',
       title: 'Short description',
