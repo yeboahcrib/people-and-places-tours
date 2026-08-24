@@ -1,0 +1,38 @@
+{
+  "_comment": "Add-on experiences from the founders' tour document, which lists them by name only. No prices or descriptions by design: each is arranged around the guest and explained when they get in touch. Minimum four people.",
+  "minimumGroup": 4,
+  "experiences": [
+    {
+      "name": "Batik Making",
+      "order": 1
+    },
+    {
+      "name": "Pottery Making",
+      "order": 2
+    },
+    {
+      "name": "Farm Tours",
+      "order": 3
+    },
+    {
+      "name": "Local Community Tours",
+      "order": 4
+    },
+    {
+      "name": "Cooking Classes",
+      "order": 5
+    },
+    {
+      "name": "Shea Butter Making",
+      "order": 6
+    },
+    {
+      "name": "Art & Painting Workshops",
+      "order": 7
+    },
+    {
+      "name": "Dance Classes",
+      "order": 8
+    }
+  ]
+}

@@ -134,6 +134,14 @@ export const structure: StructureResolver = (S) =>
                 .title('All experiences')
                 .id('all-tours')
                 .child(S.documentTypeList('tour').title('All experiences')),
+              S.listItem()
+                .title('Add-on experiences')
+                .id('local-experiences')
+                .child(
+                  S.documentTypeList('localExperience')
+                    .title('Add-on experiences')
+                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                ),
               single(S, 'featuredTourCollection', 'Featured on the homepage'),
             ]),
         ),

@@ -11,6 +11,8 @@ import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs'
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
 import {injectPolicyContent} from './render-policy.mjs';
+import {loadExperienceContent, loadLocalExperienceContent} from './local-experience-source.mjs';
+import {injectLocalExperiences} from './render-local-experiences.mjs';
 import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
 import {loadAboutContent, loadLocalAboutContent} from './about-source.mjs';
 import {injectAboutContent} from './render-about.mjs';
@@ -37,12 +39,13 @@ const footerTemplate = await readFile(join(projectRoot, 'src/partials/footer.htm
 const {content: siteContent, source: contentSource} = await loadSiteContent({projectRoot});
 const navigation = renderNavigationTemplate(navigationTemplate, siteContent);
 const footer = renderFooterTemplate(footerTemplate, siteContent);
-const [localTours, localHomepageContent, localBookingContent, localAboutContent, localPolicyContent] = await Promise.all([
+const [localTours, localHomepageContent, localBookingContent, localAboutContent, localPolicyContent, localExperienceContent] = await Promise.all([
   loadLocalTours(projectRoot),
   loadLocalHomepageContent(projectRoot),
   loadLocalBookingContent(projectRoot),
   loadLocalAboutContent(projectRoot),
   loadLocalPolicies(projectRoot),
+  loadLocalExperienceContent(projectRoot),
 ]);
 const [
   {tours, source: tourContentSource},
@@ -68,6 +71,8 @@ const policies = Object.fromEntries(await Promise.all(POLICY_PAGES.map(async pag
 const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source === 'sanity')
   ? 'sanity'
   : 'local';
+const {content: experienceContent, source: experienceContentSource} =
+  await loadExperienceContent({localContent: localExperienceContent});
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
 // 404.html only.
@@ -169,7 +174,8 @@ for (const entry of rootEntries) {
     const withPolicy = policies[entry.name]
       ? injectPolicyContent(withBooking, policies[entry.name].content, siteContent.siteSettings, entry.name)
       : withBooking;
-    const withContact = injectSiteContact(withPolicy, siteContent.siteSettings);
+    const withExperiences = injectLocalExperiences(withPolicy, experienceContent);
+    const withContact = injectSiteContact(withExperiences, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
     const withInquiryMode = injectInquiryMode(withTurnstile, Boolean(process.env.CF_PAGES));
     const withTourCards = injectTourCards(withInquiryMode, tours);
@@ -219,6 +225,7 @@ const buildHealth = {
   homepageContentSource,
   bookingContentSource,
   policyContentSource,
+  experienceContentSource,
   aboutContentSource,
   siteUrl,
   botProtection: process.env.TURNSTILE_SITE_KEY ? 'turnstile' : 'none',

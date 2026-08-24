@@ -4454,3 +4454,33 @@ a.flex-card:focus-visible {
   .flex-split { grid-template-columns: 1fr; gap: var(--sp-5); }
   .flex-split--flip .flex-split-figure { order: 0; }
 }
+
+/* ── ADD-ON EXPERIENCES ──────────────────────────────────────
+   Names only, no prices: these are arranged per group, and a price on the
+   page would be a promise we cannot keep. */
+.addons-section { background: var(--color-surface-alt); }
+.addons-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-4) 0 var(--sp-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1-5);
+}
+.addons-list li {
+  padding: 0.7rem var(--sp-2-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--white);
+  font-size: var(--text-md);
+  background: rgba(255,255,255,0.03);
+}
+.addons-note {
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+  margin: 0 0 var(--sp-3);
+}
+@media (max-width: 600px) {
+  .addons-list { gap: var(--sp-1); }
+  .addons-list li { padding: 0.6rem var(--sp-2); font-size: var(--text-base); }
+}
