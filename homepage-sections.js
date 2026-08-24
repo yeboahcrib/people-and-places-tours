@@ -206,7 +206,7 @@
         <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
         <h2 class="section-title process-title reveal reveal-delay-1">${escapeHtml(data.title)}</h2>
       </div>
-      <p class="split-body section-sub process-sub reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
+      ${data.intro ? `<p class="split-body section-sub process-sub reveal reveal-delay-2">${escapeHtml(data.intro)}</p>` : ''}
     </div>
 
     <div class="process-grid" aria-label="Your planning journey">
