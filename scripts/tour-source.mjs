@@ -42,6 +42,9 @@ function validateSanityTours(result, localTours) {
       priceUnit: tour.priceUnit || presentation.priceUnit,
       duration: tour.duration,
       groupSize: groupSize(tour),
+      // Kept alongside the formatted string: the tour page shows this note
+      // beside the price when a tour has a minimum of its own.
+      groupSizeNote: tour.groupSizeNote || presentation.groupSizeNote,
       location: tour.locations?.join(', ') || presentation.location,
       destination: tour.destination || presentation.destination,
       categories: tour.categories?.length ? tour.categories : presentation.categories,

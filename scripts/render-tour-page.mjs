@@ -9,6 +9,16 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[character]));
 
+// The catalogue image is sized for a card (800px wide). The hero spans the
+// full page, so it asks the same photo for a wider rendition rather than
+// stretching the card one.
+function heroImageFor(tour) {
+  if (tour.heroImage) return tour.heroImage;
+  const card = String(tour.image || '');
+  if (!card.includes('images.unsplash.com')) return card;
+  return card.replace(/([?&])w=\d+/, '$1w=1920').replace(/&h=\d+/, '');
+}
+
 const CHEVRON = '<span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>';
 
 export async function loadTourPageTemplate(projectRoot) {
@@ -81,7 +91,7 @@ export function renderTourPage({template, tour, catalogue}) {
     WATERMARK: escapeHtml(tour.heroWatermark || tour.title.toUpperCase()),
     TAGS: (tour.vibes || []).slice(0, 2).map(vibe => `<span class="tag">${escapeHtml(vibe)}</span>`).join(''),
     META_ROW: metaRow,
-    HERO_IMAGE: escapeHtml(tour.heroImage || tour.image),
+    HERO_IMAGE: escapeHtml(heroImageFor(tour)),
     HEADLINE: escapeHtml(tour.pageHeadline || tour.title),
     // Some pages carry two or three paragraphs, not one. Losing the second was
     // the first thing the generated-versus-written comparison caught.
@@ -98,6 +108,12 @@ export function renderTourPage({template, tour, catalogue}) {
     PRICE_SUB: `per person · ${escapeHtml(tour.duration)}`,
     WHATSAPP_HREF: whatsapp,
     SLUG: escapeHtml(tour.slug),
+    // A tour with its own minimum says so beside the price, not only in an
+    // answer further down. Ada cannot run below three, and the hand-written
+    // page said so until generation replaced it.
+    GROUP_NOTE: tour.groupSizeNote
+      ? `<div class="price-group-note">${escapeHtml(tour.groupSizeNote)}</div>`
+      : '',
     TRIP_DETAILS: renderTripDetails(tour),
     FAQS: renderFaqs(tour.faqs),
     ALSO_CARDS: renderAlsoCards(tour, catalogue),

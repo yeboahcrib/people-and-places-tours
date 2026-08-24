@@ -148,6 +148,17 @@ const sitemap = await readFile(join(outputPath, 'sitemap.xml'), 'utf8');
 const locations = [...sitemap.matchAll(/<loc>https?:\/\/[^/]+\/people-and-places-tours\/(.*?)<\/loc>/g)]
   .map(match => match[1] || 'index.html');
 
+// A tour created in the CMS has no file in the repository, so nothing would
+// have failed if the build had quietly skipped building its page.
+for (const slug of ['cape-coast-day', 'volta-community']) {
+  const file = `${slug}-tour.html`;
+  const page = await readFile(join(outputPath, file), 'utf8');
+  assert(/<h1>[^<]+<\/h1>/.test(page), `${file} was generated without a heading`);
+  assert(/big-price">\$[0-9,]+/.test(page), `${file} was generated without a price`);
+  assert(page.includes('<nav'), `${file} was generated without navigation`);
+  assert(sitemap.includes(slug), `${file} was generated but left out of the sitemap`);
+}
+
 for (const location of locations) {
   const publicFile = location || 'index.html';
   assert(await exists(publicFile), `Sitemap points to missing build output: ${publicFile}`);
