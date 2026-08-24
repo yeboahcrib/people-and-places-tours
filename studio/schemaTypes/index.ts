@@ -17,6 +17,7 @@ import {trustFact} from './documents/trustFact'
 import {planningStep} from './documents/planningStep'
 import {socialStory} from './documents/socialStory'
 import {cta} from './documents/cta'
+import {localExperience} from './documents/localExperience'
 import {policy} from './documents/policy'
 import {bookingFlow} from './documents/bookingFlow'
 import {aboutPage} from './documents/aboutPage'
@@ -43,6 +44,7 @@ export const schemaTypes = [
   planningStep,
   socialStory,
   cta,
+  localExperience,
   policy,
   bookingFlow,
   aboutPage,
