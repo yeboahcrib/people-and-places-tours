@@ -35,7 +35,7 @@
     waysToExperience: {
       eyebrow: 'Where Ghana Begins For You',
       title: 'What Pulls You In?',
-      intro: 'Some people come looking for history, or for the places their family came from. Others follow the food, the landscape, or the chance to make something with their own hands. Start with what feels closest to you. We’ll introduce you to the people and places behind it.',
+      intro: 'Some come for the history. Some for the food. Some to stand where their family stood.',
       pathways: [
         {
           title: 'History & Memory',
@@ -202,7 +202,6 @@
     planningProcess: {
       eyebrow: 'From Dream to Departure',
       title: 'Your Journey in Three Simple Steps',
-      intro: 'Tell us what you have in mind. We’ll listen, work through the details with you, and make sure you know what to expect before you arrive.',
       steps: [
         {
           icon: 'search',
