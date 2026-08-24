@@ -1,0 +1,113 @@
+import {readFile} from 'node:fs/promises';
+import {join} from 'node:path';
+
+// Generates a tour's detail page from its CMS record, using the markup of the
+// pages that were written by hand. The template is a real page with its
+// variable parts replaced, so the styling is inherited rather than rebuilt.
+
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+}[character]));
+
+const CHEVRON = '<span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>';
+
+export async function loadTourPageTemplate(projectRoot) {
+  return readFile(join(projectRoot, 'src/templates/tour-page.html'), 'utf8');
+}
+
+const listItems = values => (values || []).map(value => `<li>${escapeHtml(value)}</li>`).join('');
+
+function renderFaqs(faqs) {
+  return (faqs || []).map(faq =>
+    '      <div class="faq-item">\n'
+    + `        <div class="faq-q">${escapeHtml(faq.question)} ${CHEVRON}</div>\n`
+    + `        <div class="faq-a">${escapeHtml(faq.answer)}</div>\n`
+    + '      </div>\n').join('').replace(/\n$/, '');
+}
+
+function renderTripDetails(tour) {
+  const rows = [
+    ['Duration', tour.duration],
+    ['Departure', tour.startingPoint || 'Accra, Ghana'],
+    ['Group Size', tour.groupSize],
+    ['Local Guide', 'Included'],
+    ['Transport', 'Included'],
+  ].filter(([, value]) => value);
+  return '\n' + rows.map(([label, value]) =>
+    `      <div class="highlight-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`,
+  ).join('\n');
+}
+
+// Derived rather than authored: the plan calls for this, and a hand-picked
+// list is how a withdrawn tour ends up still being advertised from three
+// other pages.
+function relatedTours(tour, catalogue) {
+  const sameCategory = catalogue.filter(other =>
+    other.slug !== tour.slug
+    && (other.categories || []).some(category => (tour.categories || []).includes(category)));
+  const rest = catalogue.filter(other => other.slug !== tour.slug && !sameCategory.includes(other));
+  return [...sameCategory, ...rest].slice(0, 3);
+}
+
+function renderAlsoCards(tour, catalogue) {
+  return relatedTours(tour, catalogue).map(other => {
+    const tags = (other.vibes || []).slice(0, 2)
+      .map(vibe => `<span class="tag">${escapeHtml(vibe)}</span>`).join('');
+    return `\n    <a href="${escapeHtml(other.detailUrl)}" class="also-card">`
+      + `<div class="also-card-img"><img src="${escapeHtml(other.image)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" width="600" height="400" decoding="async" /></div>`
+      + `<div class="also-card-body"><div class="tag-row">${tags}</div>`
+      + `<h3>${escapeHtml(other.title)}</h3>`
+      + `<p class="also-price">From ${escapeHtml(other.price)} · ${escapeHtml(other.duration)}</p></div></a>`;
+  }).join('') + '\n  ';
+}
+
+export function renderTourPage({template, tour, catalogue}) {
+  // A generated page with an empty "What's Covered" is worse than the
+  // hand-written one it replaces, so it stops the build instead of shipping.
+  if (!tour.included?.length || !tour.excluded?.length) {
+    throw new Error(`${tour.slug}: cannot generate a page without both an included and an excluded list`);
+  }
+  if (!tour.faqs?.length) throw new Error(`${tour.slug}: cannot generate a page with no FAQs`);
+  const price = tour.price;
+  const whatsapp = `https://wa.me/233503673473?text=${encodeURIComponent(`Hi! I'd like to book the ${tour.title}.`)}`;
+  const metaRow = '\n'
+    + `      <span class="trip-meta-item"><strong>${escapeHtml(tour.duration)}</strong></span>\n`
+    + `      <span class="trip-meta-item"><strong>Departure:</strong> ${escapeHtml(tour.startingPoint || 'Accra, Ghana')}</span>\n`
+    + `      <span class="trip-meta-item"><strong>From:</strong> ${escapeHtml(price)}/person</span>\n    `;
+
+  const values = {
+    TITLE: escapeHtml(tour.title),
+    META_DESCRIPTION: escapeHtml(tour.pageIntro || tour.description || ''),
+    WATERMARK: escapeHtml(tour.heroWatermark || tour.title.toUpperCase()),
+    TAGS: (tour.vibes || []).slice(0, 2).map(vibe => `<span class="tag">${escapeHtml(vibe)}</span>`).join(''),
+    META_ROW: metaRow,
+    HERO_IMAGE: escapeHtml(tour.heroImage || tour.image),
+    HEADLINE: escapeHtml(tour.pageHeadline || tour.title),
+    // Some pages carry two or three paragraphs, not one. Losing the second was
+    // the first thing the generated-versus-written comparison caught.
+    INTRO_PARAGRAPHS: String(tour.pageIntro || tour.description || '')
+      .split(/\n\s*\n/)
+      .map(paragraph => paragraph.trim())
+      .filter(Boolean)
+      .map(paragraph => `<p>${escapeHtml(paragraph)}</p>`)
+      .join('\n    '),
+    FUN_FACTS: (tour.funFacts || []).map(fact => `\n        <li>${escapeHtml(fact)}</li>`).join('') + '\n      ',
+    INCLUDED: listItems(tour.included),
+    EXCLUDED: listItems(tour.excluded),
+    PRICE: escapeHtml(price),
+    PRICE_SUB: `per person · ${escapeHtml(tour.duration)}`,
+    WHATSAPP_HREF: whatsapp,
+    SLUG: escapeHtml(tour.slug),
+    TRIP_DETAILS: renderTripDetails(tour),
+    FAQS: renderFaqs(tour.faqs),
+    ALSO_CARDS: renderAlsoCards(tour, catalogue),
+  };
+
+  let html = template;
+  for (const [key, value] of Object.entries(values)) {
+    html = html.replaceAll(`{{${key}}}`, value);
+  }
+  const leftover = html.match(/\{\{[A-Z_]+\}\}/g);
+  if (leftover) throw new Error(`${tour.slug}: template placeholders left unfilled: ${leftover.join(', ')}`);
+  return html;
+}
