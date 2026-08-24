@@ -227,17 +227,12 @@
     finalInvitation: {
       eyebrow: 'Ready When You Are',
       headline: 'Ready to See Ghana With People Who Live Here?',
-      body: 'Tell us what kind of time in Ghana feels right for you. We’ll listen, answer your questions, and plan it with you.',
       cta: { label: 'Start Planning', href: 'contact.html' },
       secondaryCta: {
         label: 'Chat on WhatsApp',
         href: 'https://wa.me/233503673473?text=Hi%21+I%27d+like+to+book+a+tour.',
         external: true,
       },
-      reassurance: 'No pressure. No commitment. Just a conversation.',
-      trustMessage: "You'll be speaking directly with our Ghana-based team.",
-      phone: '+233 50 367 3473',
-      internationalPhone: '+1 803 477 6489',
     },
   };
 })();

@@ -290,24 +290,19 @@
 
   function renderFinalInvitationSection(data) {
     return `
-<!-- Closing CTA and contact reassurance. -->
+<!-- Closing CTA. Deliberately short: a headline and the two ways to start.
+     The reassurance line, the "speaking directly with our team" line and the
+     phone numbers were removed in August 2026 — the phones are repeated in
+     the footer directly below this, and the rest was explaining an invitation
+     that does not need explaining. Both operators the founders compared us
+     against close on a headline and a button. -->
 <section class="final-invitation-section section-pad" aria-label="Plan your trip" data-home-section="finalInvitation">
   <div class="container final-invitation-inner">
     <div class="eyebrow eyebrow-dark reveal">${escapeHtml(data.eyebrow)}</div>
     <h2 class="final-invitation-headline reveal">${escapeHtml(data.headline)}</h2>
-    <p class="final-invitation-body reveal reveal-delay-1">${escapeHtml(data.body)}</p>
     <div class="final-invitation-ctas">
       <a href="${escapeHtml(data.cta.href)}" class="btn btn-primary final-invitation-action reveal reveal-delay-2">${escapeHtml(data.cta.label)}</a>
-      ${data.secondaryCta ? `<a href="${escapeHtml(data.secondaryCta.href)}" class="btn btn-ghost final-invitation-action reveal reveal-delay-3"${externalAttrs(data.secondaryCta)}>${escapeHtml(data.secondaryCta.label)}</a>` : ''}
-    </div>
-    <div class="final-invitation-reassurance reveal reveal-delay-4">
-      <p>${escapeHtml(data.reassurance || 'No pressure. No commitment. Just a conversation.')}</p>
-      <span>${escapeHtml(data.trustMessage || "You'll be speaking directly with our Ghana-based team.")}</span>
-    </div>
-    <div class="final-invitation-phones reveal reveal-delay-5">
-      <a href="tel:${escapeHtml(data.phone.replace(/\s+/g, ''))}">${escapeHtml(data.phone)}</a>
-      <span aria-hidden="true">·</span>
-      <a href="tel:${escapeHtml(data.internationalPhone.replace(/\s+/g, ''))}">${escapeHtml(data.internationalPhone)} (US/International)</a>
+      ${data.secondaryCta ? `<a href="${escapeHtml(data.secondaryCta.href)}" class="btn btn-ghost final-invitation-action reveal reveal-delay-3"${data.secondaryCta.external ? ' target="_blank" rel="noopener"' : ''}>${escapeHtml(data.secondaryCta.label)}</a>` : ''}
     </div>
   </div>
 </section>`;
