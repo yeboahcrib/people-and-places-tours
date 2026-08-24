@@ -117,7 +117,7 @@
       price: '$150',
       priceUnit: 'Per Person',
       duration: 'Full Day',
-      groupSize: '1-15 People',
+      groupSize: '3-15 People',
       location: 'Vume, Ada',
       destination: 'ada-foah',
       categories: ['relaxation', 'nature'],
