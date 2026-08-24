@@ -1160,13 +1160,19 @@ body.page-entering {
 /* Hidden at grid widths where every review is already on screen. */
 .testimonials-dots {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--sp-1);
   margin-top: var(--sp-3);
 }
+/* The row holds one dot per review, and the number of reviews is an editor's
+   decision. Without a floor the dots shrink below a usable tap target as soon
+   as there are more than a handful: at thirteen they measured 18px wide on a
+   375px screen, against the 32px minimum. They wrap instead. */
 .testimonials-dot {
   width: 44px;
   height: 44px;
+  flex: 0 0 44px;
   position: relative;
   border-radius: var(--radius-circle);
   background: transparent;
