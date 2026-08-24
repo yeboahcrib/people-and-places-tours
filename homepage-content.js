@@ -138,8 +138,32 @@
       ],
       items: [
         {
-          quote: 'Kojo is an outstanding guide — knowledgeable, patient, and genuinely passionate about sharing Ghana with visitors. People & Places Tours brings pride, warmth, and joy to their work.',
+          quote: 'People & Places Tours brings pride, warmth, and joy to their work.',
           author: 'Louis Cameron',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'They provide exceptional customer service and are very timely and friendly.',
+          author: 'Ben Nwokeleme',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'People and Places took care of everything and planned an excellent itinerary. We laughed and made wonderful memories.',
+          author: 'Precious Nwokeleme',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'The P&P crew took care of us like royalty from the moment we landed to the day we flew back home.',
+          author: 'Tamaro Diallo',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'The tag team who runs and operates the brand People & Places, Kojo & Nana… they hands down score high in my book!',
+          author: 'Shy osler',
           location: 'Verified Google review',
           rating: 5,
         },
@@ -150,8 +174,26 @@
           rating: 5,
         },
         {
-          quote: 'The tag team who runs and operates the brand People & Places, Kojo & Nana… they hands down score high in my book!',
-          author: 'Shy osler',
+          quote: 'Samuel is an Awesome Guide his escorts are the best! He was very knowledgeable of Ghanaian history which enhanced the entire experience!',
+          author: 'Sonora',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'The itinerary was well-planned, the accommodations were top-notch, and the group dynamics were fantastic.',
+          author: 'Denise Collins',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'it felt as if you had known them your whole life.',
+          author: 'Eman C',
+          location: 'Verified Google review',
+          rating: 5,
+        },
+        {
+          quote: 'The tours are unforgettable, guides were amazing. I feel like I got more than I paid for.',
+          author: 'Shirley Borah',
           location: 'Verified Google review',
           rating: 5,
         },
