@@ -42,19 +42,19 @@
       }
     ],
     "teamEyebrow": "The Team",
-    "teamTitle": "The Faces Behind Every Journey",
-    "teamIntro": "There are two of us. When you write to People & Places, one of us is who answers.",
+    "teamTitle": "Ghana-Founded, Ghana-Led",
+    "teamIntro": "People & Places is a team of hosts, guides and drivers across Ghana. It was started in 2021 by two of us, and one of us still answers when you write.",
     "teamNote": "Our photographs are being taken now. We would rather show you real ones than borrowed ones.",
     "team": [
       {
         "name": "Isaac “Nana” Yeboah",
         "role": "Co-founder & Tech Lead",
-        "bio": "Co-founded People & Places in 2021. Nana looks after the side you are using right now: the website, the planning tools, and the messages that arrive through them."
+        "bio": "Co-founded People & Places in 2021. Nana builds and runs the technical side: this website, the planning tools behind it, and the systems that carry your messages to a person rather than a queue."
       },
       {
         "name": "Evans “Kojo” Yirenkyi",
         "role": "Co-founder & Manager",
-        "bio": "Co-founded People & Places in 2021. Kojo runs the trips themselves: the routes, the hosts, the timings, and the hundred small details that decide whether a day feels easy."
+        "bio": "Co-founded People & Places in 2021. Kojo runs the company day to day and leads the team on the ground: the routes, the hosts, the timings, and the hundred small details that decide whether a day feels easy."
       }
     ],
     "impactStats": [
