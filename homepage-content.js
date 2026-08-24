@@ -18,7 +18,7 @@
         height: 1280,
       },
       headline: 'The People Make the Place.',
-      sub: 'Hosted by people who grew up here. Stories, traditions and the everyday moments of the streets we call home, whether you are seeing them for the first time or coming back to them.',
+      sub: 'Whether it\'s your first time in Ghana or your way back, you\'ll see it with people who live here.',
       cta: { label: 'See Ghana With Us', href: 'packages.html' },
     },
     founderStory: {
