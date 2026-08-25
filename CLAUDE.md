@@ -134,8 +134,17 @@ If a breakpoint can't be checked in your current environment, say so explicitly 
   border and 24px radius, not by fill, so don't reach for a new dark value to
   separate a surface; reach for the border. `--black` remains, but it is ink:
   28 rules colour text with it.
-- **There is green in the brand**, contrary to what this file used to say.
-  `--pap-forest` (`#123F35`) backs the "How You're Hosted" homepage section and
-  tints the scrolled nav's borders. It appears on that one section and nowhere
-  else, which is a known loose end rather than a decision — see
-  `docs/design-system.md` before spreading it or removing it.
+- **There is green in the brand, and it is not a loose end.** `--pap-forest`
+  (`#123F35`) is the second most-used brand colour after `--pap-charcoal` —
+  more than `--pap-terracotta`, `--pap-soft-gold` or `--pap-cream`. The five
+  `--pap-*` colours form one deliberate palette, most visibly in the kente
+  stripe under the "How You're Hosted" section, which repeats yellow,
+  terracotta, soft gold and forest-deep. Green also colours the Adinkra motif
+  in the gold pathways section, the scrolled nav, the founder avatars and the
+  pathways CTA.
+- What green is *not*, since August 2026, is a 1,359px field. That section is
+  cream now: it was ~17% of the homepage, and it sat between a gold section
+  and a dark one, so gold → cream → dark reads as three bands where gold →
+  dark → dark would have read as two. Removing green from a surface is not the
+  same as removing it from the brand — check which one you mean before
+  touching `--pap-forest`.
