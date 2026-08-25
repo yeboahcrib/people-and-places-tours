@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 
@@ -73,11 +74,7 @@ export async function loadBookingContent({localContent, env = process.env, fetch
     faqs[]{question, answer}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity booking request failed with HTTP ${response.status}`);
-
-  const body = await response.json();
-  if (body.error) throw new Error(`Sanity booking request failed: ${body.error.description || body.error.type}`);
+  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity booking'});
 
   // When Sanity is configured, publish what editors approved or fail loudly —
   // never quietly fall back to the committed copy.

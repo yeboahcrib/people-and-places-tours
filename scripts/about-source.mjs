@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 
@@ -82,11 +83,7 @@ export async function loadAboutContent({localContent, env = process.env, fetchIm
     faqs[]{question, answer}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity About request failed with HTTP ${response.status}`);
-
-  const body = await response.json();
-  if (body.error) throw new Error(`Sanity About request failed: ${body.error.description || body.error.type}`);
+  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity about'});
 
   // Fail the build rather than quietly publishing the committed copy when
   // Sanity is configured but incomplete.

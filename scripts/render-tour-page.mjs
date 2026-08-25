@@ -19,6 +19,11 @@ function heroImageFor(tour) {
   return card.replace(/([?&])w=\d+/, '$1w=1920').replace(/&h=\d+/, '');
 }
 
+// Matches the catalogue's formatting so a page never shows $400 beside $400.00.
+const formatMoney = value => (typeof value === 'number'
+  ? `$${value.toLocaleString('en-US')}`
+  : String(value ?? ''));
+
 const CHEVRON = '<span class="faq-q-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>';
 
 export async function loadTourPageTemplate(projectRoot) {
@@ -111,6 +116,14 @@ export function renderTourPage({template, tour, catalogue}) {
     // A tour with its own minimum says so beside the price, not only in an
     // answer further down. Ada cannot run below three, and the hand-written
     // page said so until generation replaced it.
+    // A tour can have a genuinely different way to book at a different price:
+    // Kumasi by road or by air, Cape Coast with a naming ceremony added. These
+    // sat in the CMS unseen because no page had anywhere to show them.
+    PRICE_OPTIONS: (tour.priceOptions || []).length
+      ? `<div class="price-options">${(tour.priceOptions || []).map(option =>
+          `<div class="price-option"><strong>${escapeHtml(formatMoney(option.price))}</strong> ${escapeHtml(option.label)}</div>`,
+        ).join('')}</div>`
+      : '',
     GROUP_NOTE: tour.groupSizeNote
       ? `<div class="price-group-note">${escapeHtml(tour.groupSizeNote)}</div>`
       : '',

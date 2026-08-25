@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 const API_VERSION = '2026-08-02';
 const SECTION_KEYS = [
   'hero', 'founderStory', 'waysToExperience', 'howHosted',
@@ -430,10 +431,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
 
   const combined = `{"sections": ${query}, "flexible": ${flexQuery}}`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(combined)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity homepage request failed with HTTP ${response.status}`);
-  const body = await response.json();
-  if (body.error) throw new Error(`Sanity homepage request failed: ${body.error.description || body.error.type}`);
+  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity homepage'});
 
   const content = mergeHomepage(localContent, body.result?.sections);
   content.sectionOrder = planSections(body.result?.flexible);

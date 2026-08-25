@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 
@@ -38,10 +39,7 @@ export async function loadExperienceContent({localContent, env = process.env, fe
 
   const query = '*[_type == "localExperience" && active == true]|order(order asc){name, order}';
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity add-on request failed with HTTP ${response.status}`);
-  const body = await response.json();
-  if (body.error) throw new Error(`Sanity add-on request failed: ${body.error.description || body.error.type}`);
+  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity add-on'});
 
   // Switching every add-on off is a decision an editor is allowed to make;
   // an empty response should take the section down, not fall back to a list
