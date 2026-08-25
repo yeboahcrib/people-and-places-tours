@@ -122,4 +122,20 @@ If a breakpoint can't be checked in your current environment, say so explicitly 
 - Booking-flow copy is CMS-backed. `src/content/booking.json` is the committed source of truth, `studio/schemaTypes/documents/bookingFlow.ts` is the matching Sanity singleton, and `scripts/render-booking.mjs` injects both into `contact.html` at build time via `data-booking-copy` / `data-booking-trust` / `data-booking-next-steps` / `data-booking-faqs`. Editing copy directly in `contact.html` works but will be overwritten by the build — change the JSON instead. `tests/booking-source.mjs` fails the build if a bound key has no content.
 - **Design tokens are consolidated — use the semantic layer.** `var(--color-primary)`, not `var(--pap-yellow)`; `var(--sp-3)`, not `1.5rem`; `var(--motion-base)`, not `300ms`. The full reference is `docs/design-system.md`. Yellow as *text on a light surface* must use `--yellow-on-light`; `--color-primary` fails AA there.
 - **Verify visual changes with `npm run test:visual`.** It pixel-compares 21 pages at three widths against a stored baseline and is tight enough (0.002%) to catch a single card's border radius. Re-record intentional changes with `npm run test:visual:baseline`; baselines are gitignored and take ~49s to regenerate.
-- Brand colors live in `style.css` `:root` CSS variables: `--yellow` (`#FFB81C`, primary accent), `--pap-charcoal` (`#1A1A1A`, dark sections), `--terracotta` (secondary accent for badges), `--white`, `--gray`. The `--forest*` variables are kept for compatibility but currently resolve to off-blacks (no green in the brand).
+- Brand colors live in `style.css` `:root` CSS variables: `--yellow`
+  (`#FFB81C`, primary accent), `--pap-charcoal` (`#1A1A1A`), `--terracotta`
+  (secondary accent for badges), `--white`, `--gray`.
+- **Dark surfaces are two tokens, not five.** `--surface-dark` for every dark
+  section and the footer, `--surface-raised` for cards. They replaced
+  `--black-2`, `--black-3`, `--black-card`, `--forest`, `--forest-card` and a
+  raw `#050505`, which between them held only two distinct values and measured
+  1.03:1 to 1.22:1 against each other — the "alternate dark band" the old
+  comment described was never visible on screen. Cards read by their 1px
+  border and 24px radius, not by fill, so don't reach for a new dark value to
+  separate a surface; reach for the border. `--black` remains, but it is ink:
+  28 rules colour text with it.
+- **There is green in the brand**, contrary to what this file used to say.
+  `--pap-forest` (`#123F35`) backs the "How You're Hosted" homepage section and
+  tints the scrolled nav's borders. It appears on that one section and nowhere
+  else, which is a known loose end rather than a decision — see
+  `docs/design-system.md` before spreading it or removing it.
