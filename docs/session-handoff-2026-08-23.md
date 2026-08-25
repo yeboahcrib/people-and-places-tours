@@ -72,15 +72,23 @@ prices.
 document, not a projection, or the Studio reports missing keys. Repaired twice
 on `navigation` and `bookingFlow`.
 
+## Done since (24 August 2026)
+
+- **Cape Coast Day Tour ($160)** and **Volta Community Tour ($230)** are live,
+  created entirely in the CMS. Tour-page generation is switched on.
+- **Add-on experiences** are listed on the experiences page. Batik stays a
+  bookable $120 day tour — the founders confirmed both are true.
+- **All fourteen usable Google reviews** carry an excerpt, and no reviewer is
+  quoted twice on one page.
+- **Copy**: hero, closing block, two homepage intros, team framing, both
+  founder bios and the mission. #Connect4Change is deliberately off the site.
+
 ## Not done
 
-- **Cape Coast Day Tour ($160)** and **Volta Community Tour ($230)** are sold
-  and absent from the site. They are the first thing Phase 4 should add, and
-  after the generator they are a form, not a page build.
-- **Batik** still sells at $120; the founders chose to move it to Local
-  Experiences with the other seven, which the site has no surface for yet.
 - **Kumasi's $400 flight option** and **Cape Coast's $180 naming ceremony** are
   in the CMS and render nowhere.
+- The eleven hand-written tour pages are now dead weight; generation overrides
+  them. Deleting them is the last step of the plan.
 - The **Just Go Ghana page is not generated** — it has the itinerary and needs
   its own template.
 - **#Connect4Change** has no page, despite being a homepage pillar on the

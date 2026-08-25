@@ -1,6 +1,12 @@
 const { chromium } = require('playwright');
 
-const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8081';
+const {serveDist} = require('./serve-dist.js');
+
+// Serves dist/ rather than the source tree. Tour pages are generated from the
+// CMS and have no file in the repository, so a source server 404s on every one
+// of them — and this suite's whole job is the paths a visitor actually walks.
+// An explicit BASE_URL still wins, for a build already being served.
+let BASE_URL = process.env.BASE_URL;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -25,6 +31,8 @@ async function withPage(browser, path, callback) {
 }
 
 (async () => {
+  const hosted = BASE_URL ? null : await serveDist();
+  BASE_URL = BASE_URL || hosted.origin;
   const browser = await chromium.launch({ headless: true });
 
   await withPage(browser, '/index.html', async page => {
@@ -46,7 +54,9 @@ async function withPage(browser, path, callback) {
     assert(catalogSize > 0, 'catalog is empty');
     assert(searchItems === catalogSize, `expected ${catalogSize} command palette items, got ${searchItems}`);
 
-    const pathwayLinks = await page.locator('.pathway-card[href*="packages.html?category="]').count();
+    // The built site strips .html from internal links, so this matches both
+    // forms rather than the source-tree one it was written against.
+    const pathwayLinks = await page.locator('.pathway-card[href*="packages?category="], .pathway-card[href*="packages.html?category="]').count();
     assert(pathwayLinks === 6, `expected 6 filtered experience links, got ${pathwayLinks}`);
 
     const instagramFooterLink = await page.locator('footer a[href="https://instagram.com/peopleand.places"]').count();
@@ -161,6 +171,7 @@ async function withPage(browser, path, callback) {
   });
 
   await browser.close();
+  hosted?.server.close();
   console.log('Smoke tests passed.');
 })().catch(async error => {
   console.error(error.message);
