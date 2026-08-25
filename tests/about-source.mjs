@@ -154,4 +154,45 @@ const escaped = injectAboutContent(aboutHtml, {...local, heroTitle: '<script>ale
 assert(!escaped.includes('<script>alert(1)</script>'));
 assert(escaped.includes('&lt;script&gt;'));
 
+// ── Mission section ───────────────────────────────────────────────
+// The section was rebuilt in August 2026 because it had only two type
+// steps — a 100px heading dropping straight to 18px body — and buried its
+// only concrete evidence mid-paragraph. Both halves of that fix are easy
+// to undo by accident, so both are asserted here.
+
+// The lede is the step that was missing. Losing it collapses the ladder
+// back to the shape the redesign existed to fix.
+await assert.rejects(
+  loadAboutContent({
+    localContent: local,
+    env: {SANITY_STUDIO_PROJECT_ID: 'project-123'},
+    fetchImpl: async () => new Response(JSON.stringify({result: {...local, missionLede: '   '}}),
+      {status: 200, headers: {'Content-Type': 'application/json'}}),
+  }),
+  /missionLede/,
+);
+
+// The proof row carries the place names. An entry missing either half
+// would render a headless label or a nameless craft.
+for (const broken of [{place: 'Vume'}, {craft: 'Potters'}]) {
+  await assert.rejects(
+    loadAboutContent({
+      localContent: local,
+      env: {SANITY_STUDIO_PROJECT_ID: 'project-123'},
+      fetchImpl: async () => new Response(JSON.stringify({result: {...local, missionProof: [broken]}}),
+        {status: 200, headers: {'Content-Type': 'application/json'}}),
+    }),
+    /missionProof/,
+  );
+}
+
+// The row reaches the page as real markup, not as an untouched placeholder.
+const mission = injectAboutContent(aboutHtml, {
+  ...local,
+  missionProof: [{place: 'Kpando', craft: 'Drum makers'}],
+});
+assert(mission.includes('<dt>Kpando</dt>'), 'mission proof row must render its places');
+assert(mission.includes('<dd>Drum makers</dd>'), 'mission proof row must render its crafts');
+assert(!mission.includes('<dt>Vume</dt>'), 'committed placeholder row must be replaced, not appended');
+
 console.log('About page content contract tests passed.');

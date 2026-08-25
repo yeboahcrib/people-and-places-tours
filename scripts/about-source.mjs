@@ -7,7 +7,7 @@ const API_VERSION = '2026-08-02';
 const TEXT_KEYS = [
   'heroTitle', 'heroSubtitle',
   'storyEyebrow', 'storyTitle',
-  'missionEyebrow', 'missionTitle', 'missionBody',
+  'missionEyebrow', 'missionTitle', 'missionLede', 'missionBody',
   'differenceEyebrow', 'differenceTitle', 'differenceIntro',
   'teamEyebrow', 'teamTitle', 'teamIntro', 'teamNote',
   // ctaBody and ctaNote were retired in August 2026: the block asked the
@@ -17,6 +17,7 @@ const TEXT_KEYS = [
 ];
 
 const LIST_SHAPES = {
+  missionProof: ['place', 'craft'],
   differenceItems: ['title', 'text'],
   team: ['name', 'role', 'bio'],
   impactStats: ['value', 'label'],
@@ -70,6 +71,7 @@ export async function loadAboutContent({localContent, env = process.env, fetchIm
   const query = `*[_id == "aboutPage"][0]{
     ${TEXT_KEYS.join(', ')},
     storyParagraphs,
+    missionProof[]{place, craft},
     differenceItems[]{title, text},
     team[]{
       name, role, bio,

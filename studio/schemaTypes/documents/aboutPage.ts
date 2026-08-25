@@ -85,13 +85,55 @@ export const aboutPage = defineType({
       validation: r => r.required().max(70),
     }),
     defineField({
-      name: 'missionBody',
-      title: 'What you are trying to do',
+      name: 'missionLede',
+      title: 'The purpose itself',
       type: 'text',
-      rows: 4,
+      rows: 3,
       group: 'story',
-      description: 'One paragraph. What People & Places is for, in your own words.',
-      validation: r => r.required().max(400),
+      description:
+        'The largest sentences in the section, set under the heading. Two sentences at most \u2014 ' +
+        'anything longer stops working when centred.',
+      validation: r => r.required().max(260),
+    }),
+    defineField({
+      name: 'missionBody',
+      title: 'The line underneath',
+      type: 'text',
+      rows: 3,
+      group: 'story',
+      description:
+        'Smaller supporting text below the purpose. Keep it to three lines or so.',
+      validation: r => r.required().max(240),
+    }),
+    defineField({
+      name: 'missionProof',
+      title: 'Places you work with',
+      type: 'array',
+      group: 'story',
+      description:
+        'Three communities, shown as a row beneath the mission. These make ' +
+        '\u201cbuilt with the communities we visit\u201d concrete rather than a claim.',
+      validation: r => r.required().length(3),
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'place',
+              title: 'Place',
+              type: 'string',
+              validation: r => r.required().max(24),
+            }),
+            defineField({
+              name: 'craft',
+              title: 'What they do',
+              type: 'string',
+              validation: r => r.required().max(28),
+            }),
+          ],
+          preview: {select: {title: 'place', subtitle: 'craft'}},
+        }),
+      ],
     }),
 
     defineField({
