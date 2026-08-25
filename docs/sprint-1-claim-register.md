@@ -58,6 +58,7 @@ These already carry founder approval per the Brand Foundation (§2, §25).
 | VAT / tax registration (GRA) | Status not yet confirmed — separate from the Registrar General business registration above. See `docs/tax-and-levies-note.md` | Founders | Await evidence |
 | Tourism Development Levy (GTA) | Not yet registered — confirmed 2026-07-25, tied to the same pending GTA relationship as the licence | Founders | Withheld |
 | Guide certifications (GTA-certified, first-aid) | **Resolved (2026-07-25): no formal certification exists to claim.** Replaced with honest language centered on hosting experience instead — see Truth-Correction Backlog for the drafted replacement | Founders | Decided — not withheld, rewritten |
+| Guide certifications — rewording | **Reworded 24 August 2026 without changing the claim.** The answer now opens with what can be evidenced — Ghanaian guides, 300+ guests since 2021, reviewers naming their guide — and states the licensing position last. No certification is claimed, and the wording commits to announcing the licence here when it is granted. |
 | "All vehicles maintained to international standards" | **Resolved (2026-07-25): same treatment as the guide-certification claim** — drop the specific unsupported claim, replace with plain honest language (e.g. "reliable, well-maintained vehicles suited to each route") | Founders | Decided |
 
 ## Claims live on the current site that need a register row
