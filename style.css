@@ -4687,3 +4687,72 @@ a.flex-card:focus-visible {
   .catalog-note-band { padding: var(--sp-4) 0; }
   .catalog-note-band .experience-price-note { text-align: left; }
 }
+
+/* ────────────────────────────────────────────────────────────── */
+/*  "HOW YOU'RE HOSTED" ON CREAM                                  */
+/*                                                                */
+/*  This section used to be a 1,359px field of --pap-forest, about */
+/*  17% of the homepage, and it was the only place green appeared  */
+/*  at that scale. Green stays in the brand — it is still one of    */
+/*  four bands in the kente stripe below, and still backs the      */
+/*  Adinkra motif in the gold section above — but it stops being    */
+/*  a wall.                                                        */
+/*                                                                */
+/*  Cream also fixes the rhythm: the gold section sits directly    */
+/*  above and the dark testimonials directly below, so gold →      */
+/*  cream → dark gives three readable bands where gold → dark →    */
+/*  dark would have given two indistinguishable ones.              */
+/*                                                                */
+/*  Appended rather than edited in place: same specificity as the  */
+/*  .ui-v2 rules above, later in the file, so the whole light      */
+/*  treatment reads as one decision instead of fifteen.            */
+/* ────────────────────────────────────────────────────────────── */
+.ui-v2 .why-section {
+  background-color: var(--light-surface);
+  /* Same three layers, re-tuned: the warm radials survive at higher
+     alpha, and the hairline weave flips from white to ink — white
+     lines on cream are invisible. */
+  background-image:
+    radial-gradient(circle at 14% 16%, rgba(194, 85, 61, 0.07), transparent 27rem),
+    radial-gradient(circle at 86% 72%, rgba(18, 63, 53, 0.06), transparent 30rem),
+    repeating-linear-gradient(135deg, rgba(26, 26, 26, 0.028) 0 1px, transparent 1px 18px);
+  color: var(--light-text);
+}
+.ui-v2 .why-section .eyebrow {
+  /* --color-primary-deep measures 2.42:1 here. */
+  color: var(--yellow-on-light);
+}
+.ui-v2 .why-editorial-title { color: var(--black); }
+.ui-v2 .why-editorial-intro { color: var(--light-text-muted); }
+.ui-v2 .why-section .why-row {
+  border-top-color: var(--light-border);
+}
+.ui-v2 .why-section .why-row:last-child {
+  border-bottom-color: var(--light-border);
+}
+/* The card heading and its line are a bare <h3> and <p> — no classes to
+   hook, so these are element selectors on purpose. */
+.ui-v2 .why-section .why-row-content h3 { color: var(--black); }
+.ui-v2 .why-section .why-row-content p  { color: var(--light-text-muted); }
+/* The pull quotes are the section's evidence — real guest words. They
+   keep the gold rule but need ink, and a deeper gold on the citation
+   so the attribution does not fade out on cream. */
+.ui-v2 .why-section .principle-proof {
+  color: var(--black);
+  border-left-color: var(--color-primary);
+}
+.ui-v2 .why-section .principle-proof cite { color: var(--yellow-on-light); }
+
+/* Both motifs are set for a dark field — soft gold at 0.24 and
+   terracotta at 0.12 simply disappear on cream. Deeper hues at lower
+   alpha read as a watermark rather than a smudge, and the lower one
+   takes the forest green: the same colour that used to fill the whole
+   section, now at the scale of a watermark. */
+.ui-v2 .why-section .cultural-motif--hosted {
+  color: var(--pap-terracotta);
+  opacity: 0.16;
+}
+.ui-v2 .why-section .cultural-motif--hosted-lower {
+  color: var(--pap-forest);
+  opacity: 0.14;
+}
