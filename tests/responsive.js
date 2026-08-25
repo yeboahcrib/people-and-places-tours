@@ -7,7 +7,11 @@ const {serveDist} = require('./serve-dist.js');
 // build time — so a source server both 404s on tour pages and cannot see a
 // navigation change at all. An explicit BASE_URL still wins.
 let BASE_URL = process.env.BASE_URL;
-const widths = [375, 430, 768, 1024, 1440];
+// 320 is WCAG 1.4.10's reflow width, not a device width — it is the point the
+// spec names, and it sat below this suite's floor. .contact-info-grid
+// overflowed by 14px there for as long as the page has existed, invisible to
+// every check because the smallest width tested was 375.
+const widths = [320, 375, 430, 768, 1024, 1440];
 const pages = [
   '/index.html',
   '/packages.html',

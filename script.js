@@ -297,9 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle && mobileMenu) {
     mobileMenu.id ||= 'mobile-navigation';
     toggle.setAttribute('aria-controls', mobileMenu.id);
-    toggle.addEventListener('click', () => {
-      const open = mobileMenu.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', open);
+    // One writer for the drawer's state. The open and close paths used to be
+    // written out separately, which is how Escape ended up wired to neither.
+    const setMenu = open => {
+      mobileMenu.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
       const spans = toggle.querySelectorAll('span');
       if (open) {
         spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
@@ -308,15 +310,20 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
       }
-    });
+    };
+    toggle.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('open')));
     // Close menu when a link is clicked
     mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.remove('open');
-        toggle.setAttribute('aria-expanded', 'false');
-        const spans = toggle.querySelectorAll('span');
-        spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
-      });
+      link.addEventListener('click', () => setMenu(false));
+    });
+    // Escape closes it and hands focus back to the toggle. Without the focus
+    // return, closing from inside the drawer drops focus onto <body> and a
+    // keyboard user restarts the page. The lightbox and the command palette
+    // already did this; the drawer did not.
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !mobileMenu.classList.contains('open')) return;
+      setMenu(false);
+      toggle.focus();
     });
   }
 
