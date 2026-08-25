@@ -1053,12 +1053,17 @@ body.page-entering {
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   cursor: grab;
-  /* No touch-action restriction. It was `pan-y`, which tells the browser to
-     accept only vertical gestures here — so a sideways swipe was handed to the
-     page and the carousel never moved. The drag script bails on anything that
-     is not a mouse (`pointerType !== 'mouse'`), so touch has always depended on
-     native scrolling, and native scrolling was the thing being forbidden.
-     Leaving it unset also restores pinch-zoom over the carousel. */
+  /* Horizontal only, deliberately.
+     This was `pan-y` — the exact opposite — which handed every sideways swipe
+     to the page, so the carousel never moved. The drag script bails on anything
+     that is not a mouse (`pointerType !== 'mouse'`), so touch has always
+     depended on native scrolling, and native scrolling was being forbidden.
+     Removing the restriction altogether fixed the swipe but left the browser
+     choosing the axis per gesture, and a real thumb swipe always drifts
+     vertically — so the page scrolled out from under the card mid-swipe.
+     `pan-x` commits this element to horizontal, and `pinch-zoom` is kept
+     alongside it so the carousel can still be zoomed. */
+  touch-action: pan-x pinch-zoom;
 }
 .testimonials-track::-webkit-scrollbar { display: none; }
 .testimonials-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }

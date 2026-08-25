@@ -189,8 +189,11 @@ async function withPage(browser, path, callback) {
     const track = page.locator('.testimonials-track');
     if (await track.count()) {
       const touchAction = await track.evaluate(el => getComputedStyle(el).touchAction);
-      assert(!/^pan-y$|^none$/.test(touchAction),
+      assert(/\bpan-x\b/.test(touchAction) || touchAction === 'auto' || touchAction === 'manipulation',
         `.testimonials-track has touch-action: ${touchAction}, which blocks horizontal swiping on touch`);
+      // pan-y would let the page scroll out from under the card mid-swipe.
+      assert(!/\bpan-y\b/.test(touchAction),
+        `.testimonials-track allows vertical panning (${touchAction}); a thumb swipe will scroll the page instead`);
       const overflowX = await track.evaluate(el => getComputedStyle(el).overflowX);
       assert(overflowX === 'auto' || overflowX === 'scroll',
         `.testimonials-track must scroll horizontally, got overflow-x: ${overflowX}`);
