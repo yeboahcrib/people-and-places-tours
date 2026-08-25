@@ -37,6 +37,15 @@ const renderStory = paragraphs => paragraphs
   .map(text => `\n          <p style="font-size:16px;color:var(--gray-2);line-height:1.85;margin-bottom:20px;">${escapeHtml(text)}</p>`)
   .join('');
 
+// The mission proof row. These three names are the section's only concrete
+// evidence, so they are typeset as anchors rather than buried in the prose
+// where they used to live.
+const renderMissionProof = items => items.map(item => `
+        <div>
+          <dt>${escapeHtml(item.place)}</dt>
+          <dd>${escapeHtml(item.craft)}</dd>
+        </div>`).join('');
+
 // Icons stay in code deliberately. They are part of the design system, not
 // content, and letting editors pick arbitrary SVG is how a design system rots.
 const renderDifference = (items, icons) => items.map((item, index) => `
@@ -117,6 +126,7 @@ export function injectAboutContent(html, about) {
     if (typeof value === 'string') output = replaceText(output, key, value);
   }
   output = replaceList(output, 'data-about-story', renderStory(about.storyParagraphs), 'story');
+  output = replaceList(output, 'data-about-mission-proof', renderMissionProof(about.missionProof), 'mission proof row');
   output = replaceList(output, 'data-about-difference', renderDifference(about.differenceItems, icons), 'difference grid');
   output = replaceList(output, 'data-about-team', renderTeam(about.team), 'team grid');
   // The "photography in progress" note is a placeholder-state message. Once

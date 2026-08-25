@@ -10,8 +10,23 @@
       "Since then we have hosted more than 300 guests. What we hear most often is not that Ghana was beautiful, though it is. It is that they felt looked after."
     ],
     "missionEyebrow": "Our Mission",
-    "missionTitle": "We Believe a Place Is Its People",
-    "missionBody": "Whether you are tracing your family's story at Assin Manso or seeing this country for the first time, we show you Ghana through the people who live in it. Every trip is built with the communities it visits, and pays them directly: the potters at Vume, the weavers at Adanwomase, the families whose work makes a day what it is.",
+    "missionTitle": "A Return, and a Welcome",
+    "missionLede": "For those tracing an ancestry that was interrupted, Ghana is not a destination — it is a return. For everyone else, it is one of the most generous countries you will ever be welcomed into.",
+    "missionBody": "We host both, and we do not pretend they are the same journey. Ghanaian-founded, Ghanaian-led, and built with the communities we visit.",
+    "missionProof": [
+      {
+        "place": "Vume",
+        "craft": "Potters"
+      },
+      {
+        "place": "Adanwomase",
+        "craft": "Kente weavers"
+      },
+      {
+        "place": "Assin Manso",
+        "craft": "Ancestral rites"
+      }
+    ],
     "differenceEyebrow": "Why Choose Us",
     "differenceTitle": "The Difference Is Real",
     "differenceIntro": "These are the things we decided to be careful about from the beginning, and the reasons guests tell us the trip felt different.",
