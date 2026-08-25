@@ -76,10 +76,11 @@ const {content: experienceContent, source: experienceContentSource} =
   await loadExperienceContent({localContent: localExperienceContent});
 const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
 
-// Tour detail pages are generated from the CMS when GENERATE_TOUR_PAGES is set.
-// Off by default so the switch is deliberate: the hand-written pages remain the
-// published ones until the generated versions have been reviewed on a preview.
-const generateTourPages = process.env.GENERATE_TOUR_PAGES === 'true';
+// Tour detail pages are generated from the CMS. Reviewed on a preview and
+// switched on 24 August 2026, which is what made adding the Cape Coast Day
+// Tour and the Volta Community Tour a matter of filling in a form. Set
+// GENERATE_TOUR_PAGES=false to fall back to any hand-written page still present.
+const generateTourPages = process.env.GENERATE_TOUR_PAGES !== 'false';
 const tourPageTemplate = generateTourPages ? await loadTourPageTemplate(projectRoot) : null;
 const tourPageContent = generateTourPages
   ? JSON.parse(await readFile(join(projectRoot, 'src/content/tour-pages.json'), 'utf8')).tours
@@ -223,6 +224,27 @@ for (const entry of rootEntries) {
     await cp(join(projectRoot, entry.name), join(outputRoot, entry.name));
   }
   copiedRootFiles.push(entry.name);
+}
+
+// A tour created in the CMS has no file in the repository to iterate over, so
+// its page would silently never be built. These go through exactly the same
+// pipeline as a committed page: navigation, footer, meta, clean URLs, hashes.
+for (const [fileName, generated] of generatedTourPages) {
+  if (copiedRootFiles.includes(fileName)) continue;
+  const withNavigation = replacePrimaryNavigation(generated, navigation, fileName);
+  const withFooter = replaceFooter(withNavigation, footer);
+  const withContact = injectSiteContact(withFooter, siteContent.siteSettings);
+  const withInquiryMode = injectInquiryMode(withContact, Boolean(process.env.CF_PAGES));
+  const withMeta = injectPageMeta(withInquiryMode, {
+    file: fileName,
+    siteUrl,
+    siteName: siteContent.siteSettings.businessName,
+    ogImage,
+  });
+  if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(fileName);
+  const stamped = stampAssets(cleanInternalUrls(injectFormNext(withMeta, siteUrl)));
+  await writeFile(join(outputRoot, fileName), stamped, 'utf8');
+  copiedRootFiles.push(fileName);
 }
 
 await writeFile(join(outputRoot, 'sitemap.xml'), renderSitemap(siteUrl, indexableFiles, new Date().toISOString().slice(0, 10)), 'utf8');

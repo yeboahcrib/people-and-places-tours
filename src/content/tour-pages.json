@@ -161,6 +161,10 @@
       ],
       "faqs": [
         {
+          "answer": "This one runs for groups of three or more, because of the boat. If you are travelling alone or as a pair, tell us your dates and we will try to join you to another booking.",
+          "question": "Can I book this on my own?"
+        },
+        {
           "answer": "About 2–2.5 hours east of Accra. We travel in a comfortable air-conditioned vehicle with good company along the way.",
           "question": "How far is Ada from Accra?"
         },
@@ -312,6 +316,56 @@
         }
       ],
       "title": "Cape Coast Ancestral Tour"
+    },
+    "cape-coast-day": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch"
+      ],
+      "faqs": [
+        {
+          "answer": "This day is Kakum, the castle and Elmina. The Ancestral Tour begins at Assin Manso and the Slave River instead, and spends the day on that history rather than the forest.",
+          "question": "How is this different from the Ancestral Tour?"
+        },
+        {
+          "answer": "There is a walk uphill to reach it, and the walkway itself sways. If you are unsure about heights, tell your host and you can enjoy the forest floor instead.",
+          "question": "Is the canopy walk difficult?"
+        },
+        {
+          "answer": "Around three hours each way, so we leave early. The road is good and we stop when you need to.",
+          "question": "How long is the drive from Accra?"
+        },
+        {
+          "answer": "Yes. Kakum, Cape Coast Castle and the boat to Elmina are all covered, along with taxes. Lunch is at your own expense.",
+          "question": "Are entrance fees included?"
+        },
+        {
+          "answer": "It can be. Your host gives you the history before you go in and leaves you room afterwards, for as long as you need.",
+          "question": "Is the castle emotionally heavy?"
+        },
+        {
+          "answer": "Comfortable walking shoes for the canopy walk, light layers, water and a camera. Out of respect, no flash photography inside the castle dungeons.",
+          "question": "What should I bring?"
+        }
+      ],
+      "funFacts": [
+        "The Kakum canopy walkway runs more than 350 metres above the forest floor.",
+        "Cape Coast Castle was built in 1653 and is a UNESCO World Heritage Site.",
+        "Elmina is one of the oldest European settlements in sub-Saharan Africa, founded in 1482."
+      ],
+      "heroWatermark": "CAPE COAST",
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Transportation and fuel surcharge",
+        "Tour guide",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all sites and taxes",
+        "Service fee"
+      ],
+      "pageHeadline": "Above the Forest, Then Into the Castle.",
+      "pageIntro": "A day that holds two very different things. In the morning you walk the Kakum canopy walkway, suspended above the rainforest floor with the canopy stretching out around you. In the afternoon you stand inside Cape Coast Castle, a former slave fort, and hear what happened there.\n\nAfterwards a speed boat takes you across to Elmina, where the fishing fleet works as it has for generations, and the day ends with lunch at a beach resort.",
+      "title": "Cape Coast Day Tour"
     },
     "just-go-ghana": {
       "excluded": [
@@ -635,6 +689,59 @@
       "pageHeadline": "West Africa's Tallest Waterfall. One Day You'll Never Forget.",
       "pageIntro": "Journey through the breathtaking Volta Region — Ghana's most scenic landscape. Visit powerful waterfalls, cross the famous suspended rope bridge, explore traditional villages rich with history, and take in dramatic hills and valleys that make this one of Ghana's most unforgettable day trips.",
       "title": "Volta Day Tour"
+    },
+    "volta-community": {
+      "excluded": [
+        "Gratuities",
+        "Personal expenses",
+        "Lunch",
+        "Any items purchased from local farmers, producers or communities"
+      ],
+      "faqs": [
+        {
+          "answer": "The Volta Day Tour is the sights: Mount Gemi, the monkey sanctuary and Wli. This one is the people: farms, palm wine, distilling and cocoa, with Wli at the end.",
+          "question": "How is this different from the Volta Day Tour?"
+        },
+        {
+          "answer": "Yes. Tasting the palm wine and the akpeteshie is part of the day. Anything you want to buy and take home is not.",
+          "question": "Is the palm wine tasting included?"
+        },
+        {
+          "answer": "Four to five hours each way, so we leave Accra very early to make the most of the daylight.",
+          "question": "How long is the drive?"
+        },
+        {
+          "answer": "About thirty minutes on a forest path to the lower falls. Regular fitness is fine, and it can be slippery in the wet season.",
+          "question": "Is there a hike to the waterfall?"
+        },
+        {
+          "answer": "Yes, and it is welcome. Anything you buy is between you and them, and is not part of the tour price.",
+          "question": "Can I buy from the farmers?"
+        },
+        {
+          "answer": "Walking shoes, a light rain jacket, sun protection and cash for anything you want to buy from the producers.",
+          "question": "What should I bring?"
+        }
+      ],
+      "funFacts": [
+        "Akpeteshie is distilled from fermented palm wine and was banned under colonial rule.",
+        "Ghana was the world's largest cocoa producer for much of the twentieth century.",
+        "Wli Waterfalls is the highest in West Africa."
+      ],
+      "heroWatermark": "VOLTA",
+      "included": [
+        "Hotel or apartment pickup and drop-off in Accra",
+        "Private transportation and fuel surcharge",
+        "Professional tour guide",
+        "Local guide for the included community experiences",
+        "Drinks, snacks and bottled water",
+        "Entry fees to all included sites and experiences",
+        "Palm wine and akpeteshie tasting",
+        "Applicable taxes"
+      ],
+      "pageHeadline": "The Volta Region, From the Inside.",
+      "pageIntro": "This day steps off the usual route. You cross the Adome Bridge and spend time with families in a Volta community: walking their farms, meeting palm wine producers, and watching how akpeteshie is distilled from the sap.\n\nYou will see palm oil pressed and cocoa picked from the pod, and talk to the people who do it. The day ends at Wli Waterfalls, the highest in West Africa.",
+      "title": "Volta Community Tour"
     }
   }
 }
