@@ -4668,26 +4668,6 @@ a.flex-card:focus-visible {
   color: var(--light-text);
 }
 
-/* The group-of-three pricing rule used to sit inside the dark catalogue
-   section, where it read as small print above a wall of cards. It is the
-   one thing a visitor needs before they interpret any price on the page,
-   so it gets its own light band — compact, not a full section, because a
-   single paragraph in section-pad reads as an empty room. */
-.catalog-note-band {
-  padding: var(--sp-5) 0;
-}
-.catalog-note-band .experience-price-note {
-  max-width: 640px;
-  margin: 0 auto;
-  text-align: center;
-  font-size: var(--text-xl);
-  line-height: 1.65;
-}
-@media (max-width: 768px) {
-  .catalog-note-band { padding: var(--sp-4) 0; }
-  .catalog-note-band .experience-price-note { text-align: left; }
-}
-
 /* ────────────────────────────────────────────────────────────── */
 /*  "HOW YOU'RE HOSTED" ON CREAM                                  */
 /*                                                                */
@@ -4755,4 +4735,41 @@ a.flex-card:focus-visible {
 .ui-v2 .why-section .cultural-motif--hosted-lower {
   color: var(--pap-forest);
   opacity: 0.14;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  CATALOGUE PRICE NOTE                                          */
+/*                                                                */
+/*  Every price on this page is a group-of-three price, so this    */
+/*  is the one line a visitor needs before they can read any       */
+/*  number below it. It was small print above a wall of cards.     */
+/*                                                                */
+/*  It briefly had its own cream band, which read as a white       */
+/*  stripe cutting between the dark hero and the dark catalogue —  */
+/*  an interruption rather than a part of the page. It sits back   */
+/*  on the dark now and earns its prominence the way everything    */
+/*  else on this site does: a border and the gold accent, not a    */
+/*  change of background.                                          */
+/* ────────────────────────────────────────────────────────────── */
+.experience-price-note {
+  max-width: 720px;
+  /* Left-aligned, not centred: the filter bar and every card below start at
+     the container's left edge, and a centred note floats free of that grid. */
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-2-5) var(--sp-3-5);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md, 14px);
+  background: var(--surface-raised);
+  color: var(--gray-2);
+  font-size: var(--text-xl);
+  line-height: 1.7;
+  text-align: left;
+}
+@media (max-width: 768px) {
+  .experience-price-note {
+    padding: var(--sp-2) var(--sp-2-5);
+    font-size: var(--text-lg);
+    margin-bottom: var(--sp-4);
+  }
 }

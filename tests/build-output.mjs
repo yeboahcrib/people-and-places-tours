@@ -193,4 +193,34 @@ for (const location of locations) {
   assert.deepEqual(broken, [], `skip links with no target: ${broken.join(', ')}`);
 }
 
+
+// A stylesheet with unbalanced braces does not fail to load — the browser
+// silently discards everything after the stray one. A deletion script once
+// left a single orphaned `}` in style.css, which dropped the whole cream
+// treatment on the homepage's "How You're Hosted" section; the page still
+// built, still passed every structural test, and only the pixel diff caught
+// it. Counting braces costs nothing and catches the whole class.
+{
+  const css = await readFile(join(outputPath, 'style.css'), 'utf8');
+  // Strip comments and string literals so braces inside them do not count.
+  const stripped = css
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''");
+  let depth = 0;
+  let firstOrphanLine = 0;
+  let line = 1;
+  for (const character of stripped) {
+    if (character === '\n') line += 1;
+    else if (character === '{') depth += 1;
+    else if (character === '}') {
+      depth -= 1;
+      if (depth < 0 && !firstOrphanLine) firstOrphanLine = line;
+    }
+  }
+  assert.equal(firstOrphanLine, 0,
+    `style.css has an unmatched closing brace near line ${firstOrphanLine} of the comment-stripped file`);
+  assert.equal(depth, 0, `style.css has ${depth} unclosed block(s)`);
+}
+
 console.log('Build output and availability checks passed.');
