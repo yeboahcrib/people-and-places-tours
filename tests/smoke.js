@@ -40,7 +40,7 @@ async function withPage(browser, path, callback) {
     const homepageContentLoaded = await page.evaluate(() => Boolean(window.PEOPLE_PLACES_HOME?.hero));
     assert(homepageContentLoaded, 'homepage content data did not load');
 
-    const renderedSections = await page.locator('#homepage-root [data-home-section]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-home-section')));
+    const renderedSections = await page.locator('[data-homepage-renderer] [data-home-section]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-home-section')));
     const expectedSections = ['hero', 'founderStory', 'waysToExperience', 'howHosted', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
     assert(renderedSections.join('|') === expectedSections.join('|'), `unexpected homepage section order: ${renderedSections.join(', ')}`);
 

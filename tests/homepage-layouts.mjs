@@ -112,7 +112,7 @@ assert.deepEqual(cards.map(card => card.title), ['Kept']);
 // ── The rendered markup ────────────────────────────────────────────────────
 
 const sectionsScript = await readFile(join(projectRoot, 'homepage-sections.js'), 'utf8');
-const sandbox = {window: {}, document: {readyState: 'complete', getElementById: () => null, addEventListener() {}}};
+const sandbox = {window: {}, document: {readyState: 'complete', getElementById: () => null, querySelector: () => null, addEventListener() {}}};
 sandbox.window.PEOPLE_PLACES_HOME = null;
 vm.createContext(sandbox);
 vm.runInContext(sectionsScript, sandbox);

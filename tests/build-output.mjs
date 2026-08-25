@@ -175,4 +175,22 @@ for (const location of locations) {
   assert(await exists(publicFile), `Sitemap points to missing build output: ${publicFile}`);
 }
 
+
+// Every page's skip link must resolve to a real element on that page. The
+// homepage shipped a skip link pointing at #main-content while its <main>
+// carried id="homepage-root", so keyboard users had no way past the nav on
+// the most-visited page — and nothing caught it, because the link and the
+// target live in different files.
+{
+  const pages = (await readdir(outputPath)).filter(f => f.endsWith('.html'));
+  const broken = [];
+  for (const page of pages) {
+    const html = await readFile(join(outputPath, page), 'utf8');
+    for (const [, target] of html.matchAll(/<a[^>]*class="skip-link"[^>]*href="#([^"]+)"/g)) {
+      if (!new RegExp(`id="${target}"`).test(html)) broken.push(`${page} -> #${target}`);
+    }
+  }
+  assert.deepEqual(broken, [], `skip links with no target: ${broken.join(', ')}`);
+}
+
 console.log('Build output and availability checks passed.');

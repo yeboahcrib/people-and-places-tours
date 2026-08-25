@@ -466,7 +466,10 @@
   window.PEOPLE_PLACES_RENDER_HOMEPAGE = renderHomepageMarkup;
 
   function renderHomepage() {
-    const root = document.getElementById('homepage-root');
+    // Keyed to the attribute, not an id: the id has to stay `main-content` so
+    // the skip link in the shared nav resolves here the way it does on every
+    // other page.
+    const root = document.querySelector('[data-homepage-renderer]');
     if (!root || !content) return;
     // The deployed homepage is generated at build time, so its root already
     // has children. Only the un-built source tree leaves it empty.
