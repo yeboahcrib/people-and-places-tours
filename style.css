@@ -2064,21 +2064,6 @@ body.page-entering {
   line-height: 1.45;
 }
 
-/* Every catalogue price is a group-of-three price. Saying so here, before a
-   visitor reads a single card, is cheaper than saying it after they have
-   planned a trip around a figure they cannot get. Deliberately not set in the
-   subtle grey the rest of the fine print uses: a disclosure that changes the
-   price has to be legible. */
-/* Sits above the sticky filter bar, not inside it: the bar is a three-column
-   grid, and a paragraph dropped into it takes a column and pushes the filters
-   sideways. */
-.experience-price-note {
-  font-size: var(--text-md);
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  max-width: 70ch;
-  margin: 0 0 var(--sp-3);
-}
 .filter-tabs {
   display: flex;
   gap: 0.4rem;
@@ -4626,7 +4611,6 @@ a.flex-card:focus-visible {
 .light-section h3 { color: var(--black); }
 .light-section .section-subtitle,
 .light-section .addons-note,
-.light-section .experience-price-note,
 .light-section .experience-filter-prompt,
 .light-section p { color: var(--light-text-muted); }
 /* --color-primary-deep measures 2.42:1 on cream. Yellow as text on a light
@@ -4737,42 +4721,6 @@ a.flex-card:focus-visible {
   opacity: 0.14;
 }
 
-/* ────────────────────────────────────────────────────────────── */
-/*  CATALOGUE PRICE NOTE                                          */
-/*                                                                */
-/*  Every price on this page is a group-of-three price, so this    */
-/*  is the one line a visitor needs before they can read any       */
-/*  number below it. It was small print above a wall of cards.     */
-/*                                                                */
-/*  It briefly had its own cream band, which read as a white       */
-/*  stripe cutting between the dark hero and the dark catalogue —  */
-/*  an interruption rather than a part of the page. It sits back   */
-/*  on the dark now and earns its prominence the way everything    */
-/*  else on this site does: a border and the gold accent, not a    */
-/*  change of background.                                          */
-/* ────────────────────────────────────────────────────────────── */
-.experience-price-note {
-  max-width: 720px;
-  /* Left-aligned, not centred: the filter bar and every card below start at
-     the container's left edge, and a centred note floats free of that grid. */
-  margin: 0 0 var(--sp-5);
-  padding: var(--sp-2-5) var(--sp-3-5);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-primary);
-  border-radius: var(--radius-md, 14px);
-  background: var(--surface-raised);
-  color: var(--gray-2);
-  font-size: var(--text-xl);
-  line-height: 1.7;
-  text-align: left;
-}
-@media (max-width: 768px) {
-  .experience-price-note {
-    padding: var(--sp-2) var(--sp-2-5);
-    font-size: var(--text-lg);
-    margin-bottom: var(--sp-4);
-  }
-}
 
 /* ────────────────────────────────────────────────────────────── */
 /*  REFLOW AT 320px — SC 1.4.10                                   */
