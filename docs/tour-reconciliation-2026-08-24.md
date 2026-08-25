@@ -48,7 +48,7 @@ verified**. They came from the original site build.
 | Field | Site value | Risk |
 | --- | --- | --- |
 | ~~Duration~~ | Half Day / Full Day / Evening | **Confirmed by the founders, 24 August 2026.** Accra City is a half day, the food tour is an evening, the rest are full days |
-| Maximum group size | 8, 10, 12 or 15 depending on tour | **Open.** The founders put the standard maximum at 30, with lower caps where capacity physically binds — Quad Bike is limited by available bikes and Ada by boat seats. Those two figures are still needed |
+| ~~Maximum group size~~ | 8, 10, 12 or 15 depending on tour | **Left as it is, 24 August 2026.** A standard maximum of 30 was considered and set aside: Quad Bike is limited by available bikes and Ada by boat seats, and neither figure was to hand. The existing numbers are conservative, so the failure mode is turning away a booking that could have been taken rather than accepting one that cannot run. Do not raise this again unless the founders do |
 | Starting point | Accra, Ghana | Consistent with the document's "hotel or apartment pickup in Accra" |
 | Departure time | Only stated in a few FAQ answers | "Pickup around 8am" for Accra City; the document says only "early morning" for Cape Coast, Kumasi and Volta |
 
