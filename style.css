@@ -27,7 +27,10 @@
   /* Brand yellow as text on white fails WCAG AA badly (1.73:1). Use this
      deepened amber wherever yellow carries words on a light surface;
      --yellow stays the accent/fill colour on dark. 4.69:1 on white. */
-  --yellow-on-light: #9C6A00;
+  /* AA-safe yellow for text on a light surface. Was #9C6A00, which was
+     computed against pure white (4.69:1) and fell to 4.49:1 on the cream
+     the site actually uses — just under AA. This clears 4.5:1 on both. */
+  --yellow-on-light: #976500;
   --yellow-glow:   rgba(255,184,28,.15);
   --black:         var(--pap-charcoal);
 
@@ -270,7 +273,8 @@ h1, h2, h3, h4,
 }
 .white-lift .section-title { color: var(--black); }
 .white-lift .section-sub { color: var(--light-text-subtle); }
-.white-lift .eyebrow { color: var(--color-primary-deep); }
+/* Was --color-primary-deep, which measures 2.37:1 on this surface. */
+.white-lift .eyebrow { color: var(--yellow-on-light); }
 
 /* ── BUTTONS ─────────────────────────────────────────────────── */
 .btn {
@@ -4599,4 +4603,87 @@ a.flex-card:focus-visible {
     padding: var(--sp-2) 0;
   }
   .mission-proof > div:last-child { border-bottom: 0; }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  LIGHT SECTION                                                 */
+/*                                                                */
+/*  Packages and contact measured 100% and 99% dark top to bottom, */
+/*  on the two pages that actually sell — browsing tours and       */
+/*  booking one. Home and the tour pages already sit near 50/50,   */
+/*  so this is not a sitewide problem, it is those two pages.      */
+/*                                                                */
+/*  The card grid and the booking form stay on dark deliberately:  */
+/*  both are protected components. This lights the sections that   */
+/*  frame them, which is enough to break the wall.                 */
+/* ────────────────────────────────────────────────────────────── */
+.light-section {
+  background: var(--light-surface);
+  color: var(--light-text);
+}
+.light-section .section-title,
+.light-section h2,
+.light-section h3 { color: var(--black); }
+.light-section .section-subtitle,
+.light-section .addons-note,
+.light-section .experience-price-note,
+.light-section .experience-filter-prompt,
+.light-section p { color: var(--light-text-muted); }
+/* --color-primary-deep measures 2.42:1 on cream. Yellow as text on a light
+   surface has to be --yellow-on-light; the same trap CLAUDE.md warns about. */
+.light-section .eyebrow { color: var(--yellow-on-light); }
+
+/* Pills and chips: the dark styles hang white text on a dark border,
+   which disappears entirely on cream. */
+.light-section .addons-list li {
+  color: var(--light-text);
+  border-color: var(--light-border);
+  background: var(--white);
+}
+.light-section .filter-tab {
+  color: var(--light-text-muted);
+  border-color: var(--light-border);
+  background: var(--white);
+}
+.light-section .filter-tab:hover { border-color: var(--color-primary-deep); }
+.light-section .filter-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--black);
+}
+.light-section .form-select,
+.light-section select {
+  color: var(--light-text);
+  border-color: var(--light-border);
+  background-color: var(--white);
+}
+
+/* FAQ rows are hairline-separated; the dark border vanishes on cream. */
+.light-section .faq-item { border-bottom-color: var(--light-border); }
+.light-section .faq-question { color: var(--black); }
+.light-section .faq-question:hover { color: var(--color-primary-deep); }
+.light-section .faq-answer-inner { color: var(--light-text-muted); }
+.light-section .faq-q-icon {
+  border-color: var(--light-border);
+  color: var(--light-text);
+}
+
+/* The group-of-three pricing rule used to sit inside the dark catalogue
+   section, where it read as small print above a wall of cards. It is the
+   one thing a visitor needs before they interpret any price on the page,
+   so it gets its own light band — compact, not a full section, because a
+   single paragraph in section-pad reads as an empty room. */
+.catalog-note-band {
+  padding: var(--sp-5) 0;
+}
+.catalog-note-band .experience-price-note {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: var(--text-xl);
+  line-height: 1.65;
+}
+@media (max-width: 768px) {
+  .catalog-note-band { padding: var(--sp-4) 0; }
+  .catalog-note-band .experience-price-note { text-align: left; }
 }
