@@ -246,7 +246,8 @@
     ${(data.ratingSummary || (data.trustFacts && data.trustFacts.length)) ? `
     <div class="trust-facts-row reveal reveal-delay-1">
       ${data.ratingSummary ? `
-      <${data.ratingSummary.href ? 'a' : 'div'} class="trust-rating"${data.ratingSummary.href ? ` href="${escapeHtml(data.ratingSummary.href)}" target="_blank" rel="noopener"` : ''}>
+      <${data.ratingSummary.href ? 'a' : 'div'} class="trust-rating"${data.ratingSummary.href ? ` href="${escapeHtml(data.ratingSummary.href)}" target="_blank" rel="noopener" aria-label="${escapeHtml(`Rated ${data.ratingSummary.value} out of 5 from ${data.ratingSummary.count} ${data.ratingSummary.source} reviews. Opens ${data.ratingSummary.source} in a new tab.`)}"` : ''}>
+        ${data.ratingSummary.source === 'Google' ? GOOGLE_MARK : ''}
         ${renderCountValue(data.ratingSummary.value, 'trust-rating-value')}
         <span class="trust-rating-meta">
           ${renderStars(`Rated ${data.ratingSummary.value} out of 5`)}
@@ -273,7 +274,7 @@
               ${item.image ? renderImage(item.image, 'testi-author-photo', 'loading="lazy" sizes="44px"') : `<span class="testi-author-fallback" aria-hidden="true">${escapeHtml(String(item.author || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join(''))}</span>`}
               <div>
                 <strong>${escapeHtml(item.author)}</strong>
-                <span>${escapeHtml(item.location)}</span>
+                <span>${escapeHtml(item.location)}${item.date && formatReviewDate(item.date) ? ` &middot; ${escapeHtml(formatReviewDate(item.date))}` : ''}</span>
               </div>
             </div>
           </div>
@@ -286,6 +287,27 @@
     </div>` : ''}
   </div>
 </section>`;
+  }
+
+  // Google's own mark, inline. It appears only where it labels genuine Google
+  // reviews, which is what it is for — the reviews carry a documented source in
+  // the CMS. It is the shape people scan for; "Google" set in our own type is
+  // read as our claim about ourselves rather than as provenance.
+  const GOOGLE_MARK = `<svg class="google-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="#4285F4" d="M23.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47a5.5 5.5 0 0 1-2.4 3.61v3h3.86c2.26-2.08 3.57-5.15 3.57-8.85z"/>
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09A11.99 11.99 0 0 0 12 24z"/>
+      <path fill="#FBBC05" d="M5.27 14.29a7.2 7.2 0 0 1 0-4.58V6.62H1.29a12 12 0 0 0 0 10.76l3.98-3.09z"/>
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.7 0 3.99 2.47 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"/>
+    </svg>`;
+
+  // "February 2026", not "2026-02-07" and not "3 weeks ago". A month is how
+  // people remember a trip, and unlike a relative date it does not quietly rot
+  // into "2 years ago" on a page nobody has rebuilt.
+  function formatReviewDate(value) {
+    if (!value) return '';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return '';
+    return parsed.toLocaleDateString('en-GB', {month: 'long', year: 'numeric', timeZone: 'UTC'});
   }
 
   function renderFinalInvitationSection(data) {

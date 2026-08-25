@@ -130,7 +130,11 @@
         value: '5.0',
         source: 'Google',
         count: 15,
-        href: 'https://www.google.com/search?q=People+%26+Places+Tours+Ghana+reviews',
+        // `stick` anchors the search to this business's own knowledge panel
+        // rather than to whatever a text search happens to surface. The session
+        // parameters that came with it (sxsrf, ved, sca_esv) are deliberately
+        // dropped: they identify a Google session, not a business.
+        href: 'https://www.google.com/search?q=People+%26+Places+Tours&stick=H4sIAAAAAAAAAONgU1I1qEg0MzNOMTQxNrdMM7U0TTO0MqhINUozTDYxNjY1SU42SzYyWcQqGpCaX5CTqqCmEJCTmJxarBCSX1pUDAAgUN00QQAAAA',
       },
       trustFacts: [
         { label: 'Guests Hosted', value: '300+' },
@@ -141,36 +145,42 @@
           quote: 'People & Places Tours brings pride, warmth, and joy to their work.',
           author: 'Louis Cameron',
           location: 'Verified Google review',
+          date: '2026-02-07',
           rating: 5,
         },
         {
           quote: 'They provide exceptional customer service and are very timely and friendly.',
           author: 'Ben Nwokeleme',
           location: 'Verified Google review',
+          date: '2025-10-13',
           rating: 5,
         },
         {
           quote: 'People and Places took care of everything and planned an excellent itinerary. We laughed and made wonderful memories.',
           author: 'Precious Nwokeleme',
           location: 'Verified Google review',
+          date: '2025-10-11',
           rating: 5,
         },
         {
           quote: 'The P&P crew took care of us like royalty from the moment we landed to the day we flew back home.',
           author: 'Tamaro Diallo',
           location: 'Verified Google review',
+          date: '2025-05-29',
           rating: 5,
         },
         {
           quote: 'The tag team who runs and operates the brand People & Places, Kojo & Nana… they hands down score high in my book!',
           author: 'Shy osler',
           location: 'Verified Google review',
+          date: '2025-03-21',
           rating: 5,
         },
         {
           quote: 'My tour guide Nana Yeboah was not only knowledgeable but also warm and genuinely passionate about sharing his expertise.',
           author: 'Heather Harlin',
           location: 'Verified Google review',
+          date: '2025-01-08',
           rating: 5,
         },
         {

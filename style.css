@@ -4754,3 +4754,55 @@ a.flex-card:focus-visible {
     white-space: normal;
   }
 }
+
+/* ────────────────────────────────────────────────────────────── */
+/*  GOOGLE REVIEW PROVENANCE                                      */
+/*                                                                */
+/*  The rating block has always been a link to Google, but it      */
+/*  carried no visual sign of it: no underline, no arrow, nothing  */
+/*  but cursor:pointer — which you only meet by hovering, and      */
+/*  never on a phone. The proof was there and invisible, which is  */
+/*  why the section read as copy we wrote about ourselves.         */
+/* ────────────────────────────────────────────────────────────── */
+.google-mark {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  align-self: center;
+}
+a.trust-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1-5);
+  border-radius: var(--radius-md, 14px);
+  padding: var(--sp-1) var(--sp-1-5);
+  margin-inline-start: calc(var(--sp-1-5) * -1);
+  text-decoration: none;
+  transition: background var(--motion-base, 300ms) ease;
+}
+/* The source line is what carries the affordance: it reads as a link, gains
+   an arrow, and the arrow moves on hover. The 5.0 itself stays quiet — it is
+   a number, not a control. */
+a.trust-rating .trust-rating-source {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+a.trust-rating .trust-rating-source::after {
+  content: '↗';
+  display: inline-block;
+  margin-inline-start: 0.4em;
+  text-decoration: none;
+  transition: transform var(--motion-base, 300ms) ease;
+}
+a.trust-rating:hover { background: rgba(255, 255, 255, 0.06); }
+a.trust-rating:hover .trust-rating-source::after { transform: translate(2px, -2px); }
+a.trust-rating:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  a.trust-rating,
+  a.trust-rating .trust-rating-source::after { transition: none; }
+  a.trust-rating:hover .trust-rating-source::after { transform: none; }
+}
