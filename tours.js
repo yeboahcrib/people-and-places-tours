@@ -8,7 +8,7 @@
       price: '$3,000',
       priceUnit: 'Per Person',
       duration: '8 Days / 7 Nights',
-      groupSize: '1–12 (larger by arrangement)',
+      groupSize: 'Any group size',
       location: 'Accra, Ghana',
       destination: 'accra',
       categories: ['multi-day', 'culture', 'adventure', 'nature', 'relaxation'],
