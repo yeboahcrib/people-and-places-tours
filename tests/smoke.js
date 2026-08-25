@@ -168,6 +168,19 @@ async function withPage(browser, path, callback) {
     await expectClass(nav, 'open', 'mobile nav did not open');
     await page.locator('.nav-toggle').click();
     await expectNoClass(nav, 'open', 'mobile nav did not close');
+
+    // Escape closes the drawer and hands focus back to the toggle. Without the
+    // focus return, closing from inside the drawer drops focus onto <body> and
+    // a keyboard user has to tab the page from the top again.
+    await page.locator('.nav-toggle').click();
+    await expectClass(nav, 'open', 'mobile nav did not reopen');
+    await page.locator('.nav-mobile a').first().focus();
+    await page.keyboard.press('Escape');
+    await expectNoClass(nav, 'open', 'Escape did not close the mobile nav');
+    assert(await page.evaluate(() => document.activeElement?.classList.contains('nav-toggle')),
+      'Escape closed the mobile nav but did not return focus to the toggle');
+    assert(await page.locator('.nav-toggle').getAttribute('aria-expanded') === 'false',
+      'aria-expanded was not reset after Escape');
   });
 
   await browser.close();

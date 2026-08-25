@@ -4773,3 +4773,36 @@ a.flex-card:focus-visible {
     margin-bottom: var(--sp-4);
   }
 }
+
+/* ────────────────────────────────────────────────────────────── */
+/*  REFLOW AT 320px — SC 1.4.10                                   */
+/*                                                                */
+/*  .contact-info-grid overflowed its container by 14px at 320px:  */
+/*  a `1fr` track is `minmax(auto, 1fr)`, and that `auto` floor is  */
+/*  the item's min-content width, which the email address inflated  */
+/*  past the 280px available. min-width: 0 lets the track shrink;   */
+/*  the wrap rule lets the long string break instead of forcing     */
+/*  the floor back up.                                              */
+/*                                                                */
+/*  Never caught because the responsive suite starts at 375px and   */
+/*  WCAG's reflow requirement is 320px. tests/responsive.js now      */
+/*  measures 320 as well.                                           */
+/* ────────────────────────────────────────────────────────────── */
+.contact-info-grid > * { min-width: 0; }
+.contact-card-value,
+.contact-card-sub,
+.contact-card p,
+.contact-card a { overflow-wrap: anywhere; }
+
+/* Below 360px a long button label cannot fit: .btn is `white-space: nowrap`
+   with 64px of horizontal padding, so "Start Planning Together" needs 311px
+   inside a 280px column and the flex item's min-content floor pushes it past
+   the viewport. Tightening the padding and letting the label wrap keeps the
+   button inside the page; a two-line button is better than a scrollbar.
+   Scoped below 360 so nothing changes at 375 and up. */
+@media (max-width: 360px) {
+  .btn {
+    padding-inline: var(--sp-2-5);
+    white-space: normal;
+  }
+}
