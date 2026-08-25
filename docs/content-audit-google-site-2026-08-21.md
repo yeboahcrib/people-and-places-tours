@@ -97,10 +97,13 @@ deposits with no published cancellation terms is the most serious gap this
 audit found, and it is a legal exposure rather than a content one.
 
 **#Connect4Change.** The digital-literacy initiative has its own page on the
-Google Site and is one of the four homepage pillars ("Local Community", "a
-percentage of your payment goes towards providing digital literacy skills for a
-child"). It appears **nowhere** on the new website. This is a differentiator
-competitors cannot copy and it is currently invisible.
+Google Site and is one of the four homepage pillars. It appears nowhere on the
+new website.
+
+> **Decided 24 August 2026: leave it off for now.** A founder decision, not an
+> oversight — do not re-raise it. The community claim on the About page is
+> carried instead by the makers the tours already pay: Vume, Adanwomase,
+> Rum Island.
 
 **Fourteen answered FAQs.** Visa, yellow-fever requirements, travel insurance,
 currency and USD bill-date advice, SIM cards and Wi-Fi, packing list including
