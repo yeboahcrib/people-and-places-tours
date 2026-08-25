@@ -150,6 +150,17 @@ const locations = [...sitemap.matchAll(/<loc>https?:\/\/[^/]+\/people-and-places
 
 // A tour created in the CMS has no file in the repository, so nothing would
 // have failed if the build had quietly skipped building its page.
+// Kumasi is $250 by road or $400 by air; Cape Coast is $160 or $180 with the
+// naming ceremony. Both sat in the CMS for a week with no page able to show
+// them, which is revenue a visitor could not see.
+for (const [file, expected] of [['kumasi-tour.html', '$400'], ['cape-coast-tour.html', '$180']]) {
+  const page = await readFile(join(outputPath, file), 'utf8');
+  assert(
+    page.includes('price-option') && page.includes(expected),
+    `${file} does not show its alternative price of ${expected}`,
+  );
+}
+
 for (const slug of ['cape-coast-day', 'volta-community']) {
   const file = `${slug}-tour.html`;
   const page = await readFile(join(outputPath, file), 'utf8');

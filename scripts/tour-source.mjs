@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 const API_VERSION = '2026-08-02';
 
 const formatPrice = (price, currency = 'USD') => new Intl.NumberFormat('en-US', {
@@ -11,6 +12,11 @@ function groupSize(tour) {
   if (tour.groupSizeMax) return `${minimum}-${tour.groupSizeMax} People`;
   return tour.groupSizeNote || `${minimum}+ People`;
 }
+
+const definedOnly = fields => Object.fromEntries(
+  Object.entries(fields).filter(([, value]) => value !== undefined && value !== null
+    && !(Array.isArray(value) && value.length === 0)),
+);
 
 function validateSanityTours(result, localTours) {
   if (!Array.isArray(result?.tours) || result.tours.length === 0) {
@@ -54,6 +60,19 @@ function validateSanityTours(result, localTours) {
       commandSummary: tour.commandSummary || presentation.commandSummary,
       homeFeatured: featuredOrder.has(slug),
       homeOrder: featuredOrder.get(slug),
+      // Only fields the document actually holds, so a tour with no FAQs in
+      // Sanity falls back to the committed snapshot rather than blanking it.
+      ...definedOnly({
+        included: tour.included,
+        excluded: tour.excluded,
+        funFacts: tour.funFacts,
+        heroWatermark: tour.heroWatermark,
+        pageHeadline: tour.pageHeadline,
+        pageIntro: tour.pageIntro,
+        priceOptions: tour.priceOptions,
+        faqs: tour.faqs,
+        itinerary: tour.itinerary,
+      }),
     };
   });
 }
@@ -70,14 +89,21 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
   }
 
   const query = `{
-    "tours": *[_type == "tour" && active == true] | order(title asc){slug, title, duration, locations, groupSizeMin, groupSizeMax, groupSizeNote, price, currency, priceUnit, description, categories, vibes, destination, commandSummary},
+    "tours": *[_type == "tour" && active == true] | order(title asc){
+      slug, title, duration, locations, groupSizeMin, groupSizeMax, groupSizeNote,
+      price, currency, priceUnit, description, categories, vibes, destination, commandSummary,
+      // Everything a generated tour page is made of. Without these the pages
+      // build from the committed snapshot alone, and an edit in the Studio
+      // changes nothing a visitor sees.
+      included, excluded, funFacts, heroWatermark, pageHeadline, pageIntro,
+      priceOptions[]{label, price},
+      faqs[]{question, answer},
+      itinerary[]{day, title, description, meals}
+    },
     "featured": *[_id == "featuredTourCollection"][0]{items[]{order, tour->{slug}}}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity tour request failed with HTTP ${response.status}`);
-  const body = await response.json();
-  if (body.error) throw new Error(`Sanity tour request failed: ${body.error.description || body.error.type}`);
+  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity tour'});
 
   // Images and detail-page filenames intentionally remain local for now. The
   // user-visible catalogue facts come from Sanity and are merged by slug.

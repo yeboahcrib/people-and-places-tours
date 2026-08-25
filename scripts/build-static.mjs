@@ -90,11 +90,14 @@ if (generateTourPages) {
   for (const tour of tours) {
     // The package page has an itinerary and its own template; not yet generated.
     if (tour.slug === 'just-go-ghana') continue;
+    // Sanity wins; the committed snapshot fills anything it does not hold and
+    // carries the whole page when Sanity is switched off entirely.
     const extra = tourPageContent[tour.slug];
-    if (!extra) continue;
+    const merged = {...extra, ...tour};
+    if (!merged.faqs?.length) continue;
     generatedTourPages.set(tour.detailUrl, renderTourPage({
       template: tourPageTemplate,
-      tour: {...tour, ...extra},
+      tour: merged,
       catalogue: tours,
     }));
   }

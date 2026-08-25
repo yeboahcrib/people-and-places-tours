@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 
@@ -39,11 +40,7 @@ export async function loadSiteContent({projectRoot, env = process.env, fetchImpl
     "navigation": *[_id == "navigation"][0]{navLinks[]{label, href}, footerTagline, footerColumns[]{heading, links[]{label, href}}}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity content request failed with HTTP ${response.status}`);
-
-  const result = await response.json();
-  if (result.error) throw new Error(`Sanity content request failed: ${result.error.description || result.error.type}`);
+  const result = await fetchSanity(url, {fetchImpl, label: 'Sanity content'});
 
   // When Sanity is explicitly configured, fail the build instead of silently
   // publishing stale local values. A visible failed deployment is safer than

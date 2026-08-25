@@ -1,3 +1,4 @@
+import {fetchSanity} from './sanity-fetch.mjs';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 
@@ -80,11 +81,7 @@ export async function loadPolicyContent({localContent, policyType = 'cancellatio
     sections[]{heading, intro, items[]{term, text}}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const response = await fetchImpl(url, {headers: {Accept: 'application/json'}});
-  if (!response.ok) throw new Error(`Sanity policy request failed with HTTP ${response.status}`);
-
-  const body = await response.json();
-  if (body.error) throw new Error(`Sanity policy request failed: ${body.error.description || body.error.type}`);
+  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity policy'});
 
   // Unlike the homepage, there is no merge here. A half-written policy must
   // never be blended with the committed one — the result would be a document
