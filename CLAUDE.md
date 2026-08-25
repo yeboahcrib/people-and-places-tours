@@ -2,7 +2,8 @@
 
 Static HTML/CSS/JS site with no frontend framework. A lightweight deployment
 build validates browser JavaScript and copies approved public files into
-`dist/`; it does not bundle or transform the site. 20 HTML pages share
+`dist/`; it does not bundle or transform the site. Twelve committed HTML pages
+plus the tour pages generated from the CMS share
 `style.css` and `script.js`; the homepage additionally uses
 `homepage-content.js` + `homepage-sections.js` (data + renderer) and `tours.js`
 (the tour catalog used across the site).
@@ -78,14 +79,18 @@ for (const w of [375, 430, 768, 1024, 1440]) {
 }
 ```
 
-**`tests/responsive.js` reads the *source* pages by default, and the navigation
-and footer are injected from the CMS at build time.** So a change to either is
-invisible to it unless you point it at the build:
-`BASE_URL=http://127.0.0.1:8082 npm run test:responsive` against a server on
-`dist/`. Adding a fifth navigation link once pushed the "Book a Tour" button
-off screen between 1024px and 1180px and every check still passed, because
-`body { overflow-x: hidden }` hides a clipped control from a document-width
-test. The suite now measures that button directly.
+**`tests/smoke.js`, `tests/responsive.js`, `tests/resilient-rendering.js` and
+`tests/visual-regression.js` all serve `dist/` themselves** through
+`tests/serve-dist.js`, so they need `npm run build` first and no server of your
+own. They have to: tour pages are generated from the CMS and have no file in
+this repository, and the navigation and footer are injected at build time, so a
+source server 404s on every tour page and cannot see a navigation change at
+all. `BASE_URL` still overrides, for a build already being served.
+
+That gap was not theoretical. Adding a fifth navigation link once pushed the
+"Book a Tour" button off screen between 1024px and 1180px and every check
+passed, because `body { overflow-x: hidden }` hides a clipped control from a
+document-width test. The suite measures that button directly now.
 
 `tests/smoke.js` runs an end-to-end happy-path check across the main pages — run it (`node tests/smoke.js` with the server up) before declaring work done.
 
@@ -109,7 +114,7 @@ If a breakpoint can't be checked in your current environment, say so explicitly 
 ## Other repo-wide conventions worth knowing
 
 - **The homepage renders from a plan, not a fixed sequence.** `renderHomepageMarkup()` in `homepage-sections.js` walks `content.sectionOrder`, where each entry is `{key}` for one of the seven built-in sections or `{layout, ...}` for a section an editor added in Sanity. With no plan it falls back to the seven in their designed order. Four editor-facing layouts exist (`photoBeside`, `cards`, `quote`, `invitation`); adding a fifth means touching three files, and `tests/homepage-layouts.mjs` fails if they drift apart. See `docs/adding-homepage-sections.md`.
-- Nav markup is duplicated across all 20 HTML pages (no SSI / template engine). Style changes go in `style.css`. Markup changes need to be propagated across all 20 files — keep them identical so a single Python pass can update them in future. Header comment in `style.css` explains this.
+- Nav markup is duplicated across the committed HTML pages (no SSI / template engine), though the build replaces it from `src/partials/navigation.html` on every page. Style changes go in `style.css`. Markup changes need to be propagated across those files — keep them identical so a single Python pass can update them in future. Header comment in `style.css` explains this.
 - Active-page highlight on the nav is set two ways: JS (`script.js` matches `location.pathname` against link hrefs) handles top-level pages; tour-detail pages get a static `class="active"` on the Packages link in markup because their URLs don't match a nav item.
 - The booking sidebar on tour-detail pages, the day-by-day accordion itinerary, and the included/not-included checklist are **off-limits** for redesign unless explicitly requested — those work well functionally.
 - The `packages.html` card grid is the strongest layout on the site and should not be restyled without explicit ask.

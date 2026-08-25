@@ -1,58 +1,17 @@
 const {chromium} = require('playwright');
-const http = require('node:http');
-const {createReadStream, existsSync, readFileSync} = require('node:fs');
-const {extname, join, normalize} = require('node:path');
+const {readFileSync} = require('node:fs');
+const {join} = require('node:path');
+const {serveDist, DIST_ROOT} = require('./serve-dist.js');
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
 
 // These checks only make sense against dist/. The homepage and the packages
 // grid are assembled at build time, so the editable source tree legitimately
 // has an empty homepage shell and no tour cards — pointing this suite at the
 // dev server reports failures that are not real. Serve dist/ ourselves rather
 // than relying on whoever runs this to remember a port.
-const DIST_ROOT = join(__dirname, '..', 'dist');
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.webp': 'image/webp',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-};
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function serveDist() {
-  if (!existsSync(DIST_ROOT)) {
-    throw new Error('dist/ is missing — run `npm run build` before this suite, or set BASE_URL to an already-served build.');
-  }
-  const server = http.createServer((request, response) => {
-    const path = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const relative = normalize(path).replace(/^(\.\.[/\\])+/, '').replace(/^[/\\]+/, '');
-    // Resolve extensionless URLs the way Cloudflare Pages does — /about serves
-    // about.html. Internal links carry no extension, so a plain file server
-    // would 404 on every one of them and this suite would be testing a site
-    // that does not match production.
-    const file = [relative || 'index.html', `${relative}.html`]
-      .map(candidate => join(DIST_ROOT, candidate))
-      .find(candidate => candidate.startsWith(DIST_ROOT) && existsSync(candidate)) || '';
-    if (!file || !file.startsWith(DIST_ROOT) || !existsSync(file)) {
-      response.writeHead(404).end('Not found');
-      return;
-    }
-    response.writeHead(200, {'Content-Type': MIME[extname(file)] || 'application/octet-stream'});
-    createReadStream(file).pipe(response);
-  });
-  return new Promise(resolve => {
-    server.listen(0, '127.0.0.1', () => resolve({server, origin: `http://127.0.0.1:${server.address().port}`}));
-  });
-}
-
 (async () => {
   // An explicit BASE_URL still wins, for CI setups that already serve a build.
   const hosted = process.env.BASE_URL ? null : await serveDist();

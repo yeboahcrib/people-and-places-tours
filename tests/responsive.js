@@ -1,6 +1,12 @@
 const {chromium} = require('playwright');
 
-const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8081';
+const {serveDist} = require('./serve-dist.js');
+
+// Serves dist/, not the source tree. Tour pages are generated from the CMS and
+// have no file in the repository, and the navigation and footer are injected at
+// build time — so a source server both 404s on tour pages and cannot see a
+// navigation change at all. An explicit BASE_URL still wins.
+let BASE_URL = process.env.BASE_URL;
 const widths = [375, 430, 768, 1024, 1440];
 const pages = [
   '/index.html',
@@ -14,6 +20,8 @@ const pages = [
   '/privacy-policy.html',
   '/booking-terms.html',
   '/travel-information.html',
+  '/cape-coast-day-tour.html',
+  '/volta-community-tour.html',
 ];
 
 function assert(condition, message) {
@@ -21,6 +29,8 @@ function assert(condition, message) {
 }
 
 (async () => {
+  const hosted = BASE_URL ? null : await serveDist();
+  BASE_URL = BASE_URL || hosted.origin;
   const browser = await chromium.launch({headless: true});
 
   for (const width of widths) {
@@ -119,6 +129,7 @@ function assert(condition, message) {
   }
 
   await browser.close();
+  hosted?.server.close();
   console.log(`Responsive checks passed across ${pages.length} page templates at ${widths.join(' / ')}px.`);
 })().catch(error => {
   console.error(error.message);
