@@ -27,12 +27,25 @@
   /* Brand yellow as text on white fails WCAG AA badly (1.73:1). Use this
      deepened amber wherever yellow carries words on a light surface;
      --yellow stays the accent/fill colour on dark. 4.69:1 on white. */
-  --yellow-on-light: #9C6A00;
+  /* AA-safe yellow for text on a light surface. Was #9C6A00, which was
+     computed against pure white (4.69:1) and fell to 4.49:1 on the cream
+     the site actually uses — just under AA. This clears 4.5:1 on both. */
+  --yellow-on-light: #976500;
   --yellow-glow:   rgba(255,184,28,.15);
   --black:         var(--pap-charcoal);
-  --black-2:       #111111;
-  --black-3:       #0d0d0d;
-  --black-card:    #1e1e1e;
+
+  /* ── DARK SURFACES ──────────────────────────────────────────
+     This was five values: #1A1A1A, #111111, #0d0d0d, #050505 and
+     #1e1e1e. Every pair among them measures between 1.03:1 and
+     1.22:1, so none of them ever read as a distinct band — the
+     "alternate dark section" this file used to describe was not
+     visible to anyone. Cards are defined by a 1px border and a 24px
+     radius, not by their fill, which is why collapsing the scale
+     costs nothing. Two values is what the design actually uses:
+     one for surfaces you look at, one for surfaces that sit on top.
+     `--black` stays as ink (28 rules colour text with it). */
+  --surface-dark:   var(--pap-charcoal);
+  --surface-raised: #1e1e1e;
   --border:        #2a2a2a;
   --border-yellow: rgba(255,184,28,.3);
   --white:         #FFFFFF;
@@ -45,11 +58,6 @@
   /* Secondary brand accents — terracotta (badges/hover) */
   --terracotta:        #C2553D;
   --terracotta-dark:   #A2422F;
-  /* Alternate-dark sections — slightly deeper than --pap-charcoal so they
-     still read as a visually distinct band when next to the main black.
-     (Variable kept named "forest" for backward compatibility; actual hue is off-black.) */
-  --forest:            #0d0d0d;
-  --forest-card:       #1e1e1e;
 
 
   /* ── LIGHT SURFACES ──────────────────────────────────────────
@@ -75,8 +83,8 @@
   --color-error:        #ef4444;
   --color-whatsapp:     #25D366;
 
-  --color-surface:      var(--black-card);
-  --color-surface-alt:  var(--black-2);
+  --color-surface:      var(--surface-raised);
+  --color-surface-alt:  var(--surface-dark);
   --color-border:       var(--border);
 
   --color-text-muted:   var(--gray-2);
@@ -265,7 +273,8 @@ h1, h2, h3, h4,
 }
 .white-lift .section-title { color: var(--black); }
 .white-lift .section-sub { color: var(--light-text-subtle); }
-.white-lift .eyebrow { color: var(--color-primary-deep); }
+/* Was --color-primary-deep, which measures 2.37:1 on this surface. */
+.white-lift .eyebrow { color: var(--yellow-on-light); }
 
 /* ── BUTTONS ─────────────────────────────────────────────────── */
 .btn {
@@ -1002,7 +1011,7 @@ body.page-entering {
 /*  TESTIMONIALS                                                  */
 /* ────────────────────────────────────────────────────────────── */
 .testimonials-section {
-  background: var(--forest);
+  background: var(--surface-dark);
   position: relative;
   overflow: hidden;
 }
@@ -1011,7 +1020,7 @@ body.page-entering {
   position: relative;
   z-index: 1;
 }
-.testimonials-section .sec-img-head { background-color: var(--forest); }
+.testimonials-section .sec-img-head { background-color: var(--surface-dark); }
 .testimonials-section .sec-img-head { min-height: clamp(440px, 48vw, 620px); }
 .testimonials-section .sec-img-head .section-split { align-items: end; gap: clamp(3rem, 7vw, 7rem); }
 .testimonials-section .sec-img-head .section-title { font-size: clamp(3rem, 5.2vw, 5rem); line-height: 0.98; }
@@ -1217,7 +1226,7 @@ body.page-entering {
 /*  FOOTER                                                        */
 /* ────────────────────────────────────────────────────────────── */
 .footer {
-  background: #050505;
+  background: var(--surface-dark);
   padding: var(--sp-8) 0 0;
   border-top: 1px solid var(--color-border);
 }
@@ -1375,7 +1384,7 @@ body.page-entering {
 .accordion { margin: var(--sp-4) 0; }
 .also-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-3); max-width: var(--container); margin: 0 auto; }
 .also-card {
-  background: var(--forest-card);
+  background: var(--surface-raised);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -1728,7 +1737,7 @@ body.page-entering {
 }
 
 .why-item {
-  background: var(--forest-card);
+  background: var(--surface-raised);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--radius-md);
   padding: var(--sp-5) var(--sp-4);
@@ -2506,7 +2515,7 @@ body.page-entering {
   border-color: rgba(255,171,0,.45);
 }
 /* .contact-card-sub is decorative-weight text on a card that can now lift;
-   .4 alpha sits under 4.5:1 against --black-card. */
+   .4 alpha sits under 4.5:1 against --surface-raised. */
 .contact-card-sub { color: var(--color-text-muted); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4594,4 +4603,87 @@ a.flex-card:focus-visible {
     padding: var(--sp-2) 0;
   }
   .mission-proof > div:last-child { border-bottom: 0; }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  LIGHT SECTION                                                 */
+/*                                                                */
+/*  Packages and contact measured 100% and 99% dark top to bottom, */
+/*  on the two pages that actually sell — browsing tours and       */
+/*  booking one. Home and the tour pages already sit near 50/50,   */
+/*  so this is not a sitewide problem, it is those two pages.      */
+/*                                                                */
+/*  The card grid and the booking form stay on dark deliberately:  */
+/*  both are protected components. This lights the sections that   */
+/*  frame them, which is enough to break the wall.                 */
+/* ────────────────────────────────────────────────────────────── */
+.light-section {
+  background: var(--light-surface);
+  color: var(--light-text);
+}
+.light-section .section-title,
+.light-section h2,
+.light-section h3 { color: var(--black); }
+.light-section .section-subtitle,
+.light-section .addons-note,
+.light-section .experience-price-note,
+.light-section .experience-filter-prompt,
+.light-section p { color: var(--light-text-muted); }
+/* --color-primary-deep measures 2.42:1 on cream. Yellow as text on a light
+   surface has to be --yellow-on-light; the same trap CLAUDE.md warns about. */
+.light-section .eyebrow { color: var(--yellow-on-light); }
+
+/* Pills and chips: the dark styles hang white text on a dark border,
+   which disappears entirely on cream. */
+.light-section .addons-list li {
+  color: var(--light-text);
+  border-color: var(--light-border);
+  background: var(--white);
+}
+.light-section .filter-tab {
+  color: var(--light-text-muted);
+  border-color: var(--light-border);
+  background: var(--white);
+}
+.light-section .filter-tab:hover { border-color: var(--color-primary-deep); }
+.light-section .filter-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--black);
+}
+.light-section .form-select,
+.light-section select {
+  color: var(--light-text);
+  border-color: var(--light-border);
+  background-color: var(--white);
+}
+
+/* FAQ rows are hairline-separated; the dark border vanishes on cream. */
+.light-section .faq-item { border-bottom-color: var(--light-border); }
+.light-section .faq-question { color: var(--black); }
+.light-section .faq-question:hover { color: var(--color-primary-deep); }
+.light-section .faq-answer-inner { color: var(--light-text-muted); }
+.light-section .faq-q-icon {
+  border-color: var(--light-border);
+  color: var(--light-text);
+}
+
+/* The group-of-three pricing rule used to sit inside the dark catalogue
+   section, where it read as small print above a wall of cards. It is the
+   one thing a visitor needs before they interpret any price on the page,
+   so it gets its own light band — compact, not a full section, because a
+   single paragraph in section-pad reads as an empty room. */
+.catalog-note-band {
+  padding: var(--sp-5) 0;
+}
+.catalog-note-band .experience-price-note {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: var(--text-xl);
+  line-height: 1.65;
+}
+@media (max-width: 768px) {
+  .catalog-note-band { padding: var(--sp-4) 0; }
+  .catalog-note-band .experience-price-note { text-align: left; }
 }
