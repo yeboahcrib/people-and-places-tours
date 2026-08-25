@@ -10,7 +10,10 @@ const TEXT_KEYS = [
   'missionEyebrow', 'missionTitle', 'missionBody',
   'differenceEyebrow', 'differenceTitle', 'differenceIntro',
   'teamEyebrow', 'teamTitle', 'teamIntro', 'teamNote',
-  'ctaEyebrow', 'ctaTitle', 'ctaBody', 'ctaNote',
+  // ctaBody and ctaNote were retired in August 2026: the block asked the
+  // same question the homepage closing block asks, and the note repeated a
+  // promise the booking form already makes where it matters.
+  'ctaEyebrow', 'ctaTitle',
 ];
 
 const LIST_SHAPES = {
