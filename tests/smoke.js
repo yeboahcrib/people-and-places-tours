@@ -181,6 +181,20 @@ async function withPage(browser, path, callback) {
       'Escape closed the mobile nav but did not return focus to the toggle');
     assert(await page.locator('.nav-toggle').getAttribute('aria-expanded') === 'false',
       'aria-expanded was not reset after Escape');
+
+    // The reviews carousel is scrolled natively on touch — the drag script bails
+    // on anything that is not a mouse. `touch-action: pan-y` therefore made it
+    // unswipeable on a phone: the browser handed every sideways gesture to the
+    // page, and the carousel never moved. One CSS property, no visible error.
+    const track = page.locator('.testimonials-track');
+    if (await track.count()) {
+      const touchAction = await track.evaluate(el => getComputedStyle(el).touchAction);
+      assert(!/^pan-y$|^none$/.test(touchAction),
+        `.testimonials-track has touch-action: ${touchAction}, which blocks horizontal swiping on touch`);
+      const overflowX = await track.evaluate(el => getComputedStyle(el).overflowX);
+      assert(overflowX === 'auto' || overflowX === 'scroll',
+        `.testimonials-track must scroll horizontally, got overflow-x: ${overflowX}`);
+    }
   });
 
   await browser.close();

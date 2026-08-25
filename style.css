@@ -1053,7 +1053,12 @@ body.page-entering {
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   cursor: grab;
-  touch-action: pan-y;
+  /* No touch-action restriction. It was `pan-y`, which tells the browser to
+     accept only vertical gestures here — so a sideways swipe was handed to the
+     page and the carousel never moved. The drag script bails on anything that
+     is not a mouse (`pointerType !== 'mouse'`), so touch has always depended on
+     native scrolling, and native scrolling was the thing being forbidden.
+     Leaving it unset also restores pinch-zoom over the carousel. */
 }
 .testimonials-track::-webkit-scrollbar { display: none; }
 .testimonials-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
@@ -4805,4 +4810,24 @@ a.trust-rating:focus-visible {
   a.trust-rating,
   a.trust-rating .trust-rating-source::after { transition: none; }
   a.trust-rating:hover .trust-rating-source::after { transform: none; }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  CAROUSEL DOTS ON SMALL SCREENS                                */
+/*                                                                */
+/*  One dot per review, and the review count is an editor's        */
+/*  decision. At ten reviews the row is 440px of 44px tap targets   */
+/*  inside a 335px screen, so it wrapped into three rows — a 96px   */
+/*  block of dots under a 300px card.                              */
+/*                                                                */
+/*  Nielsen Norman's guidance on mobile carousels is that progress  */
+/*  dots struggle on touch precisely here: the tap area has to be   */
+/*  large and the UI has no room for it. Now that swiping works,    */
+/*  the peek of the next card is the affordance, so the dots step   */
+/*  aside below tablet and stay where there is room for them.       */
+/*  The track itself keeps role="region" and tabindex="0", so       */
+/*  keyboard users still reach and arrow through it.                */
+/* ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .testimonials-dots { display: none; }
 }
