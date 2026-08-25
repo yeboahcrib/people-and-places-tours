@@ -192,8 +192,8 @@ for (const entry of rootEntries) {
     const withFooter = replaceFooter(withNavigation, footer);
     const withHomepage = entry.name === 'index.html'
       ? withFooter.replace(
-        '<main id="homepage-root" data-homepage-renderer="homepage-sections"></main>',
-        `<main id="homepage-root" data-homepage-renderer="homepage-sections">${homepageMarkup}</main>`,
+        '<main id="main-content" data-homepage-renderer="homepage-sections"></main>',
+        `<main id="main-content" data-homepage-renderer="homepage-sections">${homepageMarkup}</main>`,
       )
       : withFooter;
     const withAbout = injectAboutContent(withHomepage, aboutContent);
