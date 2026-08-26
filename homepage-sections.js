@@ -251,7 +251,7 @@
         ${renderCountValue(data.ratingSummary.value, 'trust-rating-value')}
         <span class="trust-rating-meta">
           ${renderStars(`Rated ${data.ratingSummary.value} out of 5`)}
-          <span class="trust-rating-source">${escapeHtml(`${data.ratingSummary.count} ${data.ratingSummary.source} reviews`)}</span>
+          <span class="trust-rating-source">${escapeHtml(`${data.ratingSummary.count} ${data.ratingSummary.source} reviews`)}<svg class="arrow-icon trust-rating-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </span>
       </${data.ratingSummary.href ? 'a' : 'div'}>` : ''}
       ${(data.trustFacts || []).map(f => `

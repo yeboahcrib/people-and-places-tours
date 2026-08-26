@@ -4170,8 +4170,9 @@ body.page-entering {
 .trust-rating-meta { display: flex; flex-direction: column; gap: 0.3rem; }
 .trust-rating .testi-stars { margin-bottom: 0; }
 .trust-rating-source {
-  font-size: var(--text-xs);
-  letter-spacing: 0.04em;
+  /* Was --text-xs (12px), which disappeared beside a 50px numeral. */
+  font-size: var(--text-md);
+  letter-spacing: 0.02em;
   color: rgba(255,255,255,0.62);
   border-bottom: 1px solid transparent;
   transition: color var(--transition), border-color var(--transition);
@@ -4775,9 +4776,11 @@ a.flex-card:focus-visible {
 /*  why the section read as copy we wrote about ourselves.         */
 /* ────────────────────────────────────────────────────────────── */
 .google-mark {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
+  /* Matched to the rating numeral beside it, from the same clamp. At 22px it
+     read as a footnote next to a 50px figure. */
+  width: clamp(2.4rem, 4vw, 3.1rem);
+  height: clamp(2.4rem, 4vw, 3.1rem);
+  flex: 0 0 auto;
   align-self: center;
 }
 a.trust-rating {
@@ -4798,23 +4801,25 @@ a.trust-rating .trust-rating-source {
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
-a.trust-rating .trust-rating-source::after {
-  content: '↗';
-  display: inline-block;
-  margin-inline-start: 0.4em;
-  text-decoration: none;
+/* The arrow is the site's own icon, the one every button uses, not a glyph
+   pasted into CSS content. */
+.trust-rating-arrow {
+  width: 0.9em;
+  height: 0.9em;
+  margin-inline-start: 0.45em;
+  vertical-align: -0.08em;
   transition: transform var(--motion-base, 300ms) ease;
 }
 a.trust-rating:hover { background: rgba(255, 255, 255, 0.06); }
-a.trust-rating:hover .trust-rating-source::after { transform: translate(2px, -2px); }
+a.trust-rating:hover .trust-rating-arrow { transform: translateX(3px); }
 a.trust-rating:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
 @media (prefers-reduced-motion: reduce) {
   a.trust-rating,
-  a.trust-rating .trust-rating-source::after { transition: none; }
-  a.trust-rating:hover .trust-rating-source::after { transform: none; }
+  a.trust-rating .trust-rating-arrow { transition: none; }
+  a.trust-rating:hover .trust-rating-arrow { transform: none; }
 }
 
 /* ────────────────────────────────────────────────────────────── */
