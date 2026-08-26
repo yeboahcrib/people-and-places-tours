@@ -76,37 +76,6 @@
       ],
       cta: { label: 'Find Your Way Into Ghana', href: 'packages.html' },
     },
-    howHosted: {
-      eyebrow: "How You're Hosted",
-      titleLines: ['Care You Can', 'Actually Feel'],
-      intro: 'Less like following a tour. More like being welcomed in.',
-      principles: [
-        {
-          icon: 'pin',
-          title: 'Places With Meaning',
-          proofQuote: 'This was not just a tour — it was emotional, educational, spiritual, and incredibly meaningful for all of us.',
-          proofAuthor: 'Cynthia Muldrow',
-        },
-        {
-          icon: 'heart',
-          title: 'Your Comfort Matters',
-          proofQuote: 'I felt safe, protected and well taken care of.',
-          proofAuthor: 'Myra Mirabel Aboagye',
-        },
-        {
-          icon: 'user-circle',
-          title: 'Hosted From Experience',
-          proofQuote: 'During the trip, you could feel the warmth and passion at every step of the way, and that\'s completely contagious for the group!',
-          proofAuthor: 'Iga Gawronska',
-        },
-        {
-          icon: 'calendar',
-          title: 'Plans That Fit Real Life',
-          proofQuote: 'Even with short notice, everything was handled smoothly and without any stress which honestly says a lot.',
-          proofAuthor: 'Jacoya Miller',
-        },
-      ],
-    },
     reviewsAndTrust: {
       eyebrow: 'Real Reviews',
       titleLines: ['What Our', 'Travellers Say'],

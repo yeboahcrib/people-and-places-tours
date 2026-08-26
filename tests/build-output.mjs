@@ -93,7 +93,12 @@ assert(['local', 'sanity'].includes(health.homepageContentSource));
 assert(!Number.isNaN(Date.parse(health.builtAt)), 'health.json has an invalid build time');
 
 const generatedHome = await readFile(join(outputPath, 'index.html'), 'utf8');
-assert.equal((generatedHome.match(/data-home-section=/g) || []).length, 7, 'Homepage was not statically rendered with 7 sections');
+// Derived from the renderer's own list, not frozen at a number. This assertion
+// said 7, and retiring one section turned a deliberate change into a build
+// failure that named the wrong problem.
+const {SECTION_KEYS} = await import('../scripts/homepage-source.mjs');
+assert.equal((generatedHome.match(/data-home-section=/g) || []).length, SECTION_KEYS.length,
+  `Homepage was not statically rendered with all ${SECTION_KEYS.length} built-in sections`);
 assert.equal((generatedHome.match(/<article class="trip-card/g) || []).length, 0, 'Homepage still contains featured tour cards');
 const generatedPackages = await readFile(join(outputPath, 'packages.html'), 'utf8');
 assert(Number.isInteger(health.tourCount) && health.tourCount > 0, 'health.json is missing a tour count');

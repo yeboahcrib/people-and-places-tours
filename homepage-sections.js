@@ -163,37 +163,6 @@
 </section>`;
   }
 
-  function renderHowHostedSection(data) {
-    if (!(data.principles || []).length) return '';
-    return `
-<!-- Hosting principles, each backed by a real, unedited review excerpt. -->
-<section class="why-section" aria-label="How you're hosted" data-home-section="howHosted">
-  ${renderWeaveMotif('hosted')}
-  ${renderWeaveMotif('hosted-lower')}
-  <div class="container">
-    <div class="why-editorial">
-      <div class="why-editorial-head">
-        <div class="why-editorial-heading-group">
-          <div class="eyebrow reveal">${escapeHtml(data.eyebrow)}</div>
-          <h2 class="why-editorial-title reveal reveal-delay-1">${renderLines(data.titleLines)}</h2>
-        </div>
-        <p class="why-editorial-intro reveal reveal-delay-2">${escapeHtml(data.intro)}</p>
-      </div>
-      <ol class="why-editorial-list">
-        ${(data.principles || []).map((p, index) => `
-        <li class="why-row reveal why-row-delay-${Math.floor(index / 2) + 1}">
-          <span class="why-row-icon" aria-hidden="true">${renderIcon(p.icon)}</span>
-          <div class="why-row-content">
-            <h3>${escapeHtml(p.title)}</h3>
-            ${p.text ? `<p>${escapeHtml(p.text)}</p>` : ''}
-            ${p.proofQuote ? `<blockquote class="principle-proof">&ldquo;${escapeHtml(p.proofQuote)}&rdquo;${p.proofAuthor ? ` <cite>— ${escapeHtml(p.proofAuthor)}</cite>` : ''}</blockquote>` : ''}
-          </div>
-        </li>`).join('')}
-      </ol>
-    </div>
-  </div>
-</section>`;
-  }
 
   function renderBookingStepsSection(data) {
     if (!(data.steps || []).length) return '';
@@ -433,7 +402,6 @@
     hero: renderHeroSection,
     founderStory: renderFounderStorySection,
     waysToExperience: renderWaysToExperienceSection,
-    howHosted: renderHowHostedSection,
     reviewsAndTrust: renderReviewsAndTrustSection,
     planningProcess: renderBookingStepsSection,
     finalInvitation: renderFinalInvitationSection,
