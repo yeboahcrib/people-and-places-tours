@@ -13,9 +13,10 @@
       // instead of `image` switches the hero back to film; the renderer
       // supports both and prefers `image`.
       image: {
-        src: 'https://images.unsplash.com/photo-1660675133902-acd1b057f75d?auto=format&fit=crop&w=1920&q=80',
+        src: 'assets/photos/home-hero-group-welcome.jpg',
         width: 1920,
-        height: 1280,
+        height: 1200,
+        alt: 'A People & Places group together outside at the end of a day\u2019s touring',
       },
       headline: 'The People Make the Place.',
       sub: 'Whether it\'s your first time in Ghana or your way back, you\'ll see it with people who live here.',
@@ -84,13 +85,13 @@
           title: 'Adventure',
           text: 'Canopy walks, mountain trails, quad bikes, and the kind of days that leave dust on your shoes.',
           href: 'packages.html?category=adventure',
-          image: { src: 'https://images.unsplash.com/photo-1636389396809-c3ab57b60d93?auto=format&fit=crop&w=1000&q=82&h=760', width: 1000, height: 760, alt: 'Quad bike adventure through forest trails in Ghana' },
+          image: { src: 'assets/photos/pathway-adventure-quadbike.jpg', width: 1100, height: 852, alt: 'A guest on a quad bike on a forest trail' },
         },
         {
           title: 'Craft & Tradition',
           text: 'Kente, batik, and pottery learned beside the makers who continue these traditions by hand.',
           href: 'packages.html?category=craft',
-          image: { src: 'https://images.unsplash.com/photo-1720343354398-89c6aa6d12a4?auto=format&fit=crop&w=1000&q=82&h=760', width: 1000, height: 760, alt: 'Kente weaving and artisan traditions in Ghana' },
+          image: { src: 'assets/photos/pathway-craft-kente-loom.jpg', width: 1100, height: 853, alt: 'Hands weaving kente on a loom at Adanwomase' },
         },
         {
           title: 'The Longer Story',
