@@ -1053,7 +1053,17 @@ body.page-entering {
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   cursor: grab;
-  touch-action: pan-y;
+  /* Horizontal only, deliberately.
+     This was `pan-y` — the exact opposite — which handed every sideways swipe
+     to the page, so the carousel never moved. The drag script bails on anything
+     that is not a mouse (`pointerType !== 'mouse'`), so touch has always
+     depended on native scrolling, and native scrolling was being forbidden.
+     Removing the restriction altogether fixed the swipe but left the browser
+     choosing the axis per gesture, and a real thumb swipe always drifts
+     vertically — so the page scrolled out from under the card mid-swipe.
+     `pan-x` commits this element to horizontal, and `pinch-zoom` is kept
+     alongside it so the carousel can still be zoomed. */
+  touch-action: pan-x pinch-zoom;
 }
 .testimonials-track::-webkit-scrollbar { display: none; }
 .testimonials-track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
@@ -4160,8 +4170,9 @@ body.page-entering {
 .trust-rating-meta { display: flex; flex-direction: column; gap: 0.3rem; }
 .trust-rating .testi-stars { margin-bottom: 0; }
 .trust-rating-source {
-  font-size: var(--text-xs);
-  letter-spacing: 0.04em;
+  /* Was --text-xs (12px), which disappeared beside a 50px numeral. */
+  font-size: var(--text-md);
+  letter-spacing: 0.02em;
   color: rgba(255,255,255,0.62);
   border-bottom: 1px solid transparent;
   transition: color var(--transition), border-color var(--transition);
@@ -4753,4 +4764,80 @@ a.flex-card:focus-visible {
     padding-inline: var(--sp-2-5);
     white-space: normal;
   }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  GOOGLE REVIEW PROVENANCE                                      */
+/*                                                                */
+/*  The rating block has always been a link to Google, but it      */
+/*  carried no visual sign of it: no underline, no arrow, nothing  */
+/*  but cursor:pointer — which you only meet by hovering, and      */
+/*  never on a phone. The proof was there and invisible, which is  */
+/*  why the section read as copy we wrote about ourselves.         */
+/* ────────────────────────────────────────────────────────────── */
+.google-mark {
+  /* Matched to the rating numeral beside it, from the same clamp. At 22px it
+     read as a footnote next to a 50px figure. */
+  width: clamp(2.4rem, 4vw, 3.1rem);
+  height: clamp(2.4rem, 4vw, 3.1rem);
+  flex: 0 0 auto;
+  align-self: center;
+}
+a.trust-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1-5);
+  border-radius: var(--radius-md, 14px);
+  padding: var(--sp-1) var(--sp-1-5);
+  margin-inline-start: calc(var(--sp-1-5) * -1);
+  text-decoration: none;
+  transition: background var(--motion-base, 300ms) ease;
+}
+/* The source line is what carries the affordance: it reads as a link, gains
+   an arrow, and the arrow moves on hover. The 5.0 itself stays quiet — it is
+   a number, not a control. */
+a.trust-rating .trust-rating-source {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+/* The arrow is the site's own icon, the one every button uses, not a glyph
+   pasted into CSS content. */
+.trust-rating-arrow {
+  width: 0.9em;
+  height: 0.9em;
+  margin-inline-start: 0.45em;
+  vertical-align: -0.08em;
+  transition: transform var(--motion-base, 300ms) ease;
+}
+a.trust-rating:hover { background: rgba(255, 255, 255, 0.06); }
+a.trust-rating:hover .trust-rating-arrow { transform: translateX(3px); }
+a.trust-rating:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  a.trust-rating,
+  a.trust-rating .trust-rating-arrow { transition: none; }
+  a.trust-rating:hover .trust-rating-arrow { transform: none; }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/*  CAROUSEL DOTS ON SMALL SCREENS                                */
+/*                                                                */
+/*  One dot per review, and the review count is an editor's        */
+/*  decision. At ten reviews the row is 440px of 44px tap targets   */
+/*  inside a 335px screen, so it wrapped into three rows — a 96px   */
+/*  block of dots under a 300px card.                              */
+/*                                                                */
+/*  Nielsen Norman's guidance on mobile carousels is that progress  */
+/*  dots struggle on touch precisely here: the tap area has to be   */
+/*  large and the UI has no room for it. Now that swiping works,    */
+/*  the peek of the next card is the affordance, so the dots step   */
+/*  aside below tablet and stay where there is room for them.       */
+/*  The track itself keeps role="region" and tabindex="0", so       */
+/*  keyboard users still reach and arrow through it.                */
+/* ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .testimonials-dots { display: none; }
 }

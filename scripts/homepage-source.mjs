@@ -187,6 +187,7 @@ function applyPrimaryCopy(target, section) {
         author: entry?.reviewerName,
         location: entry?.country || (entry?.platform ? `Verified ${entry.platform} review` : undefined),
         rating: entry?.rating,
+        date: entry?.reviewDate,
         sourceUrl: entry?.sourceUrl,
         image: usablePhoto(entry?.image),
       }),
@@ -396,7 +397,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
       "proofReview": proofReview->{reviewerName, selectedExcerpt}
     },
     "featuredReviews": featuredReviews[]->{
-      reviewerName, country, selectedExcerpt, rating, platform, sourceUrl,
+      reviewerName, country, selectedExcerpt, rating, platform, sourceUrl, reviewDate,
       "image": {
         "src": media[0].image.asset->url,
         "alt": media[0].altText,
