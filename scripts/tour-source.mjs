@@ -18,6 +18,32 @@ const definedOnly = fields => Object.fromEntries(
     && !(Array.isArray(value) && value.length === 0)),
 );
 
+/**
+ * Turn a Studio photo into a card image URL, cropped around its focal point.
+ *
+ * The Studio has always shown a draggable circle on every photo — "drag the
+ * circle over the most important part so it stays visible wherever the photo
+ * is cropped" — but nothing read it, so the circle did nothing. Sanity's image
+ * CDN does the cropping itself from these parameters, which means an editor
+ * moving that circle changes the card without a deploy and without anyone
+ * re-cutting a JPEG by hand.
+ *
+ * Without a hotspot the CDN centre-crops, which is the old behaviour.
+ */
+function cardImageUrl(photo, width, height) {
+  if (!photo?.src) return undefined;
+  const params = new URLSearchParams({
+    w: String(width), h: String(height), fit: 'crop', auto: 'format', q: '80',
+  });
+  const {x, y} = photo.hotspot || {};
+  if (Number.isFinite(x) && Number.isFinite(y)) {
+    params.set('crop', 'focalpoint');
+    params.set('fp-x', x.toFixed(4));
+    params.set('fp-y', y.toFixed(4));
+  }
+  return `${photo.src}?${params}`;
+}
+
 function validateSanityTours(result, localTours) {
   if (!Array.isArray(result?.tours) || result.tours.length === 0) {
     throw new Error('Sanity content is missing active tours');
@@ -60,6 +86,13 @@ function validateSanityTours(result, localTours) {
       commandSummary: tour.commandSummary || presentation.commandSummary,
       homeFeatured: featuredOrder.has(slug),
       homeOrder: featuredOrder.get(slug),
+      // A photo published in the Studio replaces the committed one. Both card
+      // sizes come from the same source photo and the same focal point.
+      ...definedOnly({
+        image: cardImageUrl(tour.cardPhoto, 1200, 840),
+        packageImage: cardImageUrl(tour.cardPhoto, 1200, 825),
+        alt: tour.cardPhoto?.alt,
+      }),
       // Only fields the document actually holds, so a tour with no FAQs in
       // Sanity falls back to the committed snapshot rather than blanking it.
       ...definedOnly({
@@ -96,6 +129,13 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
       // build from the committed snapshot alone, and an edit in the Studio
       // changes nothing a visitor sees.
       included, excluded, funFacts, heroWatermark, pageHeadline, pageIntro,
+      // The first photo an editor has actually approved, plus the focal point
+      // they set on it. Unapproved and stand-in photos are skipped here rather
+      // than filtered later, so a tour with none falls back to the committed
+      // image instead of rendering a blank card.
+      "cardPhoto": media[publicApprovalState == "approved" && placeholderState == "approved"][0]{
+        "src": image.asset->url, "alt": altText, "hotspot": image.hotspot
+      },
       priceOptions[]{label, price},
       faqs[]{question, answer},
       itinerary[]{day, title, description, meals}
@@ -105,7 +145,7 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
   const body = await fetchSanity(url, {fetchImpl, label: 'Sanity tour'});
 
-  // Images and detail-page filenames intentionally remain local for now. The
-  // user-visible catalogue facts come from Sanity and are merged by slug.
+  // Detail-page filenames intentionally remain local. Catalogue facts and the
+  // card photo come from Sanity and are merged by slug.
   return {tours: validateSanityTours(body.result, localTours), source: 'sanity'};
 }
