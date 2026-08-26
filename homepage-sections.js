@@ -185,7 +185,7 @@
           <span class="why-row-icon" aria-hidden="true">${renderIcon(p.icon)}</span>
           <div class="why-row-content">
             <h3>${escapeHtml(p.title)}</h3>
-            <p>${escapeHtml(p.text)}</p>
+            ${p.text ? `<p>${escapeHtml(p.text)}</p>` : ''}
             ${p.proofQuote ? `<blockquote class="principle-proof">&ldquo;${escapeHtml(p.proofQuote)}&rdquo;${p.proofAuthor ? ` <cite>— ${escapeHtml(p.proofAuthor)}</cite>` : ''}</blockquote>` : ''}
           </div>
         </li>`).join('')}
