@@ -6,6 +6,24 @@ const output = new URL('../dist/', import.meta.url);
 const outputPath = decodeURIComponent(output.pathname);
 const exists = path => access(join(outputPath, path)).then(() => true, () => false);
 
+// In coming-soon mode the build deliberately emits one page, so the checks
+// below — which describe the whole site — do not apply. This asserts what that
+// mode actually promises: a holding page that is contactable, and that no
+// crawler is invited to index.
+if (process.env.COMING_SOON === 'true') {
+  const page = await readFile(join(outputPath, 'index.html'), 'utf8');
+  assert(/<meta name="robots" content="noindex/.test(page), 'the holding page must not be indexable');
+  assert(/wa\.me\//.test(page), 'the holding page must offer WhatsApp');
+  assert(/tel:\+?\d/.test(page), 'the holding page must offer a phone number');
+  assert(/mailto:[^"]+@/.test(page), 'the holding page must offer an email address');
+  assert(!(await exists('sitemap.xml')),
+    'the holding page build must not ship a sitemap inviting a crawler in');
+  const robots = await readFile(join(outputPath, 'robots.txt'), 'utf8');
+  assert(/Disallow: \/$/m.test(robots), 'robots.txt must disallow crawling while the hold is up');
+  console.log('Coming-soon holding page checks passed.');
+  process.exit(0);
+}
+
 for (const required of [
   'index.html',
   'contact.html',
