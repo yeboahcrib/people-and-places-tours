@@ -40,11 +40,21 @@
       // is dropped in, the slot renders as a labelled placeholder rather than
       // as stock: a wall of strangers is the problem these are meant to fix.
       moments: [
-        {shape: 'tall',  caption: 'A guest at Cape Coast Castle'},
-        {shape: 'wide',  caption: 'Hands at the loom in Adanwomase'},
-        {shape: 'tall',  caption: 'The boat on the Volta at Ada'},
-        {shape: 'wide',  caption: 'A chop bar table, mid-meal'},
-        {shape: 'tall',  caption: 'Nana and Kojo with a group'},
+        {shape: 'tall', caption: 'The First Bath of Return at Assin Manso',
+         image: {src: 'assets/photos/moment-assin-manso-first-bath.jpg', width: 825, height: 1100,
+                 alt: 'Guests standing in the river at Assin Manso for the First Bath of Return'}},
+        {shape: 'wide', caption: 'At the wheel with a potter in Vume',
+         image: {src: 'assets/photos/moment-potters-wheel-vume.jpg', width: 1200, height: 900,
+                 alt: 'A potter guiding a guest\u2019s hands on the wheel'}},
+        {shape: 'tall', caption: 'The Door of No Return',
+         image: {src: 'assets/photos/moment-door-of-no-return.jpg', width: 825, height: 1100,
+                 alt: 'Two guests standing at the Door of No Return'}},
+        {shape: 'wide', caption: 'A full group under the palms at Aburi',
+         image: {src: 'assets/photos/moment-group-aburi-gardens.jpg', width: 1200, height: 899,
+                 alt: 'A large group of guests together at Aburi Botanical Gardens'}},
+        {shape: 'tall', caption: 'Across the canopy walkway at Kakum',
+         image: {src: 'assets/photos/moment-kakum-canopy-walk.jpg', width: 825, height: 1100,
+                 alt: 'A guest in a Ghana shirt on the Kakum canopy walkway'}},
       ],
     },
     waysToExperience: {
