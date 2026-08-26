@@ -3,13 +3,14 @@ import {loadHomepageContent} from '../scripts/homepage-source.mjs';
 
 const clone = value => structuredClone(value);
 
-const keys = ['hero', 'founderStory', 'waysToExperience', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
+const keys = ['hero', 'founderStory', 'waysToExperience', 'tripMoments', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
 const localContent = Object.fromEntries(keys.map(key => [key, {
   eyebrow: 'Local eyebrow', headline: 'Local headline', title: 'Local title', titleLines: ['Local title'], body: 'Local body', intro: 'Local intro', sub: 'Local sub', tagline: 'Local tagline', cta: {label: 'Local', href: 'index.html'},
 }]));
 localContent.waysToExperience.pathways = [{title: 'Local pathway', text: 'Local description', href: 'packages.html?category=nature', image: {src: 'local.jpg', alt: 'Local'}}];
 localContent.reviewsAndTrust.items = [{quote: 'Local quote', author: 'Local author', rating: 5}];
 localContent.planningProcess.steps = [{icon: 'search', number: '01', title: 'Local step', text: 'Local step text'}];
+localContent.tripMoments.moments = [{shape: 'wide', caption: 'Local moment'}];
 localContent.hero.video = {src: 'local.mp4'};
 
 let loaded = await loadHomepageContent({localContent, env: {}});

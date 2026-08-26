@@ -1,7 +1,7 @@
 import {fetchSanity} from './sanity-fetch.mjs';
 const API_VERSION = '2026-08-02';
 const SECTION_KEYS = [
-  'hero', 'founderStory', 'waysToExperience',
+  'hero', 'founderStory', 'waysToExperience', 'tripMoments',
   'reviewsAndTrust', 'planningProcess', 'finalInvitation',
 ];
 

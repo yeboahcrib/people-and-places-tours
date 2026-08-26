@@ -32,6 +32,21 @@
       trustNote: 'Welcoming first-time visitors and people coming home since 2021',
       cta: { label: 'Read our full story', href: 'about.html' },
     },
+    tripMoments: {
+      eyebrow: 'From Our Trips',
+      title: 'Ghana, As Our Guests Met It',
+      intro: 'Photographs from the days themselves.',
+      // Each slot names the picture that belongs in it. Until a real photograph
+      // is dropped in, the slot renders as a labelled placeholder rather than
+      // as stock: a wall of strangers is the problem these are meant to fix.
+      moments: [
+        {shape: 'tall',  caption: 'A guest at Cape Coast Castle'},
+        {shape: 'wide',  caption: 'Hands at the loom in Adanwomase'},
+        {shape: 'tall',  caption: 'The boat on the Volta at Ada'},
+        {shape: 'wide',  caption: 'A chop bar table, mid-meal'},
+        {shape: 'tall',  caption: 'Nana and Kojo with a group'},
+      ],
+    },
     waysToExperience: {
       eyebrow: 'Where Ghana Begins For You',
       title: 'What Pulls You In?',

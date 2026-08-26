@@ -17,7 +17,7 @@ import vm from 'node:vm';
 import {loadHomepageContent, FLEX_LAYOUTS} from '../scripts/homepage-source.mjs';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const keys = ['hero', 'founderStory', 'waysToExperience', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
+const keys = ['hero', 'founderStory', 'waysToExperience', 'tripMoments', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
 
 const localContent = Object.fromEntries(keys.map(key => [key, {
   eyebrow: 'E', headline: 'H', title: 'T', titleLines: ['T'], body: 'B', intro: 'I', sub: 'S',
@@ -29,6 +29,7 @@ localContent.finalInvitation.cta = {label: 'Go', href: 'contact.html'};
 localContent.waysToExperience.pathways = [{title: 'P', text: 'P', href: 'packages.html?category=nature', image: {src: 'p.jpg', alt: 'P'}}];
 localContent.reviewsAndTrust.items = [{quote: 'R', author: 'A', location: 'L', rating: 5}];
 localContent.planningProcess.steps = [{icon: 'search', number: '01', title: 'S', text: 'S'}];
+localContent.tripMoments.moments = [{shape: 'wide', caption: 'M'}];
 
 const builtInSections = keys.map((sectionKey, index) => ({sectionKey, order: index + 1}));
 
@@ -52,8 +53,8 @@ let content = await load([{...base, title: 'Mid', layout: 'quote', quote: 'A lin
 let plan = content.sectionOrder.map(entry => entry.layout ? `flex:${entry.title}` : entry.key);
 assert.deepEqual(plan, [
   'hero', 'founderStory', 'waysToExperience', 'flex:Mid',
-  'reviewsAndTrust', 'planningProcess', 'finalInvitation',
-], 'a section placed after waysToExperience must sit between it and reviewsAndTrust');
+  'tripMoments', 'reviewsAndTrust', 'planningProcess', 'finalInvitation',
+], 'a section placed after waysToExperience must sit directly after it, before the next built-in section');
 
 content = await load([{...base, title: 'Top', layout: 'quote', quote: 'Q', placement: 'top'}]);
 assert.equal(content.sectionOrder[0].title, 'Top', 'top placement must precede the hero');
@@ -151,7 +152,7 @@ const withGhost = render({...localContent, sectionOrder: [{key: 'hero'}, {layout
 assert.doesNotMatch(withGhost, /Ghost/);
 assert.match(withGhost, /data-home-section="hero"/);
 
-// With no plan at all, the homepage is the seven built-ins, exactly as before.
+// With no plan at all, the homepage is the built-ins, exactly as before.
 const defaultHtml = render(localContent);
 for (const key of keys) {
   assert.match(defaultHtml, new RegExp(`data-home-section="${key}"`), `${key} must render without a plan`);
