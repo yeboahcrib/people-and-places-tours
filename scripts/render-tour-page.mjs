@@ -15,6 +15,12 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
 function heroImageFor(tour) {
   if (tour.heroImage) return tour.heroImage;
   const card = String(tour.image || '');
+  // A Studio photo arrives already cropped to card size around its focal
+  // point. Widen it for the hero at the same crop rather than letting a
+  // 1200px card image be stretched across the top of the page.
+  if (card.includes('cdn.sanity.io')) {
+    return card.replace(/([?&])w=\d+/, '$1w=1920').replace(/([?&])h=\d+/, '$1h=1344');
+  }
   if (!card.includes('images.unsplash.com')) return card;
   return card.replace(/([?&])w=\d+/, '$1w=1920').replace(/&h=\d+/, '');
 }

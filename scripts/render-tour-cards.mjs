@@ -10,7 +10,7 @@ const safeRelativeUrl = value => {
 
 const safeImageUrl = value => {
   const url = String(value ?? '').trim();
-  if (!/^(?:https:\/\/images\.unsplash\.com\/|assets\/)[^\s"']+$/i.test(url)) throw new Error(`Unsafe tour image URL: ${url}`);
+  if (!/^(?:https:\/\/images\.unsplash\.com\/|https:\/\/cdn\.sanity\.io\/|assets\/)[^\s"']+$/i.test(url)) throw new Error(`Unsafe tour image URL: ${url}`);
   return escapeHtml(url);
 };
 
