@@ -58,7 +58,7 @@
         <span class="breadcrumb-sep">/</span>
         <span class="breadcrumb-current">Experiences</span>
       </div>
-      <h1 class="page-hero-title">Explore Ghana<br><span>Experiences</span></h1>
+      <h1 class="page-hero-title">Explore Ghana <br><span>Experiences</span></h1>
       <p class="page-hero-subtitle">Spend time with Ghana through the people who know it firsthand. Follow the history, food, craft, cities, and landscapes that shape everyday life here.</p>
       <a class="experience-scroll-indicator" href="#experiences-list" aria-label="Browse all Ghana experiences">
         <span>Browse Experiences</span>
@@ -72,6 +72,12 @@
     <div class="container">
 
       <div class="experience-catalog">
+
+        <!-- The thirteen card titles are h3, and without this the outline jumped
+             h1 -> h3: a screen-reader user moving by heading met thirteen
+             third-level items belonging to nothing. Hidden rather than shown
+             because the page already says what it is, twice, above the fold. -->
+        <h2 class="visually-hidden">All experiences</h2>
 
 
         <div class="experience-filter-nav" aria-label="Explore experiences by interest or destination">

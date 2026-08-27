@@ -575,7 +575,7 @@
       },
       {
         "heading": "Before you travel",
-        "intro": "Three things are your responsibility rather than ours, and all three have their own page.",
+        "intro": "Three things are your responsibility rather than ours.",
         "items": [
           {
             "term": "A visa",
@@ -587,7 +587,8 @@
           },
           {
             "term": "Travel insurance",
-            "text": "Cover is required on every trip we run, and we need proof of it 30 days before you travel. Our Travel Insurance page sets out what your policy must include."
+            "text": "Cover is required on every trip we run, and we need proof of it 30 days before you travel. Our Travel Insurance page sets out what your policy must include.",
+            "link": {"href": "travel-insurance.html", "label": "Read the insurance requirements"}
           }
         ]
       }

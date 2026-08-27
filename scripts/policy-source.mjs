@@ -78,7 +78,7 @@ export async function loadPolicyContent({localContent, policyType = 'cancellatio
   if (!/^[a-z]+$/.test(policyType)) throw new Error(`Unsupported policy type: ${policyType}`);
   const query = `*[_type == "policy" && policyType == "${policyType}"][0]{
     title, intro, contactIntro, closing, "lastUpdated": string(lastUpdated),
-    sections[]{heading, intro, items[]{term, text}}
+    sections[]{heading, intro, items[]{term, text, link{href, label}}}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
   const body = await fetchSanity(url, {fetchImpl, label: 'Sanity policy'});

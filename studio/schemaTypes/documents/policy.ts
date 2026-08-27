@@ -77,6 +77,23 @@ export const policy = defineType({
                   fields: [
                     defineField({name: 'term', title: 'The rule, in a few words', type: 'string', description: 'For example "30 days or less before the trip".', validation: (Rule) => Rule.required()}),
                     defineField({name: 'text', title: 'What it means', type: 'text', rows: 3, validation: (Rule) => Rule.required()}),
+                    // Optional. Every string on a policy page is escaped, so a
+                    // term that mentions another of our pages had no way to link
+                    // to it: travel-information told visitors that visas, yellow
+                    // fever and insurance each had their own page and linked
+                    // none, sending them to Google at the point they trusted us
+                    // most. Only a page on this site is accepted; the build
+                    // drops anything else rather than rendering it.
+                    defineField({
+                      name: 'link',
+                      title: 'Link to one of our pages (optional)',
+                      type: 'object',
+                      options: {collapsible: true, collapsed: true},
+                      fields: [
+                        defineField({name: 'href', title: 'Which page', type: 'string', description: 'A page on this site, for example travel-insurance.html'}),
+                        defineField({name: 'label', title: 'Link wording', type: 'string', description: 'For example "Read the insurance requirements".'}),
+                      ],
+                    }),
                   ],
                   preview: {select: {title: 'term', subtitle: 'text'}},
                 }),
