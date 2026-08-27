@@ -95,6 +95,16 @@ function validateSanityTours(result, localTours) {
         // Only when an editor chose one. Without it the page keeps widening the
         // card, which is the old behaviour and still perfectly reasonable.
         heroImage: cardImageUrl(tour.coverPhoto, 1920, 1080),
+        // Two photographs are a pair, not a gallery — the section only appears
+        // once there are enough to read as a set.
+        gallery: (tour.gallery || []).length >= 3
+          ? tour.gallery.map(photo => ({
+              src: cardImageUrl(photo, 900, 1125),
+              alt: photo.alt || photo.caption || '',
+              caption: photo.caption || '',
+              tall: !(photo.width && photo.height && photo.width > photo.height),
+            }))
+          : undefined,
       }),
       // Only fields the document actually holds, so a tour with no FAQs in
       // Sanity falls back to the committed snapshot rather than blanking it.
@@ -145,6 +155,16 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
           "src": image.asset->url, "alt": altText, "hotspot": image.hotspot
         }
       ),
+      // Photographs from the experience itself. Approved only, and filtered
+      // here rather than later so an unpublished one cannot reach the page.
+      "gallery": media[publicApprovalState == "approved" && placeholderState == "approved"]{
+        "src": image.asset->url,
+        "alt": altText,
+        "caption": caption,
+        "hotspot": image.hotspot,
+        "width": image.asset->metadata.dimensions.width,
+        "height": image.asset->metadata.dimensions.height
+      },
       "coverPhoto": select(
         coverPhoto.publicApprovalState == "approved" && coverPhoto.placeholderState == "approved" =>
           coverPhoto{"src": image.asset->url, "alt": altText, "hotspot": image.hotspot},

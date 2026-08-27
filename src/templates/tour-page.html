@@ -82,6 +82,19 @@
     .also-card-body .tag-row{margin-bottom:.4rem;}
     .also-card-body h3{font-family:'Archivo Black',sans-serif;font-size:var(--text-xl);color:var(--white);margin-bottom:.25rem;}
     .also-price{color:var(--yellow);font-size:var(--text-sm);font-weight:600;}
+    .tour-gallery{padding:3.5rem 0 0;}
+    .tour-gallery-inner{max-width:1200px;margin:0 auto;padding:0 2.5rem;}
+    @media(max-width:600px){.tour-gallery-inner{padding:0 1.25rem;}}
+    .tour-gallery-head{margin-bottom:1.5rem;}
+    .tour-gallery-eyebrow{font-size:var(--text-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--yellow-on-light);font-weight:700;margin-bottom:.5rem;}
+    .tour-gallery-title{font-family:'Archivo Black',sans-serif;font-size:clamp(1.6rem,3.4vw,2.3rem);color:var(--dark);line-height:1.15;}
+    .tour-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+    .tour-gallery figure{margin:0;}
+    .tour-gallery img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:16px;display:block;background:var(--gray);}
+    .tour-gallery figure.is-wide img{aspect-ratio:3/2;}
+    .tour-gallery figcaption{font-size:var(--text-sm);color:var(--muted-dark);line-height:1.5;padding-top:.55rem;}
+    @media(max-width:900px){.tour-gallery-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:520px){.tour-gallery-grid{grid-template-columns:1fr;}.tour-gallery img{aspect-ratio:3/2;}}
     footer{background:#050505;padding:3rem 2.5rem 2rem;}
     .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2rem;}
     .footer-brand .logo{display:block;height:48px;width:auto;margin-bottom:.5rem;}
@@ -200,6 +213,11 @@
     </div>
   </div>
 </div>
+
+<!-- Photographs from the experience itself. Sits before the questions, because
+     it answers the one a visitor is actually asking at this point: what does
+     this look like. Replaced entirely when a tour has fewer than three. -->
+{{GALLERY}}
 
 <div class="faq-wrap">
   <div class="section-label" style="margin-top:2.5rem;">Frequently Asked Questions</div>

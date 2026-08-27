@@ -12,6 +12,34 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
 // The catalogue image is sized for a card (800px wide). The hero spans the
 // full page, so it asks the same photo for a wider rendition rather than
 // stretching the card one.
+/**
+ * Photographs from the experience itself.
+ *
+ * Empty for a tour with fewer than three approved photographs — the source
+ * leaves the list undefined in that case, because two pictures read as a pair
+ * that lost one rather than as a gallery.
+ */
+function renderGallery(tour) {
+  const photos = tour.gallery || [];
+  if (!photos.length) return '';
+  const figures = photos.map(photo => `
+      <figure${photo.tall ? '' : ' class="is-wide"'}>
+        <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.alt)}" loading="lazy" decoding="async" />
+        ${photo.caption ? `<figcaption>${escapeHtml(photo.caption)}</figcaption>` : ''}
+      </figure>`).join('');
+  return `
+<div class="tour-gallery">
+  <div class="tour-gallery-inner">
+    <div class="tour-gallery-head">
+      <div class="tour-gallery-eyebrow">From this experience</div>
+      <h2 class="tour-gallery-title">Photographs from the day</h2>
+    </div>
+    <div class="tour-gallery-grid">${figures}
+    </div>
+  </div>
+</div>`;
+}
+
 function heroImageFor(tour) {
   if (tour.heroImage) return tour.heroImage;
   const card = String(tour.image || '');
@@ -135,6 +163,7 @@ export function renderTourPage({template, tour, catalogue}) {
       : '',
     TRIP_DETAILS: renderTripDetails(tour),
     FAQS: renderFaqs(tour.faqs),
+    GALLERY: renderGallery(tour),
     ALSO_CARDS: renderAlsoCards(tour, catalogue),
   };
 
