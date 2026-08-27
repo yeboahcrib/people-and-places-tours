@@ -14,7 +14,7 @@ import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {dirname, join} from 'node:path';
 import vm from 'node:vm';
-import {loadHomepageContent, FLEX_LAYOUTS} from '../scripts/homepage-source.mjs';
+import {loadHomepageContent, FLEX_LAYOUTS, SECTION_KEYS} from '../scripts/homepage-source.mjs';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const keys = ['hero', 'founderStory', 'waysToExperience', 'tripMoments', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
@@ -118,6 +118,21 @@ vm.createContext(sandbox);
 vm.runInContext(sectionsScript, sandbox);
 const render = sandbox.window.PEOPLE_PLACES_RENDER_HOMEPAGE;
 const renderableLayouts = sandbox.window.PEOPLE_PLACES_HOMEPAGE_LAYOUTS;
+
+// The narrative spine is declared twice: as SECTION_KEYS, which the build walks
+// to make the render plan, and as the key order of BUILT_IN_SECTIONS, which the
+// renderer falls back to when no plan is supplied. Both are real orders and
+// nothing made them agree. They drifted — the trip-moments strip was fourth in
+// one and third in the other, so the built page put it before the pathways it
+// was designed to follow, and every structural test still passed because each
+// file was self-consistent.
+assert.deepEqual(
+  // Spread: the sandbox is a separate vm realm, so its Array has a different
+  // prototype and assert/strict would fail two identical lists.
+  [...sandbox.window.PEOPLE_PLACES_HOMEPAGE_SECTIONS],
+  [...SECTION_KEYS],
+  'homepage-sections.js BUILT_IN_SECTIONS order must match SECTION_KEYS in homepage-source.mjs',
+);
 
 // The three declarations of "which layouts exist" must agree.
 const schema = await readFile(join(projectRoot, 'studio/schemaTypes/documents/flexibleSection.ts'), 'utf8');

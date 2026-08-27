@@ -436,8 +436,8 @@
   const BUILT_IN_SECTIONS = {
     hero: renderHeroSection,
     founderStory: renderFounderStorySection,
-    tripMoments: renderTripMomentsSection,
     waysToExperience: renderWaysToExperienceSection,
+    tripMoments: renderTripMomentsSection,
     reviewsAndTrust: renderReviewsAndTrustSection,
     planningProcess: renderBookingStepsSection,
     finalInvitation: renderFinalInvitationSection,
