@@ -246,4 +246,27 @@ for (const location of locations) {
   assert.equal(depth, 0, `style.css has ${depth} unclosed block(s)`);
 }
 
+// The contact page told a visitor both "within one hour during business hours"
+// and "within one business day", ~600px apart, at the moment they were deciding
+// whether to hand over their travel plans. The committed files are guarded in
+// tests/booking-source.mjs, but Sanity merges over them and is what actually
+// ships, so the only place the real answer is visible is the built page.
+//
+// A warning rather than a failure: this is an editor's sentence to fix in the
+// Studio, and the site already prefers to render, complain, and carry on rather
+// than block a deploy over copy.
+{
+  const contact = await readFile(join(outputPath, 'contact.html'), 'utf8');
+  const text = contact.replace(/<[^>]+>/g, ' ');
+  const WINDOW = /within (?:the )?(one|two|a|\d+)\s+(hour|hours|business day|business days|day|days)/gi;
+  const norm = m => `${m[1].toLowerCase().replace(/^a$/, 'one')} ${m[2].toLowerCase().replace(/s$/, '')}`;
+  const windows = [...new Set([...text.matchAll(WINDOW)].map(norm))];
+  if (windows.length > 1) {
+    console.warn(
+      `contact.html promises ${windows.length} different reply windows on one page — ` +
+      `${windows.join(' and ')}. Whichever is true, the Studio should say only that one.`,
+    );
+  }
+}
+
 console.log('Build output and availability checks passed.');

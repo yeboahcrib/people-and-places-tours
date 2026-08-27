@@ -106,6 +106,19 @@
 
         <!-- Tours Grid -->
         <div class="packages-grid" id="tours-grid" data-tour-source="catalog"></div><!-- /packages-grid -->
+
+        <!-- Two taps could empty this page: Craft in Kumasi matches nothing, and
+             the grid simply went blank with no message and no control to undo it.
+             Hidden until JavaScript reports a zero result, so a visitor with no
+             JavaScript — who cannot filter at all — never sees it. -->
+        <div class="experience-empty" data-experience-empty hidden>
+          <p class="experience-empty-title">No experiences match <strong data-empty-combo>that combination</strong>.</p>
+          <p class="experience-empty-body">We may still be able to arrange it. Most of what we run is shaped around the people coming.</p>
+          <div class="experience-empty-actions">
+            <button type="button" class="btn btn-primary" data-experience-reset>Show all experiences</button>
+            <a href="contact.html?tour=custom" class="btn btn-ghost">Ask for something custom</a>
+          </div>
+        </div>
       </div>
 
       <!-- Custom Tour CTA -->
