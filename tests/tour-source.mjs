@@ -93,4 +93,41 @@ alpha = (await withPhoto(null)).tours[0];
 assert.equal(alpha.image, 'assets/alpha.jpg', 'a tour with no approved photo keeps its committed image');
 assert.equal(alpha.packageImage, undefined);
 
+// A card and a cover are separate choices now. The cover falls back to the
+// card, because a tour with only one photograph should still have a page.
+{
+  const SRC2 = 'https://cdn.sanity.io/images/p1/production/def-4000x2000.jpg';
+  const load = (cardPhoto, coverPhoto) => loadTourContent({
+    localTours,
+    env: {SANITY_STUDIO_PROJECT_ID: 'project-123'},
+    fetchImpl: async () => new Response(JSON.stringify({result: {
+      tours: [
+        {slug: {current: 'alpha'}, title: 'Alpha', duration: '1 Day', price: 125, cardPhoto, coverPhoto},
+        {slug: {current: 'beta'}, title: 'Beta', duration: '2 Hours', price: 80},
+        {slug: {current: 'gamma'}, title: 'Gamma', duration: '3 Hours', price: 90},
+      ],
+      featured: {items: [
+        {order: 1, tour: {slug: {current: 'alpha'}}},
+        {order: 2, tour: {slug: {current: 'beta'}}},
+        {order: 3, tour: {slug: {current: 'gamma'}}},
+      ]},
+    }}), {status: 200, headers: {'Content-Type': 'application/json'}}),
+  });
+
+  const card = {src: SRC, alt: 'Card', hotspot: {x: 0.5, y: 0.5}};
+  const cover = {src: SRC2, alt: 'Cover', hotspot: {x: 0.2, y: 0.4}};
+
+  let a = (await load(card, cover)).tours[0];
+  assert.ok(a.image.startsWith(SRC + '?'), 'the card comes from the card photo');
+  assert.ok(a.heroImage.startsWith(SRC2 + '?'), 'the cover comes from the cover photo');
+  assert.match(a.heroImage, /w=1920/);
+  assert.match(a.heroImage, /fp-x=0\.2000/, 'the cover keeps its own focal point');
+
+  // No cover chosen: the page widens the card, which is what it did before
+  // these fields existed and is still a reasonable page.
+  a = (await load(card, null)).tours[0];
+  assert.ok(a.image.startsWith(SRC + '?'));
+  assert.equal(a.heroImage, undefined, 'no cover means no override, so the card is widened');
+}
+
 console.log('Tour source contract tests passed.');

@@ -301,13 +301,32 @@ export const tour = defineType({
       rows: 6,
       description: 'The longer piece for the experience\'s own page — the history, the people, why it matters. This is where People & Places sounds different from a listings site.',
     }),
+    // Three jobs, three fields. The first photo in one list used to become both
+    // the card and the page cover, and nothing said so — an editor could not
+    // tell which picture went where, and one photograph was made to do two jobs
+    // that want opposite shapes: a card is nearly square and wants a tight
+    // subject, a cover is very wide and needs a calm area for the headline.
+    defineField({
+      name: 'cardPhoto',
+      title: 'Photo for the card',
+      type: 'mediaAsset',
+      group: 'media',
+      description: 'The picture people see in the experiences list before they click. Nearly square, so a close subject works best. Remember to set it to "Yes, publish it".',
+    }),
+    defineField({
+      name: 'coverPhoto',
+      title: 'Photo across the top of this page',
+      type: 'mediaAsset',
+      group: 'media',
+      description: 'The wide band behind this experience\'s title. Very wide, and the title sits on the left, so something with a calmer left side reads best. Leave it empty and the card photo is used.',
+    }),
     defineField({
       name: 'media',
-      title: 'Photos',
+      title: 'More photos from this experience',
       type: 'array',
       of: [{type: 'mediaAsset'}],
       group: 'media',
-      description: 'The first photo is the main one. Remember each photo has to be set to "Yes, publish it" before it appears.',
+      description: 'Photographs from the experience itself, shown together further down the page. Each one has to be set to "Yes, publish it" before it appears.',
     }),
     defineField({
       name: 'relatedGuestStory',

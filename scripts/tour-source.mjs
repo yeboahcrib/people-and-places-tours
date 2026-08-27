@@ -92,6 +92,9 @@ function validateSanityTours(result, localTours) {
         image: cardImageUrl(tour.cardPhoto, 1200, 840),
         packageImage: cardImageUrl(tour.cardPhoto, 1200, 825),
         alt: tour.cardPhoto?.alt,
+        // Only when an editor chose one. Without it the page keeps widening the
+        // card, which is the old behaviour and still perfectly reasonable.
+        heroImage: cardImageUrl(tour.coverPhoto, 1920, 1080),
       }),
       // Only fields the document actually holds, so a tour with no FAQs in
       // Sanity falls back to the committed snapshot rather than blanking it.
@@ -129,13 +132,24 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
       // build from the committed snapshot alone, and an edit in the Studio
       // changes nothing a visitor sees.
       included, excluded, funFacts, heroWatermark, pageHeadline, pageIntro,
-      // The first photo an editor has actually approved, plus the focal point
-      // they set on it. Unapproved and stand-in photos are skipped here rather
-      // than filtered later, so a tour with none falls back to the committed
-      // image instead of rendering a blank card.
-      "cardPhoto": media[publicApprovalState == "approved" && placeholderState == "approved"][0]{
-        "src": image.asset->url, "alt": altText, "hotspot": image.hotspot
-      },
+      // A card and a cover want opposite shapes, so they are separate fields.
+      // Each falls back rather than failing: no cover uses the card, and no
+      // card uses the first approved gallery photo, which is what every tour
+      // held before these fields existed. Unapproved and stand-in photos are
+      // filtered here rather than later, so a tour with none falls back to the
+      // committed image instead of rendering a blank card.
+      "cardPhoto": select(
+        cardPhoto.publicApprovalState == "approved" && cardPhoto.placeholderState == "approved" =>
+          cardPhoto{"src": image.asset->url, "alt": altText, "hotspot": image.hotspot},
+        media[publicApprovalState == "approved" && placeholderState == "approved"][0]{
+          "src": image.asset->url, "alt": altText, "hotspot": image.hotspot
+        }
+      ),
+      "coverPhoto": select(
+        coverPhoto.publicApprovalState == "approved" && coverPhoto.placeholderState == "approved" =>
+          coverPhoto{"src": image.asset->url, "alt": altText, "hotspot": image.hotspot},
+        null
+      ),
       priceOptions[]{label, price},
       faqs[]{question, answer},
       itinerary[]{day, title, description, meals}

@@ -13,8 +13,8 @@ export const experiencesPage = defineType({
   type: 'document',
   fields: [
     defineField({
-      name: 'heroPhoto',
-      title: 'Photo behind the page title',
+      name: 'coverPhoto',
+      title: 'Photo across the top of this page',
       type: 'mediaAsset',
       description: 'The wide photograph at the top of the experiences page. It sits behind text, so something with a calm area on the left reads best.',
     }),
