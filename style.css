@@ -394,6 +394,29 @@ body.page-entering {
   .split-body { padding-top: 0; }
 }
 
+/* The add-ons section listed batik, pottery, cooking and dance across the left
+   half and left the right half empty — 687px of section carrying 76 words and
+   no picture at all. The photo shows one of the things the list names, so it
+   illustrates rather than decorates. Centred rather than start-aligned: the
+   copy column is short here, unlike the pathways split this borrows from. */
+.addons-split { align-items: center; }
+.addons-media img {
+  width: 100%;
+  /* Without this the height attribute on the img wins and aspect-ratio is
+     ignored, which rendered the photo at its full 1125px and doubled the
+     height of the section. */
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  display: block;
+}
+@media (max-width: 768px) {
+  /* Below the copy on a phone, and shorter — a full 4:5 frame would push the
+     "Ask about an experience" button most of a screen further down. */
+  .addons-media img { aspect-ratio: 4 / 3; }
+}
+
 /* ────────────────────────────────────────────────────────────── */
 /*  NAV — floating pill                                           */
 /*                                                                */
