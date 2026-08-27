@@ -19,7 +19,7 @@ import type {StructureResolver} from 'sanity/structure'
 // instead of showing a list with a single row in it.
 const SINGLETON_IDS = [
   'siteSettings', 'navigation', 'originStory',
-  'featuredTourCollection', 'bookingFlow', 'aboutPage',
+  'featuredTourCollection', 'bookingFlow', 'aboutPage', 'experiencesPage',
 ]
 
 const single = (S: any, type: string, title: string, subtitle?: string) =>
@@ -52,6 +52,18 @@ export const structure: StructureResolver = (S) =>
                         .child(
                           S.documentTypeList('homepageSection')
                             .title('Homepage sections')
+                            .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                        ),
+                      // The six photo cards in "What Pulls You In?". They are
+                      // their own documents rather than fields on the section,
+                      // so without an entry here they existed but could not be
+                      // found — the photographs were editable and invisible.
+                      S.listItem()
+                        .title('The “what pulls you in” cards')
+                        .id('homepage-pathways')
+                        .child(
+                          S.documentTypeList('experiencePathway')
+                            .title('Experience pathways')
                             .defaultOrdering([{field: 'order', direction: 'asc'}]),
                         ),
                       // Kept separate from the seven above because it is a
@@ -143,6 +155,7 @@ export const structure: StructureResolver = (S) =>
                     .defaultOrdering([{field: 'order', direction: 'asc'}]),
                 ),
               single(S, 'featuredTourCollection', 'Featured on the homepage'),
+              single(S, 'experiencesPage', 'Experiences page photos'),
             ]),
         ),
 
