@@ -26,7 +26,7 @@ export async function loadExperiencesPagePhotos({env = process.env, fetchImpl = 
   }
 
   const query = `*[_type == "experiencesPage"][0]{
-    "experiencesHero": heroPhoto${PHOTO},
+    "experiencesHero": coverPhoto${PHOTO},
     "experiencesAddOn": addOnPhoto${PHOTO}
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;

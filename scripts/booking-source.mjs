@@ -72,7 +72,7 @@ export async function loadBookingContent({localContent, env = process.env, fetch
     trustPoints[]{icon, label},
     nextSteps[]{title, description},
     faqs[]{question, answer},
-    "heroPhoto": heroPhoto{
+    "coverPhoto": coverPhoto{
       "src": image.asset->url,
       "alt": altText,
       "width": image.asset->metadata.dimensions.width,

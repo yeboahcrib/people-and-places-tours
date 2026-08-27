@@ -256,7 +256,7 @@ for (const entry of rootEntries) {
     // that carries none is untouched and a photo that is not approved yet
     // leaves the committed image in place.
     const withPagePhotos = injectPagePhotos(withPolicy, {
-      contactHero: bookingContent.heroPhoto,
+      contactHero: bookingContent.coverPhoto,
       ...experiencesPagePhotos.photos,
     });
     const withExperiences = injectLocalExperiences(withPagePhotos, experienceContent);
