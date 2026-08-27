@@ -1,7 +1,7 @@
 import {fetchSanity} from './sanity-fetch.mjs';
 const API_VERSION = '2026-08-02';
 const SECTION_KEYS = [
-  'hero', 'founderStory', 'waysToExperience', 'howHosted',
+  'hero', 'founderStory', 'waysToExperience',
   'reviewsAndTrust', 'planningProcess', 'finalInvitation',
 ];
 
@@ -93,7 +93,7 @@ function applyPrimaryCopy(target, section) {
   const {sectionKey, eyebrow, headline, body, reassurance, trustMessage} = section;
   if (eyebrow) target.eyebrow = eyebrow;
   if (headline) {
-    if (sectionKey === 'howHosted' || sectionKey === 'reviewsAndTrust') target.titleLines = headline.split(/\s*\n\s*/).filter(Boolean);
+    if (sectionKey === 'reviewsAndTrust') target.titleLines = headline.split(/\s*\n\s*/).filter(Boolean);
     else if (sectionKey === 'hero' || sectionKey === 'founderStory' || sectionKey === 'finalInvitation') target.headline = headline;
     else target.title = headline;
   }
@@ -154,25 +154,6 @@ function applyPrimaryCopy(target, section) {
         image: usablePhoto(entry?.image),
       }),
       isRenderable: item => Boolean(item.title && item.href && item.image?.src),
-    });
-  }
-  if (sectionKey === 'howHosted' && Array.isArray(section.hostingPrinciples)) {
-    target.principles = mergeList(target.principles, section.hostingPrinciples, {
-      label: 'hosting principle',
-      needs: 'It needs an icon, a title and a description.',
-      describe: entry => entry?.title || entry?.icon || 'untitled',
-      orderOf: entry => entry?.order,
-      defaults: {proofQuote: '', proofAuthor: ''},
-      committedKey: item => item?.icon,
-      incomingKey: entry => entry?.icon,
-      patch: entry => ({
-        icon: entry?.icon,
-        title: entry?.title,
-        text: entry?.description,
-        proofQuote: entry?.proofReview?.selectedExcerpt,
-        proofAuthor: entry?.proofReview?.reviewerName,
-      }),
-      isRenderable: item => Boolean(item.icon && item.title && item.text),
     });
   }
   if (sectionKey === 'reviewsAndTrust' && Array.isArray(section.featuredReviews)) {
@@ -261,7 +242,7 @@ export const FLEX_LAYOUTS = ['photoBeside', 'cards', 'quote', 'invitation'];
  * Turn the sections an editor added into the homepage's render plan.
  *
  * The seven built-in sections are fixed and ordered; an added section says
- * where it goes relative to them ("top", or "after:howHosted"). Two sections
+ * where it goes relative to them ("top", or "after:waysToExperience"). Two sections
  * claiming the same slot are separated by `positionWithinPlacement`, and then
  * by name, so the order is always deterministic rather than dependent on the
  * order Sanity happened to return them in.
@@ -392,10 +373,6 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
         "placeholderState": image.placeholderState
       }
     },
-    "hostingPrinciples": hostingPrinciples[]->{
-      title, description, icon, order,
-      "proofReview": proofReview->{reviewerName, selectedExcerpt}
-    },
     "featuredReviews": featuredReviews[]->{
       reviewerName, country, selectedExcerpt, rating, platform, sourceUrl, reviewDate,
       "image": {
@@ -438,3 +415,5 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
   content.sectionOrder = planSections(body.result?.flexible);
   return {content, source: 'sanity'};
 }
+
+export {SECTION_KEYS};

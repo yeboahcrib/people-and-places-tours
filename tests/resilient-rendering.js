@@ -34,7 +34,11 @@ function assert(condition, message) {
     h1: document.querySelector('h1')?.textContent.trim(),
     invisibleContent: [...document.querySelectorAll('.reveal')].filter(element => getComputedStyle(element).opacity === '0').length,
   }));
-  assert(homeState.sections === 7, `JavaScript-free homepage has ${homeState.sections} sections`);
+  // Derived, not frozen: this said 7, so retiring a section reported itself as
+  // a resilience failure rather than as the intended change.
+  const {SECTION_KEYS} = await import('../scripts/homepage-source.mjs');
+  assert(homeState.sections === SECTION_KEYS.length,
+    `JavaScript-free homepage has ${homeState.sections} sections, expected ${SECTION_KEYS.length}`);
   assert(homeState.cards === 0, `JavaScript-free homepage still has ${homeState.cards} featured tours`);
   assert(homeState.h1, 'JavaScript-free homepage has no h1');
   assert(homeState.invisibleContent === 0, `JavaScript-free homepage hides ${homeState.invisibleContent} reveal elements`);

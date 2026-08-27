@@ -24,7 +24,7 @@
     founderStory: {
       eyebrow: 'The Beginning of Our Story',
       headline: 'Why We Started People & Places',
-      body: 'Whenever we shared images from home, we kept hearing the same thing: “I never knew Ghana looked like this.” We realized that too many people were seeing only a small part of the place we knew and loved.\n\nSo we created People & Places to share more of the Ghana we know: its history, food, daily rhythms, and the people who give each place its meaning.',
+      body: 'Whenever we shared images from home, we kept hearing the same thing: “I never knew Ghana looked like this.” \n\nSo we created People & Places to share the Ghana we know: its history, food, daily rhythms, and the people who give each place its meaning.',
       founders: [
         { initials: 'IY', name: 'Isaac Yeboah', preferredName: 'Nana Yeboah', role: 'Co-founder & Tech Lead' },
         { initials: 'EY', name: 'Evans Yirenkyi', preferredName: 'Kojo', role: 'Co-founder & Manager' },
@@ -39,7 +39,7 @@
       pathways: [
         {
           title: 'History & Memory',
-          text: 'Cape Coast, Elmina, Jamestown and Kumasi hold histories still carried in walls, streets and family stories. For some who come, they are also personal.',
+          text: 'Cape Coast, Elmina, Jamestown and Kumasi hold histories still carried in walls, streets and family stories.',
           href: 'packages.html?category=heritage',
           image: { src: 'assets/photos/pathway-heritage-cannons.jpg', width: 900, height: 900, alt: 'Cannons along the fort ramparts overlooking the Atlantic at Cape Coast' },
         },
@@ -76,45 +76,10 @@
       ],
       cta: { label: 'Find Your Way Into Ghana', href: 'packages.html' },
     },
-    howHosted: {
-      eyebrow: "How You're Hosted",
-      titleLines: ['Care You Can', 'Actually Feel'],
-      intro: 'Traveling with us should feel less like following a tour and more like being welcomed in. Your hosts notice your pace, share the stories behind each place, and leave room for the moments no itinerary can plan.',
-      principles: [
-        {
-          icon: 'pin',
-          title: 'Places With Meaning',
-          text: 'Understand the history and human stories behind what you see, not just where to stand for a photograph.',
-          proofQuote: 'This was not just a tour — it was emotional, educational, spiritual, and incredibly meaningful for all of us.',
-          proofAuthor: 'Cynthia Muldrow',
-        },
-        {
-          icon: 'heart',
-          title: 'Your Comfort Matters',
-          text: 'Your pace, questions, and needs shape the day, whether you travel alone, with family, or as a group.',
-          proofQuote: 'I felt safe, protected and well taken care of.',
-          proofAuthor: 'Myra Mirabel Aboagye',
-        },
-        {
-          icon: 'user-circle',
-          title: 'Hosted From Experience',
-          text: 'The people guiding you know these roads, communities, and stories because Ghana is home.',
-          proofQuote: 'During the trip, you could feel the warmth and passion at every step of the way, and that\'s completely contagious for the group!',
-          proofAuthor: 'Iga Gawronska',
-        },
-        {
-          icon: 'calendar',
-          title: 'Plans That Fit Real Life',
-          text: 'We plan honestly around your time, budget, and priorities. When life changes, we adjust with you.',
-          proofQuote: 'Even with short notice, everything was handled smoothly and without any stress which honestly says a lot.',
-          proofAuthor: 'Jacoya Miller',
-        },
-      ],
-    },
     reviewsAndTrust: {
       eyebrow: 'Real Reviews',
       titleLines: ['What Our', 'Travellers Say'],
-      intro: 'The words below come from people we’ve welcomed across Ghana. They remember the care, the stories, and the people they met along the way.',
+      intro: 'From people we’ve welcomed across Ghana.',
       heroImage: {
         src: 'assets/photos/reviews-trust-banner.jpg',
         width: 1120,
@@ -211,7 +176,7 @@
     },
     planningProcess: {
       eyebrow: 'From Dream to Departure',
-      title: 'Your Journey in Three Simple Steps',
+      title: 'Your Journey in Three Steps',
       steps: [
         {
           icon: 'search',

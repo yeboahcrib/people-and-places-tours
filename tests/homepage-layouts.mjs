@@ -17,7 +17,7 @@ import vm from 'node:vm';
 import {loadHomepageContent, FLEX_LAYOUTS} from '../scripts/homepage-source.mjs';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const keys = ['hero', 'founderStory', 'waysToExperience', 'howHosted', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
+const keys = ['hero', 'founderStory', 'waysToExperience', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
 
 const localContent = Object.fromEntries(keys.map(key => [key, {
   eyebrow: 'E', headline: 'H', title: 'T', titleLines: ['T'], body: 'B', intro: 'I', sub: 'S',
@@ -27,7 +27,6 @@ localContent.finalInvitation.internationalPhone = '+1 000';
 localContent.finalInvitation.cta = {label: 'Go', href: 'contact.html'};
 // The list-backed sections omit themselves when empty, so give each one entry.
 localContent.waysToExperience.pathways = [{title: 'P', text: 'P', href: 'packages.html?category=nature', image: {src: 'p.jpg', alt: 'P'}}];
-localContent.howHosted.principles = [{icon: 'heart', title: 'C', text: 'C'}];
 localContent.reviewsAndTrust.items = [{quote: 'R', author: 'A', location: 'L', rating: 5}];
 localContent.planningProcess.steps = [{icon: 'search', number: '01', title: 'S', text: 'S'}];
 
@@ -45,16 +44,16 @@ const load = async flexible => {
 };
 
 const approvedPhoto = {src: 'https://cdn.sanity.io/x.jpg', alt: 'x', width: 900, height: 600, publicApprovalState: 'approved', placeholderState: 'approved'};
-const base = {visible: true, tone: 'light', placement: 'after:howHosted', positionWithinPlacement: 1};
+const base = {visible: true, tone: 'light', placement: 'after:waysToExperience', positionWithinPlacement: 1};
 
 // ── Placement ──────────────────────────────────────────────────────────────
 
 let content = await load([{...base, title: 'Mid', layout: 'quote', quote: 'A line worth reading.'}]);
 let plan = content.sectionOrder.map(entry => entry.layout ? `flex:${entry.title}` : entry.key);
 assert.deepEqual(plan, [
-  'hero', 'founderStory', 'waysToExperience', 'howHosted', 'flex:Mid',
+  'hero', 'founderStory', 'waysToExperience', 'flex:Mid',
   'reviewsAndTrust', 'planningProcess', 'finalInvitation',
-], 'a section placed after howHosted must sit between it and reviewsAndTrust');
+], 'a section placed after waysToExperience must sit between it and reviewsAndTrust');
 
 content = await load([{...base, title: 'Top', layout: 'quote', quote: 'Q', placement: 'top'}]);
 assert.equal(content.sectionOrder[0].title, 'Top', 'top placement must precede the hero');
