@@ -58,7 +58,9 @@
     .price-option{font-size:var(--text-sm);color:rgba(255,255,255,.75);line-height:1.5;padding:.55rem 0;border-top:1px solid rgba(255,255,255,.12);}
     .price-option strong{color:var(--color-primary);font-weight:600;}
     .price-options{margin:0 0 1.25rem;}
-    .price-group-note{font-size:var(--text-xs);color:rgba(255,255,255,.55);line-height:1.55;margin:-1rem 0 1.5rem;}
+    /* The condition the price depends on. It was 12px at 55% opacity — the smallest, faintest text in a card whose number is 56px — so a solo traveller read $160 in the largest type on the page and the line saying that is not their price in the smallest. Same size as the line above it now, and bright enough to be read rather than skimmed past. It sits on a left rule so two stacked notes read as one set of conditions. */
+    .price-group-note{font-size:var(--text-sm);color:rgba(255,255,255,.78);line-height:1.6;margin:-0.75rem 0 1rem;padding-left:.7rem;border-left:2px solid rgba(255,184,28,.5);}
+    .price-group-note + .price-group-note{margin-top:-0.5rem;}
     .booking-btns{display:flex;flex-direction:column;gap:.75rem;}
     .btn-outline-white{background:transparent;color:var(--white);border:2px solid rgba(255,255,255,.3);padding:.85rem 1.8rem;border-radius:50px;font-family:'Inter',sans-serif;font-weight:600;font-size:var(--text-base);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;display:block;text-align:center;}
     .btn-outline-white:hover{border-color:var(--white);background:rgba(255,255,255,.1);}

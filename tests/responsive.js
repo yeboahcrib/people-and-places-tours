@@ -105,8 +105,19 @@ function assert(condition, message) {
           })
           .filter(img => img.skew > 0.05);
 
+        // A clamped quote with no way to open it is a truncated customer review
+        // shown under the words "Verified Google review". The button used to be
+        // decided by character count, which cannot know how many lines a quote
+        // wraps to: at 375px that stranded four quotes and at 320px seven, one
+        // of them only 75 characters long.
+        const strandedQuotes = [...document.querySelectorAll('.testi-quote')]
+          .filter(q => q.scrollHeight > q.clientHeight + 1)
+          .filter(q => { const btn = q.nextElementSibling; return !btn || !btn.classList.contains('testi-read-more') || btn.hidden; })
+          .map(q => q.textContent.trim().slice(0, 40));
+
         return {
           documentWidth,
+          strandedQuotes,
           stretchedImages,
           viewportWidth: document.documentElement.clientWidth,
           navCta: navCtaRect && visible(navCta)
@@ -134,6 +145,11 @@ function assert(condition, message) {
         assert(audit.navCta.left >= 0, `${path} pushes the "Book a Tour" button off the left edge at ${width}px`);
       }
       assert(audit.invisibleRevealCount === 0, `${path} hides reveal content with reduced motion at ${width}px: ${JSON.stringify(audit.invisibleReveals)}`);
+      assert(
+        audit.strandedQuotes.length === 0,
+        `${path} truncates ${audit.strandedQuotes.length} review(s) with no way to expand at ${width}px: ` +
+        audit.strandedQuotes.map(q => `"${q}…"`).join(', '),
+      );
       assert(
         audit.stretchedImages.length === 0,
         `${path} distorts ${audit.stretchedImages.length} image(s) at ${width}px: ` +
