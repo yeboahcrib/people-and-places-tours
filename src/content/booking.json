@@ -12,11 +12,11 @@
     "step2Legend": "How should our team reach you?",
     "step2Help": "Just enough for a real person to write back to you.",
     "submitLabel": "Let's Plan Together",
-    "submitNote": "Our Ghana-based team usually replies within one business day.",
+    "submitNote": "Our Ghana-based team usually replies within one hour during business hours.",
     "privacyNote": "We use these details only to reply and plan with you. Please don't include passport, payment, medical, or other sensitive information.",
     "altPrompt": "Would you rather just talk it through?",
     "successTitle": "Your Ghana journey has started.",
-    "successText": "Thank you for trusting us with it. Someone from our team in Accra will read your note personally and write back, usually within one business day.",
+    "successText": "Thank you for trusting us with it. Someone from our team in Accra will read your note personally and write back, usually within one hour during business hours.",
     "trustPoints": [
       {
         "icon": "pin",
@@ -24,7 +24,7 @@
       },
       {
         "icon": "clock",
-        "label": "Usually a reply within one business day"
+        "label": "Usually a reply within one hour during business hours"
       },
       {
         "icon": "lock",
@@ -36,7 +36,7 @@
     "nextSteps": [
       {
         "title": "We read your note",
-        "description": "Someone from our local team replies personally, usually within one business day."
+        "description": "Someone from our local team replies personally, usually within one hour during business hours."
       },
       {
         "title": "We shape it together",

@@ -128,4 +128,28 @@ const escaped = injectBookingContent(contactHtml, {...local, title: '<script>ale
 assert(!escaped.includes('<script>alert(1)</script>'));
 assert(escaped.includes('&lt;script&gt;'));
 
+// The contact page told a visitor both "within one hour during business hours"
+// and "within one business day", about 600px apart on the same screen, at the
+// moment they were deciding whether to hand over their travel plans. The two
+// came from different files — site.json and booking.json — and nothing made
+// them agree. Any reply window written into the booking copy must now match the
+// one the site settings promise.
+{
+  const siteSettings = JSON.parse(await readFile(new URL('../src/content/site.json', import.meta.url), 'utf8'));
+  const promise = siteSettings?.siteSettings?.responsePromise || '';
+  const WINDOW = /within (?:the )?(one|two|a|\d+)\s+(hour|hours|business day|business days|day|days)/gi;
+  const normalise = m => `${m[1].toLowerCase().replace(/^a$/, 'one')} ${m[2].toLowerCase().replace(/s$/, '')}`;
+
+  const promised = [...promise.matchAll(WINDOW)].map(normalise);
+  assert(promised.length > 0, 'site.json contact.responsePromise must state a reply window');
+
+  const bookingRaw = await readFile(new URL('../src/content/booking.json', import.meta.url), 'utf8');
+  const found = [...bookingRaw.matchAll(WINDOW)].map(normalise);
+  const conflicting = [...new Set(found.filter(w => !promised.includes(w)))];
+  assert.deepEqual(
+    conflicting, [],
+    `booking.json promises a reply window the site settings do not: ${conflicting.join(', ')} vs ${promised.join(', ')}`,
+  );
+}
+
 console.log('Booking flow content contract tests passed.');
