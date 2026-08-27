@@ -10,6 +10,8 @@
  * photograph exists, so a page is never left with an empty frame while
  * photography is still being chosen.
  */
+import {sanityImageUrl} from './sanity-image.mjs';
+
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[character]));
@@ -32,10 +34,15 @@ export function injectPagePhotos(html, photos = {}) {
     if (!usable(photo)) continue;
     const pattern = new RegExp(`<img\\b[^>]*\\sdata-cms-photo="${key}"[^>]*>`, 'g');
     output = output.replace(pattern, tag => {
-      let next = tag
-        .replace(/\ssrc="[^"]*"/, ` src="${escapeHtml(photo.src)}"`)
-        .replace(/\swidth="[^"]*"/, photo.width ? ` width="${escapeHtml(photo.width)}"` : '')
-        .replace(/\sheight="[^"]*"/, photo.height ? ` height="${escapeHtml(photo.height)}"` : '');
+      // The width and height already on the tag describe the slot, not the
+      // file, and they are what stops the page jumping while the image loads.
+      // They are kept, and the photograph is fetched at that size — an earlier
+      // version overwrote them with the source's dimensions and shipped a
+      // 4100x4100 master into a 1920x720 band.
+      const slotWidth = Number((tag.match(/\swidth="(\d+)"/) || [])[1]) || undefined;
+      const slotHeight = Number((tag.match(/\sheight="(\d+)"/) || [])[1]) || undefined;
+      const src = sanityImageUrl(photo, {width: slotWidth, height: slotHeight}) || photo.src;
+      const next = tag.replace(/\ssrc="[^"]*"/, ` src="${escapeHtml(src)}"`);
       // A decorative image keeps its empty alt: describing a photograph that
       // sits behind a heading only makes a screen reader read the heading twice.
       if (/\salt="\s*"/.test(next)) return next;

@@ -1,4 +1,5 @@
 import {fetchSanity} from './sanity-fetch.mjs';
+import {sizedPhoto} from './sanity-image.mjs';
 const API_VERSION = '2026-08-02';
 const SECTION_KEYS = [
   'hero', 'founderStory', 'waysToExperience', 'tripMoments',
@@ -36,11 +37,24 @@ function overlay(base, fields) {
  * for the website. Anything else returns undefined, which `overlay` skips —
  * so the committed photo stays until the new one is ready.
  */
-function usablePhoto(image) {
+// What each slot measures at its widest. sanity-image doubles these for retina
+// and never asks for more than the uploaded master holds.
+const SLOT_WIDTH = {
+  hero: 1440,
+  banner: 1440,
+  pathway: 660,
+  moment: 520,
+  portrait: 320,
+  flexible: 720,
+};
+
+function usablePhoto(image, slot = 'flexible') {
   if (!image?.src) return undefined;
   if (image.publicApprovalState !== 'approved') return undefined;
   if (image.placeholderState !== 'approved') return undefined;
-  return image;
+  // Without this the bare asset URL ships: the browser downloads the original
+  // and the focal point is never applied, because no crop was ever requested.
+  return sizedPhoto(image, {width: SLOT_WIDTH[slot] || SLOT_WIDTH.flexible});
 }
 
 /**
@@ -115,19 +129,19 @@ function applyPrimaryCopy(target, section) {
     if (video) {
       target.video ||= {};
       target.video.src = video.video;
-      if (poster) target.video.poster = poster;
+      if (poster) target.video.poster = sizedPhoto(poster, {width: SLOT_WIDTH.hero});
     } else if (poster) {
       // No video, so the photograph is the hero rather than a poster frame
       // waiting behind one. The renderer prefers `image` over `video`, and
       // without this a hero photo uploaded in the Studio was stored as the
       // poster for a video that does not exist — so the committed file kept
       // rendering and the upload did nothing.
-      target.image = poster;
+      target.image = sizedPhoto(poster, {width: SLOT_WIDTH.hero});
     }
   }
   if (sectionKey === 'reviewsAndTrust') {
     const banner = approvedMedia.find(media => media.src);
-    if (banner) target.heroImage = banner;
+    if (banner) target.heroImage = sizedPhoto(banner, {width: SLOT_WIDTH.banner});
   }
   if (sectionKey === 'tripMoments') {
     const photos = approvedMedia.filter(media => media.src);
@@ -139,7 +153,7 @@ function applyPrimaryCopy(target, section) {
       target.moments = photos.map(photo => ({
         shape: photo.width && photo.height && photo.width > photo.height ? 'wide' : 'tall',
         caption: photo.caption || photo.alt || '',
-        image: photo,
+        image: sizedPhoto(photo, {width: SLOT_WIDTH.moment}),
       }));
     }
   }
@@ -156,7 +170,7 @@ function applyPrimaryCopy(target, section) {
         quote: founder.quote || undefined,
         initials: String(displayName || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase(),
       };
-      if (founder.photo?.src && founder.photo.publicApprovalState === 'approved' && founder.photo.placeholderState === 'approved') profile.image = founder.photo;
+      if (founder.photo?.src && founder.photo.publicApprovalState === 'approved' && founder.photo.placeholderState === 'approved') profile.image = usablePhoto(founder.photo, 'portrait');
       return profile;
     });
   }
@@ -174,7 +188,7 @@ function applyPrimaryCopy(target, section) {
         title: entry?.title,
         text: entry?.description,
         href: entry?.filterKey ? `packages.html?category=${encodeURIComponent(entry.filterKey)}` : undefined,
-        image: usablePhoto(entry?.image),
+        image: usablePhoto(entry?.image, 'pathway'),
       }),
       isRenderable: item => Boolean(item.title && item.href && item.image?.src),
     });
@@ -193,7 +207,7 @@ function applyPrimaryCopy(target, section) {
         rating: entry?.rating,
         date: entry?.reviewDate,
         sourceUrl: entry?.sourceUrl,
-        image: usablePhoto(entry?.image),
+        image: usablePhoto(entry?.image, 'portrait'),
       }),
       defaults: {rating: 5, location: 'Verified traveler review'},
       isRenderable: item => Boolean(item.quote && item.author),
@@ -367,6 +381,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
     sectionKey, order, eyebrow, headline, body, reassurance, trustMessage,
     "media": media[]{
       "src": image.asset->url,
+      "hotspot": image.hotspot,
       "video": video,
       "alt": altText,
       "caption": caption,
@@ -379,6 +394,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
       name, preferredName, role, quote,
       "photo": {
         "src": photo.image.asset->url,
+        "hotspot": photo.image.hotspot,
         "alt": photo.altText,
         "width": photo.image.asset->metadata.dimensions.width,
         "height": photo.image.asset->metadata.dimensions.height,
@@ -390,6 +406,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
       title, description, filterKey, order,
       "image": {
         "src": image.image.asset->url,
+        "hotspot": image.image.hotspot,
         "alt": image.altText,
         "width": image.image.asset->metadata.dimensions.width,
         "height": image.image.asset->metadata.dimensions.height,
@@ -401,6 +418,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
       reviewerName, country, selectedExcerpt, rating, platform, sourceUrl, reviewDate,
       "image": {
         "src": media[0].image.asset->url,
+        "hotspot": media[0].image.hotspot,
         "alt": media[0].altText,
         "width": media[0].image.asset->metadata.dimensions.width,
         "height": media[0].image.asset->metadata.dimensions.height,
@@ -418,6 +436,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
   // homepage still costs one request.
   const photoProjection = `{
     "src": image.asset->url,
+    "hotspot": image.hotspot,
     "alt": altText,
     "width": image.asset->metadata.dimensions.width,
     "height": image.asset->metadata.dimensions.height,

@@ -48,20 +48,40 @@ assert.equal(loaded.source, 'sanity');
 assert.equal(loaded.content.hero.headline, 'Headline 1');
 assert.equal(loaded.content.hero.sub, 'Body 1');
 assert.equal(loaded.content.hero.video.src, 'https://cdn.example.com/ghana.mp4');
-assert.equal(loaded.content.hero.video.poster.src, 'https://cdn.sanity.io/hero-poster.jpg');
-assert.equal(loaded.content.reviewsAndTrust.heroImage.src, 'https://cdn.sanity.io/reviews.jpg');
+// The bare asset URL used to ship, so the browser downloaded the original and
+// the focal point was never applied — a homepage carrying five-megapixel
+// masters came to 10.4MB of images. Every photograph now asks the CDN for the
+// size its slot actually occupies.
+const poster = loaded.content.hero.video.poster.src;
+assert.ok(poster.startsWith('https://cdn.sanity.io/hero-poster.jpg?'), 'the poster keeps its asset');
+assert.match(poster, /[?&]w=\d+/, 'and asks for a width rather than the original');
+const banner = loaded.content.reviewsAndTrust.heroImage.src;
+assert.ok(banner.startsWith('https://cdn.sanity.io/reviews.jpg?'), 'the banner keeps its asset');
+assert.match(banner, /[?&]w=\d+/, 'and asks for a width rather than the original');
 assert.deepEqual(loaded.content.reviewsAndTrust.titleLines, ['What Guests', 'Say']);
 // Sanity owns the list once it has one: one pathway in the Studio means one
 // pathway on the page, and the committed pathway it does not mention is gone.
 assert.equal(loaded.content.waysToExperience.pathways.length, 1);
-assert.deepEqual(loaded.content.waysToExperience.pathways[0], {
-  title: 'Sanity pathway', text: 'From Sanity', href: 'packages.html?category=craft',
-  image: {src: 'https://cdn.sanity.io/pathway.jpg', alt: 'A maker', width: 1200, height: 800, placeholderState: 'approved', publicApprovalState: 'approved'},
-});
-assert.deepEqual(loaded.content.founderStory.founders[0], {
-  name: 'Ama Example', preferredName: 'Ama', role: 'Founder', quote: 'A verified quote.', initials: 'A',
-  image: {src: 'https://cdn.sanity.io/ama.jpg', alt: 'Ama', width: 800, height: 800, placeholderState: 'approved', publicApprovalState: 'approved'},
-});
+{
+  // The src now carries the size its slot needs, so it is asserted separately
+  // from the fields that must survive unchanged.
+  const pathway = loaded.content.waysToExperience.pathways[0];
+  const {src: pathwaySrc, ...pathwayRest} = pathway.image;
+  assert.deepEqual({...pathway, image: pathwayRest}, {
+    title: 'Sanity pathway', text: 'From Sanity', href: 'packages.html?category=craft',
+    image: {alt: 'A maker', width: 1200, height: 800, placeholderState: 'approved', publicApprovalState: 'approved'},
+  });
+  assert.ok(pathwaySrc.startsWith('https://cdn.sanity.io/pathway.jpg?'));
+  assert.match(pathwaySrc, /[?&]w=\d+/);
+
+  const founder = loaded.content.founderStory.founders[0];
+  const {src: founderSrc, ...founderRest} = founder.image;
+  assert.deepEqual({...founder, image: founderRest}, {
+    name: 'Ama Example', preferredName: 'Ama', role: 'Founder', quote: 'A verified quote.', initials: 'A',
+    image: {alt: 'Ama', width: 800, height: 800, placeholderState: 'approved', publicApprovalState: 'approved'},
+  });
+  assert.ok(founderSrc.startsWith('https://cdn.sanity.io/ama.jpg?'));
+}
 assert.equal(loaded.content.finalInvitation.cta.href, 'packages.html');
 assert.equal(loaded.content.planningProcess.steps.length, 1);
 assert.equal(loaded.content.planningProcess.steps[0].title, 'Sanity step');
@@ -205,7 +225,12 @@ const swapped = await loadHomepageContent({
   env: {SANITY_STUDIO_PROJECT_ID: 'project-123'},
   fetchImpl: async () => new Response(JSON.stringify({result: {sections: photoOnly, flexible: []}}), {status: 200}),
 });
-assert.deepEqual(swapped.content.waysToExperience.pathways[0].image, newPhoto);
+{
+  const {src, ...rest} = swapped.content.waysToExperience.pathways[0].image;
+  const {src: _ignored, ...expected} = newPhoto;
+  assert.deepEqual(rest, expected);
+  assert.ok(src.startsWith(newPhoto.src + '?'), 'the swapped photo keeps its asset, resized');
+}
 assert.equal(swapped.content.waysToExperience.pathways[0].title, 'Local pathway',
   'swapping a photo must not disturb the copy');
 
