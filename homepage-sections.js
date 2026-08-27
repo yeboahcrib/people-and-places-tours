@@ -46,13 +46,30 @@
 
   const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
   const renderStars = label => `<span class="testi-stars" role="img" aria-label="${escapeHtml(label)}">${STAR_SVG.repeat(5)}</span>`;
+  /**
+   * Render a figure, and decide whether it is honest to count up to it.
+   *
+   * It is not honest for most of them. Counting to a 5.0 rating displays 1.8
+   * on the way, beside five filled stars; counting to a founding year of 2021
+   * displays 714. Both were on the homepage, in the two elements that exist
+   * purely to be believed, for about 1.6 seconds each.
+   *
+   * A tally is the only kind of figure where the intermediate values were
+   * themselves true once — we really had hosted 150 guests before we had
+   * hosted 300. So a value only animates when it carries a "+", which is how
+   * this site writes a total that is still climbing. Everything else renders
+   * as itself. The default is static because a figure that never animates is
+   * never wrong, and one that does is wrong every time someone scrolls past.
+   */
   const renderCountValue = (value, className) => {
     const text = String(value ?? '');
     const match = text.match(/([\d,.]+)(.*)/);
     if (!match) return `<span class="${className}">${escapeHtml(text)}</span>`;
+    const suffix = match[2];
+    if (!suffix.includes('+')) return `<span class="${className}">${escapeHtml(text)}</span>`;
     const numeric = Number(match[1].replace(/,/g, ''));
     const decimals = (match[1].split('.')[1] || '').length;
-    return `<span class="${className}" data-count-value="${escapeHtml(numeric)}" data-count-decimals="${decimals}" data-count-suffix="${escapeHtml(match[2])}">${escapeHtml(text)}</span>`;
+    return `<span class="${className}" data-count-value="${escapeHtml(numeric)}" data-count-decimals="${decimals}" data-count-suffix="${escapeHtml(suffix)}">${escapeHtml(text)}</span>`;
   };
 
   function renderImage(image, className, extraAttrs = '') {

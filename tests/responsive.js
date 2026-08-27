@@ -82,8 +82,32 @@ function assert(condition, message) {
         const navCta = document.querySelector('.nav-cta .btn-primary');
         const navCtaRect = navCta ? navCta.getBoundingClientRect() : null;
 
+        // An <img> carrying width/height attributes with a percentage CSS width
+        // and no height:auto renders at the attribute's height, so aspect-ratio
+        // and the natural proportions are both ignored and the photograph is
+        // squashed. It shipped twice in one day — the add-ons photo and the
+        // About founders photo, the latter 24.6% off at desktop and 52% at
+        // mobile. object-fit cover/contain are excluded: those crop by design.
+        const stretchedImages = [...document.images]
+          .filter(visible)
+          .filter(img => img.naturalWidth > 0 && img.naturalHeight > 0)
+          .filter(img => !['cover', 'contain', 'scale-down', 'none'].includes(getComputedStyle(img).objectFit))
+          .map(img => {
+            const rect = img.getBoundingClientRect();
+            const natural = img.naturalWidth / img.naturalHeight;
+            const rendered = rect.width / rect.height;
+            return {
+              src: (img.getAttribute('src') || '').split('/').pop().slice(0, 48),
+              skew: Math.abs(rendered - natural) / natural,
+              rendered: `${Math.round(rect.width)}x${Math.round(rect.height)}`,
+              natural: `${img.naturalWidth}x${img.naturalHeight}`,
+            };
+          })
+          .filter(img => img.skew > 0.05);
+
         return {
           documentWidth,
+          stretchedImages,
           viewportWidth: document.documentElement.clientWidth,
           navCta: navCtaRect && visible(navCta)
             ? {right: Math.round(navCtaRect.right), left: Math.round(navCtaRect.left)}
@@ -110,6 +134,11 @@ function assert(condition, message) {
         assert(audit.navCta.left >= 0, `${path} pushes the "Book a Tour" button off the left edge at ${width}px`);
       }
       assert(audit.invisibleRevealCount === 0, `${path} hides reveal content with reduced motion at ${width}px: ${JSON.stringify(audit.invisibleReveals)}`);
+      assert(
+        audit.stretchedImages.length === 0,
+        `${path} distorts ${audit.stretchedImages.length} image(s) at ${width}px: ` +
+        audit.stretchedImages.map(i => `${i.src} rendered ${i.rendered} from ${i.natural} (${Math.round(i.skew * 100)}% off)`).join('; '),
+      );
 
       if (width <= 768) {
         assert(!audit.navLinksVisible, `${path} desktop navigation is visible at ${width}px`);

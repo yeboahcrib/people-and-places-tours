@@ -608,6 +608,32 @@ document.addEventListener('DOMContentLoaded', () => {
       history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
     };
 
+    const emptyPanel = document.querySelector('[data-experience-empty]');
+    const emptyCombo = document.querySelector('[data-empty-combo]');
+    const resetButton = document.querySelector('[data-experience-reset]');
+
+    // What the visitor actually picked, in their words rather than slugs.
+    const activeFilterLabel = () => {
+      const parts = [];
+      groups.forEach(group => {
+        const kind = group.dataset.filterGroup;
+        if (filterState[kind] === 'all') return;
+        const active = group.querySelector(`.filter-tab[data-filter="${filterState[kind]}"]`);
+        if (active) parts.push(active.textContent.trim());
+      });
+      if (destinationSelect && filterState.destination !== 'all') {
+        const option = destinationSelect.selectedOptions[0];
+        if (option) parts.push(option.textContent.trim());
+      }
+      return parts.join(' in ');
+    };
+
+    const reportResultCount = count => {
+      if (!emptyPanel) return;
+      emptyPanel.hidden = count > 0;
+      if (count === 0 && emptyCombo) emptyCombo.textContent = activeFilterLabel() || 'that combination';
+    };
+
     const applyFilters = (animate = true) => {
       if (!grid) return;
       window.clearTimeout(filterTimer);
@@ -627,6 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
         grid.classList.remove('is-filtering');
+        // visibleIndex was computed and thrown away. Craft in Kumasi matches
+        // nothing, and the page simply went blank — no message, no count, and
+        // no control anywhere to undo it.
+        reportResultCount(visibleIndex);
         if (animate) {
           requestAnimationFrame(() => cards.filter(card => !card.hidden).forEach(card => card.classList.add('filter-enter')));
         }
@@ -655,6 +685,22 @@ document.addEventListener('DOMContentLoaded', () => {
         filterState.destination = destinationSelect.value;
         syncFilterUrl();
         applyFilters();
+      });
+    }
+
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        groups.forEach(group => {
+          filterState[group.dataset.filterGroup] = 'all';
+          setActiveButton(group, 'all');
+        });
+        if (destinationSelect) {
+          filterState.destination = 'all';
+          destinationSelect.value = 'all';
+        }
+        syncFilterUrl();
+        applyFilters();
+        grid?.scrollIntoView({behavior: filterReducedMotion ? 'auto' : 'smooth', block: 'start'});
       });
     }
 

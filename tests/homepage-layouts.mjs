@@ -134,6 +134,31 @@ assert.deepEqual(
   'homepage-sections.js BUILT_IN_SECTIONS order must match SECTION_KEYS in homepage-source.mjs',
 );
 
+// Counting up to a figure displays every value on the way to it, so it is only
+// honest for a running total. The homepage counted to a 5.0 Google rating,
+// showing 1.8 beside five filled stars, and to a founding year of 2021, showing
+// 714 — for about 1.6 seconds each, in the two elements that exist purely to be
+// believed. Only a "+" total animates now.
+{
+  const trust = render({
+    ...localContent,
+    sectionOrder: [{key: 'reviewsAndTrust'}],
+    reviewsAndTrust: {
+      ...localContent.reviewsAndTrust,
+      ratingSummary: {value: '5.0', label: 'Google rating', caption: 'from 15 reviews', href: 'https://example.com'},
+      trustFacts: [
+        {label: 'Guests Hosted', value: '300+'},
+        {label: 'Hosting Locally Since', value: '2021'},
+      ],
+    },
+  });
+  const animated = [...trust.matchAll(/data-count-value="([^"]+)"[^>]*data-count-suffix="([^"]*)"/g)]
+    .map(m => m[1] + m[2]);
+  assert.deepEqual(animated, ['300+'], 'only a running total may animate — not a rating, not a year');
+  assert.ok(/>5\.0</.test(trust), 'the rating must render as itself');
+  assert.ok(/>2021</.test(trust), 'the year must render as itself');
+}
+
 // The three declarations of "which layouts exist" must agree.
 const schema = await readFile(join(projectRoot, 'studio/schemaTypes/documents/flexibleSection.ts'), 'utf8');
 const schemaLayouts = [...schema.matchAll(/value: '(photoBeside|cards|quote|invitation)'/g)].map(match => match[1]);

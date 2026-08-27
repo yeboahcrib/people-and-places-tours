@@ -2107,6 +2107,65 @@ body.page-entering {
   -webkit-overflow-scrolling: touch;
 }
 .filter-tabs::-webkit-scrollbar { display: none; }
+
+/* The eight category chips need about 770px. The middle grid column gives them
+   that only past ~1200px, so between the tablet breakpoint and there the last
+   chip — Multi-Day, which filters to the most expensive trip on the site — was
+   sheared off with no cue that anything had been cut. At 1440px, the intended
+   design width, it lost its right border. `body { overflow-x: hidden }` keeps
+   this away from any document-width test, which is why it survived so long.
+
+   The chips column tops out around 720px because the row sits inside a
+   max-width container and the prompt and select take ~390px of it, so the row
+   never fitted at any width — 1600px was as clipped as 1201px. The place
+   select drops to its own line at every desktop width now, which gives the
+   chips the whole row. The mask is the belt-and-braces half: wherever the row still cannot
+   fit, the last chip now fades instead of ending in a hard vertical cut, so a
+   clipped edge reads as "scroll me" rather than as a broken pill. */
+/* Shown only when the filter matches nothing. Sized to roughly the height of
+   one card row so the page does not collapse when the grid empties. */
+.experience-empty {
+  padding: var(--sp-6) var(--sp-3);
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+}
+.experience-empty[hidden] { display: none; }
+.experience-empty-title {
+  font-size: var(--text-xl);
+  color: var(--white);
+  margin: 0 0 var(--sp-1);
+}
+.experience-empty-title strong { color: var(--color-primary); font-weight: 700; }
+.experience-empty-body {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 auto var(--sp-3);
+  max-width: 46ch;
+}
+.experience-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1-5);
+  justify-content: center;
+}
+
+@media (min-width: 769px) {
+  .experience-filter-nav { grid-template-columns: minmax(0, 1fr) auto; }
+  /* Rows are explicit: without them auto-placement puts the select after the
+     full-width chip row instead of beside the prompt, leaving it orphaned on a
+     third line with the whole row empty to its left. */
+  .experience-filter-prompt { grid-column: 1; grid-row: 1; }
+  .destination-filter { grid-column: 2; grid-row: 1; justify-self: end; }
+  .filter-tabs { grid-column: 1 / -1; grid-row: 2; }
+}
+.filter-tabs {
+  padding-right: var(--sp-3);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.25rem), transparent 100%);
+  mask-image: linear-gradient(to right, #000 calc(100% - 2.25rem), transparent 100%);
+}
+@supports not (mask-image: linear-gradient(#000, #000)) {
+  .filter-tabs { -webkit-mask-image: none; mask-image: none; }
+}
 .filter-tab {
   flex: 0 0 auto;
   min-height: 40px;
