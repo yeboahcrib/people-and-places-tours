@@ -539,6 +539,37 @@ document.addEventListener('DOMContentLoaded', () => {
       quote?.classList.toggle('is-expanded', !expanded);
     });
 
+    /*
+     * Show "Read more" only on quotes that are actually cut off.
+     *
+     * The button used to be decided at build time by character count, which
+     * cannot know how many lines a quote wraps to — the clamp is three lines at
+     * every width, so a quote short enough to miss the threshold could still be
+     * truncated with no way to open it. Measuring the rendered box answers the
+     * real question, and answers it again when the width changes.
+     *
+     * Only collapsed quotes are measured: an expanded one has no clamp, so it
+     * never overflows and would have its button taken away mid-read.
+     */
+    const syncQuoteButtons = () => {
+      document.querySelectorAll('.testi-read-more').forEach(button => {
+        const quote = button.previousElementSibling;
+        if (!quote || quote.classList.contains('is-expanded')) return;
+        const overflows = quote.scrollHeight > quote.clientHeight + 1;
+        button.hidden = !overflows;
+        quote.classList.toggle('is-collapsible', overflows);
+      });
+    };
+
+    syncQuoteButtons();
+    // Web fonts land after first paint and change how many lines a quote takes.
+    if (document.fonts?.ready) document.fonts.ready.then(syncQuoteButtons).catch(() => {});
+    let quoteResizeTimer;
+    window.addEventListener('resize', () => {
+      window.clearTimeout(quoteResizeTimer);
+      quoteResizeTimer = window.setTimeout(syncQuoteButtons, 150);
+    });
+
     const advanceCarousel = timestamp => {
       if (!lastFrame) lastFrame = timestamp;
       const elapsed = Math.min(timestamp - lastFrame, 50);

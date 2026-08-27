@@ -289,8 +289,16 @@
         <div class="testimonial-slide reveal testimonial-delay-${Math.min(idx + 1, 3)}">
           <div class="testimonial-card${idx === 0 ? ' testimonial-card-feature' : ''}">
             ${renderStars(`Rated ${item.rating || 5} out of 5`)}
-            <blockquote class="testi-quote${String(item.quote || '').length > 130 ? ' is-collapsible' : ''}">${escapeHtml(item.quote)}</blockquote>
-            ${String(item.quote || '').length > 130 ? '<button type="button" class="testi-read-more" aria-expanded="false">Read more</button>' : ''}
+            <!-- Whether a quote needs "Read more" is a question about how many
+                 lines it wraps to, and a character count cannot answer it: the
+                 clamp is three lines at every width, but the button only used to
+                 appear past 130 characters, so a shorter quote that still wrapped
+                 to four lines was cut off with no way to open it. The button now
+                 ships hidden on every quote and script.js reveals it only where
+                 the text actually overflows, re-checking on resize. Hidden rather
+                 than absent so it never renders as a control that does nothing. -->
+            <blockquote class="testi-quote">${escapeHtml(item.quote)}</blockquote>
+            <button type="button" class="testi-read-more" aria-expanded="false" hidden>Read more</button>
             <div class="testi-author">
               ${item.image ? renderImage(item.image, 'testi-author-photo', 'loading="lazy" sizes="44px"') : `<span class="testi-author-fallback" aria-hidden="true">${escapeHtml(String(item.author || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join(''))}</span>`}
               <div>
