@@ -112,13 +112,36 @@ function applyPrimaryCopy(target, section) {
   if (sectionKey === 'hero' && approvedMedia.length) {
     const video = approvedMedia.find(media => media.video);
     const poster = approvedMedia.find(media => media.src);
-    target.video ||= {};
-    if (video) target.video.src = video.video;
-    if (poster) target.video.poster = poster;
+    if (video) {
+      target.video ||= {};
+      target.video.src = video.video;
+      if (poster) target.video.poster = poster;
+    } else if (poster) {
+      // No video, so the photograph is the hero rather than a poster frame
+      // waiting behind one. The renderer prefers `image` over `video`, and
+      // without this a hero photo uploaded in the Studio was stored as the
+      // poster for a video that does not exist — so the committed file kept
+      // rendering and the upload did nothing.
+      target.image = poster;
+    }
   }
   if (sectionKey === 'reviewsAndTrust') {
     const banner = approvedMedia.find(media => media.src);
     if (banner) target.heroImage = banner;
+  }
+  if (sectionKey === 'tripMoments') {
+    const photos = approvedMedia.filter(media => media.src);
+    // The strip alternates tall and wide frames, and a photograph already
+    // knows which it is — a portrait is tall, a landscape is wide. Deriving it
+    // from the dimensions means an editor never has to answer a question about
+    // layout that the picture has already answered.
+    if (photos.length) {
+      target.moments = photos.map(photo => ({
+        shape: photo.width && photo.height && photo.width > photo.height ? 'wide' : 'tall',
+        caption: photo.caption || photo.alt || '',
+        image: photo,
+      }));
+    }
   }
   const ctas = (section.ctas || []).map(cta => safeCta(cta, sectionKey));
   if (ctas[0]) target.cta = ctas[0];
@@ -346,6 +369,7 @@ export async function loadHomepageContent({localContent, env = process.env, fetc
       "src": image.asset->url,
       "video": video,
       "alt": altText,
+      "caption": caption,
       "width": image.asset->metadata.dimensions.width,
       "height": image.asset->metadata.dimensions.height,
       placeholderState, publicApprovalState
