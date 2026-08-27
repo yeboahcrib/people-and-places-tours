@@ -75,7 +75,13 @@ export const homepageSection = defineType({
       type: 'array',
       of: [{type: 'reference', to: [{type: 'review'}]}],
       hidden: ({document}) => document?.sectionKey !== 'reviewsAndTrust',
-      validation: (Rule) => Rule.max(8),
+      // Was max(8) while the published document already carried ten, which the
+      // carousel renders perfectly well. The rule was never enforced against the
+      // existing content, so it only surfaced when an editor next tried to save
+      // — the document could not be published at all, and the reason was a cap
+      // that reality had already passed. Twelve leaves room without going
+      // unbounded; a marquee of twenty-odd would be its own problem.
+      validation: (Rule) => Rule.max(12),
       description: 'Select and order the verified reviews shown in the homepage carousel. Traveler country and approved media are read from each review.',
     }),
     defineField({
