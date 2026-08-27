@@ -51,9 +51,23 @@ const renderSections = sections => sections.map(section => {
   const intro = section.intro
     ? `<p class="policy-block-intro">${escapeHtml(section.intro)}</p>`
     : '';
-  const items = section.items.map(item =>
-    `<div class="policy-term"><dt>${escapeHtml(item.term)}</dt><dd>${escapeHtml(item.text)}</dd></div>`,
-  ).join('');
+  const items = section.items.map(item => {
+    // Optional, and deliberately not part of the text: every string here is
+    // escaped, so a term that names another page of ours had no way to link to
+    // it. The travel-information page told a first-time visitor that visas,
+    // yellow fever and insurance "all three have their own page" and then linked
+    // none of them, which sends them to Google at the point they trust us most.
+    //
+    // Only same-site page links are accepted. Anything else is dropped rather
+    // than rendered, because this text is editor-supplied.
+    const href = String(item.link?.href || '').trim();
+    const safe = /^[a-z0-9-]+\.html(?:#[a-z0-9-]+)?$/i.test(href) ? href : '';
+    const link = safe && item.link?.label
+      ? ` <a class="policy-term-link" href="${escapeHtml(safe)}">${escapeHtml(item.link.label)}</a>`
+      : '';
+    if (href && !safe) console.warn(`Policy term "${item.term}" has a link this site will not render (${href}) — leaving it off.`);
+    return `<div class="policy-term"><dt>${escapeHtml(item.term)}</dt><dd>${escapeHtml(item.text)}${link}</dd></div>`;
+  }).join('');
   return `<section class="policy-block">`
     + `<h3 class="policy-block-title">${escapeHtml(section.heading)}</h3>`
     + intro

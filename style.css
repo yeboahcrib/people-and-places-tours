@@ -996,13 +996,16 @@ body.page-entering {
   transition: opacity 0.5s ease-out, transform 0.65s var(--ease-out);
 }
 .reveal-ready .process-connector.visible { opacity: 1; transform: scaleX(1); }
+/* --yellow-dark measures about 2.4:1 on cream and fails AA badly. The design
+   system already carries --yellow-on-light for exactly this — yellow as text on
+   a light surface — and it was applied in some places and not others. */
 .process-step-num {
   font-family: var(--font-body);
   font-weight: 700;
   font-size: var(--text-2xs);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-primary-deep);
+  color: var(--yellow-on-light);
   margin: 0;
   transition: color 0.35s ease-out, letter-spacing 0.35s ease-out;
 }
@@ -1318,10 +1321,18 @@ body.page-entering {
   color: var(--color-primary);
   margin-bottom: var(--sp-2-5);
 }
-.footer-col ul { display: flex; flex-direction: column; gap: var(--sp-1-5); }
+/* The gap shrinks as the links grow their own hit area, so the column keeps
+   roughly the rhythm it had. Sixteen or seventeen links per page were 17px tall
+   — the bare text line, with the list item adding nothing — against the 32px
+   floor this project sets for itself in CLAUDE.md. */
+.footer-col ul { display: flex; flex-direction: column; gap: var(--sp-0-5); }
 .footer-col a {
   font-size: var(--text-base);
   color: var(--color-text-muted);
+  /* inline-block so the padding actually makes a box: vertical padding on an
+     inline element grows the paint area without growing what you can tap. */
+  display: inline-block;
+  padding-block: var(--sp-1);
   transition: color var(--motion-base) ease-out, transform var(--motion-base) ease-out;
 }
 .footer-col a:hover,
@@ -2122,6 +2133,50 @@ body.page-entering {
    chips the whole row. The mask is the belt-and-braces half: wherever the row still cannot
    fit, the last chip now fades instead of ending in a hard vertical cut, so a
    clipped edge reads as "scroll me" rather than as a broken pill. */
+/* The closing invitation on a tour page. Shared rather than inline in the tour
+   template, because just-go-ghana.html is a committed page rather than a
+   generated one and needs the same block. */
+.tour-closing { background: var(--black); padding: 4rem 0 5rem; }
+.tour-closing-inner { max-width: 720px; margin: 0 auto; padding: 0 var(--sp-3); text-align: center; }
+.tour-closing-eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: var(--sp-1-5);
+}
+.tour-closing-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: var(--sp-2);
+}
+.tour-closing-body {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  margin: 0 auto var(--sp-4);
+  max-width: 52ch;
+}
+.tour-closing-actions { display: flex; gap: var(--sp-1-5); justify-content: center; flex-wrap: wrap; }
+.tour-closing-actions > a { display: inline-block; }
+
+/* A policy term may link to another page of ours. Shared rather than inlined in
+   each policy page's <style>, because five pages can carry one. Dark surface, so
+   the primary yellow is correct here — the light-surface variant would be
+   --yellow-on-light. */
+.policy-term-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.policy-term-link:hover,
+.policy-term-link:focus-visible { text-decoration-thickness: 2px; }
+
 /* Shown only when the filter matches nothing. Sized to roughly the height of
    one card row so the page does not collapse when the grid empties. */
 .experience-empty {
@@ -3180,6 +3235,8 @@ body.page-entering {
 .footer-links a {
   font-size: var(--text-base);
   color: rgba(255,255,255,.45);
+  display: inline-block;
+  padding-block: var(--sp-1);
   transition: color var(--motion-base) ease-out, transform var(--motion-base) ease-out;
 }
 .footer-links a:hover,
@@ -3540,7 +3597,7 @@ body.page-entering {
 }
 .founder-mini-role {
   font-size: var(--text-xs);
-  color: var(--color-primary-deep);
+  color: var(--yellow-on-light);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;

@@ -68,7 +68,8 @@
     .trip-highlights-card h4{font-family:'Archivo Black',sans-serif;font-size:var(--text-2xl);margin-bottom:1rem;color:var(--dark);}
     .highlight-row{display:flex;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid #e8e8e0;font-size:var(--text-base);}
     .highlight-row:last-child{border-bottom:none;}
-    .highlight-row span:first-child{color:#888;}
+    /* #888 measures 3.26:1 on this card and fails AA for body text. --muted-dark is the token for muted text on a light surface and clears it at 5.27:1. */
+    .highlight-row span:first-child{color:var(--muted-dark);}
     .highlight-row span:last-child{font-weight:600;}
     .also-check{background:var(--surface-dark);padding:4rem 2.5rem;border-radius:40px 40px 0 0;}
     .also-check h2{font-family:'Archivo Black',sans-serif;font-size:var(--text-7xl);color:var(--white);margin-bottom:2rem;text-align:center;}
@@ -211,6 +212,22 @@
 <div class="also-check">
   <h2>Also Check Out</h2>
   <div class="also-grid">{{ALSO_CARDS}}</div>
+</div>
+
+<!-- The page used to end on the cross-sell. On the heritage tours that meant
+     someone finished reading about the Door of No Return and was handed a
+     quad-bike tour, which is the wrong last thing to say. The invitation goes
+     after it so the page closes on this trip rather than pointing away. -->
+<div class="tour-closing">
+  <div class="tour-closing-inner">
+    <p class="tour-closing-eyebrow">Ready when you are</p>
+    <h2 class="tour-closing-title">See it for yourself.</h2>
+    <p class="tour-closing-body">Tell us roughly what you have in mind. It is the start of a conversation, not a commitment, and someone from our team in Accra answers personally.</p>
+    <div class="tour-closing-actions">
+      <a href="contact.html?tour={{SLUG}}" class="btn-yellow">Plan This Trip</a>
+      <a href="{{WHATSAPP_HREF}}" target="_blank" rel="noopener" class="btn-outline-white">Ask on WhatsApp</a>
+    </div>
+  </div>
 </div>
 
   </main>
