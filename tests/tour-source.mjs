@@ -130,4 +130,36 @@ assert.equal(alpha.packageImage, undefined);
   assert.equal(a.heroImage, undefined, 'no cover means no override, so the card is widened');
 }
 
+// Photographs from the experience itself. Two read as a pair that lost one, so
+// the section only appears once there are three.
+{
+  const photo = n => ({src: `https://cdn.sanity.io/g${n}.jpg`, alt: `Photo ${n}`, caption: `Caption ${n}`, width: 800, height: 1000});
+  const withGallery = gallery => loadTourContent({
+    localTours,
+    env: {SANITY_STUDIO_PROJECT_ID: 'project-123'},
+    fetchImpl: async () => new Response(JSON.stringify({result: {
+      tours: [
+        {slug: {current: 'alpha'}, title: 'Alpha', duration: '1 Day', price: 125, gallery},
+        {slug: {current: 'beta'}, title: 'Beta', duration: '2 Hours', price: 80},
+        {slug: {current: 'gamma'}, title: 'Gamma', duration: '3 Hours', price: 90},
+      ],
+      featured: {items: [
+        {order: 1, tour: {slug: {current: 'alpha'}}},
+        {order: 2, tour: {slug: {current: 'beta'}}},
+        {order: 3, tour: {slug: {current: 'gamma'}}},
+      ]},
+    }}), {status: 200, headers: {'Content-Type': 'application/json'}}),
+  });
+
+  assert.equal((await withGallery([photo(1), photo(2)])).tours[0].gallery, undefined, 'two photos is not a gallery');
+  const three = (await withGallery([photo(1), photo(2), photo(3)])).tours[0].gallery;
+  assert.equal(three.length, 3);
+  assert.ok(three[0].src.includes('w='), 'gallery photos are fetched at a size, not as the original');
+  assert.equal(three[0].caption, 'Caption 1');
+  assert.equal(three[0].tall, true, 'a portrait is a tall frame');
+
+  const wide = (await withGallery([{...photo(1), width: 1600, height: 900}, photo(2), photo(3)])).tours[0].gallery;
+  assert.equal(wide[0].tall, false, 'a landscape is a wide frame');
+}
+
 console.log('Tour source contract tests passed.');
