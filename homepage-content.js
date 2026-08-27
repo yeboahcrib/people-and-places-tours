@@ -13,9 +13,10 @@
       // instead of `image` switches the hero back to film; the renderer
       // supports both and prefers `image`.
       image: {
-        src: 'https://images.unsplash.com/photo-1660675133902-acd1b057f75d?auto=format&fit=crop&w=1920&q=80',
+        src: 'assets/photos/home-hero-group-welcome.jpg',
         width: 1920,
-        height: 1280,
+        height: 1200,
+        alt: 'A People & Places group together outside at the end of a day\u2019s touring',
       },
       headline: 'The People Make the Place.',
       sub: 'Whether it\'s your first time in Ghana or your way back, you\'ll see it with people who live here.',
@@ -31,6 +32,31 @@
       ],
       trustNote: 'Welcoming first-time visitors and people coming home since 2021',
       cta: { label: 'Read our full story', href: 'about.html' },
+    },
+    tripMoments: {
+      eyebrow: 'From Our Trips',
+      title: 'Ghana, As Our Guests Met It',
+      intro: 'Photographs from the days themselves.',
+      // Each slot names the picture that belongs in it. Until a real photograph
+      // is dropped in, the slot renders as a labelled placeholder rather than
+      // as stock: a wall of strangers is the problem these are meant to fix.
+      moments: [
+        {shape: 'tall', caption: 'The First Bath of Return at Assin Manso',
+         image: {src: 'assets/photos/moment-assin-manso-first-bath.jpg', width: 825, height: 1100,
+                 alt: 'Guests standing in the river at Assin Manso for the First Bath of Return'}},
+        {shape: 'wide', caption: 'At the wheel with a potter in Vume',
+         image: {src: 'assets/photos/moment-potters-wheel-vume.jpg', width: 1200, height: 900,
+                 alt: 'A potter guiding a guest\u2019s hands on the wheel'}},
+        {shape: 'tall', caption: 'The Door of No Return',
+         image: {src: 'assets/photos/moment-door-of-no-return.jpg', width: 825, height: 1100,
+                 alt: 'Two guests standing at the Door of No Return'}},
+        {shape: 'wide', caption: 'A full group under the palms at Aburi',
+         image: {src: 'assets/photos/moment-group-aburi-gardens.jpg', width: 1200, height: 899,
+                 alt: 'A large group of guests together at Aburi Botanical Gardens'}},
+        {shape: 'tall', caption: 'Across the canopy walkway at Kakum',
+         image: {src: 'assets/photos/moment-kakum-canopy-walk.jpg', width: 825, height: 1100,
+                 alt: 'A guest in a Ghana shirt on the Kakum canopy walkway'}},
+      ],
     },
     waysToExperience: {
       eyebrow: 'Where Ghana Begins For You',
@@ -59,13 +85,13 @@
           title: 'Adventure',
           text: 'Canopy walks, mountain trails, quad bikes, and the kind of days that leave dust on your shoes.',
           href: 'packages.html?category=adventure',
-          image: { src: 'https://images.unsplash.com/photo-1636389396809-c3ab57b60d93?auto=format&fit=crop&w=1000&q=82&h=760', width: 1000, height: 760, alt: 'Quad bike adventure through forest trails in Ghana' },
+          image: { src: 'assets/photos/pathway-adventure-quadbike.jpg', width: 1100, height: 852, alt: 'A guest on a quad bike on a forest trail' },
         },
         {
           title: 'Craft & Tradition',
           text: 'Kente, batik, and pottery learned beside the makers who continue these traditions by hand.',
           href: 'packages.html?category=craft',
-          image: { src: 'https://images.unsplash.com/photo-1720343354398-89c6aa6d12a4?auto=format&fit=crop&w=1000&q=82&h=760', width: 1000, height: 760, alt: 'Kente weaving and artisan traditions in Ghana' },
+          image: { src: 'assets/photos/pathway-craft-kente-loom.jpg', width: 1100, height: 853, alt: 'Hands weaving kente on a loom at Adanwomase' },
         },
         {
           title: 'The Longer Story',

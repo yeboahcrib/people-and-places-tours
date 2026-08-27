@@ -132,6 +132,41 @@
 </section>`;
   }
 
+  // A band of real moments from real trips, sitting between what we offer and
+  // what guests said about it. Buoyant and TravelMo both carry photographs of
+  // their own travellers; this site carries stock, and this is where the first
+  // real photographs land. Until they arrive each slot renders as a labelled
+  // placeholder naming the picture that belongs there, so an empty slot reads
+  // as unfinished rather than as a design.
+  function renderTripMomentsSection(data) {
+    const moments = data.moments || [];
+    if (!moments.length) return '';
+    return `
+<!-- Photographs from our own trips. -->
+<section class="moments-section section-pad" aria-label="Moments from our trips" data-home-section="tripMoments">
+  <div class="container">
+    <div class="section-split moments-heading">
+      <div class="split-headline">
+        <div class="eyebrow reveal">${escapeHtml(data.eyebrow || '')}</div>
+        <h2 class="section-title reveal reveal-delay-1">${escapeHtml(data.title || '')}</h2>
+      </div>
+      ${data.intro ? `<p class="split-body section-sub reveal reveal-delay-2">${escapeHtml(data.intro)}</p>` : ''}
+    </div>
+    <ul class="moments-grid">
+      ${moments.map((m, i) => `
+      <li class="moment moment--${escapeHtml(m.shape || 'wide')} reveal moment-delay-${Math.min(i + 1, 4)}">
+        ${m.image?.src
+          ? `<figure class="moment-figure">${renderImage(m.image, 'moment-img', 'loading="lazy"')}${m.caption ? `<figcaption>${escapeHtml(m.caption)}</figcaption>` : ''}</figure>`
+          : `<div class="moment-slot" role="img" aria-label="${escapeHtml(`Photograph to come: ${m.caption || 'a moment from a trip'}`)}">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.6"/><path d="m21 15-4.5-4.5L7 20"/></svg>
+               <span>${escapeHtml(m.caption || 'A moment from a trip')}</span>
+             </div>`}
+      </li>`).join('')}
+    </ul>
+  </div>
+</section>`;
+  }
+
   function renderWaysToExperienceSection(data) {
     // An editor who removes every pathway means it: leave the section out
     // rather than printing a heading over an empty grid.
@@ -402,6 +437,7 @@
     hero: renderHeroSection,
     founderStory: renderFounderStorySection,
     waysToExperience: renderWaysToExperienceSection,
+    tripMoments: renderTripMomentsSection,
     reviewsAndTrust: renderReviewsAndTrustSection,
     planningProcess: renderBookingStepsSection,
     finalInvitation: renderFinalInvitationSection,

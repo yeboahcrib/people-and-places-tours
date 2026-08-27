@@ -4841,3 +4841,83 @@ a.trust-rating:focus-visible {
 @media (max-width: 768px) {
   .testimonials-dots { display: none; }
 }
+
+/* ────────────────────────────────────────────────────────────── */
+/*  MOMENTS FROM OUR TRIPS                                        */
+/*                                                                */
+/*  A strip, not a grid. Five photographs in a six-column grid     */
+/*  leave an orphan column and a 1,900px section; a strip never    */
+/*  has that problem, however many an editor adds. It is also      */
+/*  what the reference sites do — Buoyant's destinations and       */
+/*  TravelMo's upcoming trips are both horizontally scrolled.      */
+/*                                                                */
+/*  Mixed portrait and landscape on purpose: a row of identical    */
+/*  rectangles reads as a stock library.                           */
+/* ────────────────────────────────────────────────────────────── */
+.moments-section { background: var(--surface-dark); }
+.moments-heading { margin-bottom: var(--sp-5); }
+/* .section-sub is coloured for the light sections it usually appears in, so
+   on this dark band it rendered as ink on charcoal — present, and invisible. */
+.moments-section .section-title { color: #fff; }
+.moments-section .section-sub { color: var(--gray-2); }
+.moments-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--sp-1);
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Horizontal only. Left unset, a thumb swipe drifts vertically and the page
+     scrolls out from under the strip — the same fault the reviews carousel
+     had. pinch-zoom stays so the photographs can still be zoomed. */
+  touch-action: pan-x pinch-zoom;
+}
+.moments-grid::-webkit-scrollbar { display: none; }
+.moment {
+  flex: 0 0 auto;
+  height: clamp(17rem, 30vw, 24rem);
+  scroll-snap-align: start;
+}
+.moment--tall { aspect-ratio: 3 / 4; }
+.moment--wide { aspect-ratio: 4 / 3; }
+.moment-figure,
+.moment-slot {
+  height: 100%;
+  margin: 0;
+  border-radius: var(--radius-lg, 20px);
+  overflow: hidden;
+  position: relative;
+}
+.moment-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.moment-figure figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: var(--sp-4) var(--sp-2) var(--sp-2);
+  font-size: var(--text-base);
+  line-height: 1.4;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+}
+/* The empty state names the photograph that belongs here. An unlabelled grey
+   box reads as a design decision; this reads as work outstanding. */
+.moment-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1-5);
+  padding: var(--sp-2);
+  text-align: center;
+  background: var(--surface-raised);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+}
+.moment-slot svg { width: 28px; height: 28px; opacity: 0.45; }
+.moment-slot span { font-size: var(--text-base); line-height: 1.45; max-width: 18ch; }
+
+@media (max-width: 560px) {
+  .moment { height: 15rem; }
+}

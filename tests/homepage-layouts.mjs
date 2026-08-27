@@ -14,10 +14,10 @@ import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {dirname, join} from 'node:path';
 import vm from 'node:vm';
-import {loadHomepageContent, FLEX_LAYOUTS} from '../scripts/homepage-source.mjs';
+import {loadHomepageContent, FLEX_LAYOUTS, SECTION_KEYS} from '../scripts/homepage-source.mjs';
 
 const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const keys = ['hero', 'founderStory', 'waysToExperience', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
+const keys = ['hero', 'founderStory', 'waysToExperience', 'tripMoments', 'reviewsAndTrust', 'planningProcess', 'finalInvitation'];
 
 const localContent = Object.fromEntries(keys.map(key => [key, {
   eyebrow: 'E', headline: 'H', title: 'T', titleLines: ['T'], body: 'B', intro: 'I', sub: 'S',
@@ -29,6 +29,7 @@ localContent.finalInvitation.cta = {label: 'Go', href: 'contact.html'};
 localContent.waysToExperience.pathways = [{title: 'P', text: 'P', href: 'packages.html?category=nature', image: {src: 'p.jpg', alt: 'P'}}];
 localContent.reviewsAndTrust.items = [{quote: 'R', author: 'A', location: 'L', rating: 5}];
 localContent.planningProcess.steps = [{icon: 'search', number: '01', title: 'S', text: 'S'}];
+localContent.tripMoments.moments = [{shape: 'wide', caption: 'M'}];
 
 const builtInSections = keys.map((sectionKey, index) => ({sectionKey, order: index + 1}));
 
@@ -52,8 +53,8 @@ let content = await load([{...base, title: 'Mid', layout: 'quote', quote: 'A lin
 let plan = content.sectionOrder.map(entry => entry.layout ? `flex:${entry.title}` : entry.key);
 assert.deepEqual(plan, [
   'hero', 'founderStory', 'waysToExperience', 'flex:Mid',
-  'reviewsAndTrust', 'planningProcess', 'finalInvitation',
-], 'a section placed after waysToExperience must sit between it and reviewsAndTrust');
+  'tripMoments', 'reviewsAndTrust', 'planningProcess', 'finalInvitation',
+], 'a section placed after waysToExperience must sit directly after it, before the next built-in section');
 
 content = await load([{...base, title: 'Top', layout: 'quote', quote: 'Q', placement: 'top'}]);
 assert.equal(content.sectionOrder[0].title, 'Top', 'top placement must precede the hero');
@@ -118,6 +119,21 @@ vm.runInContext(sectionsScript, sandbox);
 const render = sandbox.window.PEOPLE_PLACES_RENDER_HOMEPAGE;
 const renderableLayouts = sandbox.window.PEOPLE_PLACES_HOMEPAGE_LAYOUTS;
 
+// The narrative spine is declared twice: as SECTION_KEYS, which the build walks
+// to make the render plan, and as the key order of BUILT_IN_SECTIONS, which the
+// renderer falls back to when no plan is supplied. Both are real orders and
+// nothing made them agree. They drifted — the trip-moments strip was fourth in
+// one and third in the other, so the built page put it before the pathways it
+// was designed to follow, and every structural test still passed because each
+// file was self-consistent.
+assert.deepEqual(
+  // Spread: the sandbox is a separate vm realm, so its Array has a different
+  // prototype and assert/strict would fail two identical lists.
+  [...sandbox.window.PEOPLE_PLACES_HOMEPAGE_SECTIONS],
+  [...SECTION_KEYS],
+  'homepage-sections.js BUILT_IN_SECTIONS order must match SECTION_KEYS in homepage-source.mjs',
+);
+
 // The three declarations of "which layouts exist" must agree.
 const schema = await readFile(join(projectRoot, 'studio/schemaTypes/documents/flexibleSection.ts'), 'utf8');
 const schemaLayouts = [...schema.matchAll(/value: '(photoBeside|cards|quote|invitation)'/g)].map(match => match[1]);
@@ -151,7 +167,7 @@ const withGhost = render({...localContent, sectionOrder: [{key: 'hero'}, {layout
 assert.doesNotMatch(withGhost, /Ghost/);
 assert.match(withGhost, /data-home-section="hero"/);
 
-// With no plan at all, the homepage is the seven built-ins, exactly as before.
+// With no plan at all, the homepage is the built-ins, exactly as before.
 const defaultHtml = render(localContent);
 for (const key of keys) {
   assert.match(defaultHtml, new RegExp(`data-home-section="${key}"`), `${key} must render without a plan`);
