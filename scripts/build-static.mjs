@@ -35,6 +35,51 @@ const publicRootFiles = new Set([
   'sitemap.xml',
 ]);
 const publicDirectories = ['assets', '.well-known'];
+
+// ── COMING-SOON MODE ──────────────────────────────────────────────
+// Set COMING_SOON=true in Cloudflare's Production scope and the deployed site
+// becomes a single holding page. Preview builds do not carry the variable, so
+// every branch preview keeps serving the real site: the work continues on main
+// exactly as before, and nothing about the site is deleted or branched away.
+//
+// Turning it off is one variable, not a revert.
+if (process.env.COMING_SOON === 'true') {
+  const {loadSiteContent: loadForHold} = await import('./content-source.mjs');
+  const {content: held} = await loadForHold({projectRoot});
+  const settings = held.siteSettings;
+  const digits = String(settings.primaryPhone).replace(/[^\d+]/g, '');
+  const template = await readFile(join(projectRoot, 'src/templates/coming-soon.html'), 'utf8');
+  const page = template
+    .replaceAll('{{LOGO}}', 'assets/PAP LOGO_YELLOW_NO BACKGROUND.svg')
+    .replaceAll('{{FAVICON}}', 'assets/favicon.svg')
+    .replaceAll('{{WHATSAPP}}', settings.whatsappUrl || `https://wa.me/${digits.replace(/^\+/, '')}`)
+    .replaceAll('{{PHONE_HREF}}', digits)
+    .replaceAll('{{PHONE}}', settings.primaryPhone)
+    .replaceAll('{{EMAIL}}', settings.email)
+    // The CMS serviceArea reads "Accra and the Adenta Municipality, with
+    // experiences across Ghana" — correct for a business listing, too
+    // administrative for a holding page. The hours are what someone reaching
+    // out actually needs to know.
+    .replaceAll('{{SERVICE_AREA}}', settings.hours || '');
+
+  await rm(outputRoot, {recursive: true, force: true});
+  await mkdir(outputRoot, {recursive: true});
+  await writeFile(join(outputRoot, 'index.html'), page, 'utf8');
+  // The logo and favicon are the only assets the page loads.
+  await mkdir(join(outputRoot, 'assets'), {recursive: true});
+  for (const asset of ['PAP LOGO_YELLOW_NO BACKGROUND.svg', 'favicon.svg']) {
+    await cp(join(projectRoot, 'assets', asset), join(outputRoot, 'assets', asset)).catch(() => {});
+  }
+  // Headers still apply; the sitemap deliberately does not ship, so nothing
+  // invites a crawler to index a placeholder.
+  await cp(join(projectRoot, '_headers'), join(outputRoot, '_headers')).catch(() => {});
+  await writeFile(join(outputRoot, 'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');
+  await writeFile(join(outputRoot, 'health.json'),
+    `${JSON.stringify({status: 'ok', service: 'people-and-places-website', mode: 'coming-soon', builtAt: new Date().toISOString()}, null, 2)}\n`, 'utf8');
+  console.log('Built the coming-soon holding page. Unset COMING_SOON to build the site.');
+  process.exit(0);
+}
+
 const navigationTemplate = await readFile(join(projectRoot, 'src/partials/navigation.html'), 'utf8');
 const footerTemplate = await readFile(join(projectRoot, 'src/partials/footer.html'), 'utf8');
 const {content: siteContent, source: contentSource} = await loadSiteContent({projectRoot});

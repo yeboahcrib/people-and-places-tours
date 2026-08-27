@@ -30,6 +30,23 @@ one. Likewise `scripts/render-meta.mjs` defaults `SITE_URL` to the live domain,
 so canonicals, `sitemap.xml`, and `robots.txt` are generated at build time; the
 copies in the repository root are inputs, not what ships.
 
+## Coming-soon mode
+
+Setting `COMING_SOON=true` makes `npm run build` emit a single holding page
+instead of the site: logo, one line, WhatsApp, phone, email and opening hours,
+all read from `src/content/site.json`. The page is `noindex, nofollow`, ships a
+`Disallow: /` robots.txt, and deliberately ships **no sitemap** — nothing
+invites a crawler to index a placeholder.
+
+Set it in **Cloudflare's Production scope only**. Preview builds do not carry
+the variable, so every branch preview keeps serving the real site and work
+continues on `main` exactly as before. Nothing is branched away or deleted, and
+turning it off is one variable rather than a revert.
+
+`tests/build-output.mjs` branches on the same variable: in coming-soon mode it
+checks the holding page is contactable and uncrawlable rather than checking a
+site that was not built.
+
 A more detailed architecture handoff lives at `docs/claude-homepage-handoff.md`.
 
 ## Standing rule: responsive checks before "done"
