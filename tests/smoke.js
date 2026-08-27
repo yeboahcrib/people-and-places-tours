@@ -65,8 +65,21 @@ async function withPage(browser, path, callback) {
     const inlineSectionBackgrounds = await page.locator('.sec-img-head[style*="background-image"]').count();
     assert(inlineSectionBackgrounds === 0, `expected no inline section background images, got ${inlineSectionBackgrounds}`);
 
-    const lazySectionImages = await page.locator('.sec-img-head-media[loading="lazy"][width="1120"][height="1400"]').count();
-    assert(lazySectionImages === 1, `expected 1 lazy section header image, got ${lazySectionImages}`);
+    // The dimensions used to be asserted literally, which was fine while this
+    // photograph was a committed file. It is chosen in the Studio now, so its
+    // size is whatever an editor uploaded — pinning 1120x1400 only asserted
+    // that nobody had exercised the CMS yet. What has to hold is that the image
+    // is there, deferred, and declares its real size so the layout does not jump.
+    const lazySectionImage = page.locator('.sec-img-head-media[loading="lazy"]');
+    assert(await lazySectionImage.count() === 1, `expected 1 lazy section header image, got ${await lazySectionImage.count()}`);
+    const sectionImageBox = await lazySectionImage.evaluate(img => ({
+      width: Number(img.getAttribute('width')),
+      height: Number(img.getAttribute('height')),
+    }));
+    assert(
+      sectionImageBox.width > 0 && sectionImageBox.height > 0,
+      `section header image must declare its dimensions, got ${JSON.stringify(sectionImageBox)}`,
+    );
   });
 
   await withPage(browser, '/packages.html', async page => {
