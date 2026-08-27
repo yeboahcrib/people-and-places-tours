@@ -71,7 +71,14 @@ export async function loadBookingContent({localContent, env = process.env, fetch
     ${TEXT_KEYS.join(', ')},
     trustPoints[]{icon, label},
     nextSteps[]{title, description},
-    faqs[]{question, answer}
+    faqs[]{question, answer},
+    "heroPhoto": heroPhoto{
+      "src": image.asset->url,
+      "alt": altText,
+      "width": image.asset->metadata.dimensions.width,
+      "height": image.asset->metadata.dimensions.height,
+      placeholderState, publicApprovalState
+    }
   }`;
   const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
   const body = await fetchSanity(url, {fetchImpl, label: 'Sanity booking'});

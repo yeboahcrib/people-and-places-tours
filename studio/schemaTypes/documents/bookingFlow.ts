@@ -28,6 +28,13 @@ export const bookingFlow = defineType({
   ],
   fields: [
     defineField({
+      name: 'heroPhoto',
+      title: 'Photo behind the page title',
+      type: 'mediaAsset',
+      group: 'intro',
+      description: 'The wide photograph at the top of the contact page. It sits behind text, so something with a calm area on the left reads best.',
+    }),
+    defineField({
       name: 'heroSubtitle',
       title: 'Sentence at the top of the page',
       type: 'text',

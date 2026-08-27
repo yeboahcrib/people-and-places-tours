@@ -8,6 +8,7 @@ import {flexibleSection} from './documents/flexibleSection'
 import {founderProfile} from './documents/founderProfile'
 import {originStory} from './documents/originStory'
 import {experiencePathway} from './documents/experiencePathway'
+import {experiencesPage} from './documents/experiencesPage'
 import {tour} from './documents/tour'
 import {featuredTourCollection} from './documents/featuredTourCollection'
 import {hostingPrinciple} from './documents/hostingPrinciple'
@@ -35,6 +36,7 @@ export const schemaTypes = [
   founderProfile,
   originStory,
   experiencePathway,
+  experiencesPage,
   tour,
   featuredTourCollection,
   hostingPrinciple,

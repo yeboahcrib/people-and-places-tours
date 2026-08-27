@@ -12,6 +12,8 @@ import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-sourc
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
 import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
 import {injectPolicyContent} from './render-policy.mjs';
+import {injectPagePhotos} from './render-page-photos.mjs';
+import {loadExperiencesPagePhotos} from './experiences-page-source.mjs';
 import {loadExperienceContent, loadLocalExperienceContent} from './local-experience-source.mjs';
 import {injectLocalExperiences} from './render-local-experiences.mjs';
 import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
@@ -107,6 +109,8 @@ const [
 
 // One request per policy page. They are independent documents; a missing
 // insurance page must not take the cancellation page down with it.
+const experiencesPagePhotos = await loadExperiencesPagePhotos();
+
 const policies = Object.fromEntries(await Promise.all(POLICY_PAGES.map(async page => {
   const {content, source} = await loadPolicyContent({
     localContent: localPolicyContent[page.key],
@@ -248,7 +252,14 @@ for (const entry of rootEntries) {
     const withPolicy = policies[entry.name]
       ? injectPolicyContent(withBooking, policies[entry.name].content, siteContent.siteSettings, entry.name)
       : withBooking;
-    const withExperiences = injectLocalExperiences(withPolicy, experienceContent);
+    // Page photographs an editor can choose. Keyed by data-cms-photo, so a page
+    // that carries none is untouched and a photo that is not approved yet
+    // leaves the committed image in place.
+    const withPagePhotos = injectPagePhotos(withPolicy, {
+      contactHero: bookingContent.heroPhoto,
+      ...experiencesPagePhotos.photos,
+    });
+    const withExperiences = injectLocalExperiences(withPagePhotos, experienceContent);
     const withContact = injectSiteContact(withExperiences, siteContent.siteSettings);
     const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
     const withInquiryMode = injectInquiryMode(withTurnstile, Boolean(process.env.CF_PAGES));
