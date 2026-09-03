@@ -1,4 +1,5 @@
 import {fetchSanity} from './sanity-fetch.mjs';
+import {loadStoryblokStandardTours} from './storyblok-tour-source.mjs';
 const API_VERSION = '2026-08-02';
 
 const formatPrice = (price, currency = 'USD') => new Intl.NumberFormat('en-US', {
@@ -123,18 +124,18 @@ function validateSanityTours(result, localTours) {
   });
 }
 
-export async function loadTourContent({localTours, env = process.env, fetchImpl = fetch}) {
+export async function loadTourContent({localTours, env = process.env, fetchImpl = fetch, logger = console}) {
   const projectId = env.SANITY_STUDIO_PROJECT_ID;
   const dataset = env.SANITY_STUDIO_DATASET || 'production';
+  let tours = localTours;
+  let source = 'local';
 
-  if (!projectId || projectId === 'REPLACE_WITH_PROJECT_ID') {
-    return {tours: localTours, source: 'local'};
-  }
-  if (!/^[a-z0-9-]+$/.test(projectId) || !/^[a-z0-9_-]+$/.test(dataset)) {
-    throw new Error('Sanity project or dataset configuration is invalid');
-  }
+  if (projectId && projectId !== 'REPLACE_WITH_PROJECT_ID') {
+    if (!/^[a-z0-9-]+$/.test(projectId) || !/^[a-z0-9_-]+$/.test(dataset)) {
+      throw new Error('Sanity project or dataset configuration is invalid');
+    }
 
-  const query = `{
+    const query = `{
     "tours": *[_type == "tour" && active == true] | order(title asc){
       slug, title, duration, locations, groupSizeMin, groupSizeMax, groupSizeNote,
       price, currency, priceUnit, description, categories, vibes, destination, commandSummary,
@@ -176,10 +177,31 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
     },
     "featured": *[_id == "featuredTourCollection"][0]{items[]{order, tour->{slug}}}
   }`;
-  const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
-  const body = await fetchSanity(url, {fetchImpl, label: 'Sanity tour'});
+    const url = `https://${projectId}.apicdn.sanity.io/v${API_VERSION}/data/query/${dataset}?query=${encodeURIComponent(query)}`;
+    const body = await fetchSanity(url, {fetchImpl, label: 'Sanity tour'});
 
-  // Detail-page filenames intentionally remain local. Catalogue facts and the
-  // card photo come from Sanity and are merged by slug.
-  return {tours: validateSanityTours(body.result, localTours), source: 'sanity'};
+    // Detail-page filenames intentionally remain local. Catalogue facts and
+    // the card photo come from Sanity and are merged by slug.
+    tours = validateSanityTours(body.result, localTours);
+    source = 'sanity';
+  }
+
+  // Storyblok deliberately maps into the same renderer-facing shape as the
+  // established sources. The generic loader validates each standard tour on
+  // its own, so an invalid or unavailable Storyblok record leaves only that
+  // tour on its local/Sanity base instead of taking down the whole catalogue.
+  const storyblok = await loadStoryblokStandardTours({
+    baseTours: tours,
+    env,
+    fetchImpl,
+    logger,
+  });
+
+  return {
+    tours: storyblok.tours,
+    source,
+    storyblokStandardTourSources: storyblok.sourcesBySlug,
+    storyblokStandardTourSummary: storyblok.summary,
+    storyblokAppliedSlugs: storyblok.appliedSlugs,
+  };
 }

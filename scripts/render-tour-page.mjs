@@ -23,7 +23,7 @@ function renderGallery(tour) {
   const photos = tour.gallery || [];
   if (!photos.length) return '';
   const figures = photos.map(photo => `
-      <figure${photo.tall ? '' : ' class="is-wide"'}>
+      <figure class="gallery-item${photo.tall ? '' : ' is-wide'}">
         <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.alt)}" loading="lazy" decoding="async" />
         ${photo.caption ? `<figcaption>${escapeHtml(photo.caption)}</figcaption>` : ''}
       </figure>`).join('');
@@ -118,6 +118,7 @@ export function renderTourPage({template, tour, catalogue}) {
   }
   if (!tour.faqs?.length) throw new Error(`${tour.slug}: cannot generate a page with no FAQs`);
   const price = tour.price;
+  const seo = tour.seo || {};
   const whatsapp = `https://wa.me/233503673473?text=${encodeURIComponent(`Hi! I'd like to book the ${tour.title}.`)}`;
   const metaRow = '\n'
     + `      <span class="trip-meta-item"><strong>${escapeHtml(tour.duration)}</strong></span>\n`
@@ -126,11 +127,14 @@ export function renderTourPage({template, tour, catalogue}) {
 
   const values = {
     TITLE: escapeHtml(tour.title),
-    META_DESCRIPTION: escapeHtml(tour.pageIntro || tour.description || ''),
+    PAGE_TITLE: escapeHtml(seo.title || `${tour.title} | People & Places Tours`),
+    META_DESCRIPTION: escapeHtml(seo.description || tour.pageIntro || tour.description || ''),
+    ROBOTS_META: seo.indexing === 'noindex' ? '<meta name="robots" content="noindex,follow" />' : '',
     WATERMARK: escapeHtml(tour.heroWatermark || tour.title.toUpperCase()),
     TAGS: (tour.vibes || []).slice(0, 2).map(vibe => `<span class="tag">${escapeHtml(vibe)}</span>`).join(''),
     META_ROW: metaRow,
     HERO_IMAGE: escapeHtml(heroImageFor(tour)),
+    HERO_ALT: escapeHtml(tour.heroAlt || ''),
     HEADLINE: escapeHtml(tour.pageHeadline || tour.title),
     // Some pages carry two or three paragraphs, not one. Losing the second was
     // the first thing the generated-versus-written comparison caught.

@@ -1,3 +1,5 @@
+import {isStoryblokEuAssetUrl} from './storyblok-tour-source.mjs';
+
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[character]));
@@ -10,7 +12,8 @@ const safeRelativeUrl = value => {
 
 const safeImageUrl = value => {
   const url = String(value ?? '').trim();
-  if (!/^(?:https:\/\/images\.unsplash\.com\/|https:\/\/cdn\.sanity\.io\/|assets\/)[^\s"']+$/i.test(url)) throw new Error(`Unsafe tour image URL: ${url}`);
+  const isExistingImage = /^(?:https:\/\/images\.unsplash\.com\/|https:\/\/cdn\.sanity\.io\/|assets\/)[^\s"']+$/i.test(url);
+  if (!isExistingImage && !isStoryblokEuAssetUrl(url)) throw new Error(`Unsafe tour image URL: ${url}`);
   return escapeHtml(url);
 };
 

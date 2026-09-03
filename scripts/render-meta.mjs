@@ -41,14 +41,19 @@ export const pageUrl = (siteUrl, file) =>
  * Adds social and canonical metadata to one page. Pages that already declare
  * og: tags are left alone, so hand-authored overrides always win.
  */
-export function injectPageMeta(html, {file, siteUrl, siteName, ogImage}) {
+export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonicalOverride}) {
   if (/property="og:/i.test(html)) return html;
 
   const title = decodeEntities((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || siteName).trim();
   const description = decodeEntities(
     (html.match(/<meta\s+name="description"\s+content="([^"]*)"/i) || [])[1] || '',
   ).trim();
-  const url = pageUrl(siteUrl, file);
+  const url = /^https?:\/\/[^\s"'<>]+$/.test(String(canonicalOverride || ''))
+    ? canonicalOverride
+    : pageUrl(siteUrl, file);
+  const socialImage = /^https?:\/\/[^\s"'<>]+$/.test(String(ogImage || ''))
+    ? ogImage
+    : `${siteUrl}/${ogImage}`;
   // thanks.html is noindex; it should never be the canonical target of a share.
   const robotsNoindex = /name="robots"[^>]*noindex/i.test(html);
 
@@ -59,13 +64,13 @@ export function injectPageMeta(html, {file, siteUrl, siteName, ogImage}) {
     `<meta property="og:title" content="${escapeAttr(title)}" />`,
     `<meta property="og:description" content="${escapeAttr(description)}" />`,
     `<meta property="og:url" content="${escapeAttr(url)}" />`,
-    `<meta property="og:image" content="${escapeAttr(`${siteUrl}/${ogImage}`)}" />`,
+    `<meta property="og:image" content="${escapeAttr(socialImage)}" />`,
     `<meta property="og:image:alt" content="${escapeAttr(title)}" />`,
     `<meta property="og:locale" content="en_GB" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeAttr(title)}" />`,
     `<meta name="twitter:description" content="${escapeAttr(description)}" />`,
-    `<meta name="twitter:image" content="${escapeAttr(`${siteUrl}/${ogImage}`)}" />`,
+    `<meta name="twitter:image" content="${escapeAttr(socialImage)}" />`,
   ];
   if (robotsNoindex) tags.shift();
 

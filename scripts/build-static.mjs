@@ -6,6 +6,7 @@ import {loadSiteContent} from './content-source.mjs';
 import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from './local-render-source.mjs';
 import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs';
 import {loadTourContent} from './tour-source.mjs';
+import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
@@ -96,7 +97,13 @@ const [localTours, localHomepageContent, localBookingContent, localAboutContent,
   loadLocalExperienceContent(projectRoot),
 ]);
 const [
-  {tours, source: tourContentSource},
+  {
+    tours,
+    source: tourContentSource,
+    storyblokStandardTourSources,
+    storyblokStandardTourSummary,
+    storyblokAppliedSlugs,
+  },
   {content: homepageContent, source: homepageContentSource},
   {content: bookingContent, source: bookingContentSource},
   {content: aboutContent, source: aboutContentSource},
@@ -106,6 +113,19 @@ const [
   loadBookingContent({localContent: localBookingContent}),
   loadAboutContent({localContent: localAboutContent}),
 ]);
+
+// script.js deliberately re-renders package cards and booking prices from the
+// public catalogue after each page loads. During the local standard-tour
+// migration, publish one token-free overlay between tours.js and script.js so
+// that this established browser behavior sees the same validated records as
+// the static HTML. Nothing is emitted when all records fall back safely.
+const storyblokBrowserOverlay = renderStoryblokStandardToursBrowserOverlay({
+  tours,
+  appliedSlugs: storyblokAppliedSlugs,
+});
+const storyblokBrowserOverlayFile = storyblokBrowserOverlay
+  ? 'storyblok-standard-tours-overlay.js'
+  : undefined;
 
 // One request per policy page. They are independent documents; a missing
 // insurance page must not take the cancellation page down with it.
@@ -144,11 +164,14 @@ if (generateTourPages) {
     const extra = tourPageContent[tour.slug];
     const merged = {...extra, ...tour};
     if (!merged.faqs?.length) continue;
-    generatedTourPages.set(tour.detailUrl, renderTourPage({
-      template: tourPageTemplate,
-      tour: merged,
-      catalogue: tours,
-    }));
+    generatedTourPages.set(tour.detailUrl, {
+      html: renderTourPage({
+        template: tourPageTemplate,
+        tour: merged,
+        catalogue: tours,
+      }),
+      seo: merged.seo,
+    });
   }
 }
 
@@ -218,14 +241,33 @@ for (const entry of await readdir(projectRoot, {withFileTypes: true})) {
   const contents = await readFile(join(projectRoot, entry.name));
   assetHashes.set(entry.name, createHash('sha256').update(contents).digest('hex').slice(0, 10));
 }
+if (storyblokBrowserOverlayFile) {
+  assetHashes.set(
+    storyblokBrowserOverlayFile,
+    createHash('sha256').update(storyblokBrowserOverlay).digest('hex').slice(0, 10),
+  );
+}
 
 const stampAssets = html => html.replace(
   /\b(href|src)="([a-z0-9][a-z0-9-]*\.(?:css|js))(?:\?[^"]*)?"/g,
   (match, attr, file) => assetHashes.has(file) ? `${attr}="${file}?v=${assetHashes.get(file)}"` : match,
 );
 
+const injectStoryblokStandardToursBrowserOverlay = html => {
+  if (!storyblokBrowserOverlayFile) return html;
+  const toursScript = '<script src="tours.js"></script>';
+  if (!html.includes(toursScript)) return html;
+  return html.replace(
+    toursScript,
+    `${toursScript}\n<script src="${storyblokBrowserOverlayFile}"></script>`,
+  );
+};
+
 await rm(outputRoot, {recursive: true, force: true});
 await mkdir(outputRoot, {recursive: true});
+if (storyblokBrowserOverlayFile) {
+  await writeFile(join(outputRoot, storyblokBrowserOverlayFile), storyblokBrowserOverlay, 'utf8');
+}
 
 const rootEntries = await readdir(projectRoot, {withFileTypes: true});
 const copiedRootFiles = [];
@@ -235,7 +277,8 @@ for (const entry of rootEntries) {
   if (!publicRootFiles.has(entry.name) && !publicRootExtensions.has(extname(entry.name))) continue;
 
   if (extname(entry.name) === '.html') {
-    const source = generatedTourPages.get(entry.name)
+    const generatedTour = generatedTourPages.get(entry.name);
+    const source = generatedTour?.html
       ?? await readFile(join(projectRoot, entry.name), 'utf8');
     const withNavigation = replacePrimaryNavigation(source, navigation, entry.name);
     const withFooter = replaceFooter(withNavigation, footer);
@@ -265,11 +308,13 @@ for (const entry of rootEntries) {
     const withInquiryMode = injectInquiryMode(withTurnstile, Boolean(process.env.CF_PAGES));
     const withTourCards = injectTourCards(withInquiryMode, tours);
     const rendered = injectContactTourOptions(withTourCards, tours);
-    const withMeta = injectPageMeta(rendered, {
+    const withBrowserCatalogue = injectStoryblokStandardToursBrowserOverlay(rendered);
+    const withMeta = injectPageMeta(withBrowserCatalogue, {
       file: entry.name,
       siteUrl,
       siteName: siteContent.siteSettings.businessName,
-      ogImage,
+      ogImage: generatedTour?.seo?.socialImage || ogImage,
+      canonicalOverride: generatedTour?.seo?.canonicalOverride,
     });
     if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(entry.name);
     const withNext = injectFormNext(withMeta, siteUrl);
@@ -288,17 +333,19 @@ for (const entry of rootEntries) {
 // A tour created in the CMS has no file in the repository to iterate over, so
 // its page would silently never be built. These go through exactly the same
 // pipeline as a committed page: navigation, footer, meta, clean URLs, hashes.
-for (const [fileName, generated] of generatedTourPages) {
+for (const [fileName, generatedTour] of generatedTourPages) {
   if (copiedRootFiles.includes(fileName)) continue;
-  const withNavigation = replacePrimaryNavigation(generated, navigation, fileName);
+  const withNavigation = replacePrimaryNavigation(generatedTour.html, navigation, fileName);
   const withFooter = replaceFooter(withNavigation, footer);
   const withContact = injectSiteContact(withFooter, siteContent.siteSettings);
   const withInquiryMode = injectInquiryMode(withContact, Boolean(process.env.CF_PAGES));
-  const withMeta = injectPageMeta(withInquiryMode, {
+  const withBrowserCatalogue = injectStoryblokStandardToursBrowserOverlay(withInquiryMode);
+  const withMeta = injectPageMeta(withBrowserCatalogue, {
     file: fileName,
     siteUrl,
     siteName: siteContent.siteSettings.businessName,
-    ogImage,
+    ogImage: generatedTour.seo?.socialImage || ogImage,
+    canonicalOverride: generatedTour.seo?.canonicalOverride,
   });
   if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(fileName);
   const stamped = stampAssets(cleanInternalUrls(injectFormNext(withMeta, siteUrl)));
@@ -324,6 +371,11 @@ const buildHealth = {
   builtAt: new Date().toISOString(),
   contentSource,
   tourContentSource,
+  // The existing source field retains its Sanity/local contract. These fields
+  // report the independently validated result for every standard Storyblok
+  // record, so one bad story cannot hide the rest of the catalogue.
+  storyblokStandardTourSources,
+  storyblokStandardTourSummary,
   // The packages grid is generated from this list, so recording its length
   // lets tests/build-output.mjs check the grid against the catalogue that
   // built it rather than against a number frozen into the test.
