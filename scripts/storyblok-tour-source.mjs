@@ -1,5 +1,5 @@
 const STORYBLOK_API_ORIGIN = 'https://api.storyblok.com';
-const STORYBLOK_EU_ASSET_HOSTS = new Set(['a.storyblok.com', 'a2.storyblok.com']);
+export const STORYBLOK_EU_ASSET_HOSTS = new Set(['a.storyblok.com', 'a2.storyblok.com']);
 const STANDARD_TOUR_DIRECTORY = 'tours/day-short-experiences';
 
 // The local catalogue owns visitor-facing routes. This registry deliberately
@@ -323,20 +323,75 @@ const sourceSummary = sources => ({
   fallback: Object.values(sources).filter(value => value !== 'applied' && value !== 'not-applicable').length,
 });
 
-async function loadOneStory({entry, token, fetchImpl}) {
+/** One attempt is allowed this long, including reading the body. */
+export const STORYBLOK_REQUEST_TIMEOUT_MS = 10000;
+/** A single retry, spaced enough to clear a blip without stalling a build. */
+export const STORYBLOK_RETRY_DELAY_MS = 400;
+
+/*
+ * Retry only what a second attempt could plausibly fix. A 404 means the story
+ * is not there, a 401 means the token is wrong, and malformed JSON means the
+ * response was not what we asked for; asking again changes none of them, and
+ * retrying would only double the delay before the tour falls back.
+ */
+const isTransientStatus = status =>
+  status === 408 || status === 425 || status === 429 || (status >= 500 && status <= 599);
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function attemptStory({url, fetchImpl, timeoutMs}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    let response;
+    try {
+      response = await fetchImpl(url, {signal: controller.signal});
+    } catch (error) {
+      // A timeout and a dropped connection arrive the same way and both deserve one more try.
+      return {source: 'unavailable', retryable: true, error};
+    }
+    if (!response?.ok) {
+      if (response?.status === 404) return {source: 'missing-story', retryable: false};
+      return {source: 'unavailable', retryable: isTransientStatus(response?.status)};
+    }
+    let body;
+    try {
+      body = await response.json();
+    } catch {
+      // A body cut short by the timeout is a transient failure, not malformed content.
+      return controller.signal.aborted
+        ? {source: 'unavailable', retryable: true, error: new Error('Storyblok response timed out')}
+        : {source: 'invalid-response', retryable: false};
+    }
+    return body?.story
+      ? {source: 'received', story: body.story, retryable: false}
+      : {source: 'invalid-response', retryable: false};
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function loadOneStory({
+  entry,
+  token,
+  fetchImpl,
+  timeoutMs = STORYBLOK_REQUEST_TIMEOUT_MS,
+  retryDelayMs = STORYBLOK_RETRY_DELAY_MS,
+}) {
   const url = new URL('/v2/cdn/stories/' + entry.fullSlug, STORYBLOK_API_ORIGIN);
   url.searchParams.set('version', 'draft');
   url.searchParams.set('resolve_assets', '1');
   url.searchParams.set('token', token);
-  const response = await fetchImpl(url);
-  if (!response?.ok) return {source: response?.status === 404 ? 'missing-story' : 'unavailable'};
-  let body;
-  try {
-    body = await response.json();
-  } catch {
-    return {source: 'invalid-response'};
-  }
-  return body?.story ? {source: 'received', story: body.story} : {source: 'invalid-response'};
+
+  const first = await attemptStory({url, fetchImpl, timeoutMs});
+  if (!first.retryable) return {source: first.source, story: first.story};
+  if (retryDelayMs > 0) await sleep(retryDelayMs);
+  const second = await attemptStory({url, fetchImpl, timeoutMs});
+  // An unreachable host still surfaces to the caller as a throw, so the record
+  // falls back with the warning it has always produced. The retry is silent;
+  // only the final outcome is reported.
+  if (second.error) throw second.error;
+  return {source: second.source, story: second.story};
 }
 
 /**

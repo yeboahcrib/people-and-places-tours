@@ -6,6 +6,7 @@ import {loadSiteContent} from './content-source.mjs';
 import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from './local-render-source.mjs';
 import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs';
 import {loadTourContent} from './tour-source.mjs';
+import {assessStoryblokFallback, resolveStoryblokMode} from './storyblok-fallback-policy.mjs';
 import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
@@ -116,11 +117,23 @@ const [
   loadAboutContent({localContent: localAboutContent}),
 ]);
 
-// script.js deliberately re-renders package cards and booking prices from the
-// public catalogue after each page loads. During the local standard-tour
-// migration, publish one token-free overlay between tours.js and script.js so
-// that this established browser behavior sees the same validated records as
-// the static HTML. Nothing is emitted when all records fall back safely.
+// Falling back is per-record and quiet by design, which is right for one bad
+// tour and wrong for thirteen: an outage or a rejected token fails every record
+// the same way and would ship a fully committed site without saying so. Assess
+// both gates together and refuse the build when the failure is systemic.
+const storyblokMode = resolveStoryblokMode(process.env);
+const storyblokFallback = assessStoryblokFallback({
+  sourcesBySlug: {...storyblokStandardTourSources, ...storyblokMultiDaySources},
+  mode: storyblokMode,
+});
+if (storyblokFallback.status === 'fail') throw new Error(storyblokFallback.message);
+if (storyblokFallback.status === 'warn') console.warn('Storyblok: ' + storyblokFallback.message);
+
+// The packages grid is rendered once, by this build, and script.js no longer
+// rebuilds it. The overlay remains because the command palette and the contact
+// form's tour list still read the public catalogue in the browser, and they
+// should see the same validated records as the static HTML. Nothing is emitted
+// when all records fall back safely.
 const storyblokBrowserOverlay = renderStoryblokStandardToursBrowserOverlay({
   tours,
   appliedSlugs: storyblokAppliedSlugs,

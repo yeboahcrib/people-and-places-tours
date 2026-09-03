@@ -3,6 +3,7 @@ import {loadTourContent} from '../scripts/tour-source.mjs';
 import {
   STORYBLOK_STANDARD_TOUR_REGISTRY,
   isStoryblokEuAssetUrl,
+  loadOneStory,
   loadStoryblokStandardTours,
   mapStoryblokTour,
   storyblokImageUrl,
@@ -635,4 +636,109 @@ assert.match(assetlessOverlay, /cape-coast/);
 assert(!assetlessOverlay.includes('accra-city'),
   'the browser overlay must not present an asset-blocked draft as a CMS card');
 
+
+// --- Phase 3G F3: a bounded request, and exactly one retry for what a retry can fix.
+// Before this, a hung Storyblok connection could stall a build indefinitely and a
+// single dropped packet dropped a tour to fallback with no second attempt.
+const storyEntry = {slug: 'cape-coast', fullSlug: fullSlugFor('cape-coast')};
+const okResponse = () => new Response(JSON.stringify({story: capeStory}), {status: 200});
+const attempt = async (responses, options = {}) => {
+  let calls = 0;
+  const result = await loadOneStory({
+    entry: storyEntry,
+    token: 'test-token',
+    fetchImpl: async (url, init) => {
+      const step = responses[Math.min(calls, responses.length - 1)];
+      calls += 1;
+      return step(init?.signal);
+    },
+    retryDelayMs: 0,
+    ...options,
+  });
+  return {...result, calls};
+};
+const status = code => () => new Response('', {status: code});
+const netFail = () => { throw new TypeError('fetch failed'); };
+const hangs = signal => new Promise((_, reject) => {
+  signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+});
+
+// 1. A healthy response is taken on the first attempt and never repeated.
+const clean = await attempt([okResponse]);
+assert.equal(clean.source, 'received');
+assert.equal(clean.calls, 1, 'a successful request must not be retried');
+
+// 2. A transient network error is retried once, and the retry is honoured.
+const recovered = await attempt([netFail, okResponse]);
+assert.equal(recovered.source, 'received');
+assert.equal(recovered.calls, 2, 'a dropped connection deserves exactly one more attempt');
+
+// 3. A hung connection is cut off by the timeout, then retried once.
+const timedOut = await attempt([hangs, okResponse], {timeoutMs: 40});
+assert.equal(timedOut.source, 'received');
+assert.equal(timedOut.calls, 2, 'a request that hangs must time out and be retried');
+
+// A request that hangs on every attempt still terminates rather than stalling the build.
+let hungCalls = 0;
+await assert.rejects(
+  () => loadOneStory({
+    entry: storyEntry,
+    token: 'test-token',
+    fetchImpl: (url, init) => { hungCalls += 1; return hangs(init.signal); },
+    timeoutMs: 40,
+    retryDelayMs: 0,
+  }),
+  'a permanently hung host must surface to the caller, which warns and falls back');
+assert.equal(hungCalls, 2, 'a permanently hung host must stop after one retry');
+
+// 4. 429 and 5xx are transient; each is retried exactly once and then given up on.
+for (const code of [429, 500, 502, 503]) {
+  const throttled = await attempt([status(code), okResponse]);
+  assert.equal(throttled.source, 'received', `${code} must be retried`);
+  assert.equal(throttled.calls, 2, `${code} must be retried exactly once`);
+  const persistent = await attempt([status(code)]);
+  assert.equal(persistent.source, 'unavailable');
+  assert.equal(persistent.calls, 2, `a persistent ${code} must stop after one retry`);
+}
+
+// 5. A missing story and a rejected token are permanent. Asking twice changes neither
+//    answer and only delays the fallback, so neither is retried.
+for (const [code, expected] of [[404, 'missing-story'], [401, 'unavailable'], [403, 'unavailable'], [400, 'unavailable']]) {
+  const permanent = await attempt([status(code)]);
+  assert.equal(permanent.source, expected, `${code} must map to ${expected}`);
+  assert.equal(permanent.calls, 1, `${code} is permanent and must not be retried`);
+}
+
+// 6. A malformed body is a bad answer, not a lost one. It is reported, not repeated.
+const malformed = await attempt([() => new Response('<html>not json</html>', {status: 200})]);
+assert.equal(malformed.source, 'invalid-response');
+assert.equal(malformed.calls, 1, 'malformed JSON must not be retried');
+
+// A 200 carrying no story is equally permanent.
+const storyless = await attempt([() => new Response(JSON.stringify({}), {status: 200})]);
+assert.equal(storyless.source, 'invalid-response');
+assert.equal(storyless.calls, 1, 'a response without a story must not be retried');
+
+// And the retry stays inside per-record isolation: one unreachable tour retries,
+// falls back alone, and leaves its healthy neighbour applied.
+let retriedSlugs = [];
+const isolated = await loadStoryblokStandardTours({
+  baseTours: [capeBase, accraBase],
+  env: storyblokEnv,
+  fetchImpl: async request => {
+    const fullSlug = new URL(request).pathname.replace('/v2/cdn/stories/', '');
+    if (fullSlug === fullSlugFor('accra-city')) {
+      retriedSlugs.push(fullSlug);
+      return new Response('', {status: 503});
+    }
+    return new Response(JSON.stringify({story: capeStory}), {status: 200});
+  },
+});
+assert.equal(isolated.sourcesBySlug['cape-coast'], 'applied');
+assert.equal(isolated.sourcesBySlug['accra-city'], 'unavailable');
+assert.equal(retriedSlugs.length, 2, 'the failing record retries once, on its own');
+assert.equal(isolated.tours[1], accraBase,
+  'an unreachable record keeps its local fallback and does not disturb its neighbour');
+
+console.log('Storyblok request timeout and retry tests passed.');
 console.log('Tour source contract tests passed.');

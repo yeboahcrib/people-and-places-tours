@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {STORYBLOK_EU_ASSET_HOSTS} from '../scripts/storyblok-tour-source.mjs';
 import {readFile} from 'node:fs/promises';
 
 const headers = await readFile(new URL('../_headers', import.meta.url), 'utf8');
@@ -42,6 +43,17 @@ for (const [host, directive] of [
 ]) {
   const value = cspLine.match(new RegExp(`${directive} ([^;]+)`))?.[1] || '';
   assert(value.includes(host), `${directive} must allow ${host}`);
+}
+
+// Storyblok images were the one host the policy did not cover. The tour adapter
+// refuses any asset not on this list, so asserting against the list itself means
+// a newly accepted host cannot be added without the policy following it.
+// Without this, a cutover would ship pages whose images are all blocked, with
+// the failure reported only to the browser console.
+const imgSrc = cspLine.match(/img-src ([^;]+)/)?.[1] || '';
+for (const host of STORYBLOK_EU_ASSET_HOSTS) {
+  assert(imgSrc.includes(`https://${host}`),
+    `img-src must allow the Storyblok asset host ${host}, which the tour adapter accepts`);
 }
 assert(headers.includes('Strict-Transport-Security: max-age=31536000'), 'HSTS header is missing');
 assert(headers.includes('X-Content-Type-Options: nosniff'), 'nosniff header is missing');
