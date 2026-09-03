@@ -703,7 +703,9 @@ for (const code of [429, 500, 502, 503]) {
 
 // 5. A missing story and a rejected token are permanent. Asking twice changes neither
 //    answer and only delays the fallback, so neither is retried.
-for (const [code, expected] of [[404, 'missing-story'], [401, 'unavailable'], [403, 'unavailable'], [400, 'unavailable']]) {
+// A rejected credential reports as 'unauthorized' rather than 'unavailable', so
+// production delivery can stop on it without waiting for a record threshold.
+for (const [code, expected] of [[404, 'missing-story'], [401, 'unauthorized'], [403, 'unauthorized'], [400, 'unavailable']]) {
   const permanent = await attempt([status(code)]);
   assert.equal(permanent.source, expected, `${code} must map to ${expected}`);
   assert.equal(permanent.calls, 1, `${code} is permanent and must not be retried`);

@@ -352,6 +352,12 @@ async function attemptStory({url, fetchImpl, timeoutMs}) {
     }
     if (!response?.ok) {
       if (response?.status === 404) return {source: 'missing-story', retryable: false};
+      // A rejected credential is reported separately from an unreachable host:
+      // production delivery must stop on it immediately rather than waiting for
+      // enough records to fail that it looks like an outage.
+      if (response?.status === 401 || response?.status === 403) {
+        return {source: 'unauthorized', retryable: false};
+      }
       return {source: 'unavailable', retryable: isTransientStatus(response?.status)};
     }
     let body;

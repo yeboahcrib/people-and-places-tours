@@ -20,7 +20,8 @@
     "test:visual:baseline": "node tests/visual-regression.js --baseline",
     "sync:sanity": "cd studio && npx sanity exec scripts/seed-pages.ts --with-user-token && npx sanity exec scripts/sync-tours.ts --with-user-token",
     "check:sanity": "node scripts/check-sanity-drift.mjs",
-    "test:packages-grid": "node tests/packages-grid.js"
+    "test:packages-grid": "node tests/packages-grid.js",
+    "test:price-ownership": "node tests/tour-price-ownership.js"
   },
   "devDependencies": {
     "playwright": "^1.61.1"

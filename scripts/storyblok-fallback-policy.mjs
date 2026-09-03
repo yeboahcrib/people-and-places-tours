@@ -16,12 +16,13 @@
 export const STORYBLOK_TOTAL_PRODUCTS = 13;
 
 /**
- * Half the attempted records failing at the transport layer is not thirteen
- * coincidences; it is one outage. Two is the floor so a two-record test space
- * cannot trip the rule on a single failure.
+ * A majority of the catalogue failing at the transport layer is not thirteen
+ * coincidences; it is one outage. For the 13 products that means 7.
+ *
+ * Only production-authoritative delivery enforces this. Migration builds are
+ * deliberately exempt — see the modes below.
  */
-export const STORYBLOK_SYSTEMIC_FAILURE_RATIO = 0.5;
-export const STORYBLOK_SYSTEMIC_FAILURE_FLOOR = 2;
+export const systemicThresholdFor = attempted => Math.floor(attempted / 2) + 1;
 
 export const STORYBLOK_MODES = {
   /**
@@ -33,6 +34,16 @@ export const STORYBLOK_MODES = {
     tokenEnvVar: 'STORYBLOK_PREVIEW_API_TOKEN',
     contentVersion: 'draft',
     active: true,
+    /*
+     * Migration builds are fallback-friendly on purpose. This mode exists to
+     * validate records one at a time against draft content, so a technical
+     * failure — however many records it hits — falls back per record, warns,
+     * and shows up in health diagnostics. It never stops the build. Failing a
+     * migration build because most of the handful of records enabled so far
+     * were unreachable would punish the exact workflow this mode is for.
+     */
+    enforcesSystemicThreshold: false,
+    failsOnAuthOrConfigFailure: false,
     /*
      * Draft returns a story whether or not it is published, so a story that is
      * absent has simply not been written yet. Thirteen products are being
@@ -52,6 +63,20 @@ export const STORYBLOK_MODES = {
     tokenEnvVar: 'STORYBLOK_PUBLIC_API_TOKEN',
     contentVersion: 'published',
     active: false,
+    /*
+     * Production delivery is authoritative, so silence is not an option: a
+     * majority of the catalogue failing means the site would ship as committed
+     * content while reporting success.
+     */
+    enforcesSystemicThreshold: true,
+    /*
+     * A missing or rejected delivery credential, or a configuration the adapter
+     * refuses to run, fails immediately. Waiting for the record threshold would
+     * be waiting for a foregone conclusion — every record is going to fail the
+     * same way, for the same reason, and it is not an outage but a deployment
+     * mistake.
+     */
+    failsOnAuthOrConfigFailure: true,
     /*
      * Published content hides an unpublished story, so absence is an editorial
      * act. This is the important asymmetry between the two modes: falling back
@@ -101,7 +126,15 @@ export function storyblokTokenFor(mode, env = process.env) {
 const NOT_ATTEMPTED = new Set([
   'not-applicable', 'disabled', 'missing-configuration', 'unsupported-region',
 ]);
-const TRANSPORT_FAILURE = new Set(['unavailable', 'invalid-response']);
+const TRANSPORT_FAILURE = new Set(['unavailable', 'invalid-response', 'unauthorized']);
+
+/*
+ * Not enough records failed — the wrong credential, or a configuration the
+ * adapter declined to run with. Production delivery stops on these outright.
+ */
+const AUTH_OR_CONFIG_FAILURE = new Set([
+  'unauthorized', 'missing-configuration', 'unsupported-region',
+]);
 const CONTENT_FAILURE = new Set([
   'invalid-content', 'duplicate-slug', 'duplicate-display-order',
 ]);
@@ -128,14 +161,20 @@ export function assessStoryblokFallback({sourcesBySlug = {}, mode = STORYBLOK_MO
   const withdrawn = mode.absenceMeansWithdrawn ? absent : [];
   const missing = mode.absenceMeansWithdrawn ? [] : absent;
 
-  const threshold = Math.max(
-    STORYBLOK_SYSTEMIC_FAILURE_FLOOR,
-    Math.ceil(attempted.length * STORYBLOK_SYSTEMIC_FAILURE_RATIO));
-  const systemic = attempted.length > 0 && transport.length >= threshold;
+  const authOrConfig = entries
+    .filter(([, source]) => AUTH_OR_CONFIG_FAILURE.has(source))
+    .map(([slug]) => slug);
+
+  const threshold = systemicThresholdFor(attempted.length);
+  const systemic = mode.enforcesSystemicThreshold
+    && attempted.length > 0
+    && transport.length >= threshold;
+  const credentialFailure = Boolean(mode.failsOnAuthOrConfigFailure) && authOrConfig.length > 0;
   const fellBack = [...transport, ...content, ...missing];
 
   let status = 'ok';
-  if (attempted.length === 0) status = 'inactive';
+  if (credentialFailure) status = 'fail';
+  else if (attempted.length === 0) status = 'inactive';
   else if (systemic) status = 'fail';
   else if (fellBack.length > 0) status = 'warn';
 
@@ -148,24 +187,49 @@ export function assessStoryblokFallback({sourcesBySlug = {}, mode = STORYBLOK_MO
     content,
     missing,
     withdrawn,
+    authOrConfig,
+    credentialFailure,
+    enforced: Boolean(mode.enforcesSystemicThreshold),
     threshold,
-    message: describe({status, attempted: attempted.length, applied, transport, content, missing, threshold}),
+    message: describe({
+      status, mode, attempted: attempted.length, applied, transport, content, missing,
+      threshold, authOrConfig, credentialFailure,
+    }),
   };
 }
 
-function describe({status, attempted, applied, transport, content, missing, threshold}) {
+function describe({
+  status, mode, attempted, applied, transport, content, missing, threshold,
+  authOrConfig, credentialFailure,
+}) {
+  if (credentialFailure) {
+    return 'Storyblok rejected or was not given a usable ' + mode.contentVersion +
+      ' credential for ' + authOrConfig.length + ' record(s): ' + authOrConfig.join(', ') +
+      '. Production delivery does not wait for a record threshold on this — every record ' +
+      'would fail the same way, for the same reason. Check ' + mode.tokenEnvVar +
+      ' and the space region.';
+  }
   if (status === 'inactive') return 'Storyblok was not asked for any record.';
   if (status === 'ok') return 'All ' + attempted + ' Storyblok records applied.';
   if (status === 'fail') {
     return 'Storyblok returned nothing usable for ' + transport.length + ' of ' + attempted +
-      ' records (threshold ' + threshold + '): ' + transport.join(', ') +
-      '. That is an outage or a rejected credential, not thirteen separate problems, and the ' +
-      'site would ship as committed content without saying so. Refusing the build instead.';
+      ' records, a majority (threshold ' + threshold + '): ' + transport.join(', ') +
+      '. That is one outage, not ' + attempted + ' separate problems, and the site would ship ' +
+      'as committed content without saying so. Refusing the build instead.';
   }
   const parts = [];
-  if (transport.length) parts.push(transport.length + ' unreachable (' + transport.join(', ') + ')');
+  // Separate the two, or a rejected token reads as a network problem and sends
+  // whoever is debugging it to the wrong place entirely.
+  const unreachable = transport.filter(slug => !authOrConfig.includes(slug));
+  if (authOrConfig.length) {
+    parts.push(authOrConfig.length + ' rejected the credential (' + authOrConfig.join(', ') + ')');
+  }
+  if (unreachable.length) parts.push(unreachable.length + ' unreachable (' + unreachable.join(', ') + ')');
   if (content.length) parts.push(content.length + ' rejected by the content gate (' + content.join(', ') + ')');
   if (missing.length) parts.push(missing.length + ' not yet in Storyblok (' + missing.join(', ') + ')');
+  const tail = mode.enforcesSystemicThreshold
+    ? ''
+    : ' Migration builds do not fail on technical failures; these records are on fallback by design.';
   return applied.length + ' of ' + attempted + ' Storyblok records applied; ' + parts.join(', ') +
-    ' kept their committed fallback.';
+    ' kept their committed fallback.' + tail;
 }

@@ -393,6 +393,22 @@ const buildHealth = {
   storyblokStandardTourSummary,
   storyblokMultiDaySources,
   storyblokMultiDaySummary,
+  // Migration builds never fail on a technical Storyblok failure, so the
+  // assessment has to be visible somewhere a person will actually look.
+  storyblokFallback: {
+    mode: storyblokFallback.mode,
+    status: storyblokFallback.status,
+    enforced: storyblokFallback.enforced,
+    attempted: storyblokFallback.attempted,
+    appliedCount: storyblokFallback.applied.length,
+    transport: storyblokFallback.transport,
+    content: storyblokFallback.content,
+    missing: storyblokFallback.missing,
+    withdrawn: storyblokFallback.withdrawn,
+    authOrConfig: storyblokFallback.authOrConfig,
+    threshold: storyblokFallback.threshold,
+    message: storyblokFallback.message,
+  },
   // The packages grid is generated from this list, so recording its length
   // lets tests/build-output.mjs check the grid against the catalogue that
   // built it rather than against a number frozen into the test.

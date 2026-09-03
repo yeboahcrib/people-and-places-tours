@@ -130,6 +130,7 @@ const STORYBLOK_STANDARD_TOUR_STATES = new Set([
   'not-applicable',
   'missing-story',
   'unavailable',
+  'unauthorized',
   'invalid-response',
   'invalid-content',
   'duplicate-slug',

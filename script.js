@@ -208,29 +208,34 @@ document.addEventListener('DOMContentLoaded', () => {
       <option value="custom">Something made around me</option>`;
   }
 
-  function hydrateTourDetailFromCatalog() {
+  /*
+   * Point the booking CTA at the booking flow itself.
+   *
+   * The build renders `contact.html?tour=<slug>`; this appends the
+   * `#booking-flow` anchor so the visitor lands on the form rather than the top
+   * of the contact page. That is this function's only job.
+   *
+   * It used to also rewrite the price, the "per person" line and the "From:"
+   * trip-meta item from the public catalogue. Those are CMS-owned and rendered
+   * by the build, and rewriting them in the browser gave the committed
+   * catalogue the final say over a published price. They agreed only because
+   * tours.js was kept in step by hand; the first divergence would have shown a
+   * stale price over the real one. The page owns its price now.
+   */
+  function linkBookingCtaToFlow() {
     if (tours.length === 0) return;
     const page = pageKey(location.pathname);
     const tour = tours.find(item => pageKey(item.detailUrl) === page);
     if (!tour) return;
 
-    document.querySelectorAll('.booking-card .big-price, .booking-card .price').forEach(el => {
-      el.textContent = tour.price;
-    });
-    document.querySelectorAll('.booking-card .price-sub').forEach(el => {
-      el.textContent = `per person · ${tour.duration}`;
-    });
     document.querySelectorAll('.booking-card .booking-btns a.btn-outline-white').forEach(link => {
       link.href = bookingUrl(tour.slug);
-    });
-    document.querySelectorAll('.trip-meta-item').forEach(item => {
-      if (item.textContent.includes('From:')) item.innerHTML = `<strong>From:</strong> ${escapeHtml(tour.price)}/person`;
     });
   }
 
   renderCommandPaletteTours();
   renderContactTourOptions();
-  hydrateTourDetailFromCatalog();
+  linkBookingCtaToFlow();
 
   /* ── NAV: light, compact state after the hero ──
      One passive, rAF-throttled listener updates only when the threshold state
