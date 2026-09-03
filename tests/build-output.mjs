@@ -485,4 +485,33 @@ for (const location of locations) {
   }
 }
 
+// just-go-ghana.html is hand-authored rather than generated, so its related
+// cards carry prices typed in by hand. They drifted: the page offered Shai
+// Hills at $130 and Accra City at $100 while the catalogue had moved to $140
+// and $110, so a visitor clicking through met a different price than the one
+// that brought them. Every price a committed page states about another tour
+// must match what that tour actually costs.
+{
+  const catalogue = await readFile(new URL('../tours.js', import.meta.url), 'utf8');
+  const priceOf = slug => {
+    const block = catalogue.split(`slug: '${slug}'`)[1] || '';
+    return (block.match(/price: '(\$[\d,]+)'/) || [])[1];
+  };
+  const page = await readFile(join(outputPath, 'just-go-ghana.html'), 'utf8');
+  const named = [
+    ['Cape Coast Ancestral Tour', 'cape-coast'],
+    ['Shai Hills & Boat Cruise', 'shai-hills'],
+    ['Accra City Tour', 'accra-city'],
+  ];
+  for (const [title, slug] of named) {
+    const shown = (page.match(new RegExp(`${title.replace(/&/g, '&(?:amp;)?')}</h3>\\s*<div class="price">From (\\$[\\d,]+)`)) || [])[1];
+    // Not `continue`: a card that cannot be found means this check stopped
+    // looking at anything, which is how the first version of it passed while a
+    // stale price sat on the page. If the markup changes, fail and be fixed.
+    assert.ok(shown, `just-go-ghana.html has no related card priced for "${title}" — this check needs updating`);
+    assert.equal(shown, priceOf(slug),
+      `just-go-ghana.html shows ${title} at ${shown}, but the catalogue says ${priceOf(slug)}`);
+  }
+}
+
 console.log('Build output and availability checks passed.');
