@@ -1,0 +1,149 @@
+{
+  "spaceId": 294832753590557,
+  "assetFolder": {
+    "id": 214693663802039,
+    "path": "Tours/Standard Tours"
+  },
+  "assets": {
+    "accra-city-card": {
+      "id": 214693975489128,
+      "shortFilename": "tour-accra-city-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/a13f7a845c/tour-accra-city-card.jpg",
+      "alt": "Bowls of spices and grains on a stall at Makola Market in Accra",
+      "title": "Accra City Tour",
+      "source": "Sanity production asset image-f0d9bc317e02bba37fdcbeccfcc2d8331621860d-5472x3078-jpg",
+      "focus": "2736x1539:2737x1540",
+      "dimensions": "5472x3078"
+    },
+    "ada-foah-card": {
+      "id": 214693999934057,
+      "shortFilename": "tour-ada-foah-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/c14c116d88/tour-ada-foah-card.jpg",
+      "alt": "Visiting the Ada Safari Eco Park",
+      "title": "Ada Day Tour",
+      "source": "Sanity production asset image-00e9562eb9b7f95455daa1c8a2c0723583f54ba1-3352x4190-jpg",
+      "focus": "1676x2513:1677x2514",
+      "dimensions": "3352x4190"
+    },
+    "ada-foah-gallery-01": {
+      "id": 214694019701354,
+      "shortFilename": "tour-ada-foah-gallery-01.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/de61d65c7a/tour-ada-foah-gallery-01.jpg",
+      "alt": "Guest on a boat ride",
+      "title": "Ada Day Tour gallery photo 1",
+      "source": "Sanity production asset image-1677f6d72fbfe5caf998ad25753d6e72bb9acf7e-3923x3923-jpg",
+      "focus": "1962x2040:1963x2041",
+      "dimensions": "3923x3923"
+    },
+    "ada-foah-gallery-02": {
+      "id": 214694035376747,
+      "shortFilename": "tour-ada-foah-gallery-02.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/c1e2fff5b8/tour-ada-foah-gallery-02.jpg",
+      "alt": "Guests on the boat deck at Ada with the river and palm shoreline behind",
+      "title": "Ada Day Tour gallery photo 2",
+      "source": "Sanity production asset image-75ddee039bf32b81b929a03efe6003afde9791fb-1200x840-jpg",
+      "focus": "",
+      "dimensions": "1200x840"
+    },
+    "aburi-card": {
+      "id": 214694053702252,
+      "shortFilename": "tour-aburi-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/441cab7e98/tour-aburi-card.jpg",
+      "alt": "A full group with arms raised under the royal palm avenue at Aburi Botanical Gardens",
+      "title": "Aburi Day Tour",
+      "source": "Sanity production asset image-4cf5401c25a2777f9c3941fa1208dbf400d51ad3-3023x3778-jpg",
+      "focus": "1512x1889:1513x1890",
+      "dimensions": "3023x3778"
+    },
+    "batik-workshop-card": {
+      "id": 215441163723115,
+      "shortFilename": "tour-batik-workshop-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/a68d2cdb7e/tour-batik-workshop-card.jpg",
+      "alt": "Guests shaping clay around a workbench at the pottery workshop",
+      "title": "Batik & Pottery Workshop",
+      "source": "Sanity production asset image-b61add9b59fa2fde430d42465bf6f7542f26e1e3-4439x4439-jpg",
+      "focus": "2220x1998:2221x1999",
+      "dimensions": "4439x4439"
+    },
+    "cape-coast-day-card": {
+      "id": 214694075271789,
+      "shortFilename": "tour-cape-coast-day-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/43741c51cd/tour-cape-coast-day-card.jpg",
+      "alt": "Guests at the entrance to the Kakum canopy walkway",
+      "title": "Cape Coast Day Tour",
+      "source": "Sanity production asset image-1d1e23af95b2a1a4b0584ee823ea93336965425e-4322x5402-jpg",
+      "focus": "2161x4322:2162x4323",
+      "dimensions": "4322x5402"
+    },
+    "kumasi-card": {
+      "id": 214694098778734,
+      "shortFilename": "tour-kumasi-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/c04f9d8b71/tour-kumasi-card.jpg",
+      "alt": "A couple seated in kente cloth in front of a weaver’s stall near Kumasi",
+      "title": "Kumasi Cultural Tour",
+      "source": "Sanity production asset image-386a03339984b14309322aca0ff5beadec4c8007-3126x3908-jpg",
+      "focus": "1563x1368:1564x1369",
+      "dimensions": "3126x3908"
+    },
+    "quad-bike-card": {
+      "id": 214694119193199,
+      "shortFilename": "tour-quad-bike-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/7dc99380fd/tour-quad-bike-card.jpg",
+      "alt": "A guest in a helmet grinning on a quad bike before the ride out",
+      "title": "Quadbike and Waterfalls",
+      "source": "Sanity production asset image-67d3097de4f7466b4ac739970586958512c942c8-4480x5600-jpg",
+      "focus": "2240x2520:2241x2521",
+      "dimensions": "4480x5600"
+    },
+    "shai-hills-card": {
+      "id": 214694141946480,
+      "shortFilename": "tour-shai-hills-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/f6c68161ce/tour-shai-hills-card.jpg",
+      "alt": "Guests sitting together on the boat cruise with the lake behind",
+      "title": "Shai Hills and Boat Cruise",
+      "source": "Sanity production asset image-77b31c20503731def585b1a157750ca1f000047b-6448x4299-jpg",
+      "focus": "3224x2150:3225x2151",
+      "dimensions": "6448x4299"
+    },
+    "volta-card": {
+      "id": 215437298110775,
+      "shortFilename": "tour-volta-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/5fb6c33475/tour-volta-card.jpg",
+      "alt": "A couple on the boat deck with the Adomi Bridge behind them",
+      "title": "Volta Day Tour",
+      "source": "Sanity production asset image-fced8237552e8e9f359bb2f8a2186bb605ad9753-4480x5600-jpg",
+      "focus": "2240x2520:2241x2521",
+      "dimensions": "4480x5600"
+    },
+    "cape-coast-card": {
+      "id": 213732737235232,
+      "shortFilename": "tour-cape-coast-card.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/37ea4a167d/tour-cape-coast-card.jpg",
+      "alt": "A group in full kente cloth after the naming ceremony at Cape Coast",
+      "title": "Cape Coast Ancestral Tour",
+      "source": "People & Places",
+      "focus": "600x420:601x421",
+      "dimensions": "1200x840"
+    },
+    "cape-coast-gallery-01": {
+      "id": 213733724940685,
+      "shortFilename": "moment-assin-manso-first-bath.jpg",
+      "filename": "https://a.storyblok.com/f/294832753590557/b686a3435b/moment-assin-manso-first-bath.jpg",
+      "alt": "Guests standing in the river at Assin Manso for the First Bath of Return",
+      "title": "The First Bath of Return at Assin Manso",
+      "source": "People & Places",
+      "focus": "412x600:413x601",
+      "dimensions": "825x1100"
+    },
+    "cape-coast-gallery-03": {
+      "id": 214049630377445,
+      "shortFilename": "assin-manso-slave-river-last-bath.jpeg",
+      "filename": "https://a.storyblok.com/f/294832753590557/4480x5600/09a5ec37ec/assin-manso-slave-river-last-bath.jpeg",
+      "alt": "Visitors wading in the Ancestral Slave River at Assin Manso.",
+      "title": "Assin Manso Ancestral Slave River",
+      "source": "People & Places",
+      "focus": "",
+      "dimensions": "4480x5600"
+    }
+  }
+}

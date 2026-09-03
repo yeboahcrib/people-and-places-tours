@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {access, readFile, readdir} from 'node:fs/promises';
 import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {loadLocalTours} from '../scripts/local-render-source.mjs';
 
 const output = new URL('../dist/', import.meta.url);
 const outputPath = decodeURIComponent(output.pathname);
@@ -35,6 +37,20 @@ for (const required of [
   '.well-known/security.txt',
 ]) {
   assert(await exists(required), `Build output is missing ${required}`);
+}
+
+// The lightbox keeps visible next/previous controls on larger screens, but a
+// phone uses a direct horizontal swipe instead. These strings live in the
+// generated browser script, so checking dist catches an accidental removal
+// during a later static build.
+{
+  const generatedScript = await readFile(join(outputPath, 'script.js'), 'utf8');
+  assert.match(generatedScript, /@media \(max-width:640px\)\{\.lb-prev,\.lb-next\{display:none;\}\}/,
+    'the mobile lightbox must hide its on-screen next/previous buttons');
+  assert.match(generatedScript, /lb\.addEventListener\('pointerdown'/,
+    'the lightbox must record the start of a swipe');
+  assert.match(generatedScript, /lb\.addEventListener\('pointerup'/,
+    'the lightbox must handle horizontal swipe navigation');
 }
 
 for (const privatePath of ['docs', 'tests', 'studio', 'functions', 'package.json', 'CLAUDE.md', 'README.md']) {
@@ -107,6 +123,169 @@ assert.equal(health.status, 'ok');
 assert.equal(health.service, 'people-and-places-website');
 assert(['local', 'sanity'].includes(health.contentSource));
 assert(['local', 'sanity'].includes(health.tourContentSource));
+const STORYBLOK_STANDARD_TOUR_STATES = new Set([
+  'disabled',
+  'missing-configuration',
+  'unsupported-region',
+  'not-applicable',
+  'missing-story',
+  'unavailable',
+  'invalid-response',
+  'invalid-content',
+  'duplicate-slug',
+  'duplicate-display-order',
+  'applied',
+]);
+
+// The local registry owns public routes. Phase 3C may replace a standard
+// tour's content at build time, but it must never infer or change the route
+// from a Storyblok folder or story slug. Just Go Ghana deliberately stays out
+// of this registry because it remains a future multi-day-tour migration.
+const projectRoot = fileURLToPath(new URL('../', import.meta.url));
+const localTourRegistry = await loadLocalTours(projectRoot);
+const justGoGhana = localTourRegistry.find(tour => tour.slug === 'just-go-ghana');
+const standardTours = localTourRegistry.filter(tour => tour.slug !== 'just-go-ghana');
+assert(justGoGhana, 'tours.js no longer contains the separately managed Just Go Ghana tour');
+assert(standardTours.length > 0, 'tours.js has no standard tours to validate');
+
+assert(health.storyblokStandardTourSources
+  && typeof health.storyblokStandardTourSources === 'object'
+  && !Array.isArray(health.storyblokStandardTourSources),
+'health.json must report one Storyblok result for every standard tour');
+const storyblokStandardTourSources = health.storyblokStandardTourSources;
+assert.deepEqual(
+  Object.keys(storyblokStandardTourSources).sort(),
+  standardTours.map(tour => tour.slug).sort(),
+  'Storyblok build health must cover exactly the standard-tour registry, never Just Go Ghana',
+);
+for (const tour of standardTours) {
+  assert(STORYBLOK_STANDARD_TOUR_STATES.has(storyblokStandardTourSources[tour.slug]),
+    `health.json has an unknown Storyblok state for ${tour.slug}: ${storyblokStandardTourSources[tour.slug]}`);
+}
+assert.equal(storyblokStandardTourSources['just-go-ghana'], undefined,
+  'Just Go Ghana must remain outside the standard-tour Storyblok registry');
+
+assert(health.storyblokStandardTourSummary
+  && typeof health.storyblokStandardTourSummary === 'object'
+  && !Array.isArray(health.storyblokStandardTourSummary),
+'health.json is missing its Storyblok standard-tour summary');
+const storyblokStandardTourSummary = health.storyblokStandardTourSummary;
+const appliedStoryblokSlugs = standardTours
+  .filter(tour => storyblokStandardTourSources[tour.slug] === 'applied')
+  .map(tour => tour.slug);
+assert(Number.isInteger(storyblokStandardTourSummary.applied) && storyblokStandardTourSummary.applied >= 0,
+  'Storyblok standard-tour health summary has an invalid applied count');
+assert(Number.isInteger(storyblokStandardTourSummary.fallback) && storyblokStandardTourSummary.fallback >= 0,
+  'Storyblok standard-tour health summary has an invalid fallback count');
+assert.equal(storyblokStandardTourSummary.applied, appliedStoryblokSlugs.length,
+  'Storyblok standard-tour health summary undercounts or overcounts applied records');
+assert.equal(storyblokStandardTourSummary.fallback, standardTours.length - appliedStoryblokSlugs.length,
+  'Storyblok standard-tour health summary must isolate fallbacks per tour');
+
+const generatedPackages = await readFile(join(outputPath, 'packages.html'), 'utf8');
+const escapeRegExp = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const cleanRoute = detailUrl => String(detailUrl).replace(/\.html$/, '');
+const cardForSlug = (html, slug) => {
+  const match = html.match(new RegExp(
+    `<article\\b[^>]*\\bdata-tour-slug="${escapeRegExp(slug)}"[^>]*>[\\s\\S]*?<\\/article>`,
+  ));
+  assert(match, `packages.html has no card for ${slug}`);
+  return match[0];
+};
+
+// The established browser script recreates the catalogue from tours.js after
+// load. A Phase 3C build emits exactly one generated, public-content-only
+// overlay when one or more standard tours were safely accepted. It must run
+// after tours.js but before script.js, preserve the original registry order,
+// and leave individual fallback tours alone.
+const storyblokOverlayFile = 'storyblok-standard-tours-overlay.js';
+const storyblokOverlayPresent = await exists(storyblokOverlayFile);
+assert(!(await exists('storyblok-cape-coast-overlay.js')),
+  'Phase 3C must replace the one-off Cape Coast browser overlay with one standard-tour overlay');
+if (appliedStoryblokSlugs.length) {
+  assert(storyblokOverlayPresent, 'an applied Storyblok build is missing its generic browser catalogue overlay');
+  const overlay = await readFile(join(outputPath, storyblokOverlayFile), 'utf8');
+  for (const slug of appliedStoryblokSlugs) {
+    assert(overlay.includes(JSON.stringify(slug)),
+      `the browser overlay does not contain the applied Storyblok tour ${slug}`);
+  }
+  assert(!/STORYBLOK_[A-Z0-9_]*TOKEN|api\.storyblok\.com|(?:[?&]token=)|\b(?:fetch|XMLHttpRequest)\b/i.test(overlay),
+    'the browser overlay must contain mapped public content only, never a Storyblok credential or API request');
+
+  const browserWindow = {PEOPLE_PLACES_TOURS: structuredClone(localTourRegistry)};
+  new Function('window', overlay)(browserWindow);
+  assert.deepEqual(
+    browserWindow.PEOPLE_PLACES_TOURS.map(tour => tour.slug),
+    localTourRegistry.map(tour => tour.slug),
+    'the generic browser overlay must preserve registry order',
+  );
+  assert.equal(browserWindow.PEOPLE_PLACES_TOURS.length, localTourRegistry.length,
+    'the generic browser overlay must not add or remove catalogue records');
+  for (const tour of standardTours.filter(item => storyblokStandardTourSources[item.slug] !== 'applied')) {
+    assert.deepEqual(browserWindow.PEOPLE_PLACES_TOURS.find(item => item.slug === tour.slug), tour,
+      `a fallback ${tour.slug} record changed in the browser catalogue`);
+  }
+  assert.deepEqual(browserWindow.PEOPLE_PLACES_TOURS.find(tour => tour.slug === 'just-go-ghana'), justGoGhana,
+    'the generic standard-tour overlay must not modify Just Go Ghana');
+  for (const tour of browserWindow.PEOPLE_PLACES_TOURS) {
+    const local = localTourRegistry.find(item => item.slug === tour.slug);
+    assert.equal(tour.detailUrl, local.detailUrl,
+      `the browser overlay changed the public route for ${tour.slug}`);
+  }
+
+  const overlayIndex = generatedPackages.indexOf(`src="${storyblokOverlayFile}?v=`);
+  const toursIndex = generatedPackages.indexOf('src="tours.js?v=');
+  const scriptIndex = generatedPackages.indexOf('src="script.js?v=');
+  assert(toursIndex >= 0 && overlayIndex > toursIndex && scriptIndex > overlayIndex,
+    'packages.html must load the generic overlay between tours.js and script.js');
+
+  const browserPackageOrder = browserWindow.PEOPLE_PLACES_TOURS
+    .filter(tour => tour.packageOrder !== undefined)
+    .sort((a, b) => (a.packageOrder ?? Number.MAX_SAFE_INTEGER) - (b.packageOrder ?? Number.MAX_SAFE_INTEGER))
+    .map(tour => tour.slug);
+  const builtPackageOrder = [...generatedPackages.matchAll(/<article\b[^>]*\bdata-tour-slug="([^"]+)"/g)]
+    .map(([, slug]) => slug);
+  assert.deepEqual(browserPackageOrder, builtPackageOrder,
+    'the generic browser overlay and pre-rendered Experiences cards disagree about catalogue ordering');
+
+  for (const tour of standardTours.filter(item => storyblokStandardTourSources[item.slug] === 'applied')) {
+    const detail = await readFile(join(outputPath, tour.detailUrl), 'utf8');
+    assert(/<img[^>]+src="https:\/\/a\.storyblok\.com\/[^\"]+"[^>]+alt="[^\"]+"/.test(detail),
+      `${tour.slug} lost the Storyblok Asset Manager alt text on its generated detail page`);
+  }
+} else {
+  assert(!storyblokOverlayPresent, 'a build with no applied Storyblok tours unexpectedly emitted a browser overlay');
+}
+
+// Storyblok Asset Manager URLs are intentionally public, but its CDN content
+// API and credentials are build-time only. Scan every textual public artifact
+// rather than only the generated overlay so an accidental inline script or
+// copied file cannot quietly turn the browser into a Storyblok client.
+const collectPublicTextFiles = async directory => {
+  const entries = await readdir(directory, {withFileTypes: true});
+  const files = await Promise.all(entries.map(async entry => {
+    const file = join(directory, entry.name);
+    if (entry.isDirectory()) return collectPublicTextFiles(file);
+    if (!entry.isFile()) return [];
+    return /\.(?:html|js|mjs|json|css|xml|txt)$/i.test(entry.name)
+      || entry.name === '_headers' || entry.name === '_redirects'
+      ? [file]
+      : [];
+  }));
+  return files.flat();
+};
+const publicOutputText = (await Promise.all(
+  (await collectPublicTextFiles(outputPath)).map(file => readFile(file, 'utf8')),
+)).join('\n');
+for (const [pattern, description] of [
+  [/\bapi\.storyblok\.com\b/i, 'Storyblok content API endpoint'],
+  [/\b(?:cdn\/stories|v2\/cdn\/stories)\b/i, 'Storyblok content API path'],
+  [/\bSTORYBLOK_[A-Z0-9_]*TOKEN\b/i, 'Storyblok token environment name'],
+  [/(?:[?&]token=|\baccess_token\b)/i, 'Storyblok token query parameter'],
+  [/\b(?:fetch|XMLHttpRequest)\b[\s\S]{0,400}\bstoryblok\b/i, 'browser-side Storyblok fetch'],
+]) {
+  assert(!pattern.test(publicOutputText), `Public build output exposes a ${description}`);
+}
 assert(['local', 'sanity'].includes(health.homepageContentSource));
 assert(!Number.isNaN(Date.parse(health.builtAt)), 'health.json has an invalid build time');
 
@@ -118,7 +297,6 @@ const {SECTION_KEYS} = await import('../scripts/homepage-source.mjs');
 assert.equal((generatedHome.match(/data-home-section=/g) || []).length, SECTION_KEYS.length,
   `Homepage was not statically rendered with all ${SECTION_KEYS.length} built-in sections`);
 assert.equal((generatedHome.match(/<article class="trip-card/g) || []).length, 0, 'Homepage still contains featured tour cards');
-const generatedPackages = await readFile(join(outputPath, 'packages.html'), 'utf8');
 assert(Number.isInteger(health.tourCount) && health.tourCount > 0, 'health.json is missing a tour count');
 assert.equal(
   (generatedPackages.match(/<article class="tour-card/g) || []).length,
@@ -170,6 +348,44 @@ for (const [, slug, cardPrice] of cardPrices) {
 const sitemap = await readFile(join(outputPath, 'sitemap.xml'), 'utf8');
 const locations = [...sitemap.matchAll(/<loc>https?:\/\/[^/]+\/people-and-places-tours\/(.*?)<\/loc>/g)]
   .map(match => match[1] || 'index.html');
+
+// Each standard story has to keep the filename and clean public URL assigned
+// in tours.js. A Storyblok full_slug is CMS organisation only; it must not
+// become a public route, and no single missing story can remove another tour's
+// card, detail page, or sitemap entry.
+const siteUrl = String(health.siteUrl).replace(/\/$/, '');
+for (const tour of standardTours) {
+  const route = cleanRoute(tour.detailUrl);
+  assert(await exists(tour.detailUrl),
+    `the standard tour ${tour.slug} lost its existing detail output file ${tour.detailUrl}`);
+  const card = cardForSlug(generatedPackages, tour.slug);
+  assert(card.includes(`href="${route}"`),
+    `the ${tour.slug} card no longer links to its existing public route /${route}`);
+  assert(sitemap.includes(`<loc>${siteUrl}/${route}</loc>`),
+    `the standard tour ${tour.slug} is missing from the sitemap at its existing route /${route}`);
+  const detail = await readFile(join(outputPath, tour.detailUrl), 'utf8');
+  assert(detail.includes(`rel="canonical" href="${siteUrl}/${route}"`),
+    `the ${tour.slug} detail page no longer declares its existing canonical route /${route}`);
+}
+
+// Just Go Ghana is explicitly out of Phase 3C. Its existing static page and
+// card still ship, but neither its content nor asset host may be replaced by a
+// standard-tour Storyblok record.
+{
+  const route = cleanRoute(justGoGhana.detailUrl);
+  assert(await exists(justGoGhana.detailUrl), 'Just Go Ghana lost its existing detail page');
+  const card = cardForSlug(generatedPackages, justGoGhana.slug);
+  assert(card.includes(`href="${route}"`), 'Just Go Ghana card changed its existing public route');
+  assert(card.includes(justGoGhana.title) && card.includes(justGoGhana.price),
+    'Just Go Ghana card content was unexpectedly changed during the standard-tour migration');
+  assert(sitemap.includes(`<loc>${siteUrl}/${route}</loc>`),
+    'Just Go Ghana lost its existing sitemap route');
+  const detail = await readFile(join(outputPath, justGoGhana.detailUrl), 'utf8');
+  assert(detail.includes('<h1>Just Go Ghana</h1>'),
+    'Just Go Ghana page content was unexpectedly replaced during the standard-tour migration');
+  assert(!detail.includes('a.storyblok.com'),
+    'Just Go Ghana must not receive a Storyblok standard-tour asset during Phase 3C');
+}
 
 // A tour created in the CMS has no file in the repository, so nothing would
 // have failed if the build had quietly skipped building its page.

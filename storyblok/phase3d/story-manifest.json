@@ -1,0 +1,23 @@
+{
+  "spaceId": 294832753590557,
+  "parentId": 213732107080273,
+  "storyDirectory": "tours/day-short-experiences",
+  "stories": {
+    "accra-food": {
+      "id": 215443408571629,
+      "uuid": "8f6b1809-efcf-4be5-86ac-4b234b77e0b6"
+    },
+    "volta": {
+      "id": 215443408600302,
+      "uuid": "ef8ceb17-e0f8-4ada-8b3a-f6043356377c"
+    },
+    "volta-community": {
+      "id": 215443408727279,
+      "uuid": "94481455-3cd7-44dc-96fe-f24c2dc73404"
+    },
+    "batik-workshop": {
+      "id": 215443408137452,
+      "uuid": "09736bd8-4d19-4358-baaa-a7079ee60f47"
+    }
+  }
+}
