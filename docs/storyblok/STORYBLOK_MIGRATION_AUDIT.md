@@ -2,6 +2,27 @@
 
 **Scope:** repository-wide, read-only audit of `/Users/nana/Documents/Projects/People & Places` on 27 August 2026. No website, CMS, dependency, or deployment file was changed. Findings describe checked-in source, not assumed production state. Unless stated otherwise, paths in this report are relative to that audited project root.
 
+## 0. Why this migration
+
+Recorded 2 September 2026, from the founder, because no document in this set
+stated it and step 10 of the sequence below removes the fallback.
+
+Sanity is too technical to edit comfortably. Storyblok is visual and direct.
+
+That reason is borne out by the failures actually met in Sanity: a Studio
+running a schema that had never been deployed, a validation limit that blocked
+publishing a document already exceeding it, and two document types holding live
+content with no entry in the sidebar at all. Each is the same seam — the Studio
+is code deployed separately from the content it edits, so the two can drift and
+an editor discovers it by being stopped. Storyblok configures structure in the
+same interface it edits in, so that class of failure does not arise.
+
+The trade-off is recorded in section 14: the Free plan has no custom metadata
+fields, so the per-asset consent, ownership and approval flags that Sanity holds
+become folders and tags. Those exist to keep an unapproved photograph of a guest
+off the site, so their replacement is a deliberate decision rather than a
+detail.
+
 ## 1. Technology stack
 
 | Area | Actual implementation |

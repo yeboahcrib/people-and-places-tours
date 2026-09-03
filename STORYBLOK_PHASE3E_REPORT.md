@@ -53,6 +53,11 @@ once a valid multi-day record exists; a per-tour overlay is not appropriate.
 
 ## Required owner decisions
 
+> **Four of these five were answered on 2 September 2026** — see
+> [`STORYBLOK_PHASE3E_DECISIONS.md`](STORYBLOK_PHASE3E_DECISIONS.md). Only the
+> card image remains outstanding, so Phase 3E is still blocked.
+
+
 | Blocker | Evidence | Why Phase 3E stopped |
 | --- | --- | --- |
 | Group size | Page: `Small Groups`; catalogue/live Sanity: `Any group size`; approved claim register: 1–12, with larger groups by arrangement | This is an actual guest-facing operating fact. |
