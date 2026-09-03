@@ -1,0 +1,51 @@
+{
+  "name": "itinerary_day",
+  "display_name": "Itinerary day",
+  "is_nestable": true,
+  "schema": {
+    "day": {
+      "type": "number",
+      "display_name": "Day number",
+      "required": true,
+      "min_value": 1,
+      "decimals": 0,
+      "description": "The order shown on the page. Day 1 is arrival.",
+      "pos": 0
+    },
+    "title": {
+      "type": "text",
+      "display_name": "What this day is called",
+      "required": true,
+      "max_length": 120,
+      "pos": 1
+    },
+    "description": {
+      "type": "textarea",
+      "display_name": "What happens",
+      "required": true,
+      "max_length": 900,
+      "pos": 2
+    },
+    "meals": {
+      "type": "options",
+      "display_name": "Meals included",
+      "source": "self",
+      "pos": 3,
+      "description": "Leave empty for a day with no included meals.",
+      "options": [
+        {
+          "name": "Breakfast",
+          "value": "breakfast"
+        },
+        {
+          "name": "Lunch",
+          "value": "lunch"
+        },
+        {
+          "name": "Dinner",
+          "value": "dinner"
+        }
+      ]
+    }
+  }
+}

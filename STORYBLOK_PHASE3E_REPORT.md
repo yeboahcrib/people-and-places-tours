@@ -1,6 +1,10 @@
 # Storyblok Phase 3E Report — Just Go Ghana / Multi-Day Tour
 
-**Status:** **Stopped before provisioning — owner review required.**
+**Status:** **Resumed and complete for local validation. Not approved for
+production.** Just Go Ghana exists as an unpublished, content-ready,
+asset-blocked Storyblok draft.
+
+**Close-out:** 2 September 2026.
 
 ## Outcome
 
@@ -12,6 +16,90 @@ website code was changed.
 
 The complete guest-facing field inventory is in
 [`STORYBLOK_JUST_GO_GHANA_FIELD_INVENTORY.md`](STORYBLOK_JUST_GO_GHANA_FIELD_INVENTORY.md).
+
+## Resumed work
+
+The owner supplied the five decisions on 2 September 2026. Four resolved
+outright; the card photograph is still outstanding and is the reason this
+record remains asset-blocked rather than production-ready.
+
+| Decision | Applied as |
+| --- | --- |
+| Group size | Structured `1–12`, with the note *Larger groups available by arrangement.* `Any group size` is gone; `Small Groups` was not carried into the CMS as a fact. |
+| Service charge | Included. The eleven-item list Sanity already held is correct; the page's ten-item list was the one missing it. |
+| Vaccination wording | Not hard-coded. The excluded item reads *Vaccinations and travel health requirements*. Entry and health requirements stay with Travel Information, which was not touched. |
+| Photography | None used. No stock, no placeholder, no other tour's photograph, no unapproved external image. |
+| Testimonials | Not migrated. `multi_day_tour` has no testimonial field at all, so an unapproved quotation cannot be entered by accident. |
+| Related tours | Not migrated. The component has no related-tour field, so the record cannot own another tour's price. |
+
+### What was provisioned
+
+- `itinerary_day` nestable block: day number, title, description, meals.
+- `multi_day_tour` content type: 46 entries across 9 tabs. Deliberately without
+  `hero_image`, `gallery`, testimonials, or related tours.
+- Folder `tours/multi-day-experiences`.
+- One unpublished story at `tours/multi-day-experiences/just-go-ghana`.
+
+Reused rather than recreated: `list_item`, `faq_item`, `price_option`, `seo`.
+
+### Readiness
+
+| | |
+| --- | ---: |
+| Content Ready | **yes** |
+| Asset Ready | **no** |
+| Production Ready | **no** |
+| Applied in a Storyblok-enabled build | **0** |
+| Fallback retained | **1** |
+
+### The gate, tested rather than assumed
+
+The record was put through the mapper three ways:
+
+| State | Result |
+| --- | --- |
+| As it stands — unpublished, no photograph | rejected |
+| **Show this experience** on, still no photograph | **rejected** |
+| Switch on and a photograph present | applied, with every decision correct |
+
+The middle row is the one that matters. Turning the switch on is not enough;
+the gate holds on the missing asset alone. The third row proves the rest of the
+record is complete, which is what makes this content-ready rather than merely
+unfinished.
+
+### Local validation
+
+A Storyblok-enabled build with only the multi-day flag set produces output
+**byte-identical to a plain build on every visitor-facing file**. The single
+difference is `health.json`, which reports `invalid-content` instead of
+`disabled` — the diagnostics changing, not the website.
+
+- `/just-go-ghana.html` unchanged, including its route, hero, related cards,
+  booking behaviour and testimonials section.
+- Standard tours unaffected: 10 applied, 2 asset-blocked, exactly as Phase 3D
+  left them.
+- No Storyblok reference, token, or API call reaches any shipped script from
+  this phase.
+- Build, content, build-output, responsive, smoke and resilience suites pass.
+
+### Still blocking production
+
+One thing: an approved Just Go Ghana photograph, with alt text, rights and a
+focal point. Nothing else in this record is outstanding.
+
+### Noted, not changed
+
+Two consequences of the decisions describe the live website rather than the
+Storyblok record, and are outside this phase:
+
+- The two quotations on the live page are not approved content under the
+  testimonial decision.
+- The live page's included list still shows ten items, missing the service
+  charge the owner has confirmed is included.
+
+The related-card prices on that page were separately corrected on 2 September;
+they had drifted ten dollars below the catalogue, which is the duplicate price
+ownership the related-tour decision warns against.
 
 ## Sources audited
 
@@ -75,7 +163,7 @@ The fixed related-card block also has stale price copies for Shai Hills and
 Accra City. It remains untouched and should not be moved into the Just Go Ghana
 story without a separate reconciliation decision.
 
-## Proposed model, not provisioned
+## Proposed model, not provisioned *(historical — provisioned on 2 September, see Resumed work)*
 
 After the decisions above, the minimum model is:
 
@@ -118,8 +206,11 @@ migration occurred.
 
 ## Next authorization needed
 
-After the owner supplies the five decisions above (and an approved card asset),
-Phase 3E can resume from the documented model, create one unpublished draft at
-`Tours / Multi-day Experiences / Just Go Ghana`, implement the fixed build-time
-adapter, and perform the requested local validation. Until then, Just Go Ghana
-remains safely on its existing fallback path.
+Done, apart from the photograph. The draft exists, the adapter is implemented,
+and the local validation has been performed.
+
+Phase 3E stops here as instructed. Nothing was deployed or published, no
+fallback was removed, Sanity is untouched, and no other section of the site was
+migrated. Just Go Ghana remains safely on its existing fallback path and will
+continue to until an approved photograph exists and someone explicitly
+authorises the next step.

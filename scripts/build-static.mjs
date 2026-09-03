@@ -103,6 +103,8 @@ const [
     storyblokStandardTourSources,
     storyblokStandardTourSummary,
     storyblokAppliedSlugs,
+    storyblokMultiDaySources,
+    storyblokMultiDaySummary,
   },
   {content: homepageContent, source: homepageContentSource},
   {content: bookingContent, source: bookingContentSource},
@@ -376,6 +378,8 @@ const buildHealth = {
   // record, so one bad story cannot hide the rest of the catalogue.
   storyblokStandardTourSources,
   storyblokStandardTourSummary,
+  storyblokMultiDaySources,
+  storyblokMultiDaySummary,
   // The packages grid is generated from this list, so recording its length
   // lets tests/build-output.mjs check the grid against the catalogue that
   // built it rather than against a number frozen into the test.

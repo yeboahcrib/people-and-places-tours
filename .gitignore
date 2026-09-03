@@ -11,3 +11,7 @@ tests/visual-diffs/
 .dev.vars
 .dev.vars.*
 studio/.sanity/
+
+# Storyblok CLI working directory: pulled schema copies and request logs.
+# The canonical component definitions live in storyblok/phase3e/.
+.storyblok/

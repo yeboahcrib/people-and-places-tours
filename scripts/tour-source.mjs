@@ -1,5 +1,5 @@
 import {fetchSanity} from './sanity-fetch.mjs';
-import {loadStoryblokStandardTours} from './storyblok-tour-source.mjs';
+import {loadStoryblokStandardTours, loadStoryblokMultiDayTours} from './storyblok-tour-source.mjs';
 const API_VERSION = '2026-08-02';
 
 const formatPrice = (price, currency = 'USD') => new Intl.NumberFormat('en-US', {
@@ -197,11 +197,24 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
     logger,
   });
 
+  // The one multi-day trip runs through its own gate, behind its own flag,
+  // after the standard ones. Same shape of check: a record that fails it leaves
+  // Just Go Ghana on whatever source it already had.
+  const storyblokMultiDay = await loadStoryblokMultiDayTours({
+    baseTours: storyblok.tours,
+    env,
+    fetchImpl,
+    logger,
+  });
+
   return {
-    tours: storyblok.tours,
+    tours: storyblokMultiDay.tours,
     source,
     storyblokStandardTourSources: storyblok.sourcesBySlug,
     storyblokStandardTourSummary: storyblok.summary,
     storyblokAppliedSlugs: storyblok.appliedSlugs,
+    storyblokMultiDaySources: storyblokMultiDay.sourcesBySlug,
+    storyblokMultiDaySummary: storyblokMultiDay.summary,
+    storyblokMultiDayAppliedSlugs: storyblokMultiDay.appliedSlugs,
   };
 }

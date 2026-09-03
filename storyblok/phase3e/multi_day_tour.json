@@ -1,0 +1,522 @@
+{
+  "name": "multi_day_tour",
+  "display_name": "Multi-Day Experience",
+  "is_nestable": false,
+  "is_root": true,
+  "schema": {
+    "basics_tab": {
+      "type": "tab",
+      "display_name": "Basics",
+      "pos": 0,
+      "keys": [
+        "name",
+        "slug",
+        "published",
+        "experience_type",
+        "display_order"
+      ]
+    },
+    "name": {
+      "type": "text",
+      "display_name": "Name of this experience",
+      "pos": 1,
+      "required": true,
+      "max_length": 120
+    },
+    "slug": {
+      "type": "text",
+      "display_name": "Website identifier",
+      "pos": 2,
+      "required": true,
+      "description": "Must match the existing catalogue slug. The public page route is fixed in code and is not derived from this."
+    },
+    "published": {
+      "type": "boolean",
+      "display_name": "Show this experience on the website",
+      "pos": 3,
+      "description": "Leave off while the trip is still being prepared. A trip without an approved photo cannot appear even when this is on."
+    },
+    "experience_type": {
+      "type": "option",
+      "display_name": "Type of experience",
+      "pos": 4,
+      "required": true,
+      "source": "self",
+      "default_value": "tailored_multi_day",
+      "options": [
+        {
+          "name": "Tailored multi-day trip",
+          "value": "tailored_multi_day"
+        }
+      ]
+    },
+    "display_order": {
+      "type": "number",
+      "display_name": "Position in the catalogue",
+      "pos": 5,
+      "required": true,
+      "min_value": 0,
+      "decimals": 0
+    },
+    "card_tab": {
+      "type": "tab",
+      "display_name": "Card",
+      "pos": 6,
+      "keys": [
+        "card_image",
+        "card_badge",
+        "card_description",
+        "categories",
+        "vibes",
+        "destination",
+        "search_summary"
+      ]
+    },
+    "card_image": {
+      "type": "asset",
+      "display_name": "Card photo",
+      "pos": 7,
+      "required": false,
+      "filetypes": [
+        "images"
+      ],
+      "description": "Add an approved original photo before this trip can appear on the website. You may save a draft while photography is pending."
+    },
+    "card_badge": {
+      "type": "text",
+      "display_name": "Card badge",
+      "pos": 8,
+      "max_length": 24
+    },
+    "card_description": {
+      "type": "textarea",
+      "display_name": "Card description",
+      "pos": 9,
+      "required": true,
+      "max_length": 320
+    },
+    "categories": {
+      "type": "options",
+      "display_name": "Categories",
+      "pos": 10,
+      "required": true,
+      "source": "self",
+      "options": [
+        {
+          "name": "Multi-Day",
+          "value": "multi-day"
+        },
+        {
+          "name": "Culture",
+          "value": "culture"
+        },
+        {
+          "name": "Adventure",
+          "value": "adventure"
+        },
+        {
+          "name": "Nature",
+          "value": "nature"
+        },
+        {
+          "name": "Relaxation",
+          "value": "relaxation"
+        },
+        {
+          "name": "History",
+          "value": "history"
+        },
+        {
+          "name": "Food",
+          "value": "food"
+        },
+        {
+          "name": "Craft",
+          "value": "craft"
+        },
+        {
+          "name": "Beach",
+          "value": "beach"
+        }
+      ]
+    },
+    "vibes": {
+      "type": "options",
+      "display_name": "Vibes",
+      "pos": 11,
+      "source": "self",
+      "maximum": 3,
+      "options": [
+        {
+          "name": "Multi-Day",
+          "value": "Multi-Day"
+        },
+        {
+          "name": "Culture",
+          "value": "Culture"
+        },
+        {
+          "name": "Adventure",
+          "value": "Adventure"
+        },
+        {
+          "name": "Nature",
+          "value": "Nature"
+        },
+        {
+          "name": "Relaxation",
+          "value": "Relaxation"
+        },
+        {
+          "name": "History",
+          "value": "History"
+        }
+      ]
+    },
+    "destination": {
+      "type": "option",
+      "display_name": "Destination",
+      "pos": 12,
+      "required": true,
+      "source": "self",
+      "options": [
+        {
+          "name": "Accra",
+          "value": "accra"
+        },
+        {
+          "name": "Cape-Coast",
+          "value": "cape-coast"
+        },
+        {
+          "name": "Kumasi",
+          "value": "kumasi"
+        },
+        {
+          "name": "Volta",
+          "value": "volta"
+        },
+        {
+          "name": "Ada",
+          "value": "ada"
+        },
+        {
+          "name": "Aburi",
+          "value": "aburi"
+        },
+        {
+          "name": "Eastern",
+          "value": "eastern"
+        }
+      ]
+    },
+    "search_summary": {
+      "type": "textarea",
+      "display_name": "Search summary",
+      "pos": 13,
+      "max_length": 200
+    },
+    "pricing_tab": {
+      "type": "tab",
+      "display_name": "Pricing",
+      "pos": 14,
+      "keys": [
+        "price",
+        "currency",
+        "price_unit",
+        "price_options",
+        "duration",
+        "locations",
+        "starting_point",
+        "minimum_guests",
+        "maximum_guests",
+        "group_size_note"
+      ]
+    },
+    "price": {
+      "type": "number",
+      "display_name": "Price",
+      "pos": 15,
+      "required": true,
+      "min_value": 1,
+      "decimals": 0
+    },
+    "currency": {
+      "type": "option",
+      "display_name": "Currency",
+      "pos": 16,
+      "required": true,
+      "source": "self",
+      "default_value": "USD",
+      "options": [
+        {
+          "name": "US dollars",
+          "value": "USD"
+        }
+      ]
+    },
+    "price_unit": {
+      "type": "text",
+      "display_name": "Price per",
+      "pos": 17,
+      "required": true,
+      "default_value": "Per Person"
+    },
+    "price_options": {
+      "type": "bloks",
+      "display_name": "Other prices",
+      "pos": 18,
+      "restrict_components": true,
+      "component_whitelist": [
+        "price_option"
+      ],
+      "maximum_entries": 6
+    },
+    "duration": {
+      "type": "text",
+      "display_name": "How long it runs",
+      "pos": 19,
+      "required": true,
+      "max_length": 60
+    },
+    "locations": {
+      "type": "bloks",
+      "display_name": "Where it goes",
+      "pos": 20,
+      "required": true,
+      "restrict_components": true,
+      "component_whitelist": [
+        "list_item"
+      ],
+      "minimum_entries": 1,
+      "maximum_entries": 8
+    },
+    "starting_point": {
+      "type": "text",
+      "display_name": "Where it starts",
+      "pos": 21,
+      "required": true,
+      "max_length": 80
+    },
+    "minimum_guests": {
+      "type": "number",
+      "display_name": "Minimum guests",
+      "pos": 22,
+      "min_value": 1,
+      "decimals": 0
+    },
+    "maximum_guests": {
+      "type": "number",
+      "display_name": "Maximum guests",
+      "pos": 23,
+      "min_value": 1,
+      "decimals": 0
+    },
+    "group_size_note": {
+      "type": "text",
+      "display_name": "Note about group size",
+      "pos": 24,
+      "max_length": 120,
+      "description": "Shown beside the guest numbers, for example when larger groups can be arranged."
+    },
+    "overview_tab": {
+      "type": "tab",
+      "display_name": "Trip overview",
+      "pos": 25,
+      "keys": [
+        "hero_watermark",
+        "page_headline",
+        "overview",
+        "activity_level",
+        "trip_style",
+        "highlights"
+      ]
+    },
+    "hero_watermark": {
+      "type": "text",
+      "display_name": "Word behind the title",
+      "pos": 26,
+      "max_length": 24
+    },
+    "page_headline": {
+      "type": "text",
+      "display_name": "Page headline",
+      "pos": 27,
+      "required": true,
+      "max_length": 120
+    },
+    "overview": {
+      "type": "textarea",
+      "display_name": "Overview",
+      "pos": 28,
+      "required": true,
+      "max_length": 1200
+    },
+    "activity_level": {
+      "type": "option",
+      "display_name": "Activity level",
+      "pos": 29,
+      "source": "self",
+      "options": [
+        {
+          "name": "Gentle",
+          "value": "gentle"
+        },
+        {
+          "name": "Moderate",
+          "value": "moderate"
+        },
+        {
+          "name": "Active",
+          "value": "active"
+        }
+      ]
+    },
+    "trip_style": {
+      "type": "text",
+      "display_name": "Trip style",
+      "pos": 30,
+      "max_length": 80
+    },
+    "highlights": {
+      "type": "bloks",
+      "display_name": "Highlights",
+      "pos": 31,
+      "required": true,
+      "restrict_components": true,
+      "component_whitelist": [
+        "list_item"
+      ],
+      "minimum_entries": 1,
+      "maximum_entries": 10
+    },
+    "itinerary_tab": {
+      "type": "tab",
+      "display_name": "Itinerary",
+      "pos": 32,
+      "keys": [
+        "itinerary"
+      ]
+    },
+    "itinerary": {
+      "type": "bloks",
+      "display_name": "Day by day",
+      "pos": 33,
+      "required": true,
+      "restrict_components": true,
+      "component_whitelist": [
+        "itinerary_day"
+      ],
+      "minimum_entries": 2,
+      "maximum_entries": 30,
+      "description": "One block per day, in order. The day number is what the page shows."
+    },
+    "included_tab": {
+      "type": "tab",
+      "display_name": "What’s included",
+      "pos": 34,
+      "keys": [
+        "included",
+        "excluded"
+      ]
+    },
+    "included": {
+      "type": "bloks",
+      "display_name": "What’s included",
+      "pos": 35,
+      "required": true,
+      "restrict_components": true,
+      "component_whitelist": [
+        "list_item"
+      ],
+      "minimum_entries": 1,
+      "maximum_entries": 20
+    },
+    "excluded": {
+      "type": "bloks",
+      "display_name": "What’s not included",
+      "pos": 36,
+      "required": true,
+      "restrict_components": true,
+      "component_whitelist": [
+        "list_item"
+      ],
+      "minimum_entries": 1,
+      "maximum_entries": 15
+    },
+    "stay_tab": {
+      "type": "tab",
+      "display_name": "Stay and logistics",
+      "pos": 37,
+      "keys": [
+        "accommodation",
+        "airport_transfer",
+        "dedicated_host",
+        "deposit_note"
+      ]
+    },
+    "accommodation": {
+      "type": "text",
+      "display_name": "Accommodation",
+      "pos": 38,
+      "max_length": 120
+    },
+    "airport_transfer": {
+      "type": "text",
+      "display_name": "Airport transfer",
+      "pos": 39,
+      "max_length": 120
+    },
+    "dedicated_host": {
+      "type": "text",
+      "display_name": "Host",
+      "pos": 40,
+      "max_length": 120
+    },
+    "deposit_note": {
+      "type": "text",
+      "display_name": "Deposit wording",
+      "pos": 41,
+      "max_length": 200,
+      "description": "Plain wording only. Do not enter a numeric rule here; payment terms live in the Booking Terms policy."
+    },
+    "questions_tab": {
+      "type": "tab",
+      "display_name": "Questions",
+      "pos": 42,
+      "keys": [
+        "faqs"
+      ]
+    },
+    "faqs": {
+      "type": "bloks",
+      "display_name": "Questions and answers",
+      "pos": 43,
+      "required": true,
+      "restrict_components": true,
+      "component_whitelist": [
+        "faq_item"
+      ],
+      "minimum_entries": 1,
+      "maximum_entries": 15
+    },
+    "seo_tab": {
+      "type": "tab",
+      "display_name": "SEO and sharing",
+      "pos": 44,
+      "keys": [
+        "seo"
+      ]
+    },
+    "seo": {
+      "type": "bloks",
+      "display_name": "SEO",
+      "pos": 45,
+      "restrict_components": true,
+      "component_whitelist": [
+        "seo"
+      ],
+      "maximum_entries": 1
+    }
+  }
+}

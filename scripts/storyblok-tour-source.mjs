@@ -432,3 +432,189 @@ export async function loadStoryblokStandardTours({
     appliedSlugs,
   };
 }
+
+/* ── Multi-day experiences (Phase 3E) ───────────────────────────────────────
+ *
+ * One record: Just Go Ghana. It is the only multi-day trip and the only tour
+ * whose page is hand-authored rather than generated, so its route is fixed in
+ * code and is never derived from a Storyblok path.
+ *
+ * The production gate is deliberately the same as the standard one. Just Go
+ * Ghana has no approved photograph, so it is expected to fail that gate and
+ * fall back — that is the correct outcome, not a defect to work around.
+ */
+const MULTI_DAY_DIRECTORY = 'tours/multi-day-experiences';
+
+export const STORYBLOK_MULTI_DAY_REGISTRY = Object.freeze([
+  Object.freeze({slug: 'just-go-ghana', fullSlug: MULTI_DAY_DIRECTORY + '/just-go-ghana'}),
+]);
+
+function itineraryDays(value) {
+  if (!Array.isArray(value) || value.length < 2) return undefined;
+  const days = [];
+  for (const block of value) {
+    if (block?.component !== 'itinerary_day') return undefined;
+    const day = positiveInteger(block.day);
+    const title = text(block.title);
+    const description = text(block.description);
+    if (!day || !title || !description) return undefined;
+    const meals = Array.isArray(block.meals)
+      ? block.meals.map(meal => text(meal)).filter(Boolean)
+      : [];
+    days.push({day, title, description, meals: meals.map(meal => meal.charAt(0).toUpperCase() + meal.slice(1))});
+  }
+  // The page numbers the days, so an out-of-order or gapped list would render a
+  // trip that reads as though a day were missing.
+  const ordered = days.every((entry, index) => entry.day === index + 1);
+  return ordered ? days : undefined;
+}
+
+export function mapStoryblokMultiDayTour({story, baseTour, expectedFullSlug}) {
+  if (!story || !baseTour || !expectedFullSlug) return undefined;
+  const content = story.content;
+  if (
+    text(story.slug) !== baseTour.slug
+    || text(story.full_slug) !== expectedFullSlug
+    || content?.component !== 'multi_day_tour'
+    || text(content.slug) !== baseTour.slug
+    || content.published !== true
+    || text(content.experience_type) !== 'tailored_multi_day'
+  ) return undefined;
+
+  const title = text(content.name);
+  const cardDescription = text(content.card_description);
+  const duration = text(content.duration);
+  const startingPoint = text(content.starting_point);
+  const overview = text(content.overview);
+  const pageHeadline = text(content.page_headline);
+  const price = positiveNumber(content.price);
+  const currency = text(content.currency);
+  const priceUnit = text(content.price_unit);
+  const displayOrder = nonNegativeNumber(content.display_order);
+  const destination = text(content.destination);
+  const categories = stringList(content.categories, {minimum: 1, maximum: 6});
+  const vibes = stringList(content.vibes, {minimum: 1, maximum: 3});
+  const locations = listItems(content.locations, {minimum: 1, maximum: 8});
+  const highlights = listItems(content.highlights, {minimum: 1, maximum: 10});
+  const included = listItems(content.included, {minimum: 1, maximum: 20});
+  const excluded = listItems(content.excluded, {minimum: 1, maximum: 15});
+  const faqs = faqItems(content.faqs);
+  const itinerary = itineraryDays(content.itinerary);
+  const minimumGuests = positiveInteger(content.minimum_guests);
+  const maximumGuests = positiveInteger(content.maximum_guests);
+  // The gate. A trip with no approved photograph cannot be applied, however
+  // complete the rest of its record is.
+  const cardImage = validAsset(content.card_image);
+
+  if (
+    !title || !cardDescription || !duration || !startingPoint || !overview
+    || !pageHeadline || !price || currency !== 'USD' || !priceUnit
+    || displayOrder === undefined || !destination || !categories || !vibes
+    || !locations || !highlights || !included || !excluded || !faqs || !itinerary
+    || !minimumGuests || !maximumGuests || minimumGuests > maximumGuests || !cardImage
+  ) return undefined;
+
+  const card = storyblokImageUrl(cardImage, 1200, 840);
+  const packageImage = storyblokImageUrl(cardImage, 1200, 825);
+  if (!card || !packageImage) return undefined;
+
+  return mergeDefined(baseTour, {
+    // detailUrl is never taken from Storyblok: /just-go-ghana.html is a fixed
+    // public route that predates this migration.
+    title,
+    price: formatPrice(price, currency),
+    priceUnit,
+    duration,
+    groupSize: String(minimumGuests) + '-' + String(maximumGuests) + ' People',
+    groupSizeNote: optionalText(content, 'group_size_note'),
+    location: locations.join(', '),
+    destination,
+    categories,
+    vibes,
+    badge: optionalText(content, 'card_badge'),
+    image: card,
+    packageImage,
+    alt: cardImage.alt,
+    description: overview,
+    packageDescription: cardDescription,
+    commandSummary: optionalText(content, 'search_summary'),
+    packageOrder: displayOrder,
+    startingPoint,
+    pageHeadline,
+    activityLevel: optionalText(content, 'activity_level'),
+    tripStyle: optionalText(content, 'trip_style'),
+    accommodation: optionalText(content, 'accommodation'),
+    airportTransfer: optionalText(content, 'airport_transfer'),
+    dedicatedHost: optionalText(content, 'dedicated_host'),
+    depositNote: optionalText(content, 'deposit_note'),
+    highlights,
+    included,
+    excluded,
+    faqs,
+    itinerary,
+  });
+}
+
+export async function loadStoryblokMultiDayTours({
+  baseTours,
+  env = process.env,
+  fetchImpl = fetch,
+  logger = console,
+  registry = STORYBLOK_MULTI_DAY_REGISTRY,
+} = {}) {
+  const registryMap = registryBySlug(registry);
+  const safeTours = Array.isArray(baseTours) ? baseTours : [];
+  const sourcesBySlug = Object.fromEntries([...registryMap.keys()].map(slug => [slug, 'not-applicable']));
+  const baseBySlug = new Map();
+
+  for (const tour of safeTours) {
+    const slug = text(tour?.slug);
+    if (!registryMap.has(slug)) continue;
+    if (baseBySlug.has(slug)) {
+      sourcesBySlug[slug] = 'duplicate-slug';
+      baseBySlug.delete(slug);
+      continue;
+    }
+    baseBySlug.set(slug, tour);
+    sourcesBySlug[slug] = 'disabled';
+  }
+
+  if (env.STORYBLOK_MULTI_DAY_ENABLED !== 'true') {
+    return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
+  }
+  const token = text(env.STORYBLOK_PREVIEW_API_TOKEN);
+  if (!token) {
+    for (const slug of baseBySlug.keys()) sourcesBySlug[slug] = 'missing-configuration';
+    return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
+  }
+  if (text(env.STORYBLOK_REGION || 'eu').toLowerCase() !== 'eu') {
+    for (const slug of baseBySlug.keys()) sourcesBySlug[slug] = 'unsupported-region';
+    return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
+  }
+
+  const candidates = new Map();
+  await Promise.all([...baseBySlug.entries()].map(async ([slug, baseTour]) => {
+    const entry = registryMap.get(slug);
+    try {
+      const result = await loadOneStory({entry, token, fetchImpl});
+      if (result.source !== 'received') {
+        sourcesBySlug[slug] = result.source;
+        return;
+      }
+      const mapped = mapStoryblokMultiDayTour({story: result.story, baseTour, expectedFullSlug: entry.fullSlug});
+      if (!mapped) {
+        sourcesBySlug[slug] = 'invalid-content';
+        return;
+      }
+      candidates.set(slug, mapped);
+      sourcesBySlug[slug] = 'applied';
+    } catch {
+      sourcesBySlug[slug] = 'unavailable';
+      logger?.warn?.('Storyblok multi-day tour "' + slug + '" could not be loaded; using its local fallback.');
+    }
+  }));
+
+  const appliedSlugs = [...candidates.keys()];
+  const tours = safeTours.map(tour => candidates.get(tour?.slug) || tour);
+  return {tours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs};
+}
