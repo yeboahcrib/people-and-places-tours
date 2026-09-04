@@ -12,6 +12,11 @@ import {assessStoryblokFallback, resolveStoryblokMode} from './storyblok-fallbac
 // withdrawn tour from the catalogue, and the loaders need to know up front.
 const storyblokMode = resolveStoryblokMode(process.env);
 const storyblokDeliveryIsAuthoritative = Boolean(storyblokMode.enforcesSystemicThreshold);
+const storyblokDelivery = {
+  authoritativeDelivery: storyblokDeliveryIsAuthoritative,
+  contentVersion: storyblokMode.contentVersion,
+  tokenEnvVar: storyblokMode.tokenEnvVar,
+};
 import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
@@ -116,7 +121,7 @@ const [
   {content: bookingContent, source: bookingContentSource},
   {content: aboutContent, source: aboutContentSource},
 ] = await Promise.all([
-  loadTourContent({localTours, authoritativeDelivery: storyblokDeliveryIsAuthoritative}),
+  loadTourContent({localTours, ...storyblokDelivery}),
   loadHomepageContent({localContent: localHomepageContent}),
   loadBookingContent({localContent: localBookingContent}),
   loadAboutContent({localContent: localAboutContent}),

@@ -410,11 +410,12 @@ export async function loadOneStory({
   entry,
   token,
   fetchImpl,
+  contentVersion = 'draft',
   timeoutMs = STORYBLOK_REQUEST_TIMEOUT_MS,
   retryDelayMs = STORYBLOK_RETRY_DELAY_MS,
 }) {
   const url = new URL('/v2/cdn/stories/' + entry.fullSlug, STORYBLOK_API_ORIGIN);
-  url.searchParams.set('version', 'draft');
+  url.searchParams.set('version', contentVersion);
   url.searchParams.set('resolve_assets', '1');
   url.searchParams.set('token', token);
 
@@ -440,6 +441,11 @@ export async function loadStoryblokStandardTours({
   logger = console,
   registry = STORYBLOK_STANDARD_TOUR_REGISTRY,
   authoritativeDelivery = false,
+  // Which content the build reads, and which credential may read it. Draft via
+  // the Preview token is the migration default; authoritative delivery passes
+  // published and the Public token, and the two must never be crossed.
+  contentVersion = 'draft',
+  tokenEnvVar = 'STORYBLOK_PREVIEW_API_TOKEN',
 } = {}) {
   const registryMap = registryBySlug(registry);
   const safeTours = Array.isArray(baseTours) ? baseTours : [];
@@ -462,7 +468,7 @@ export async function loadStoryblokStandardTours({
     return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
   }
 
-  const token = text(env.STORYBLOK_PREVIEW_API_TOKEN);
+  const token = text(env[tokenEnvVar]);
   if (!token) {
     for (const slug of baseBySlug.keys()) sourcesBySlug[slug] = 'missing-configuration';
     return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
@@ -478,7 +484,7 @@ export async function loadStoryblokStandardTours({
     if (sourcesBySlug[slug] === 'duplicate-slug') return;
     const entry = registryMap.get(slug);
     try {
-      const result = await loadOneStory({entry, token, fetchImpl});
+      const result = await loadOneStory({entry, token, fetchImpl, contentVersion});
       if (result.source !== 'received') {
         if (result.source === 'missing-story') {
           const absence = resolveAbsence({slug, reason: 'missing-story', authoritativeDelivery});
@@ -670,6 +676,11 @@ export async function loadStoryblokMultiDayTours({
   logger = console,
   registry = STORYBLOK_MULTI_DAY_REGISTRY,
   authoritativeDelivery = false,
+  // Which content the build reads, and which credential may read it. Draft via
+  // the Preview token is the migration default; authoritative delivery passes
+  // published and the Public token, and the two must never be crossed.
+  contentVersion = 'draft',
+  tokenEnvVar = 'STORYBLOK_PREVIEW_API_TOKEN',
 } = {}) {
   const registryMap = registryBySlug(registry);
   const safeTours = Array.isArray(baseTours) ? baseTours : [];
@@ -691,7 +702,7 @@ export async function loadStoryblokMultiDayTours({
   if (env.STORYBLOK_MULTI_DAY_ENABLED !== 'true') {
     return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
   }
-  const token = text(env.STORYBLOK_PREVIEW_API_TOKEN);
+  const token = text(env[tokenEnvVar]);
   if (!token) {
     for (const slug of baseBySlug.keys()) sourcesBySlug[slug] = 'missing-configuration';
     return {tours: baseTours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs: []};
@@ -706,7 +717,7 @@ export async function loadStoryblokMultiDayTours({
   await Promise.all([...baseBySlug.entries()].map(async ([slug, baseTour]) => {
     const entry = registryMap.get(slug);
     try {
-      const result = await loadOneStory({entry, token, fetchImpl});
+      const result = await loadOneStory({entry, token, fetchImpl, contentVersion});
       if (result.source !== 'received') {
         if (result.source === 'missing-story') {
           const absence = resolveAbsence({slug, reason: 'missing-story', authoritativeDelivery});

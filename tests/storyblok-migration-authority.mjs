@@ -205,4 +205,68 @@ const slugsIn = result => result.tours.map(t => t.slug);
   assert.equal(r.tours.length, 1, 'Just Go Ghana is pending and keeps its fallback');
 }
 
+// --- Delivery separation: which content, read with which credential.
+// Authoritative delivery must never read draft content, and must never accept
+// the Preview token — crossing those is how unpublished content reaches the
+// public site.
+{
+  const seen = [];
+  const spy = async request => {
+    const url = new URL(request);
+    seen.push({version: url.searchParams.get('version'), token: url.searchParams.get('token')});
+    return new Response('', {status: 404});
+  };
+  const credentials = {
+    STORYBLOK_STANDARD_TOURS_ENABLED: 'true',
+    STORYBLOK_REGION: 'eu',
+    STORYBLOK_PREVIEW_API_TOKEN: 'preview-secret',
+    STORYBLOK_PUBLIC_API_TOKEN: 'public-secret',
+  };
+
+  await loadStoryblokStandardTours({
+    baseTours: base, env: credentials, logger: {warn(){}}, fetchImpl: spy,
+    authoritativeDelivery: true,
+    contentVersion: production.contentVersion,
+    tokenEnvVar: production.tokenEnvVar,
+  });
+  assert(seen.length > 0, 'the spy must have seen requests');
+  for (const call of seen) {
+    assert.equal(call.version, 'published', 'authoritative delivery must request published content');
+    assert.equal(call.token, 'public-secret', 'authoritative delivery must use the Public token');
+    assert.notEqual(call.token, 'preview-secret', 'the Preview token must never serve authoritative delivery');
+  }
+
+  // Migration delivery keeps draft and the Preview token.
+  seen.length = 0;
+  await loadStoryblokStandardTours({
+    baseTours: base, env: credentials, logger: {warn(){}}, fetchImpl: spy,
+    contentVersion: migration.contentVersion,
+    tokenEnvVar: migration.tokenEnvVar,
+  });
+  for (const call of seen) {
+    assert.equal(call.version, 'draft');
+    assert.equal(call.token, 'preview-secret');
+  }
+
+  // And the default, with nothing specified, stays on the migration pair.
+  seen.length = 0;
+  await loadStoryblokStandardTours({
+    baseTours: base, env: credentials, logger: {warn(){}}, fetchImpl: spy,
+  });
+  assert.equal(seen[0].version, 'draft', 'the default must remain draft');
+  assert.equal(seen[0].token, 'preview-secret', 'the default must remain the Preview token');
+
+  // Authoritative delivery without a Public token is a configuration failure,
+  // not a silent downgrade to the Preview credential.
+  const noPublic = await loadStoryblokStandardTours({
+    baseTours: base, logger: {warn(){}}, fetchImpl: spy,
+    env: {...credentials, STORYBLOK_PUBLIC_API_TOKEN: ''},
+    authoritativeDelivery: true,
+    contentVersion: production.contentVersion,
+    tokenEnvVar: production.tokenEnvVar,
+  });
+  assert.equal(noPublic.sourcesBySlug['cape-coast'], 'missing-configuration',
+    'a missing Public token must not fall back to the Preview token');
+}
+
 console.log('Storyblok migration-authority and withdrawal tests passed.');

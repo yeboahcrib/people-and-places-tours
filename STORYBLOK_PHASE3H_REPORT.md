@@ -1,6 +1,13 @@
 # Storyblok Phase 3H — production-like staging rehearsal
 
-**Two STOP conditions were reached.** Everything not blocked by them was
+> **Resumed 4 September 2026.** Both original STOPs were cleared — the Public
+> Delivery token now exists, and Phase 3H.1 fixed the withdrawal defect. The
+> rehearsal then reached **a third stop: nothing is published in Storyblok, and
+> no credential on this machine can publish it.** The resumed results are at the
+> end of this document, under "Resumed rehearsal". The original findings below
+> are unchanged.
+
+**Two STOP conditions were reached (original run).** Everything not blocked by them was
 completed. Nothing was deployed, no DNS changed, no Storyblok content published,
 no production configuration touched, Sanity and every fallback left in place.
 
@@ -326,3 +333,177 @@ removed or dropping tours that were never migrated.
 Neither is fixed by trying harder at staging. Both need a decision from you.
 
 Nothing was deployed. Nothing was published. Phase 3H stops here.
+
+
+---
+
+# Resumed rehearsal — 4 September 2026
+
+## STOP 3 — Nothing is published, and I cannot publish it
+
+Verified directly against the Published Delivery API with the Public token, one
+request per product:
+
+```
+published stories retrievable: 0 of 13
+```
+
+Every one of the 13 returns 404. The migration created drafts; nothing has ever
+been published.
+
+Publishing requires a **Management API** credential. None exists on this machine
+— no management or OAuth token in the environment or in `.env.storyblok` — and
+the Phase 3C/3D staging scripts never had one either: they only prepare JSON
+files, so the stories were created by hand.
+
+**Owner action required.** Publish the 10 authoritative tours in the Storyblok
+UI — open each story and press Publish:
+
+| Publish these 10 | Do **not** publish |
+| --- | --- |
+| accra-city, cape-coast, kumasi, ada-foah, quad-bike, volta, shai-hills, aburi, cape-coast-day, batik-workshop | accra-food, volta-community, just-go-ghana |
+
+The three excluded are asset-blocked and marked `pending` in the registry.
+
+## Why publishing must come first — measured, not assumed
+
+Production-authoritative mode was exercised against the real Published Delivery
+API, with the Public token and `version=published`:
+
+```
+record states     : { withdrawn: 10, pending-not-migrated: 3 }
+catalogue size    : 3 of 13 products
+surviving products: accra-food, volta-community, just-go-ghana
+```
+
+The Phase 3H.1 semantics are working exactly as designed — and that is precisely
+the danger. **If production-authoritative mode were switched on today, the site
+would lose 10 of its 13 tours**, because the build would correctly conclude that
+every authoritative story had been withdrawn.
+
+Publishing is therefore a hard prerequisite for activation, not a step that can
+run alongside it. That ordering is the single most important result of this
+resumed run.
+
+## A defect found and fixed: delivery was not actually wired to the mode
+
+Step 1 asks for proof that authoritative delivery does not use the Preview token
+and does use `version=published`. Both were false.
+
+The adapter hardcoded `version=draft` and always read
+`STORYBLOK_PREVIEW_API_TOKEN`, regardless of mode. Production-authoritative mode
+would have sent a Preview token against draft content — the exact combination
+the phase forbids — or, with a Public token, been rejected outright.
+
+Fixed: both loaders now take `contentVersion` and `tokenEnvVar` from the caller,
+and the build derives them from the resolved mode. Defaults are unchanged
+(`draft` + Preview), so migration builds behave exactly as before.
+
+Now verified by test, and mutation-verified both ways:
+
+| Delivery | Content version | Credential |
+| --- | --- | --- |
+| authoritative | `published` | `STORYBLOK_PUBLIC_API_TOKEN` |
+| migration | `draft` | `STORYBLOK_PREVIEW_API_TOKEN` |
+| default (unspecified) | `draft` | `STORYBLOK_PREVIEW_API_TOKEN` |
+
+A missing Public token under authoritative delivery reports
+`missing-configuration` rather than silently falling back to the Preview
+credential — also tested.
+
+## Steps completed on resume
+
+**1. Public Delivery credential — PASS.** Present, 24 characters,
+`version=published` returns 200 and `version=draft` returns 401, which is the
+correct signature: it cannot read unpublished content. Neither token appears
+anywhere in `dist/` or the repository. One housekeeping fix: an empty duplicate
+`STORYBLOK_PUBLIC_API_TOKEN=` line left over from an earlier paste was removed.
+
+**2. Production still Storyblok-disabled — PASS.** Live `health.json` reports
+all 12 standard records as `disabled`, built 2026-09-03. Publishing cannot
+change the live site by itself.
+
+**3. Pre-publication validation — PASS, publication BLOCKED.** A full build with
+the gate enabled shows exactly the expected split:
+
+```
+10 of 13 Storyblok records applied; 3 rejected by the content gate
+(accra-food, volta-community, just-go-ghana) kept their committed fallback.
+```
+
+The 10 authoritative tours are content-ready, asset-ready, visibility-enabled,
+route-mapped and valid under the adapter. Publication itself is blocked by STOP 3.
+
+**4. Published delivery verified — 0 of 13 retrievable.** Confirmed with the
+Public token only; no Management or Preview credential was used. No draft
+content leaked into the published result, because there is no published result.
+
+**5. Production-authoritative mode exercised locally — see above.** It was *not*
+activated in `resolveStoryblokMode`, and not enabled in Cloudflare. The 13-product
+catalogue could not be verified because it requires published stories.
+
+**6. Withdrawal semantics — PASS.** Covered by the nine-scenario suite from
+Phase 3H.1 and confirmed end to end against the real API in the run above. No
+legitimate story was unpublished to test this; test doubles proved the same
+behaviour. The owner's decision on invalid content — controlled fallback plus a
+prominent warning during the cutover period — matches the implemented behaviour
+and was left unchanged.
+
+**7–10, 12. Cloudflare preview, real staging QA, CSP on Cloudflare, device QA,
+SEO on staging — BLOCKED.** All of these require a staging deployment serving
+published content. With nothing published, a preview would show a 3-product
+catalogue and prove nothing. Not attempted.
+
+**11. Visual baseline — investigated in the original run, unchanged.** The cause
+is understood: rendering is deterministic across runs, and the differences are
+legitimate CSS and content changes since 26 August. No refresh is recommended
+yet, because the staging output it should be recorded from does not exist. The
+four obsolete baseline pages are `akosombo-tour`, `elmina-tour`,
+`jamestown-tour` and `kente-tour` — tours that no longer exist, whose baselines
+are never compared and should be deleted when the baseline is refreshed. When
+authorized, the procedure is `npm run test:visual:baseline` against a verified
+staging build, then delete those four page sets.
+
+**13. Health diagnostics — PASS in structure, unverifiable in production mode.**
+The diagnostic reports mode, status, enforcement, threshold 7, applied count and
+the affected slugs by cause, with no credentials. It cannot yet show 10 applied
+authoritative records, because none are published.
+
+**14. Rollback — rehearsed in the original run and still valid.** One
+environment variable and a redeploy returns Tours to Sanity, with all 24 routes
+intact. Not re-run, because there is no Storyblok-authoritative staging
+deployment to roll back from.
+
+## Remaining blockers
+
+1. **Nothing is published in Storyblok**, and publishing needs owner action in
+   the Storyblok UI (STOP 3).
+2. **Three products remain asset-blocked** — accra-food, volta-community,
+   just-go-ghana. They stay `pending` and keep their fallbacks; this does not
+   block cutover for the other 10.
+3. **No staging deployment yet**, so Cloudflare header delivery, extensionless
+   routing on real infrastructure, and real staging QA remain unverified.
+4. **No real-device QA.** Breakpoints have only ever been checked by emulation.
+   This remains an owner verification item.
+
+## Optional cleanup, explicitly not done
+
+- Refreshing the visual baseline and deleting the four obsolete page sets
+- Removing Sanity, `tours.js`, the JSON fallbacks or the browser overlay — all
+  deliberately retained until after a stable production period
+
+## Recommendation
+
+**READY FOR OWNER ACTIONS.**
+
+The architecture is now complete and correct as far as it can be exercised
+without published content. The withdrawal semantics work against the real
+Published Delivery API, the credential and content-version separation is
+enforced and tested, production is provably unaffected, and rollback is one
+variable away.
+
+One owner action stands between here and a real staging rehearsal: publish the
+10 authoritative tours. Once that is done, steps 5 and 7 through 13 can run in
+full, and the catalogue can be verified at 10 Storyblok + 3 fallback = 13.
+
+Nothing was deployed, published, or configured. Phase 3H stops here again.

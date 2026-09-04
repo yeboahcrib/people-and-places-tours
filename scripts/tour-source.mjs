@@ -132,6 +132,8 @@ export async function loadTourContent({
   // Only authoritative delivery may drop a record from the catalogue. Every
   // other build keeps per-record fallback, so this defaults off.
   authoritativeDelivery = false,
+  contentVersion = 'draft',
+  tokenEnvVar = 'STORYBLOK_PREVIEW_API_TOKEN',
 }) {
   const projectId = env.SANITY_STUDIO_PROJECT_ID;
   const dataset = env.SANITY_STUDIO_DATASET || 'production';
@@ -204,6 +206,8 @@ export async function loadTourContent({
     fetchImpl,
     logger,
     authoritativeDelivery,
+    contentVersion,
+    tokenEnvVar,
   });
 
   // The one multi-day trip runs through its own gate, behind its own flag,
@@ -215,6 +219,8 @@ export async function loadTourContent({
     fetchImpl,
     logger,
     authoritativeDelivery,
+    contentVersion,
+    tokenEnvVar,
   });
 
   return {
