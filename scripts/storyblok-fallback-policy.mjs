@@ -126,6 +126,15 @@ export function storyblokTokenFor(mode, env = process.env) {
 const NOT_ATTEMPTED = new Set([
   'not-applicable', 'disabled', 'missing-configuration', 'unsupported-region',
 ]);
+
+/*
+ * Deliberate editorial outcomes, not failures. The tour is gone from the
+ * catalogue because someone decided it should be, and no fallback replaces it.
+ */
+const INTENTIONAL_REMOVAL = new Set(['withdrawn', 'editorial-suppressed']);
+
+/* Expected mid-cutover: the tour is not migrated, and its fallback is correct. */
+const PENDING_MIGRATION = 'pending-not-migrated';
 const TRANSPORT_FAILURE = new Set(['unavailable', 'invalid-response', 'unauthorized']);
 
 /*
@@ -155,11 +164,15 @@ export function assessStoryblokFallback({sourcesBySlug = {}, mode = STORYBLOK_MO
   const transport = attempted.filter(([, source]) => TRANSPORT_FAILURE.has(source)).map(([slug]) => slug);
   const content = attempted.filter(([, source]) => CONTENT_FAILURE.has(source)).map(([slug]) => slug);
   const absent = attempted.filter(([, source]) => source === 'missing-story').map(([slug]) => slug);
+  const removed = attempted.filter(([, source]) => INTENTIONAL_REMOVAL.has(source)).map(([slug]) => slug);
+  const pending = attempted.filter(([, source]) => source === PENDING_MIGRATION).map(([slug]) => slug);
 
-  // In production delivery an absent story is a withdrawal, not a gap to paper
-  // over, so it is neither a failure nor something to fall back from.
-  const withdrawn = mode.absenceMeansWithdrawn ? absent : [];
-  const missing = mode.absenceMeansWithdrawn ? [] : absent;
+  // Under authoritative delivery the adapter has already resolved absence into
+  // a withdrawal or a pending migration, using the migration-authority
+  // registry. `missing-story` only survives in migration mode, where draft
+  // delivery cannot tell the two apart and falling back is always correct.
+  const withdrawn = [...removed, ...(mode.absenceMeansWithdrawn ? absent : [])];
+  const missing = [...pending, ...(mode.absenceMeansWithdrawn ? [] : absent)];
 
   const authOrConfig = entries
     .filter(([, source]) => AUTH_OR_CONFIG_FAILURE.has(source))
@@ -226,7 +239,7 @@ function describe({
   }
   if (unreachable.length) parts.push(unreachable.length + ' unreachable (' + unreachable.join(', ') + ')');
   if (content.length) parts.push(content.length + ' rejected by the content gate (' + content.join(', ') + ')');
-  if (missing.length) parts.push(missing.length + ' not yet in Storyblok (' + missing.join(', ') + ')');
+  if (missing.length) parts.push(missing.length + ' not yet migrated (' + missing.join(', ') + ')');
   const tail = mode.enforcesSystemicThreshold
     ? ''
     : ' Migration builds do not fail on technical failures; these records are on fallback by design.';

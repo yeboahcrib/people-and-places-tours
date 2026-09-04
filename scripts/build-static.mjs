@@ -7,6 +7,11 @@ import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from '.
 import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs';
 import {loadTourContent} from './tour-source.mjs';
 import {assessStoryblokFallback, resolveStoryblokMode} from './storyblok-fallback-policy.mjs';
+
+// Resolved before content loads: only authoritative delivery may drop a
+// withdrawn tour from the catalogue, and the loaders need to know up front.
+const storyblokMode = resolveStoryblokMode(process.env);
+const storyblokDeliveryIsAuthoritative = Boolean(storyblokMode.enforcesSystemicThreshold);
 import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
@@ -111,7 +116,7 @@ const [
   {content: bookingContent, source: bookingContentSource},
   {content: aboutContent, source: aboutContentSource},
 ] = await Promise.all([
-  loadTourContent({localTours}),
+  loadTourContent({localTours, authoritativeDelivery: storyblokDeliveryIsAuthoritative}),
   loadHomepageContent({localContent: localHomepageContent}),
   loadBookingContent({localContent: localBookingContent}),
   loadAboutContent({localContent: localAboutContent}),
@@ -121,7 +126,6 @@ const [
 // tour and wrong for thirteen: an outage or a rejected token fails every record
 // the same way and would ship a fully committed site without saying so. Assess
 // both gates together and refuse the build when the failure is systemic.
-const storyblokMode = resolveStoryblokMode(process.env);
 const storyblokFallback = assessStoryblokFallback({
   sourcesBySlug: {...storyblokStandardTourSources, ...storyblokMultiDaySources},
   mode: storyblokMode,
@@ -405,6 +409,7 @@ const buildHealth = {
     content: storyblokFallback.content,
     missing: storyblokFallback.missing,
     withdrawn: storyblokFallback.withdrawn,
+    pendingMigration: storyblokFallback.missing,
     authOrConfig: storyblokFallback.authOrConfig,
     threshold: storyblokFallback.threshold,
     message: storyblokFallback.message,

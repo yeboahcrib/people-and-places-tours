@@ -1,3 +1,5 @@
+import {isAuthoritative} from './storyblok-migration-authority.mjs';
+
 const STORYBLOK_API_ORIGIN = 'https://api.storyblok.com';
 export const STORYBLOK_EU_ASSET_HOSTS = new Set(['a.storyblok.com', 'a2.storyblok.com']);
 const STANDARD_TOUR_DIRECTORY = 'tours/day-short-experiences';
@@ -339,6 +341,33 @@ const isTransientStatus = status =>
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+
+/*
+ * What an absent or hidden story means depends on who owns the tour.
+ *
+ * Under authoritative delivery, a tour Storyblok owns has no second opinion:
+ * if the story is gone the editor removed it, and reprinting the committed
+ * copy would put a withdrawn tour back on the site. The record is dropped
+ * instead. A tour still pending migration is the opposite case — its absence
+ * is expected, and its fallback is the only content there is.
+ *
+ * Migration builds never drop anything. Pending tours have to stay testable
+ * locally, and draft delivery cannot tell withdrawal from work in progress.
+ */
+function resolveAbsence({slug, reason, authoritativeDelivery}) {
+  if (!authoritativeDelivery) return {source: reason, remove: false};
+  if (!isAuthoritative(slug)) {
+    return {source: reason === 'missing-story' ? 'pending-not-migrated' : reason, remove: false};
+  }
+  return {
+    source: reason === 'missing-story' ? 'withdrawn' : 'editorial-suppressed',
+    remove: true,
+  };
+}
+
+/** The editor's "Show this experience" switch, read before content validation. */
+const hiddenByEditor = story => story?.content?.published !== true;
+
 async function attemptStory({url, fetchImpl, timeoutMs}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -410,6 +439,7 @@ export async function loadStoryblokStandardTours({
   fetchImpl = fetch,
   logger = console,
   registry = STORYBLOK_STANDARD_TOUR_REGISTRY,
+  authoritativeDelivery = false,
 } = {}) {
   const registryMap = registryBySlug(registry);
   const safeTours = Array.isArray(baseTours) ? baseTours : [];
@@ -443,13 +473,26 @@ export async function loadStoryblokStandardTours({
   }
 
   const candidates = new Map();
+  const removedSlugs = new Set();
   await Promise.all([...baseBySlug.entries()].map(async ([slug, baseTour]) => {
     if (sourcesBySlug[slug] === 'duplicate-slug') return;
     const entry = registryMap.get(slug);
     try {
       const result = await loadOneStory({entry, token, fetchImpl});
       if (result.source !== 'received') {
+        if (result.source === 'missing-story') {
+          const absence = resolveAbsence({slug, reason: 'missing-story', authoritativeDelivery});
+          sourcesBySlug[slug] = absence.source;
+          if (absence.remove) removedSlugs.add(slug);
+          return;
+        }
         sourcesBySlug[slug] = result.source;
+        return;
+      }
+      if (hiddenByEditor(result.story)) {
+        const absence = resolveAbsence({slug, reason: 'invalid-content', authoritativeDelivery});
+        sourcesBySlug[slug] = absence.remove ? absence.source : 'invalid-content';
+        if (absence.remove) removedSlugs.add(slug);
         return;
       }
       const mapped = mapStoryblokTour({story: result.story, baseTour, expectedFullSlug: entry.fullSlug});
@@ -484,7 +527,11 @@ export async function loadStoryblokStandardTours({
 
   const appliedSlugs = [...candidates.keys()];
   for (const slug of appliedSlugs) sourcesBySlug[slug] = 'applied';
-  const tours = safeTours.map(tour => candidates.get(tour?.slug) || tour);
+  // A withdrawn or editor-suppressed record leaves the catalogue entirely. It
+  // must not reappear from the committed copy, which is the whole point.
+  const tours = safeTours
+    .filter(tour => !removedSlugs.has(text(tour?.slug)))
+    .map(tour => candidates.get(tour?.slug) || tour);
 
   return {
     tours,
@@ -622,6 +669,7 @@ export async function loadStoryblokMultiDayTours({
   fetchImpl = fetch,
   logger = console,
   registry = STORYBLOK_MULTI_DAY_REGISTRY,
+  authoritativeDelivery = false,
 } = {}) {
   const registryMap = registryBySlug(registry);
   const safeTours = Array.isArray(baseTours) ? baseTours : [];
@@ -654,12 +702,25 @@ export async function loadStoryblokMultiDayTours({
   }
 
   const candidates = new Map();
+  const removedSlugs = new Set();
   await Promise.all([...baseBySlug.entries()].map(async ([slug, baseTour]) => {
     const entry = registryMap.get(slug);
     try {
       const result = await loadOneStory({entry, token, fetchImpl});
       if (result.source !== 'received') {
+        if (result.source === 'missing-story') {
+          const absence = resolveAbsence({slug, reason: 'missing-story', authoritativeDelivery});
+          sourcesBySlug[slug] = absence.source;
+          if (absence.remove) removedSlugs.add(slug);
+          return;
+        }
         sourcesBySlug[slug] = result.source;
+        return;
+      }
+      if (hiddenByEditor(result.story)) {
+        const absence = resolveAbsence({slug, reason: 'invalid-content', authoritativeDelivery});
+        sourcesBySlug[slug] = absence.remove ? absence.source : 'invalid-content';
+        if (absence.remove) removedSlugs.add(slug);
         return;
       }
       const mapped = mapStoryblokMultiDayTour({story: result.story, baseTour, expectedFullSlug: entry.fullSlug});
@@ -676,6 +737,10 @@ export async function loadStoryblokMultiDayTours({
   }));
 
   const appliedSlugs = [...candidates.keys()];
-  const tours = safeTours.map(tour => candidates.get(tour?.slug) || tour);
+  // A withdrawn or editor-suppressed record leaves the catalogue entirely. It
+  // must not reappear from the committed copy, which is the whole point.
+  const tours = safeTours
+    .filter(tour => !removedSlugs.has(text(tour?.slug)))
+    .map(tour => candidates.get(tour?.slug) || tour);
   return {tours, sourcesBySlug, summary: sourceSummary(sourcesBySlug), appliedSlugs};
 }

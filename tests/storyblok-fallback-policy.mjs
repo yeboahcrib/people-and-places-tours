@@ -183,7 +183,7 @@ const duringMigration = assessStoryblokFallback({sourcesBySlug: absent, mode: mi
 assert.equal(duringMigration.status, 'warn');
 assert.deepEqual(duringMigration.missing, ['withdrawn-tour']);
 assert.deepEqual(duringMigration.withdrawn, []);
-assert.match(duringMigration.message, /not yet in Storyblok/);
+assert.match(duringMigration.message, /not yet migrated/);
 
 // Under production delivery the same absence is an editor unpublishing a tour.
 // Falling back would put it straight back on the site, which is the one thing

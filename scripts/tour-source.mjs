@@ -124,7 +124,15 @@ function validateSanityTours(result, localTours) {
   });
 }
 
-export async function loadTourContent({localTours, env = process.env, fetchImpl = fetch, logger = console}) {
+export async function loadTourContent({
+  localTours,
+  env = process.env,
+  fetchImpl = fetch,
+  logger = console,
+  // Only authoritative delivery may drop a record from the catalogue. Every
+  // other build keeps per-record fallback, so this defaults off.
+  authoritativeDelivery = false,
+}) {
   const projectId = env.SANITY_STUDIO_PROJECT_ID;
   const dataset = env.SANITY_STUDIO_DATASET || 'production';
   let tours = localTours;
@@ -195,6 +203,7 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
     env,
     fetchImpl,
     logger,
+    authoritativeDelivery,
   });
 
   // The one multi-day trip runs through its own gate, behind its own flag,
@@ -205,6 +214,7 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
     env,
     fetchImpl,
     logger,
+    authoritativeDelivery,
   });
 
   return {

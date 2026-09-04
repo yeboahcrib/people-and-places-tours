@@ -16,6 +16,36 @@
 
 The `Content Ready`, `Asset Ready`, and `Production Ready` labels are migration-governance statuses recorded here; they are deliberately **not** speculative implementation fields exposed to editors.
 
+## Migration authority (Phase 3H.1)
+
+A fifth status now exists in code, not only in this document:
+`scripts/storyblok-migration-authority.mjs` records, per product, whether
+published Storyblok is the **authority** for that Tour.
+
+It exists because a 404 from the Published Delivery API is ambiguous — it means
+either "never migrated" or "withdrawn by an editor" — and those need opposite
+responses. Nothing in the API distinguishes them, so a person records the answer.
+
+| Status | Meaning | Behaviour when the published Story is missing |
+| --- | --- | --- |
+| `authoritative` | Storyblok owns this Tour | **Withdrawn.** The Tour leaves the catalogue; no fallback. |
+| `pending` | Not migrated yet | **Fallback.** Committed content is served; reported as `pending-not-migrated`. |
+
+| Product | Authority | Asset | Production ready |
+| --- | --- | --- | --- |
+| accra-city, cape-coast, kumasi, ada-foah, quad-bike, volta, shai-hills, aburi, cape-coast-day, batik-workshop | `authoritative` | Ready | Not yet — nothing is published |
+| accra-food | `pending` | **Blocked** | No |
+| volta-community | `pending` | **Blocked** | No |
+| just-go-ghana | `pending` | **Blocked** | No |
+
+Authority is **not** the same as visibility. Visibility is the editorial
+"Show this experience" field inside the Story; authority is a migration fact
+recorded here and in code. A Storyblok draft existing is not grounds for
+promotion — all three `pending` products have drafts, and none may be promoted
+until approved photography exists.
+
+These remain migration-governance statuses. None of them is exposed to editors.
+
 ## Immutable route and story record
 
 The public route is always the existing `detailUrl` owned by the static site. A Storyblok path is CMS organisation only and never determines a browser route.
