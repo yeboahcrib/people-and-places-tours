@@ -54,15 +54,22 @@ export const STORYBLOK_MODES = {
   },
 
   /**
-   * Mode B — production delivery. Defined so the difference is explicit, and
-   * deliberately not active: it needs its own credential, which does not exist
-   * yet, and activating it is a separate decision from finishing the migration.
+   * Mode B — production delivery.
+   *
+   * It was defined inactive in Phase 3G.1, when it had never been exercised and
+   * its credential did not exist. Both have since changed: the Public Delivery
+   * token exists, the withdrawal semantics it depends on are tested, and the
+   * ten authoritative tours are published. It is activatable.
+   *
+   * Activatable is not active. Reaching this mode still takes a deliberate
+   * STORYBLOK_CONTENT_MODE=production alongside the enable flags and a Public
+   * token, and none of those is set in Cloudflare's Production scope.
    */
   production: {
     id: 'production',
     tokenEnvVar: 'STORYBLOK_PUBLIC_API_TOKEN',
     contentVersion: 'published',
-    active: false,
+    active: true,
     /*
      * Production delivery is authoritative, so silence is not an option: a
      * majority of the catalogue failing means the site would ship as committed

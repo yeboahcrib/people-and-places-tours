@@ -17,15 +17,16 @@ assert.equal(resolveStoryblokMode({STORYBLOK_CONTENT_MODE: '  '}).id, 'migration
 assert.equal(migration.contentVersion, 'draft');
 assert.equal(migration.tokenEnvVar, 'STORYBLOK_PREVIEW_API_TOKEN');
 
-// Production delivery is described, not switched on. Nothing may activate it by
-// accident: that would serve a different content version with a credential that
-// does not exist yet.
-assert.equal(production.active, false);
+// Production delivery is activatable now that its credential exists and its
+// semantics are tested — but it is never reached by accident. It has to be
+// asked for by name, and the default stays on migration.
+assert.equal(production.active, true);
 assert.equal(production.contentVersion, 'published');
 assert.equal(production.tokenEnvVar, 'STORYBLOK_PUBLIC_API_TOKEN');
-assert.throws(() => resolveStoryblokMode({STORYBLOK_CONTENT_MODE: 'production'}),
-  /defined but not activated/,
-  'production delivery must refuse to run until it is deliberately activated');
+assert.equal(resolveStoryblokMode({STORYBLOK_CONTENT_MODE: 'production'}).id, 'production',
+  'production delivery runs when it is asked for by name');
+assert.equal(resolveStoryblokMode({}).id, 'migration',
+  'and never by default — reaching it takes a deliberate variable');
 assert.throws(() => resolveStoryblokMode({STORYBLOK_CONTENT_MODE: 'preview'}), /Unknown/);
 
 // --- Credential separation. Each mode reads only its own variable, so a

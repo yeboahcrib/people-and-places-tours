@@ -507,3 +507,224 @@ One owner action stands between here and a real staging rehearsal: publish the
 full, and the catalogue can be verified at 10 Storyblok + 3 fallback = 13.
 
 Nothing was deployed, published, or configured. Phase 3H stops here again.
+
+---
+
+# Final resumed results — 10 tours published
+
+STOP 3 is cleared. The owner published the 10 authoritative tours manually.
+
+## Publication verification — exact match
+
+Checked one request per product against the real Published Content Delivery API
+with the Public token only. No Management or Preview credential was used.
+
+```
+published: 10 | unavailable: 3
+matches the authority registry exactly: true
+```
+
+| Result | Products |
+| --- | --- |
+| Published (HTTP 200) | accra-city, cape-coast, kumasi, ada-foah, quad-bike, volta, shai-hills, aburi, cape-coast-day, batik-workshop |
+| Unavailable (HTTP 404) | accra-food, volta-community, just-go-ghana |
+
+The 10 published are exactly the 10 marked `authoritative`; the 3 unavailable are
+exactly the 3 marked `pending`. No draft-only content can be returned — the
+Public token receives 401 on `version=draft`, which is a structural guarantee
+rather than a convention.
+
+## Production-authoritative mode activated (locally)
+
+Mode B was flipped from `active: false` to `active: true`. It was inactive
+because it had never been exercised and its credential did not exist; both have
+changed. **Activatable is not active** — reaching it still requires a deliberate
+`STORYBLOK_CONTENT_MODE=production` plus the enable flags plus a Public token,
+and none of those is set in Cloudflare. The default remains migration, asserted
+by test.
+
+## The build
+
+```
+Storyblok: 10 of 13 Storyblok records applied; 3 not yet migrated
+(accra-food, volta-community, just-go-ghana) kept their committed fallback.
+Built 33 public root files and 2 public directories into dist/.
+```
+
+**Catalogue: 10 Storyblok + 3 fallback = 13 products.** Verified in the built
+page — 13 cards, and the card image source per product is exactly right:
+
+| Source | Count | Products |
+| --- | --- | --- |
+| Storyblok | 10 | the authoritative ten |
+| Unsplash fallback | 3 | accra-food, volta-community, just-go-ghana |
+
+## Health diagnostics
+
+| Field | Value |
+| --- | --- |
+| mode | `production` |
+| status | `warn` |
+| enforced | `true` |
+| threshold | `7` |
+| attempted / applied | 13 / 10 |
+| pendingMigration | accra-food, volta-community, just-go-ghana |
+| **withdrawn** | **`[]` — no false withdrawal** |
+| transport failures / authOrConfig | none / none |
+
+No credential appears in it. Neither token appears anywhere in the build, and
+`api.storyblok.com` appears in no shipped file — the browser never contacts the
+Storyblok API.
+
+## CSP, verified in a browser with the real header
+
+| Page | CSP violations | Storyblok | Sanity | Unsplash | Broken |
+| --- | --- | --- | --- | --- | --- |
+| packages | 0 | 10 | 1 | 4 | 0 |
+| kumasi-tour | 0 | 3 | 0 | 1 | 0 |
+| cape-coast-tour | 0 | 6 | 0 | 1 | 0 |
+| accra-food-tour | 0 | 3 | 0 | 1 | 0 |
+| just-go-ghana | 0 | 0 | 0 | 2 | 0 |
+| index | 0 | 0 | 13 | 0 | 0 |
+| contact | 0 | 0 | 1 | 1 | 0 |
+
+Zero violations, zero failed image requests, all three hosts serving together,
+extensionless routes resolving. Partial load counts at narrow widths are lazy
+loading, confirmed by scrolling: 17/17 images load at 375px with zero HTTP
+failures.
+
+## User-journey QA
+
+**Packages** — 13 cards, each with title, price, badge and link. Category filter
+narrows to 1; adding the Kumasi destination gives 0 with the empty state; reset
+restores 13; `?category=nature` deep-links to 8.
+
+**Tour pages** — all 13 return 200 with a price, trip meta, Included, Not
+Included, FAQ, related tours, `og:image`, a canonical on
+`https://peopleplacesgh.com`, and no accidental `noindex`. Prices read from
+published Storyblok for the ten: Kumasi $250, Cape Coast $160, Accra City $110,
+Ada $150, Quad Bike $130, Volta $180, Shai Hills $140, Aburi $120, Cape Coast
+Day $160, Batik $120. Just Go Ghana keeps its $3,000 fallback and its 8-day
+itinerary. It has no "Good to Know" heading — that is its existing structure
+("Trip Details"), not a regression.
+
+**Gallery and lightbox** — Cape Coast is the only tour with a gallery: 3 images,
+lightbox opens on a Storyblok image and closes on Escape.
+
+**Booking** — card → detail → CTA → contact, end to end:
+`cape-coast-tour` → "Cape Coast Ancestral Tour" $160 →
+`contact?tour=cape-coast#booking-flow` → contact with `cape-coast` preselected
+from 15 options and the anchor present. No inquiry submitted.
+
+**Responsive** — 375 / 390 / 430 / 768 / 1440 on packages and a tour page: zero
+horizontal overflow at every width, nav present, 13 cards, booking CTA rendered.
+Emulated widths only; **no real device was used**, so device-specific QA remains
+an owner verification item.
+
+## SEO and routes
+
+24 HTML routes, unchanged. 22 sitemap URLs, 22 canonicals on the live domain
+(the two without are `404` and `thanks`, both `noindex` — correct). All 13 tour
+routes present. **No Storyblok path leaks into public routing** — zero Storyblok
+references in the sitemap and zero Storyblok or `/tours/` hrefs in any page.
+`_redirects` untouched.
+
+## Rollback rehearsed from the production build
+
+| Step | Result |
+| --- | --- |
+| Production-authoritative build | 10 applied, 3 fallback, 24 routes |
+| Remove `STORYBLOK_CONTENT_MODE` and the enable flags | build succeeds, all 13 `disabled`, mode `migration` |
+| Verify | 24 routes, 13 cards, images revert to 11 Sanity + 4 Unsplash |
+
+Rollback is one variable and a redeploy, and it returns Tours to Sanity rather
+than to stale committed JSON.
+
+## Visual baseline — investigated, refresh recommended, not performed
+
+The stale baseline now has a complete explanation. Every difference is accounted
+for and legitimate:
+
+1. **Rendering is deterministic** — two runs of the same build produce identical
+   sizes. Not a harness, font or reproducibility fault.
+2. **Global +168 / +95 / +44px** (375/768/1440) on every page — stylesheet work
+   since 26 August. Proven by restoring the baseline-era `style.css`, which made
+   the simple pages match the baseline *exactly*.
+3. **~+450px on tour pages** — photography and gallery work in the same commits.
+4. **+49 / +117 / +115px on 9 of the 10 authoritative tours** — new in this run,
+   caused by publishing. Storyblok carries richer copy than Sanity for the same
+   field: `starting_point` is "Pickup and drop-off from Accra or your hotel,
+   unless a different arrangement is requested." where Sanity had "Accra, Ghana".
+   That is +24 words, which wraps to +117px at 375px. A content improvement.
+   `cape-coast-day-tour` is unchanged because its copy already matched.
+5. **Four obsolete baseline page sets** — `akosombo-tour`, `elmina-tour`,
+   `jamestown-tour`, `kente-tour`: 3 files each, 12 files total, for tours that
+   no longer exist. They are never compared, which is why the failure looked
+   partial when it was total.
+
+**Recommendation: refresh the baseline from a production-authoritative build,
+once you are satisfied with the staging output.** Not performed — the phase
+forbids committing one without explicit authorization. The procedure:
+
+```bash
+npm run test:visual:baseline
+rm tests/visual-baseline/{akosombo-tour,elmina-tour,jamestown-tour,kente-tour}-*.png
+```
+
+## STOP 4 — Cloudflare preview needs owner action
+
+A preview deployment that means anything requires Storyblok variables in
+Cloudflare's **Preview** scope. There is no `wrangler` and no Cloudflare API
+token on this machine, so the only route is pushing the branch — and a preview
+built without those variables would serve the Sanity fallback site, proving
+nothing about published delivery.
+
+Rather than improvise, this stops here. **Owner action**, in Cloudflare Pages →
+Settings → Environment variables, **Preview scope only**:
+
+| Variable | Value |
+| --- | --- |
+| `STORYBLOK_CONTENT_MODE` | `production` |
+| `STORYBLOK_STANDARD_TOURS_ENABLED` | `true` |
+| `STORYBLOK_MULTI_DAY_ENABLED` | `true` |
+| `STORYBLOK_REGION` | `eu` |
+| `STORYBLOK_PUBLIC_API_TOKEN` | the Public Delivery token |
+
+Then push this branch for a `*.pages.dev` preview. Do not add any of these to
+the Production scope.
+
+**Consequence:** all QA above ran locally against the production-authoritative
+build with the real CSP header applied by the server. It verifies the policy,
+the content and the URLs. It does **not** verify Cloudflare's own header
+delivery or its extensionless routing on real infrastructure.
+
+## Remaining blockers
+
+1. **No Cloudflare preview** — needs Preview-scope variables (STOP 4).
+2. **Cloudflare header delivery and routing unverified on real infrastructure.**
+3. **Three products asset-blocked** — accra-food, volta-community,
+   just-go-ghana remain `pending` on fallback. Does not block the other ten.
+4. **No real-device QA.**
+
+## Optional cleanup, deliberately not done
+
+- Refreshing the visual baseline and deleting the 12 obsolete files
+- Removing Sanity, `tours.js`, the JSON fallbacks or the browser overlay
+
+## Recommendation
+
+**READY FOR OWNER ACTIONS.**
+
+The Tours architecture now works end to end on published Storyblok content. Ten
+authoritative tours apply from the Published Delivery API, three pending
+products hold their fallbacks, the catalogue is 13, no tour is falsely withdrawn,
+CSP passes with all three image hosts, routes and canonicals are unchanged, the
+booking journey works, and rollback is one variable away.
+
+What is left is not architectural. It is one Cloudflare configuration step to
+get a real preview, and the verification that only a real preview and a real
+device can provide. After that, controlled production cutover is a reasonable
+next phase to authorize.
+
+Nothing was deployed to `peopleplacesgh.com`. No production variable was
+changed. No further content was published. Phase 3H stops here.
