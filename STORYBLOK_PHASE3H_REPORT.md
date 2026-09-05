@@ -728,3 +728,148 @@ next phase to authorize.
 
 Nothing was deployed to `peopleplacesgh.com`. No production variable was
 changed. No further content was published. Phase 3H stops here.
+
+---
+
+# Staging deployment verified — 5 September 2026
+
+STOP 4 is cleared. A non-production Cloudflare Preview is live and serving
+published Storyblok content.
+
+**Deployment:** `storyblok-phase-3e.people-and-places-tours.pages.dev`
+Not `peopleplacesgh.com`. No DNS change, no Production-scope variable, no merge
+to `main`. Production remains Storyblok-disabled and untouched.
+
+## The gallery investigation
+
+The first preview showed the Cape Coast card and hero correctly but no gallery.
+Traced end to end; **every stage of the Storyblok pipeline was healthy**:
+
+| Stage | Result |
+| --- | --- |
+| Published Storyblok story | 3 gallery items, each with filename and alt |
+| Published Delivery API | returns all 3 |
+| Production-mode adapter | maps all 3 |
+| Generated HTML (current code) | 3 `gallery-item` figures |
+| **Deployed preview** | **0 — no gallery block** |
+
+**Cause: the preview was building Phase 3E code**, six commits behind. Its
+`health.json` had no `storyblokFallback` field — that field arrived in Phase 3G —
+and its `script.js` still contained `renderPackageTours` and
+`hydrateTourDetailFromCatalog`, both removed in 3G/3G.1.
+
+Two things compounded it:
+
+1. **"Retry deployment" rebuilds the same commit.** It picks up new environment
+   variables but never newer code, so three retries all produced Phase 3E. Only
+   a new push creates a deployment at the branch head.
+2. That old code reads only `STORYBLOK_PREVIEW_API_TOKEN`, so the Public token
+   set in Preview scope was invisible to it — reporting `missing-configuration`
+   for all 12 records while the enable flag was plainly set.
+
+The renderer's three-image rule was never involved: it received zero images, not
+two. The committed catalogue has never carried gallery data — `tours.js`
+contains the word "gallery" zero times — which is why the fallback build shows
+no gallery block at all, while the card image, a committed asset, loads fine.
+
+Reproduced locally across all four build shapes, which isolates it exactly:
+
+| Build | Gallery figures |
+| --- | --- |
+| Storyblok production + Sanity | 3 |
+| Storyblok production, no Sanity | 3 |
+| Storyblok disabled + Sanity | 4 |
+| **Storyblok disabled, no Sanity** | **0** |
+
+No code change was needed or made.
+
+## Final preview health
+
+| Field | Value |
+| --- | --- |
+| mode | `production` |
+| status | `warn` |
+| enforced | `true` |
+| threshold | `7` |
+| applied | **10 of 13** |
+| pendingMigration | accra-food, volta-community, just-go-ghana |
+| **withdrawn** | **`[]` — no false withdrawal** |
+| transport / authOrConfig failures | none / none |
+| tourCount | 13 |
+| record states | `{applied: 10, pending-not-migrated: 3}` |
+
+Exactly the shape the phase specified: **10 Storyblok + 3 fallback = 13**.
+
+## Real staging QA
+
+**Packages** — 13 cards, all with title, price and badge. 10 carry Storyblok
+images; the 3 that do not are precisely just-go-ghana, accra-food and
+volta-community. **Zero CSP violations.** Category filter narrows to 1; adding
+the Kumasi destination gives 0 with the empty state; reset restores 13;
+`?category=nature` deep-links to 8.
+
+**All 13 tour routes** — every one returns 200 through Cloudflare's
+extensionless routing, with a price and a canonical on
+`https://peopleplacesgh.com`. Prices served from published Storyblok: Accra City
+$110, Cape Coast $160, Kumasi $250, Ada $150, Quad Bike $130, Volta $180, Shai
+Hills $140, Aburi $120, Cape Coast Day $160, Batik $120. The three pending hold
+their fallbacks: Accra Food $90, Volta Community $230, Just Go Ghana $3,000.
+
+**Gallery** — Cape Coast renders 3 figures, 627px tall, all three images loaded
+and all three from Storyblok. The lightbox opens on a Storyblok image and closes
+on Escape. 9/9 images load on the page with zero failed requests.
+
+**Booking** — card → detail → CTA → contact on real staging:
+`cape-coast-tour` → `contact?tour=cape-coast#booking-flow` → contact with
+`cape-coast` preselected from 15 options and the anchor present. No inquiry
+submitted.
+
+**Breakpoints** — 375 / 390 / 430 / 768 / 1440 against the live preview: zero
+horizontal overflow at every width, and the Cape Coast gallery renders all 3
+figures at every width. Emulated widths; **no real device was used.**
+
+## Previously blocked items now verified
+
+- **Cloudflare serves the intended CSP header** — confirmed from the response
+  headers on the live preview, and zero violations in the browser across
+  packages and tour pages with Storyblok, Sanity and Unsplash images together.
+- **Extensionless routing works on real Cloudflare** — all 13 tour routes plus
+  `/packages` and `/contact` resolve without `.html`.
+- **`STORYBLOK_MULTI_DAY_ENABLED`** is now set in Preview scope; Just Go Ghana
+  reports `pending-not-migrated` rather than `disabled`, and the count reads
+  13 rather than 12.
+
+## Remaining blockers
+
+1. **Three products asset-blocked** — accra-food, volta-community,
+   just-go-ghana remain `pending` on fallback, awaiting approved photography.
+   They do not block cutover for the other ten.
+2. **No real-device QA.** All responsive verification is emulated. This remains
+   an owner verification item.
+
+## Optional cleanup, deliberately not done
+
+- Refreshing the visual baseline and deleting the 12 obsolete files
+  (`akosombo-tour`, `elmina-tour`, `jamestown-tour`, `kente-tour`)
+- Removing Sanity, `tours.js`, the JSON fallbacks or the browser overlay
+
+## Recommendation
+
+**READY FOR CONTROLLED TOURS PRODUCTION CUTOVER.**
+
+The Tours architecture has now been exercised end to end on real infrastructure
+with real published content. Ten authoritative tours serve from the Published
+Delivery API, three pending products hold their fallbacks, the catalogue is 13,
+no tour is falsely withdrawn, CSP passes on Cloudflare with all three image
+hosts, every route resolves, the booking journey works, the gallery renders, and
+rollback is one variable away and rehearsed.
+
+Two caveats on the evidence, neither architectural: responsive checks are
+emulated rather than device-tested, and the three asset-blocked products will
+stay on committed fallbacks until their photography exists.
+
+Cutover would mean setting the same five variables in Cloudflare's **Production**
+scope and merging to `main`. That has not been done and is not authorized by
+this phase.
+
+Nothing was deployed to `peopleplacesgh.com`. Phase 3H is complete.
