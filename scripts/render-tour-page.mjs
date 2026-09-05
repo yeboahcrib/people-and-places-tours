@@ -122,8 +122,8 @@ export function renderTourPage({template, tour, catalogue}) {
   const whatsapp = `https://wa.me/233503673473?text=${encodeURIComponent(`Hi! I'd like to book the ${tour.title}.`)}`;
   const metaRow = '\n'
     + `      <span class="trip-meta-item"><strong>${escapeHtml(tour.duration)}</strong></span>\n`
-    + `      <span class="trip-meta-item"><strong>Departure:</strong> ${escapeHtml(tour.startingPoint || 'Accra, Ghana')}</span>\n`
-    + `      <span class="trip-meta-item"><strong>From:</strong> ${escapeHtml(price)}/person</span>\n    `;
+    + `      <span class="trip-meta-item"><strong>Departure:</strong> <span class="trip-meta-value">${escapeHtml(tour.startingPoint || 'Accra, Ghana')}</span></span>\n`
+    + `      <span class="trip-meta-item"><strong>From:</strong> <span class="trip-meta-value">${escapeHtml(price)}/person</span></span>\n    `;
 
   const values = {
     TITLE: escapeHtml(tour.title),

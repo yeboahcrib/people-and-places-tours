@@ -11,7 +11,7 @@ let BASE_URL = process.env.BASE_URL;
 // spec names, and it sat below this suite's floor. .contact-info-grid
 // overflowed by 14px there for as long as the page has existed, invisible to
 // every check because the smallest width tested was 375.
-const widths = [320, 375, 430, 768, 1024, 1440];
+const widths = [320, 375, 390, 430, 768, 1024, 1440];
 const pages = [
   '/index.html',
   '/packages.html',
@@ -115,10 +115,103 @@ function assert(condition, message) {
           .filter(q => { const btn = q.nextElementSibling; return !btn || !btn.classList.contains('testi-read-more') || btn.hidden; })
           .map(q => q.textContent.trim().slice(0, 40));
 
+          // Real-device QA found the back link underneath the floating nav pill
+          // on Just Go Ghana: the nav is fixed, so a hero with too little top
+          // padding puts the link behind it.
+          //
+          // Hit-test rather than measure a gap: the nav is a centred pill, so a
+          // vertical overlap only matters where the pill is actually above the
+          // link. This caught the same defect at 1440px, where the link was
+          // rendering inside the pill and blocked at every point across it.
+          const backLink = [...document.querySelectorAll('a')]
+            .find(a => /back to all experiences/i.test(a.textContent));
+          const backLinkBlocked = backLink ? (() => {
+            const r = backLink.getBoundingClientRect();
+            const y = r.top + r.height / 2;
+            return [r.left + 8, r.left + r.width / 2, r.right - 8]
+              .map(x => document.elementFromPoint(x, y))
+              .some(el => !el || !(el === backLink || backLink.contains(el)));
+          })() : null;
+
+          // A CMS starting point can be a sentence, and the label must stay
+          // visibly separate from it.
+          //
+          // Measure every line box of the value, not the value's bounding box:
+          // a multi-line value can technically start below its label while its
+          // later lines sit beside it. And require real space — an earlier fix
+          // let the value wrap onto its own line 2.4px below the label, which
+          // still read as one run of text on a phone ("DeparturePickup and
+          // drop-off from Accra…") and passed a test that only asked whether it
+          // had wrapped. Every line must clear the label by MIN_GAP, either
+          // below it or to its right.
+          const MIN_GAP = 4;
+          const collides = row => {
+            const label = row.querySelector('strong');
+            const value = row.querySelector('.trip-meta-value');
+            if (!label || !value) return false;
+            const box = label.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(value);
+            return [...range.getClientRects()].some(line =>
+              line.width > 0
+              && line.top < box.bottom + MIN_GAP
+              && line.left < box.right + MIN_GAP);
+          };
+          const describeRow = row => row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40);
+
+          // Two components show a label beside a CMS value and both can collide:
+          // the meta line under the hero title, and the Trip Details card in the
+          // sidebar. They are styled separately, so checking one proves nothing
+          // about the other — the sidebar card was still broken after the hero
+          // line was fixed, because only the hero line was being measured.
+          const cardRows = [...document.querySelectorAll('.highlight-row')].map(row => {
+            const [label, value] = row.querySelectorAll('span');
+            return {row, label, value};
+          }).filter(r => r.label && r.value);
+          const metaRows = [...document.querySelectorAll('.trip-meta-item')];
+          // The card's two spans need the same treatment as a label/value pair.
+          const collidesInCard = ({label, value}) => {
+            const box = label.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(value);
+            return [...range.getClientRects()].some(line =>
+              line.width > 0
+              && line.top < box.bottom + MIN_GAP
+              && line.left < box.right + MIN_GAP);
+          };
+          const collidedMetaRows = [
+            ...metaRows.filter(collides).map(describeRow),
+            ...cardRows.filter(collidesInCard).map(r => describeRow(r.row)),
+          ];
+
+          // The rows must survive a value longer than anything currently in the
+          // CMS, so this tests the component rather than today's content: swap
+          // in a long sentence, re-measure, then put the original text back.
+          const LONG_VALUE = 'Pickup and drop-off from Accra or your hotel, '
+            + 'unless a different arrangement is requested at the time of booking.';
+          const stress = (value, isBad, describe) => {
+            const original = value.textContent;
+            value.textContent = LONG_VALUE;
+            const bad = isBad() ? describe() : null;
+            value.textContent = original;
+            return bad;
+          };
+          const collidedWhenValueIsLong = [
+            ...metaRows.map(row => {
+              const value = row.querySelector('.trip-meta-value');
+              return value ? stress(value, () => collides(row), () => describeRow(row)) : null;
+            }),
+            ...cardRows.map(r =>
+              stress(r.value, () => collidesInCard(r), () => describeRow(r.row))),
+          ].filter(Boolean);
+
         return {
           documentWidth,
           strandedQuotes,
           stretchedImages,
+          backLinkBlocked,
+          collidedMetaRows,
+          collidedWhenValueIsLong,
           viewportWidth: document.documentElement.clientWidth,
           navCta: navCtaRect && visible(navCta)
             ? {right: Math.round(navCtaRect.right), left: Math.round(navCtaRect.left)}
@@ -170,6 +263,17 @@ function assert(condition, message) {
         assert(audit.navLinksVisible, `${path} desktop navigation is hidden at ${width}px`);
         assert(!audit.navToggleVisible, `${path} mobile navigation toggle is visible at ${width}px`);
       }
+
+      if (audit.backLinkBlocked !== null) {
+        assert(!audit.backLinkBlocked,
+          `${path} back link is covered by the floating nav at ${width}px`);
+      }
+      assert(audit.collidedMetaRows.length === 0,
+        `${path} Trip Details label runs into its value at ${width}px: `
+        + JSON.stringify(audit.collidedMetaRows));
+      assert(audit.collidedWhenValueIsLong.length === 0,
+        `${path} Trip Details collides at ${width}px once a value grows longer `
+        + `than today's content: ${JSON.stringify(audit.collidedWhenValueIsLong)}`);
 
       await page.close();
     }

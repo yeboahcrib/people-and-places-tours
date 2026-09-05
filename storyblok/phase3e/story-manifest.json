@@ -1,0 +1,35 @@
+{
+  "phase": "3E",
+  "spaceId": 294832753590557,
+  "region": "eu",
+  "componentsCreated": [
+    "itinerary_day",
+    "multi_day_tour"
+  ],
+  "folder": {
+    "fullSlug": "tours/multi-day-experiences",
+    "id": 216153294304051
+  },
+  "stories": {
+    "just-go-ghana": {
+      "id": 216153393263413,
+      "fullSlug": "tours/multi-day-experiences/just-go-ghana",
+      "contentType": "multi_day_tour",
+      "published": false,
+      "showOnWebsite": false,
+      "readiness": {
+        "contentReady": true,
+        "assetReady": false,
+        "productionReady": false
+      },
+      "blocker": "No approved card photograph exists. The build gate rejects the record as invalid-content and the existing fallback is retained.",
+      "itineraryDays": 8,
+      "included": 11,
+      "excluded": 6,
+      "faqs": 4
+    }
+  },
+  "flags": {
+    "STORYBLOK_MULTI_DAY_ENABLED": "opt-in, default off"
+  }
+}

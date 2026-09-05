@@ -3,6 +3,7 @@ import {loadTourContent} from '../scripts/tour-source.mjs';
 import {
   STORYBLOK_STANDARD_TOUR_REGISTRY,
   isStoryblokEuAssetUrl,
+  loadOneStory,
   loadStoryblokStandardTours,
   mapStoryblokTour,
   storyblokImageUrl,
@@ -170,100 +171,9 @@ assert.equal(STORYBLOK_STANDARD_TOUR_REGISTRY.length, 12,
   'the registry must enumerate all approved standard tours');
 assert(!STORYBLOK_STANDARD_TOUR_REGISTRY.some(entry => entry.slug === 'just-go-ghana'),
   'Just Go Ghana must remain outside the standard-tour registry');
-const registryBySlug = new Map(STORYBLOK_STANDARD_TOUR_REGISTRY.map(entry => [entry.slug, entry]));
-const fullSlugFor = slug => {
-  const entry = registryBySlug.get(slug);
-  assert(entry, `${slug} is not an approved standard-tour registry entry`);
-  return entry.fullSlug;
-};
-
-const asset = (name, alt, {
-  focus = '600x420:601x421', width = 1600, height = 900,
-} = {}) => ({
-  filename: `https://a.storyblok.com/f/999999/${name}/${name}.jpg`,
-  alt,
-  focus,
-  meta_data: {dimensions: {width, height}},
-});
-const listItem = text => ({component: 'list_item', text});
-const faqItem = (question, answer) => ({component: 'faq_item', question, answer});
-const galleryItem = (image, layout, caption, altText) => ({
-  component: 'gallery_item', image, layout, caption, ...(altText ? {alt_text: altText} : {}),
-});
-
-const makeTourContent = (slug, {
-  title = `${slug} from Storyblok`,
-  displayOrder = 4,
-  cardImage = asset(`${slug}-card`, `${slug} card image`),
-  heroImage = asset(`${slug}-hero`, `${slug} hero image`, {focus: '412x600:413x601', width: 1200, height: 1600}),
-  ...overrides
-} = {}) => {
-  const river = asset(`${slug}-river`, `${slug} river image`, {width: 900, height: 1200});
-  const gallery = asset(`${slug}-gallery`, `${slug} gallery image`, {width: 1200, height: 1500});
-  return {
-    component: 'tour',
-    slug,
-    published: true,
-    experience_type: 'day',
-    name: title,
-    display_order: String(displayOrder),
-    card_image: cardImage,
-    card_badge: 'Best Seller',
-    card_description: `A concise ${slug} card description.`,
-    categories: ['culture', 'heritage'],
-    vibes: ['Heritage', 'History'],
-    destination: 'cape-coast',
-    search_summary: 'Places, people, and history',
-    price: '160',
-    currency: 'USD',
-    price_unit: 'Per Person',
-    price_options: [{component: 'price_option', label: 'With a naming ceremony', price: '180'}],
-    duration: 'Full Day',
-    locations: [listItem('Assin Manso'), listItem('Cape Coast'), listItem('Elmina')],
-    starting_point: 'Hotel or apartment pickup in Accra',
-    minimum_guests: '1',
-    maximum_guests: '12',
-    group_size_note: 'Private departures are available on request.',
-    hero_image: heroImage,
-    hero_watermark: 'CAPE COAST',
-    page_headline: 'Walk the Door of No Return.',
-    page_intro: 'A concise introduction for the page.',
-    overview: 'A Storyblok overview.\n\nA second paragraph.',
-    included: [listItem('Private transport'), listItem('Guide')],
-    excluded: [listItem('Lunch')],
-    good_to_know: [listItem('Bring water'), listItem('Wear comfortable shoes')],
-    gallery: [
-      galleryItem(river, 'portrait', 'First Bath of Return', 'Guests at the river'),
-      galleryItem(cardImage, 'wide', 'Naming ceremony'),
-      galleryItem(gallery, 'automatic', 'Cape Coast Castle'),
-    ],
-    faqs: [
-      faqItem('Is it reflective?', 'Yes, with room for reflection.'),
-      faqItem('Can we add a ceremony?', 'Yes.'),
-    ],
-    seo: [{
-      component: 'seo',
-      title: `${title} | People & Places`,
-      description: `A Storyblok description for ${slug}.`,
-      indexing: 'index',
-      social_image: cardImage,
-    }],
-    ...overrides,
-  };
-};
-
-const makeStory = (slug, {
-  storySlug = slug,
-  fullSlug = fullSlugFor(slug),
-  contentOverrides = {},
-} = {}) => ({
-  // Draft outer state is deliberate: the local adapter uses the Preview API
-  // while the editor-facing "Show this experience" setting controls mapping.
-  published: false,
-  slug: storySlug,
-  full_slug: fullSlug,
-  content: makeTourContent(slug, contentOverrides),
-});
+// The story fixture is shared with tests/storyblok-migration-authority.mjs so
+// the two suites cannot disagree about what a valid story looks like.
+import {fullSlugFor, listItem, makeStory, makeTourContent} from './helpers/storyblok-tour-fixtures.mjs';
 
 const capeBase = {
   slug: 'cape-coast', title: 'Cape Coast Ancestral Tour', detailUrl: 'cape-coast-tour.html',
@@ -635,4 +545,111 @@ assert.match(assetlessOverlay, /cape-coast/);
 assert(!assetlessOverlay.includes('accra-city'),
   'the browser overlay must not present an asset-blocked draft as a CMS card');
 
+
+// --- Phase 3G F3: a bounded request, and exactly one retry for what a retry can fix.
+// Before this, a hung Storyblok connection could stall a build indefinitely and a
+// single dropped packet dropped a tour to fallback with no second attempt.
+const storyEntry = {slug: 'cape-coast', fullSlug: fullSlugFor('cape-coast')};
+const okResponse = () => new Response(JSON.stringify({story: capeStory}), {status: 200});
+const attempt = async (responses, options = {}) => {
+  let calls = 0;
+  const result = await loadOneStory({
+    entry: storyEntry,
+    token: 'test-token',
+    fetchImpl: async (url, init) => {
+      const step = responses[Math.min(calls, responses.length - 1)];
+      calls += 1;
+      return step(init?.signal);
+    },
+    retryDelayMs: 0,
+    ...options,
+  });
+  return {...result, calls};
+};
+const status = code => () => new Response('', {status: code});
+const netFail = () => { throw new TypeError('fetch failed'); };
+const hangs = signal => new Promise((_, reject) => {
+  signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+});
+
+// 1. A healthy response is taken on the first attempt and never repeated.
+const clean = await attempt([okResponse]);
+assert.equal(clean.source, 'received');
+assert.equal(clean.calls, 1, 'a successful request must not be retried');
+
+// 2. A transient network error is retried once, and the retry is honoured.
+const recovered = await attempt([netFail, okResponse]);
+assert.equal(recovered.source, 'received');
+assert.equal(recovered.calls, 2, 'a dropped connection deserves exactly one more attempt');
+
+// 3. A hung connection is cut off by the timeout, then retried once.
+const timedOut = await attempt([hangs, okResponse], {timeoutMs: 40});
+assert.equal(timedOut.source, 'received');
+assert.equal(timedOut.calls, 2, 'a request that hangs must time out and be retried');
+
+// A request that hangs on every attempt still terminates rather than stalling the build.
+let hungCalls = 0;
+await assert.rejects(
+  () => loadOneStory({
+    entry: storyEntry,
+    token: 'test-token',
+    fetchImpl: (url, init) => { hungCalls += 1; return hangs(init.signal); },
+    timeoutMs: 40,
+    retryDelayMs: 0,
+  }),
+  'a permanently hung host must surface to the caller, which warns and falls back');
+assert.equal(hungCalls, 2, 'a permanently hung host must stop after one retry');
+
+// 4. 429 and 5xx are transient; each is retried exactly once and then given up on.
+for (const code of [429, 500, 502, 503]) {
+  const throttled = await attempt([status(code), okResponse]);
+  assert.equal(throttled.source, 'received', `${code} must be retried`);
+  assert.equal(throttled.calls, 2, `${code} must be retried exactly once`);
+  const persistent = await attempt([status(code)]);
+  assert.equal(persistent.source, 'unavailable');
+  assert.equal(persistent.calls, 2, `a persistent ${code} must stop after one retry`);
+}
+
+// 5. A missing story and a rejected token are permanent. Asking twice changes neither
+//    answer and only delays the fallback, so neither is retried.
+// A rejected credential reports as 'unauthorized' rather than 'unavailable', so
+// production delivery can stop on it without waiting for a record threshold.
+for (const [code, expected] of [[404, 'missing-story'], [401, 'unauthorized'], [403, 'unauthorized'], [400, 'unavailable']]) {
+  const permanent = await attempt([status(code)]);
+  assert.equal(permanent.source, expected, `${code} must map to ${expected}`);
+  assert.equal(permanent.calls, 1, `${code} is permanent and must not be retried`);
+}
+
+// 6. A malformed body is a bad answer, not a lost one. It is reported, not repeated.
+const malformed = await attempt([() => new Response('<html>not json</html>', {status: 200})]);
+assert.equal(malformed.source, 'invalid-response');
+assert.equal(malformed.calls, 1, 'malformed JSON must not be retried');
+
+// A 200 carrying no story is equally permanent.
+const storyless = await attempt([() => new Response(JSON.stringify({}), {status: 200})]);
+assert.equal(storyless.source, 'invalid-response');
+assert.equal(storyless.calls, 1, 'a response without a story must not be retried');
+
+// And the retry stays inside per-record isolation: one unreachable tour retries,
+// falls back alone, and leaves its healthy neighbour applied.
+let retriedSlugs = [];
+const isolated = await loadStoryblokStandardTours({
+  baseTours: [capeBase, accraBase],
+  env: storyblokEnv,
+  fetchImpl: async request => {
+    const fullSlug = new URL(request).pathname.replace('/v2/cdn/stories/', '');
+    if (fullSlug === fullSlugFor('accra-city')) {
+      retriedSlugs.push(fullSlug);
+      return new Response('', {status: 503});
+    }
+    return new Response(JSON.stringify({story: capeStory}), {status: 200});
+  },
+});
+assert.equal(isolated.sourcesBySlug['cape-coast'], 'applied');
+assert.equal(isolated.sourcesBySlug['accra-city'], 'unavailable');
+assert.equal(retriedSlugs.length, 2, 'the failing record retries once, on its own');
+assert.equal(isolated.tours[1], accraBase,
+  'an unreachable record keeps its local fallback and does not disturb its neighbour');
+
+console.log('Storyblok request timeout and retry tests passed.');
 console.log('Tour source contract tests passed.');

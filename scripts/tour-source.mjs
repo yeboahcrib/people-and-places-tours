@@ -1,5 +1,5 @@
 import {fetchSanity} from './sanity-fetch.mjs';
-import {loadStoryblokStandardTours} from './storyblok-tour-source.mjs';
+import {loadStoryblokStandardTours, loadStoryblokMultiDayTours} from './storyblok-tour-source.mjs';
 const API_VERSION = '2026-08-02';
 
 const formatPrice = (price, currency = 'USD') => new Intl.NumberFormat('en-US', {
@@ -124,7 +124,17 @@ function validateSanityTours(result, localTours) {
   });
 }
 
-export async function loadTourContent({localTours, env = process.env, fetchImpl = fetch, logger = console}) {
+export async function loadTourContent({
+  localTours,
+  env = process.env,
+  fetchImpl = fetch,
+  logger = console,
+  // Only authoritative delivery may drop a record from the catalogue. Every
+  // other build keeps per-record fallback, so this defaults off.
+  authoritativeDelivery = false,
+  contentVersion = 'draft',
+  tokenEnvVar = 'STORYBLOK_PREVIEW_API_TOKEN',
+}) {
   const projectId = env.SANITY_STUDIO_PROJECT_ID;
   const dataset = env.SANITY_STUDIO_DATASET || 'production';
   let tours = localTours;
@@ -195,13 +205,32 @@ export async function loadTourContent({localTours, env = process.env, fetchImpl 
     env,
     fetchImpl,
     logger,
+    authoritativeDelivery,
+    contentVersion,
+    tokenEnvVar,
+  });
+
+  // The one multi-day trip runs through its own gate, behind its own flag,
+  // after the standard ones. Same shape of check: a record that fails it leaves
+  // Just Go Ghana on whatever source it already had.
+  const storyblokMultiDay = await loadStoryblokMultiDayTours({
+    baseTours: storyblok.tours,
+    env,
+    fetchImpl,
+    logger,
+    authoritativeDelivery,
+    contentVersion,
+    tokenEnvVar,
   });
 
   return {
-    tours: storyblok.tours,
+    tours: storyblokMultiDay.tours,
     source,
     storyblokStandardTourSources: storyblok.sourcesBySlug,
     storyblokStandardTourSummary: storyblok.summary,
     storyblokAppliedSlugs: storyblok.appliedSlugs,
+    storyblokMultiDaySources: storyblokMultiDay.sourcesBySlug,
+    storyblokMultiDaySummary: storyblokMultiDay.summary,
+    storyblokMultiDayAppliedSlugs: storyblokMultiDay.appliedSlugs,
   };
 }
