@@ -873,3 +873,225 @@ scope and merging to `main`. That has not been done and is not authorized by
 this phase.
 
 Nothing was deployed to `peopleplacesgh.com`. Phase 3H is complete.
+
+---
+
+# Final Real-Device QA and Phase 3H Closeout
+
+Owner-completed QA on a real iPhone against the Cloudflare Preview. All results
+below are owner-verified unless marked as an automated check.
+
+## Real-device results
+
+| Area | Result |
+| --- | --- |
+| Packages / Experiences | **PASS** |
+| Just Go Ghana | **PASS** after the responsive fix |
+| Trip Details | **PASS** after the responsive fix |
+| Cape Coast gallery | **PASS** |
+| Cape Coast booking | **PASS** |
+| Just Go Ghana booking | **PASS** |
+
+**Packages / Experiences.** Page loads correctly on iPhone; tour cards display
+correctly; image crops appropriate; filters work; multiple tours opened
+successfully; no card text overlap or cut-off observed.
+
+**Cape Coast gallery.** Gallery visible, three photographs present,
+gallery/lightbox usable.
+
+**Booking.** Cape Coast Tour → Send Inquiry → contact flow with Cape Coast
+correctly preselected. Just Go Ghana's CTA likewise carries and preselects Just
+Go Ghana. **No real inquiry was submitted** in either case.
+
+## Responsive defects found and corrected
+
+Two defects were found on the real device that no emulated check had caught.
+
+**1. Back link hidden behind the floating navigation (Just Go Ghana).**
+The hero used a 2rem top padding on mobile where the fixed nav pill ends around
+70px down, so `← Back to All Experiences` sat underneath it. Investigating found
+**the same defect at every width above 600px, including desktop** — at 1440px the
+link rendered inside the pill, overlapping the logo and nav links, and failed a
+hit test at all three points across it. The padding now matches the generated
+tour pages at both widths rather than only on mobile.
+Fixed in **`8fcab14`**. Owner verified on the real iPhone that the link is fully
+visible and usable.
+
+**2. Long Storyblok Departure value colliding with its label.**
+Storyblok sends *"Pickup and drop-off from Accra or your hotel, unless a
+different arrangement is requested."* where the previous source held
+*"Accra, Ghana"*. The content was **not** shortened.
+
+This took two commits because two separate components show a label beside a CMS
+value, both are called Trip Details, and both sit on the same page:
+
+- **`dd6ca8d`** — the meta line under the hero title (`.trip-meta-item`). The
+  value was a bare text node, so CSS could not address it and a long value
+  wrapped underneath its own label.
+- **`4a8c950`** — the Trip Details card in the sidebar (`.highlight-row`), which
+  is the component the owner reported. It used `justify-content: space-between`
+  with no gap at all, so a long value ran straight into its label. **This is the
+  final commit for the Trip Details fix.**
+
+Both now use the same space-driven rule with no breakpoint: the label never
+shrinks, the value takes the room left beside it, and when that is not enough
+the whole value moves onto its own full-width line where it left-aligns and
+reads as a sentence. Which happens is decided by available space, not by the
+field — Duration, Group Size, Local Guide and Transport still sit right-aligned
+against their labels because they fit.
+
+Owner subsequently verified the corrected presentation.
+
+A note on process: the first two attempts fixed the wrong thing. The first
+addressed only the widths that had been reported and left desktop broken; the
+second separated the label and value by 2.4px, which passed a test asking only
+whether the text had wrapped while still reading as one run of text on a phone.
+The regression test now measures **both** components and demands real clearance,
+and stress-tests each row with a value longer than anything currently in the
+CMS — checking one component proved nothing about the other, which is precisely
+how the card survived two rounds of fixes.
+
+## Final Preview deployment
+
+| | |
+| --- | --- |
+| URL | `https://storyblok-phase-3e.people-and-places-tours.pages.dev` |
+| Commit | **`4a8c950a`** |
+| Built | 2026-09-05T15:04:29Z |
+
+Verified once more:
+
+- It is a `.pages.dev` **Preview** deployment, **not** `peopleplacesgh.com`.
+- **Production Storyblok configuration is unchanged** — the live site's
+  `health.json` still reports all 12 standard records as `disabled` and carries
+  no `storyblokFallback` field.
+- **No merge to `main`** — `git branch --merged main` does not list the branch.
+- Latest responsive fixes are present in the deployed build.
+
+## Final health state
+
+Every expected value matched. No discrepancy.
+
+| Field | Expected | Actual |
+| --- | --- | --- |
+| mode | production | **production** |
+| enforced | true | **true** |
+| systemic threshold | 7 | **7** |
+| tourCount | 13 | **13** |
+| applied | 10 | **10** |
+| attempted | 13 | **13** |
+| pending | accra-food, volta-community, just-go-ghana | **all three** |
+| withdrawn | none | **`[]`** |
+| auth/config failures | none | **`[]`** |
+| transport failures | none | **`[]`** |
+
+Record states: `{applied: 10, pending-not-migrated: 3}`.
+
+## Regression results
+
+Full suite run against the final code state on a production-authoritative build.
+Every suite below actually executed.
+
+| Suite | Result |
+| --- | --- |
+| `test:content` (12 suites) | pass |
+| `test:responsive` (13 pages × 7 widths) | pass |
+| `test:packages-grid` | pass |
+| `test:price-ownership` | pass |
+| `test:headers` | pass |
+| `test:build` | pass |
+| `test:layouts` | pass |
+| `test:resilience` | pass |
+| `test:smoke` | pass |
+| `test:a11y-static` | pass |
+| `test:pathway-spotlight` | pass |
+| `test:visual` | **not run — baseline deliberately stale, see below** |
+
+Verified on the live Preview, not only locally:
+
+- **Packages filtering** — 13 cards (10 Storyblok, all complete); craft filter → 1;
+  + Kumasi destination → 0 with the empty state; reset → 13; `?category=nature` → 8
+- **Tour cards** — all 13 carry title, price and link
+- **Tour detail pages / routes** — 13/13 return HTTP 200
+- **Canonicals** — 13/13 on `https://peopleplacesgh.com`
+- **Sitemap** — 22 URLs, zero Storyblok paths
+- **CSP** — zero violations, zero failed image requests; header served by
+  Cloudflare with both Storyblok asset hosts
+- **Gallery/lightbox** — 3 images, opens on a Storyblok image, closes on Escape
+- **Booking selection** — Cape Coast and Just Go Ghana both preselect correctly
+  with the `#booking-flow` anchor
+- **Published-delivery behaviour** — 10 authoritative records applied from
+  `version=published`
+- **Fallback behaviour** — 3 pending products on committed fallback
+- **Withdrawal behaviour** — covered by the nine-scenario suite in `test:content`
+  using test doubles; no live story was unpublished to test it
+- **Token non-exposure** — neither token, and no `api.storyblok.com` reference,
+  appears in any page, `script.js`, or `health.json` on the Preview
+
+## Visual baseline
+
+**Unchanged, and deliberately not refreshed.** 84 files, untouched since
+2026-08-26.
+
+Its cause is already fully investigated and explained earlier in this report:
+rendering is deterministic across runs; the global shift comes from stylesheet
+work since 26 August; tour-page deltas come from photography and gallery work;
+a further +49/+117/+115px arrived when publishing brought Storyblok's richer
+`starting_point` copy; and four page sets (`akosombo-tour`, `elmina-tour`,
+`jamestown-tour`, `kente-tour`) are orphans for tours that no longer exist.
+
+A refresh may happen after production approval and stabilisation.
+
+## Asset-blocked products — statuses unchanged
+
+| Product | Status |
+| --- | --- |
+| Accra After Dark Food Tour | `pending` / fallback |
+| Volta Community Tour | `pending` / fallback |
+| Just Go Ghana | `pending` / fallback |
+
+No photography added, nothing published, no status changed.
+
+## Editorial guidance for future gallery photography
+
+The owner observed that **portrait 4:5 photography suits the existing gallery
+presentation particularly well**.
+
+Recorded as a future editorial and image-composition guideline only. It is
+**not** a code or schema change, and gallery assets are **not** to be forced to
+4:5 — the gallery continues to accept the layouts the CMS provides.
+
+## Rollback status
+
+Rehearsed and working. Removing `STORYBLOK_CONTENT_MODE` and the enable flags
+returns the build to migration mode: all records `disabled`, 24 routes intact,
+13 cards, and images reverting from Storyblok to Sanity. One variable and a
+redeploy, roughly the length of a build. Tours fall back to Sanity rather than to
+stale committed JSON, so nothing is lost in content freshness.
+
+## Remaining non-blocking items
+
+- Refreshing the visual baseline and deleting the 12 obsolete files
+- Photography for the three asset-blocked products
+- Removing Sanity, `tours.js`, the JSON fallbacks or the browser overlay — all
+  deliberately retained until after a stable production period
+
+## Final cutover assessment
+
+**READY FOR CONTROLLED TOURS PRODUCTION CUTOVER**
+
+The architecture has been exercised end to end on real Cloudflare infrastructure
+with real published content, and the two defects real-device QA exposed are
+fixed, deployed and owner-verified. Ten authoritative tours serve from the
+Published Delivery API; three pending products hold their fallbacks; the
+catalogue is 13; no tour is falsely withdrawn; there are no authentication or
+configuration failures; CSP passes with all three image hosts; routes,
+canonicals and the sitemap are unchanged; booking works for both a standard tour
+and the multi-day trip; and rollback is one variable away and rehearsed.
+
+The remaining items are editorial or cleanup, not architectural, and none of
+them blocks a controlled cutover.
+
+Nothing was deployed to `peopleplacesgh.com`, no production variable was
+changed, no merge to `main` occurred, and no further content was published.
+Phase 3H is closed and awaits explicit production-cutover authorization.
