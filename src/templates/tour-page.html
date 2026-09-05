@@ -118,7 +118,13 @@
     
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
     .faq-item.open .faq-a{display:block;}
-    @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}}
+    @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}
+    /* A CMS starting point can be a whole sentence rather than "Accra, Ghana".
+       Stack the rows and let a long value wrap under its label instead of
+       running into it, so the component tolerates any length the CMS sends. */
+    .trip-meta{flex-direction:column;gap:.75rem;}
+    .trip-meta-item{display:flex;flex-wrap:wrap;gap:.15rem .4rem;}
+    .trip-meta-item strong{flex:0 0 auto;}}
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
     @media(max-width:640px){.footer-inner{grid-template-columns:1fr;gap:2rem;}.footer-inner>*{min-width:0;}}

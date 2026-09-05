@@ -115,10 +115,49 @@ function assert(condition, message) {
           .filter(q => { const btn = q.nextElementSibling; return !btn || !btn.classList.contains('testi-read-more') || btn.hidden; })
           .map(q => q.textContent.trim().slice(0, 40));
 
+          // Real-device QA found the back link underneath the floating nav pill
+          // on Just Go Ghana: the nav is fixed, so a hero with too little top
+          // padding puts the link behind it.
+          //
+          // Hit-test rather than measure a gap: the nav is a centred pill, so a
+          // vertical overlap only matters where the pill is actually above the
+          // link. This caught the same defect at 1440px, where the link was
+          // rendering inside the pill and blocked at every point across it.
+          const backLink = [...document.querySelectorAll('a')]
+            .find(a => /back to all experiences/i.test(a.textContent));
+          const backLinkBlocked = backLink ? (() => {
+            const r = backLink.getBoundingClientRect();
+            const y = r.top + r.height / 2;
+            return [r.left + 8, r.left + r.width / 2, r.right - 8]
+              .map(x => document.elementFromPoint(x, y))
+              .some(el => !el || !(el === backLink || backLink.contains(el)));
+          })() : null;
+
+          // A CMS starting point can be a sentence. When the label and value
+          // share a line and the value wraps, they run together and read as
+          // "DeparturePickup and drop-off…". The value must begin either clear
+          // to the right of its label or on a line below it.
+          const collidedMetaRows = [...document.querySelectorAll('.trip-meta-item')]
+            .filter(row => {
+              const label = row.querySelector('strong');
+              if (!label) return false;
+              const valueNode = [...row.childNodes]
+                .find(node => node.nodeType === 3 && node.textContent.trim());
+              if (!valueNode) return false;
+              const range = document.createRange();
+              range.selectNodeContents(valueNode);
+              const value = range.getBoundingClientRect();
+              const box = label.getBoundingClientRect();
+              return !(value.left >= box.right - 1 || value.top >= box.bottom - 1);
+            })
+            .map(row => row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40));
+
         return {
           documentWidth,
           strandedQuotes,
           stretchedImages,
+          backLinkBlocked,
+          collidedMetaRows,
           viewportWidth: document.documentElement.clientWidth,
           navCta: navCtaRect && visible(navCta)
             ? {right: Math.round(navCtaRect.right), left: Math.round(navCtaRect.left)}
@@ -170,6 +209,14 @@ function assert(condition, message) {
         assert(audit.navLinksVisible, `${path} desktop navigation is hidden at ${width}px`);
         assert(!audit.navToggleVisible, `${path} mobile navigation toggle is visible at ${width}px`);
       }
+
+      if (audit.backLinkBlocked !== null) {
+        assert(!audit.backLinkBlocked,
+          `${path} back link is covered by the floating nav at ${width}px`);
+      }
+      assert(audit.collidedMetaRows.length === 0,
+        `${path} Trip Details label runs into its value at ${width}px: `
+        + JSON.stringify(audit.collidedMetaRows));
 
       await page.close();
     }

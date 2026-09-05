@@ -29,7 +29,10 @@
     .btn-outline:hover { background: var(--dark); color: var(--white); }
 
     /* HERO */
-    .trip-hero { background: var(--black); padding: var(--sp-8) var(--sp-5) var(--sp-6); }
+    /* 7rem, matching the generated tour pages. The nav is a fixed pill, and at
+       4rem the back link rendered inside it — overlapping the logo and links,
+       and failing a hit test at every point across the link. */
+    .trip-hero { background: var(--black); padding: 7rem var(--sp-5) var(--sp-6); }
     .trip-hero-inner { max-width: 900px; margin: 0 auto; }
     .back-link { color: rgba(255,255,255,0.5); font-size:var(--text-base); text-decoration: none; display: inline-flex; align-items: center; gap: var(--sp-1); margin-bottom: var(--sp-4); transition: color 0.2s; }
     .back-link:hover { color: var(--yellow); }
@@ -157,8 +160,17 @@
       .nav-phone { display: none; }
     }
     @media (max-width: 600px) {
-      .trip-hero { padding: var(--sp-4) var(--sp-2-5); }
+      /* The nav is a fixed pill ending around 70px down the viewport, so a 2rem
+         hero top padding left the back link underneath it. 6rem clears it, and
+         is the value the generated tour pages already use. */
+      .trip-hero { padding: var(--sp-12) var(--sp-2-5) var(--sp-4); }
       .content-wrap { padding: var(--sp-4) var(--sp-2-5); }
+      /* A CMS starting point can be a whole sentence rather than "Accra, Ghana".
+         Give each row its own line and let a long value wrap under its label
+         instead of running into it. */
+      .trip-meta { flex-direction: column; gap: var(--sp-1-5); }
+      .trip-meta-item { flex-wrap: wrap; gap: 0.15rem 0.4rem; }
+      .trip-meta-item strong { flex: 0 0 auto; }
     }
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
