@@ -72,7 +72,15 @@
     .btn-outline-white:hover{border-color:var(--white);background:rgba(255,255,255,.1);}
     .trip-highlights-card{background:var(--gray);border-radius:24px;padding:1.5rem;}
     .trip-highlights-card h4{font-family:'Archivo Black',sans-serif;font-size:var(--text-2xl);margin-bottom:1rem;color:var(--dark);}
-    .highlight-row{display:flex;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid #e8e8e0;font-size:var(--text-base);}
+    /* Label left, value right, with nothing between them — so a CMS value long
+       enough to fill the row ran straight into its label ("DeparturePickup and
+       drop-off from Accra…"). The row wraps now: the label never shrinks, and a
+       value that cannot fit beside it drops to its own full-width line, where
+       it left-aligns and reads as a sentence. A short value still sits right-
+       aligned against the label. Decided by the space available, not the field. */
+    .highlight-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:1rem;row-gap:.35rem;padding:.65rem 0;border-bottom:1px solid #e8e8e0;font-size:var(--text-base);}
+    .highlight-row span:first-child{flex:0 0 auto;}
+    .highlight-row span:last-child{flex:0 1 auto;min-width:0;}
     .highlight-row:last-child{border-bottom:none;}
     /* #888 measures 3.26:1 on this card and fails AA for body text. --muted-dark is the token for muted text on a light surface and clears it at 5.27:1. */
     .highlight-row span:first-child{color:var(--muted-dark);}

@@ -125,7 +125,14 @@
     /* TRIP HIGHLIGHTS SIDEBAR */
     .trip-highlights-card { background: var(--gray); border-radius: 24px; padding: var(--sp-3); }
     .trip-highlights-card h4 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); margin-bottom: var(--sp-2); color: var(--dark); }
-    .highlight-row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid #e8e8e0; font-size:var(--text-base); }
+    /* Label left, value right, with nothing between them — so a CMS value long
+       enough to fill the row ran straight into its label. The row wraps now: the
+       label never shrinks, and a value that cannot fit beside it drops to its
+       own full-width line, where it left-aligns and reads as a sentence. A short
+       value still sits right-aligned against the label. */
+    .highlight-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: var(--sp-2); row-gap: 0.35rem; padding: 0.65rem 0; border-bottom: 1px solid #e8e8e0; font-size:var(--text-base); }
+    .highlight-row span:first-child { flex: 0 0 auto; }
+    .highlight-row span:last-child { flex: 0 1 auto; min-width: 0; }
     .highlight-row:last-child { border-bottom: none; }
     .highlight-row span:first-child { color: #888; }
     .highlight-row span:last-child { font-weight: 600; color: var(--dark); }

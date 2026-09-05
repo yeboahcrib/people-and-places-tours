@@ -158,24 +158,52 @@ function assert(condition, message) {
               && line.left < box.right + MIN_GAP);
           };
           const describeRow = row => row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40);
+
+          // Two components show a label beside a CMS value and both can collide:
+          // the meta line under the hero title, and the Trip Details card in the
+          // sidebar. They are styled separately, so checking one proves nothing
+          // about the other — the sidebar card was still broken after the hero
+          // line was fixed, because only the hero line was being measured.
+          const cardRows = [...document.querySelectorAll('.highlight-row')].map(row => {
+            const [label, value] = row.querySelectorAll('span');
+            return {row, label, value};
+          }).filter(r => r.label && r.value);
           const metaRows = [...document.querySelectorAll('.trip-meta-item')];
-          const collidedMetaRows = metaRows.filter(collides).map(describeRow);
+          // The card's two spans need the same treatment as a label/value pair.
+          const collidesInCard = ({label, value}) => {
+            const box = label.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(value);
+            return [...range.getClientRects()].some(line =>
+              line.width > 0
+              && line.top < box.bottom + MIN_GAP
+              && line.left < box.right + MIN_GAP);
+          };
+          const collidedMetaRows = [
+            ...metaRows.filter(collides).map(describeRow),
+            ...cardRows.filter(collidesInCard).map(r => describeRow(r.row)),
+          ];
 
           // The rows must survive a value longer than anything currently in the
           // CMS, so this tests the component rather than today's content: swap
           // in a long sentence, re-measure, then put the original text back.
-          const collidedWhenValueIsLong = metaRows
-            .map(row => {
+          const LONG_VALUE = 'Pickup and drop-off from Accra or your hotel, '
+            + 'unless a different arrangement is requested at the time of booking.';
+          const stress = (value, isBad, describe) => {
+            const original = value.textContent;
+            value.textContent = LONG_VALUE;
+            const bad = isBad() ? describe() : null;
+            value.textContent = original;
+            return bad;
+          };
+          const collidedWhenValueIsLong = [
+            ...metaRows.map(row => {
               const value = row.querySelector('.trip-meta-value');
-              if (!value) return null;
-              const original = value.textContent;
-              value.textContent = 'Pickup and drop-off from Accra or your hotel, '
-                + 'unless a different arrangement is requested at the time of booking.';
-              const bad = collides(row) ? describeRow(row) : null;
-              value.textContent = original;
-              return bad;
-            })
-            .filter(Boolean);
+              return value ? stress(value, () => collides(row), () => describeRow(row)) : null;
+            }),
+            ...cardRows.map(r =>
+              stress(r.value, () => collidesInCard(r), () => describeRow(r.row))),
+          ].filter(Boolean);
 
         return {
           documentWidth,
