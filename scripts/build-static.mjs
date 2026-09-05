@@ -19,6 +19,7 @@ const storyblokDelivery = {
 };
 import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
+import {loadStoryblokHomepage} from './storyblok-homepage-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
@@ -127,6 +128,19 @@ const [
   loadAboutContent({localContent: localAboutContent}),
 ]);
 
+// The homepage reads from Storyblok behind its own flag, after Sanity. It
+// merges over whatever the page already had, and every failure path leaves the
+// current homepage exactly as it is.
+const storyblokHomepage = await loadStoryblokHomepage({
+  baseContent: homepageContent,
+  ...storyblokDelivery,
+});
+if (storyblokHomepage.source === 'applied') {
+  console.log('Storyblok: homepage content applied.');
+} else if (!['disabled', 'missing-configuration'].includes(storyblokHomepage.source)) {
+  console.warn('Storyblok: homepage kept its current source (' + storyblokHomepage.source + ').');
+}
+
 // Falling back is per-record and quiet by design, which is right for one bad
 // tour and wrong for thirteen: an outage or a rejected token fails every record
 // the same way and would ship a fully committed site without saying so. Assess
@@ -167,7 +181,7 @@ const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source
   : 'local';
 const {content: experienceContent, source: experienceContentSource} =
   await loadExperienceContent({localContent: localExperienceContent});
-const homepageMarkup = await renderHomepageContent(projectRoot, homepageContent);
+const homepageMarkup = await renderHomepageContent(projectRoot, storyblokHomepage.content);
 
 // Tour detail pages are generated from the CMS. Reviewed on a preview and
 // switched on 24 August 2026, which is what made adding the Cape Coast Day
@@ -424,6 +438,7 @@ const buildHealth = {
   // built it rather than against a number frozen into the test.
   tourCount: tours.length,
   homepageContentSource,
+  storyblokHomepageSource: storyblokHomepage.source,
   bookingContentSource,
   policyContentSource,
   experienceContentSource,
