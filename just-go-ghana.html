@@ -40,8 +40,13 @@
     .tag { background: rgba(255,171,0,0.15); color: var(--yellow); border: 1px solid rgba(255,171,0,0.3); padding: 0.3rem var(--sp-2); border-radius: 50px; font-size:var(--text-xs); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
     .trip-hero h1 { font-family:'Archivo Black',sans-serif;  font-size: clamp(3rem, 7vw, 5.5rem); color: var(--white); line-height: 1; margin-bottom: var(--sp-2); }
     .trip-meta { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
-    .trip-meta-item { color: rgba(255,255,255,0.6); font-size:var(--text-base); display: flex; align-items: center; gap: 0.4rem; }
-    .trip-meta-item strong { color: var(--white); }
+    /* A CMS value can be a word or a sentence, so the row decides by the space
+       it has rather than by the value. The label never shrinks; the value takes
+       the room left beside it and, when that is not enough, wraps onto its own
+       full-width line under the label. Nothing here special-cases a field. */
+    .trip-meta-item { color: rgba(255,255,255,0.6); font-size:var(--text-base); display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.4rem; row-gap: var(--sp-1); }
+    .trip-meta-item strong { color: var(--white); flex: 0 0 auto; }
+    .trip-meta-value { flex: 1 1 auto; min-width: 0; }
 
     /* HERO IMAGE */
     .hero-img { width: 100%; height: 500px; object-fit: cover; border-radius: 0 0 32px 32px; background: linear-gradient(135deg, #1a3a2a, #2d5a3d); display: flex; align-items: center; justify-content: center; }
@@ -165,12 +170,9 @@
          is the value the generated tour pages already use. */
       .trip-hero { padding: var(--sp-12) var(--sp-2-5) var(--sp-4); }
       .content-wrap { padding: var(--sp-4) var(--sp-2-5); }
-      /* A CMS starting point can be a whole sentence rather than "Accra, Ghana".
-         Give each row its own line and let a long value wrap under its label
-         instead of running into it. */
-      .trip-meta { flex-direction: column; gap: var(--sp-1-5); }
-      .trip-meta-item { flex-wrap: wrap; gap: 0.15rem 0.4rem; }
-      .trip-meta-item strong { flex: 0 0 auto; }
+      /* One row per line on a phone. How the label and value sit inside a row is
+         decided by the base rule, which works at every width. */
+      .trip-meta { flex-direction: column; gap: var(--sp-3); }
     }
     /* Two 3rem-gapped columns still exceed a 375px viewport, and 1fr tracks
        cannot shrink below their content. Collapse to one column. */
@@ -233,10 +235,10 @@
     </div>
     <h1>Just Go Ghana</h1>
     <div class="trip-meta">
-      <span class="trip-meta-item"><strong>8 Days</strong> / 7 Nights</span>
-      <span class="trip-meta-item"><strong>Departure:</strong> Accra, Ghana</span>
-      <span class="trip-meta-item"><strong>Activity Level:</strong> Moderate</span>
-      <span class="trip-meta-item"><strong>Trip Style:</strong> Immersive Cultural Adventure</span>
+      <span class="trip-meta-item"><strong>8 Days</strong> <span class="trip-meta-value">/ 7 Nights</span></span>
+      <span class="trip-meta-item"><strong>Departure:</strong> <span class="trip-meta-value">Accra, Ghana</span></span>
+      <span class="trip-meta-item"><strong>Activity Level:</strong> <span class="trip-meta-value">Moderate</span></span>
+      <span class="trip-meta-item"><strong>Trip Style:</strong> <span class="trip-meta-value">Immersive Cultural Adventure</span></span>
     </div>
   </div>
 </div>

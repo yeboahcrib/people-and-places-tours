@@ -11,7 +11,7 @@ let BASE_URL = process.env.BASE_URL;
 // spec names, and it sat below this suite's floor. .contact-info-grid
 // overflowed by 14px there for as long as the page has existed, invisible to
 // every check because the smallest width tested was 375.
-const widths = [320, 375, 430, 768, 1024, 1440];
+const widths = [320, 375, 390, 430, 768, 1024, 1440];
 const pages = [
   '/index.html',
   '/packages.html',
@@ -133,24 +133,49 @@ function assert(condition, message) {
               .some(el => !el || !(el === backLink || backLink.contains(el)));
           })() : null;
 
-          // A CMS starting point can be a sentence. When the label and value
-          // share a line and the value wraps, they run together and read as
-          // "DeparturePickup and drop-off…". The value must begin either clear
-          // to the right of its label or on a line below it.
-          const collidedMetaRows = [...document.querySelectorAll('.trip-meta-item')]
-            .filter(row => {
-              const label = row.querySelector('strong');
-              if (!label) return false;
-              const valueNode = [...row.childNodes]
-                .find(node => node.nodeType === 3 && node.textContent.trim());
-              if (!valueNode) return false;
-              const range = document.createRange();
-              range.selectNodeContents(valueNode);
-              const value = range.getBoundingClientRect();
-              const box = label.getBoundingClientRect();
-              return !(value.left >= box.right - 1 || value.top >= box.bottom - 1);
+          // A CMS starting point can be a sentence, and the label must stay
+          // visibly separate from it.
+          //
+          // Measure every line box of the value, not the value's bounding box:
+          // a multi-line value can technically start below its label while its
+          // later lines sit beside it. And require real space — an earlier fix
+          // let the value wrap onto its own line 2.4px below the label, which
+          // still read as one run of text on a phone ("DeparturePickup and
+          // drop-off from Accra…") and passed a test that only asked whether it
+          // had wrapped. Every line must clear the label by MIN_GAP, either
+          // below it or to its right.
+          const MIN_GAP = 4;
+          const collides = row => {
+            const label = row.querySelector('strong');
+            const value = row.querySelector('.trip-meta-value');
+            if (!label || !value) return false;
+            const box = label.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(value);
+            return [...range.getClientRects()].some(line =>
+              line.width > 0
+              && line.top < box.bottom + MIN_GAP
+              && line.left < box.right + MIN_GAP);
+          };
+          const describeRow = row => row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40);
+          const metaRows = [...document.querySelectorAll('.trip-meta-item')];
+          const collidedMetaRows = metaRows.filter(collides).map(describeRow);
+
+          // The rows must survive a value longer than anything currently in the
+          // CMS, so this tests the component rather than today's content: swap
+          // in a long sentence, re-measure, then put the original text back.
+          const collidedWhenValueIsLong = metaRows
+            .map(row => {
+              const value = row.querySelector('.trip-meta-value');
+              if (!value) return null;
+              const original = value.textContent;
+              value.textContent = 'Pickup and drop-off from Accra or your hotel, '
+                + 'unless a different arrangement is requested at the time of booking.';
+              const bad = collides(row) ? describeRow(row) : null;
+              value.textContent = original;
+              return bad;
             })
-            .map(row => row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40));
+            .filter(Boolean);
 
         return {
           documentWidth,
@@ -158,6 +183,7 @@ function assert(condition, message) {
           stretchedImages,
           backLinkBlocked,
           collidedMetaRows,
+          collidedWhenValueIsLong,
           viewportWidth: document.documentElement.clientWidth,
           navCta: navCtaRect && visible(navCta)
             ? {right: Math.round(navCtaRect.right), left: Math.round(navCtaRect.left)}
@@ -217,6 +243,9 @@ function assert(condition, message) {
       assert(audit.collidedMetaRows.length === 0,
         `${path} Trip Details label runs into its value at ${width}px: `
         + JSON.stringify(audit.collidedMetaRows));
+      assert(audit.collidedWhenValueIsLong.length === 0,
+        `${path} Trip Details collides at ${width}px once a value grows longer `
+        + `than today's content: ${JSON.stringify(audit.collidedWhenValueIsLong)}`);
 
       await page.close();
     }
