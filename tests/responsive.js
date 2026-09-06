@@ -205,8 +205,23 @@ function assert(condition, message) {
               stress(r.value, () => collidesInCard(r), () => describeRow(r.row))),
           ].filter(Boolean);
 
+          // Once a form row stacks, a field's own parts must sit closer together
+          // than two fields do, or the helper text reads as belonging to the
+          // field underneath it. Real-device QA found exactly that: an
+          // uppercase label 6px above its input and its helper 6px below.
+          const crowdedFields = [...document.querySelectorAll('.form-group')]
+            .map(group => {
+              const label = group.querySelector('.form-label');
+              const input = group.querySelector('.form-input, select, textarea');
+              if (!label || !input || label.getBoundingClientRect().height === 0) return null;
+              const gap = Math.round(input.getBoundingClientRect().top - label.getBoundingClientRect().bottom);
+              return gap < 8 ? {field: input.id || input.name || '?', gap} : null;
+            })
+            .filter(Boolean);
+
         return {
           documentWidth,
+          crowdedFields,
           strandedQuotes,
           stretchedImages,
           backLinkBlocked,
@@ -267,6 +282,13 @@ function assert(condition, message) {
       if (audit.backLinkBlocked !== null) {
         assert(!audit.backLinkBlocked,
           `${path} back link is covered by the floating nav at ${width}px`);
+      }
+      // Only while the row is stacked; the two-column desktop layout is
+      // deliberately tighter and reads fine because fields sit side by side.
+      if (width <= 768) {
+        assert(audit.crowdedFields.length === 0,
+          `${path} form labels crowd their inputs at ${width}px: `
+          + JSON.stringify(audit.crowdedFields));
       }
       assert(audit.collidedMetaRows.length === 0,
         `${path} Trip Details label runs into its value at ${width}px: `

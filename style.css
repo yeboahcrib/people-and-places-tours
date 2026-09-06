@@ -1512,7 +1512,15 @@ body.page-entering {
   .reveal-ready .process-connector.visible { transform: scaleY(1); }
   .booking-sidebar { position: static; }
   .also-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
+  /* Once the row stacks, the two fields sit one above the other and the old
+     spacing stopped reading as pairs: an uppercase, letter-spaced label sat
+     6px above its input and the helper text 6px below it, so a label, its
+     input and its helper ran together and the helper appeared to belong to the
+     field underneath. Give a field's parts a little more room, and the gap
+     between fields more than that, so each group still reads as one. */
+  .form-row { grid-template-columns: 1fr; gap: var(--sp-3); }
+  .form-group { gap: 0.6rem; }
+  .form-help { margin-top: 0.15rem; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
 }
 
