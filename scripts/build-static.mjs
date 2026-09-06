@@ -20,6 +20,7 @@ const storyblokDelivery = {
 import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadStoryblokHomepage} from './storyblok-homepage-source.mjs';
+import {loadStoryblokAbout} from './storyblok-about-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
@@ -139,6 +140,19 @@ if (storyblokHomepage.source === 'applied') {
   console.log('Storyblok: homepage content applied.');
 } else if (!['disabled', 'missing-configuration'].includes(storyblokHomepage.source)) {
   console.warn('Storyblok: homepage kept its current source (' + storyblokHomepage.source + ').');
+}
+
+// The About page reads from Storyblok behind its own flag, after Sanity, on the
+// same terms as the homepage: it merges over whatever the page already had, and
+// every failure path leaves the current About page exactly as it is.
+const storyblokAbout = await loadStoryblokAbout({
+  baseContent: aboutContent,
+  ...storyblokDelivery,
+});
+if (storyblokAbout.source === 'applied') {
+  console.log('Storyblok: About page content applied.');
+} else if (!['disabled', 'missing-configuration'].includes(storyblokAbout.source)) {
+  console.warn('Storyblok: About page kept its current source (' + storyblokAbout.source + ').');
 }
 
 // Falling back is per-record and quiet by design, which is right for one bad
@@ -326,7 +340,7 @@ for (const entry of rootEntries) {
         `<main id="main-content" data-homepage-renderer="homepage-sections">${homepageMarkup}</main>`,
       )
       : withFooter;
-    const withAbout = injectAboutContent(withHomepage, aboutContent);
+    const withAbout = injectAboutContent(withHomepage, storyblokAbout.content);
     const withBooking = injectBookingContent(withAbout, bookingContent);
     // Guarded by filename: the renderer throws when a binding is missing, which
     // is what we want on a policy page and wrong everywhere else.
@@ -439,6 +453,7 @@ const buildHealth = {
   tourCount: tours.length,
   homepageContentSource,
   storyblokHomepageSource: storyblokHomepage.source,
+  storyblokAboutSource: storyblokAbout.source,
   bookingContentSource,
   policyContentSource,
   experienceContentSource,
