@@ -224,6 +224,18 @@ function assert(condition, message) {
               bottom: Math.max(...rects.map(r => r.bottom)),
             };
           };
+          // Every control in this form has its native appearance reset except,
+          // once, the date inputs — which is what let iOS draw their value
+          // outside the padded box. Desktop engines lay them out correctly
+          // either way, so only the declaration itself can be checked here.
+          const unresetDateInputs = [...document.querySelectorAll('input[type="date"]')]
+            .filter(input => {
+              const style = getComputedStyle(input);
+              return (style.appearance || style.webkitAppearance) !== 'none'
+                || style.lineHeight === 'normal';
+            })
+            .map(input => input.id || input.name || '?');
+
           const stackedFields = [...document.querySelectorAll('.form-group')]
             .map(group => {
               const label = group.querySelector('.form-label');
@@ -258,6 +270,7 @@ function assert(condition, message) {
         return {
           documentWidth,
           crowdedFields,
+          unresetDateInputs,
           strandedQuotes,
           stretchedImages,
           backLinkBlocked,
@@ -322,6 +335,10 @@ function assert(condition, message) {
       // Only while the row is stacked; the two-column desktop layout is
       // deliberately tighter and reads fine because fields sit side by side.
       if (width <= 768) {
+        assert(audit.unresetDateInputs.length === 0,
+          `${path} date inputs keep their native appearance at ${width}px, which `
+          + `lets iOS draw the value outside the field: `
+          + JSON.stringify(audit.unresetDateInputs));
         assert(audit.crowdedFields.length === 0,
           `${path} stacked form fields do not read as separate groups at ${width}px: `
           + JSON.stringify(audit.crowdedFields));

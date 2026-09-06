@@ -1421,6 +1421,32 @@ body.page-entering {
 .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,.25); }
 .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--color-primary); }
 .form-select { appearance: none; cursor: pointer; }
+
+/* iOS renders a date field as a native control, and it was the only control in
+   this form that never had its native appearance reset — the selects do, the
+   text inputs have nothing to reset. Left alone, iOS draws the value through a
+   shadow element that ignores the padded box and sits against the top edge, so
+   on a real iPhone the field collided with the label above it. Desktop browsers
+   lay the same markup out correctly, which is why every emulator missed this.
+   Reset the appearance like the selects, and give the value an explicit line
+   box so it sits inside the padding rather than on top of it. */
+.form-input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1.4;
+  min-height: 0;
+}
+.form-input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+  line-height: 1.4;
+}
+/* The calendar button is the field's only affordance once iOS shows no
+   placeholder text, so keep it visible and aligned with the value. */
+.form-input[type="date"]::-webkit-calendar-picker-indicator {
+  margin: 0;
+  opacity: 0.55;
+}
 .form-select option { background: var(--black); color: var(--white); }
 .form-textarea { resize: vertical; min-height: 130px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); }
