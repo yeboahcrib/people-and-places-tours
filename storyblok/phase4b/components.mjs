@@ -61,18 +61,27 @@ export const NESTABLE = [
 export const ABOUT_PAGE = {
   name: 'about_page', display_name: 'About page', is_root: true, is_nestable: false,
   schema: {
-    hero_tab: tab('Hero', 0, ['published', 'hero_title', 'hero_subtitle']),
+    hero_tab: tab('Hero', 0, ['published', 'hero_title', 'hero_subtitle', 'hero_image']),
     published: {
       type: 'boolean', display_name: 'Show this About page', pos: 1, default_value: false,
       description: 'Leave off until the page is ready. The site keeps its current About page until this is on.',
     },
     hero_title: text('Heading', 2, {required: true}),
     hero_subtitle: area('Sub-heading', 3),
+    hero_image: {
+      type: 'asset', filetypes: ['images'], display_name: 'Background photograph', pos: 4,
+      description: 'Sits behind the heading. Decorative, so it is described by the heading '
+        + 'rather than by alt text — leave the asset\'s alt text empty.',
+    },
 
-    story_tab: tab('Our story', 10, ['story_eyebrow', 'story_title', 'story_paragraphs']),
+    story_tab: tab('Our story', 10, ['story_eyebrow', 'story_title', 'story_paragraphs', 'story_image']),
     story_eyebrow: text('Small label above the heading', 11),
     story_title: text('Heading', 12),
     story_paragraphs: blocks('Paragraphs', 13, ['about_paragraph']),
+    story_image: {
+      type: 'asset', filetypes: ['images'], display_name: 'Photograph beside the story', pos: 14,
+      description: 'Shown at 700x850. Needs alt text, because it carries meaning of its own.',
+    },
 
     mission_tab: tab('Mission', 20, ['mission_eyebrow', 'mission_title', 'mission_lede', 'mission_body', 'mission_proof']),
     mission_eyebrow: text('Small label above the heading', 21),

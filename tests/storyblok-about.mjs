@@ -17,9 +17,11 @@ const content = (overrides = {}) => ({
   published: true,
   hero_title: 'The People Behind the Places',
   hero_subtitle: 'We grew up here.',
+  hero_image: {...asset('hero'), alt: ''},
   story_eyebrow: 'How It Began',
   story_title: 'From Passion to Purpose',
   story_paragraphs: [blok('about_paragraph', {text: 'A first paragraph.'})],
+  story_image: asset('founders'),
   mission_eyebrow: 'Our Mission',
   mission_title: 'A Return, and a Welcome',
   mission_lede: 'A lede.',
@@ -53,6 +55,41 @@ const story = (o = {}) => ({slug: 'about', content: content(o)});
   assert.deepEqual(m.faqs, [{question: 'A question?', answer: 'An answer.'}]);
   assert.equal(m.team[0].name, 'Isaac Yeboah');
   assert(!('photo' in m.team[0]), 'an empty photograph field must not become an empty photo object');
+}
+
+// --- The two page photographs, requested at the sizes about.html already
+//     displays them at, so migrating them cannot move the page.
+{
+  const m = mapStoryblokAbout(story());
+  assert.match(m.heroImage.src, /\/m\/1920x720\//, 'the hero is requested at its displayed size');
+  assert.match(m.storyImage.src, /\/m\/700x850\//, 'the story photograph is requested at its displayed size');
+  assert.match(m.heroImage.src, /quality\(80\)/);
+
+  // The hero sits behind the heading and is described by it, so an empty alt is
+  // correct there and must survive rather than being treated as missing.
+  assert.equal(m.heroImage.alt, '', 'the decorative hero keeps its empty alt');
+  assert.equal(m.storyImage.alt, 'A photograph of founders');
+
+  // A decorative image with no alt still ships; a meaningful one does not.
+  const heroNoAlt = mapStoryblokAbout(story({hero_image: {filename: asset('hero').filename}}));
+  assert(heroNoAlt.heroImage, 'the hero ships without alt text, because it is decorative');
+  const storyNoAlt = mapStoryblokAbout(story({story_image: {filename: asset('founders').filename}}));
+  assert(!('storyImage' in storyNoAlt), 'a meaningful photograph without alt text must not ship');
+
+  // A focal point survives into the crop.
+  const focused = mapStoryblokAbout(story({story_image: {...asset('founders'), focus: '350x425:351x426'}}));
+  assert.match(focused.storyImage.src, /filters:focal\(350x425:351x426\)/);
+
+  // Neither image is required: without them the page keeps the ones in its own
+  // markup rather than falling back entirely.
+  const none = mapStoryblokAbout(story({hero_image: {}, story_image: {}}));
+  assert(none && !none.hidden, 'missing photographs must not fail the content gate');
+  assert(!('heroImage' in none) && !('storyImage' in none),
+    'an empty asset field must stay absent so the committed image is left in place');
+
+  // A photograph from another host is refused.
+  const foreign = mapStoryblokAbout(story({hero_image: {filename: 'https://example.com/x.jpg', alt: ''}}));
+  assert(!('heroImage' in foreign));
 }
 
 // --- Team photographs are optional, and unusable ones are dropped rather than shipped.

@@ -24,17 +24,30 @@ const list = value => (Array.isArray(value) ? value : []);
 const blocksOf = (value, component) =>
   list(value).filter(entry => entry && entry.component === component);
 
-/** Team photographs are optional, and unusable ones are dropped rather than shipped. */
-const TEAM_PHOTO = {width: 700, height: 850};
-function teamPhoto(asset) {
+/**
+ * A photograph, requested at the size the existing markup already displays it
+ * at so the rendered page does not move.
+ *
+ * `decorative` is the difference between the two kinds of image on this page.
+ * The hero sits behind the heading and is described by it, so an empty alt is
+ * correct there and must be preserved rather than treated as missing. Every
+ * other photograph carries meaning of its own, so one without alt text is
+ * dropped rather than shipped unlabelled.
+ */
+function photo(asset, width, height, {decorative = false} = {}) {
   const filename = text(asset?.filename);
   if (!filename || !isStoryblokEuAssetUrl(filename)) return undefined;
   const alt = text(asset?.alt);
-  if (!alt) return undefined;
-  const src = storyblokImageUrl(asset, TEAM_PHOTO.width, TEAM_PHOTO.height);
+  if (!alt && !decorative) return undefined;
+  const src = storyblokImageUrl(asset, width, height);
   if (!src) return undefined;
-  return {src, alt, width: TEAM_PHOTO.width, height: TEAM_PHOTO.height};
+  return {src, alt: decorative ? '' : alt, width, height};
 }
+
+/* The sizes about.html already asks for. Changing one would move the page. */
+const HERO_IMAGE = {width: 1920, height: 720};
+const STORY_IMAGE = {width: 700, height: 850};
+const TEAM_PHOTO = {width: 700, height: 850};
 
 /**
  * Map one story onto the About content shape.
@@ -58,8 +71,8 @@ export function mapStoryblokAbout(story) {
     .map(d => ({title: text(d.title), text: text(d.text)})).filter(d => d.title);
   const team = blocksOf(c.team, 'about_team_member')
     .map(m => {
-      const photo = teamPhoto(m.photo);
-      return {name: text(m.name), role: text(m.role), bio: text(m.bio), ...(photo ? {photo} : {})};
+      const portrait = photo(m.photo, TEAM_PHOTO.width, TEAM_PHOTO.height);
+      return {name: text(m.name), role: text(m.role), bio: text(m.bio), ...(portrait ? {photo: portrait} : {})};
     })
     .filter(m => m.name);
   const impactStats = blocksOf(c.impact_stats, 'about_stat')
@@ -72,9 +85,14 @@ export function mapStoryblokAbout(story) {
   if (!storyParagraphs.length || !missionProof.length || !differenceItems.length
     || !team.length || !impactStats.length || !faqs.length) return undefined;
 
+  const heroImage = photo(c.hero_image, HERO_IMAGE.width, HERO_IMAGE.height, {decorative: true});
+  const storyImage = photo(c.story_image, STORY_IMAGE.width, STORY_IMAGE.height);
+
   return {
     heroTitle,
     heroSubtitle: text(c.hero_subtitle),
+    ...(heroImage ? {heroImage} : {}),
+    ...(storyImage ? {storyImage} : {}),
     storyEyebrow: text(c.story_eyebrow),
     storyTitle: text(c.story_title),
     storyParagraphs,

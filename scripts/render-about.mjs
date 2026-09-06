@@ -115,6 +115,31 @@ const renderFaqs = faqs => faqs.map((faq, index) => `
             </div>
           </li>`).join('');
 
+/**
+ * Swap one tagged image's source, and its alt text when it has any.
+ *
+ * Only those two attributes move. Everything else the tag carries — its class,
+ * width, height, loading, fetchpriority, decoding and inline style — is left
+ * exactly as authored, so a CMS photograph renders identically to the one it
+ * replaces.
+ *
+ * A decorative image keeps its empty alt: the hero sits behind the heading and
+ * is described by it, so alt="" is correct rather than missing.
+ */
+function replaceImage(html, slot, photo) {
+  if (!photo?.src) return html;
+  const pattern = new RegExp(`(<img(?=[^>]*\\sdata-about-image="${slot}")[^>]*>)`);
+  return html.replace(pattern, tag => {
+    let next = tag.replace(/\ssrc="[^"]*"/, ` src="${escapeHtml(photo.src)}"`);
+    if (typeof photo.alt === 'string') {
+      next = /\salt="[^"]*"/.test(next)
+        ? next.replace(/\salt="[^"]*"/, ` alt="${escapeHtml(photo.alt)}"`)
+        : next.replace('<img', `<img alt="${escapeHtml(photo.alt)}"`);
+    }
+    return next;
+  });
+}
+
 export function injectAboutContent(html, about) {
   if (!html.includes('data-about-copy')) return html;
 
@@ -125,6 +150,8 @@ export function injectAboutContent(html, about) {
   for (const [key, value] of Object.entries(about)) {
     if (typeof value === 'string') output = replaceText(output, key, value);
   }
+  output = replaceImage(output, 'hero', about.heroImage);
+  output = replaceImage(output, 'story', about.storyImage);
   output = replaceList(output, 'data-about-story', renderStory(about.storyParagraphs), 'story');
   output = replaceList(output, 'data-about-mission-proof', renderMissionProof(about.missionProof), 'mission proof row');
   output = replaceList(output, 'data-about-difference', renderDifference(about.differenceItems, icons), 'difference grid');
