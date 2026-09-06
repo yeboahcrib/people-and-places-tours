@@ -1512,13 +1512,15 @@ body.page-entering {
   .reveal-ready .process-connector.visible { transform: scaleY(1); }
   .booking-sidebar { position: static; }
   .also-grid { grid-template-columns: 1fr; }
-  /* Once the row stacks, the two fields sit one above the other and the old
-     spacing stopped reading as pairs: an uppercase, letter-spaced label sat
-     6px above its input and the helper text 6px below it, so a label, its
-     input and its helper ran together and the helper appeared to belong to the
-     field underneath. Give a field's parts a little more room, and the gap
-     between fields more than that, so each group still reads as one. */
-  .form-row { grid-template-columns: 1fr; gap: var(--sp-3); }
+  /* Once the row stacks, every field sits directly above the next one and the
+     page has to say which helper belongs to which input by proximity alone.
+     Measured ink-to-ink on iOS, it was not saying it: 10px from a label to its
+     input, 12px from that input to its helper, and only 20–26px on to the next
+     field's label. At barely 2:1 the helper sits almost equidistant between the
+     field it describes and the one below, which is what reads as crowding —
+     the gaps inside a field are fine, the separation between fields was not.
+     32px puts it near 3:1, matching the one field that already read correctly. */
+  .form-row { grid-template-columns: 1fr; gap: var(--sp-4); }
   .form-group { gap: 0.6rem; }
   .form-help { margin-top: 0.15rem; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
@@ -2854,6 +2856,16 @@ body.page-entering {
 .booking-step > .form-group { margin-bottom: var(--sp-2-5); }
 .booking-step > *:last-child { margin-bottom: 0; }
 .form-group-half { max-width: 340px; }
+
+/* Separation between stacked fields, set here rather than with the rest of the
+   mobile form rules because this line and the one above it have equal
+   specificity — placed earlier, the override simply lost to source order and
+   only the gaps inside a .form-row actually changed. */
+@media (max-width: 768px) {
+  .booking-step > .form-row,
+  .booking-step > .form-group { margin-bottom: var(--sp-4); }
+  .booking-step > *:last-child { margin-bottom: 0; }
+}
 
 .booking-flow-ready .booking-step { display: none; }
 .booking-flow-ready[data-booking-current="1"] .booking-step[data-booking-step="1"],

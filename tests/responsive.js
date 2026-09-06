@@ -205,19 +205,55 @@ function assert(condition, message) {
               stress(r.value, () => collidesInCard(r), () => describeRow(r.row))),
           ].filter(Boolean);
 
-          // Once a form row stacks, a field's own parts must sit closer together
-          // than two fields do, or the helper text reads as belonging to the
-          // field underneath it. Real-device QA found exactly that: an
-          // uppercase label 6px above its input and its helper 6px below.
-          const crowdedFields = [...document.querySelectorAll('.form-group')]
+          // Once a form row stacks, every field sits directly above the next and
+          // proximity is the only thing saying which helper belongs to which
+          // input. So measure the ratio, not a single gap: a first attempt at
+          // this checked only the gap inside a field, passed, and the form still
+          // read as crowded on a real iPhone because the separation *between*
+          // fields was barely twice it.
+          //
+          // Ink-to-ink, not box-to-box — line-height leading means a box gap and
+          // the gap a reader actually sees are different numbers.
+          const inkBounds = element => {
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            const rects = [...range.getClientRects()].filter(r => r.width > 0);
+            if (!rects.length) return element.getBoundingClientRect();
+            return {
+              top: Math.min(...rects.map(r => r.top)),
+              bottom: Math.max(...rects.map(r => r.bottom)),
+            };
+          };
+          const stackedFields = [...document.querySelectorAll('.form-group')]
             .map(group => {
               const label = group.querySelector('.form-label');
               const input = group.querySelector('.form-input, select, textarea');
-              if (!label || !input || label.getBoundingClientRect().height === 0) return null;
-              const gap = Math.round(input.getBoundingClientRect().top - label.getBoundingClientRect().bottom);
-              return gap < 8 ? {field: input.id || input.name || '?', gap} : null;
+              if (!label || !input || input.getBoundingClientRect().height === 0) return null;
+              const help = group.querySelector('.form-help');
+              const labelInk = inkBounds(label);
+              const box = input.getBoundingClientRect();
+              return {
+                field: input.id || input.name || '?',
+                labelToInput: Math.round(box.top - labelInk.bottom),
+                inputToHelp: help ? Math.round(inkBounds(help).top - box.bottom) : null,
+                labelTop: labelInk.top,
+                end: help ? inkBounds(help).bottom : box.bottom,
+              };
             })
             .filter(Boolean);
+
+          const crowdedFields = stackedFields.map((field, index) => {
+            const next = stackedFields[index + 1];
+            const inside = Math.max(field.labelToInput, field.inputToHelp ?? 0);
+            if (inside < 8) return {field: field.field, reason: 'label sits on its input', inside};
+            if (!next) return null;
+            const between = Math.round(next.labelTop - field.end);
+            // Below 2.5:1 the helper stops binding to the field above it. The
+            // one field that read correctly before this fix measured 3:1.
+            return between < inside * 2.5
+              ? {field: field.field, inside, between, ratio: Number((between / inside).toFixed(1))}
+              : null;
+          }).filter(Boolean);
 
         return {
           documentWidth,
@@ -287,7 +323,7 @@ function assert(condition, message) {
       // deliberately tighter and reads fine because fields sit side by side.
       if (width <= 768) {
         assert(audit.crowdedFields.length === 0,
-          `${path} form labels crowd their inputs at ${width}px: `
+          `${path} stacked form fields do not read as separate groups at ${width}px: `
           + JSON.stringify(audit.crowdedFields));
       }
       assert(audit.collidedMetaRows.length === 0,
