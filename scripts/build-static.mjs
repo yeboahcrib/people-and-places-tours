@@ -22,6 +22,7 @@ import {loadHomepageContent} from './homepage-source.mjs';
 import {loadStoryblokHomepage} from './storyblok-homepage-source.mjs';
 import {loadStoryblokAbout} from './storyblok-about-source.mjs';
 import {loadStoryblokContact} from './storyblok-contact-source.mjs';
+import {loadStoryblokPolicy} from './storyblok-policy-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
@@ -202,8 +203,26 @@ const policies = Object.fromEntries(await Promise.all(POLICY_PAGES.map(async pag
     localContent: localPolicyContent[page.key],
     policyType: page.policyType,
   });
-  return [page.file, {content, source}];
+  // Storyblok reads each policy behind its own flag, after Sanity. A policy is
+  // replaced whole or keeps its current wording whole — never blended — and
+  // each page stands alone, so one failing its gate leaves the others applied.
+  const storyblok = await loadStoryblokPolicy({
+    policyType: page.policyType,
+    baseContent: content,
+    ...storyblokDelivery,
+  });
+  if (storyblok.source !== 'applied'
+    && !['disabled', 'missing-configuration'].includes(storyblok.source)) {
+    console.warn(`Storyblok: policy "${page.policyType}" kept its current wording (${storyblok.source}).`);
+  }
+  return [page.file, {content: storyblok.content, source, storyblokSource: storyblok.source}];
 })));
+const storyblokPolicySources = Object.fromEntries(
+  POLICY_PAGES.map(page => [page.policyType, policies[page.file].storyblokSource]));
+const appliedPolicies = POLICY_PAGES.filter(page => policies[page.file].storyblokSource === 'applied');
+if (appliedPolicies.length) {
+  console.log(`Storyblok: ${appliedPolicies.length} of ${POLICY_PAGES.length} policies applied.`);
+}
 const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source === 'sanity')
   ? 'sanity'
   : 'local';
@@ -473,6 +492,7 @@ const buildHealth = {
   storyblokHomepageSource: storyblokHomepage.source,
   storyblokAboutSource: storyblokAbout.source,
   storyblokContactSource: storyblokContact.source,
+  storyblokPolicySources,
   bookingContentSource,
   policyContentSource,
   experienceContentSource,
