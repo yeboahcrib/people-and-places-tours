@@ -88,7 +88,7 @@ The two asset-blocked stories deliberately omit `card_image`, `hero_image`, and 
 
 ## Schema and failure isolation
 
-Two minimal schema adjustments were required, both staged reproducibly by [scripts/storyblok-phase3d-stage.mjs](scripts/storyblok-phase3d-stage.mjs):
+Two minimal schema adjustments were required, both staged reproducibly by `scripts/storyblok-phase3d-stage.mjs` (a one-off staging script, removed in Phase 5A once the schema it staged was live):
 
 1. `tour.card_image` changed from required to optional with editor-facing help: “Add an approved original photo before this experience can appear on the website. You may save a draft while photography is pending.” This enables genuine incomplete drafts on the Free plan, whose conditional-field support cannot provide a reliable draft-only required rule.
 2. The shared `list_item` text limit changed from 120 to 160 characters. This is the smallest limit that preserves Accra Food’s existing approved 158-character guest fact; no wording was shortened or invented.

@@ -1,5 +1,13 @@
 # Storyblok Phase 3B: local Cape Coast test
 
+> **Superseded — kept as a record of how the first tour was proved.**
+> `STORYBLOK_CAPE_COAST_ENABLED` no longer exists: the per-tour flag was
+> replaced by the tour registry in `scripts/storyblok-migration-authority.mjs`,
+> and all thirteen products are now covered by
+> `STORYBLOK_STANDARD_TOURS_ENABLED` / `STORYBLOK_MULTI_DAY_ENABLED`.
+> Setting the old variable today does nothing. Follow this only to
+> understand what Phase 3B did, not as a current procedure.
+
 This is a local-only, build-time test for **Cape Coast Ancestral Tour**. It
 does not enable Storyblok in Cloudflare and it does not change any other tour.
 
