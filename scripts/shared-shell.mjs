@@ -48,9 +48,28 @@ export function renderNavigationTemplate(template, content) {
     .replace('    <!-- shared: mobile-nav-links -->', mobileLinks);
 }
 
+/**
+ * The footer's social addresses. These were hardcoded in the partial and have
+ * never been in Sanity, so the constant below is their source of truth rather
+ * than a CMS value that would arrive undefined and leave three icons linking
+ * nowhere. Storyblok may replace them; nothing else supplies them.
+ */
+export const FOOTER_SOCIAL_DEFAULTS = Object.freeze({
+  instagramUrl: 'https://instagram.com/peopleand.places',
+  tiktokUrl: 'https://tiktok.com/@peopandplaces',
+  whatsappUrl: 'https://wa.me/233503673473',
+});
+
+function safeSocialHref(value, fallback) {
+  const href = String(value ?? '').trim();
+  if (!/^https:\/\/[^\s"']+$/i.test(href)) return escapeHtml(fallback);
+  return escapeHtml(href);
+}
+
 export function renderFooterTemplate(template, content, year = new Date().getUTCFullYear()) {
   const settings = content.siteSettings;
   const navigation = content.navigation;
+  const social = content.social ?? {};
   const columns = navigation.footerColumns.map(column => {
     const links = column.links.map(link => {
       const href = safeFooterHref(link.href);
@@ -60,11 +79,15 @@ export function renderFooterTemplate(template, content, year = new Date().getUTC
     return `      <div class="footer-col">\n        <h2>${escapeHtml(column.heading)}</h2>\n        <ul role="list">\n${links}\n        </ul>\n      </div>`;
   }).join('\n\n');
 
-  return template
+  let output = template
     .replaceAll('{{businessName}}', escapeHtml(settings.businessName))
     .replaceAll('{{footerTagline}}', escapeHtml(navigation.footerTagline))
     .replaceAll('{{year}}', escapeHtml(year))
     .replace('      <!-- shared: footer-columns -->', columns);
+  for (const [key, fallback] of Object.entries(FOOTER_SOCIAL_DEFAULTS)) {
+    output = output.replaceAll(`{{${key}}}`, safeSocialHref(social[key], fallback));
+  }
+  return output;
 }
 
 export function replacePrimaryNavigation(html, navigation, fileName) {

@@ -23,6 +23,7 @@ import {loadStoryblokHomepage} from './storyblok-homepage-source.mjs';
 import {loadStoryblokAbout} from './storyblok-about-source.mjs';
 import {loadStoryblokContact} from './storyblok-contact-source.mjs';
 import {loadStoryblokPolicy} from './storyblok-policy-source.mjs';
+import {loadStoryblokGlobals} from './storyblok-globals-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
@@ -100,7 +101,16 @@ if (process.env.COMING_SOON === 'true') {
 
 const navigationTemplate = await readFile(join(projectRoot, 'src/partials/navigation.html'), 'utf8');
 const footerTemplate = await readFile(join(projectRoot, 'src/partials/footer.html'), 'utf8');
-const {content: siteContent, source: contentSource} = await loadSiteContent({projectRoot});
+const {content: committedSiteContent, source: contentSource} = await loadSiteContent({projectRoot});
+// Globals are read before anything renders, because the contact details they
+// carry reach further than the shell: the policy contact block and every
+// data-site-copy binding on the contact page read the same siteSettings. On
+// any failure this returns the committed content unchanged, so the navigation
+// and the legal column cannot be affected by a bad read.
+const {content: siteContent, source: storyblokGlobalsSource} = await loadStoryblokGlobals({
+  baseContent: committedSiteContent,
+  ...storyblokDelivery,
+});
 const navigation = renderNavigationTemplate(navigationTemplate, siteContent);
 const footer = renderFooterTemplate(footerTemplate, siteContent);
 const [localTours, localHomepageContent, localBookingContent, localAboutContent, localPolicyContent, localExperienceContent] = await Promise.all([
@@ -493,6 +503,7 @@ const buildHealth = {
   storyblokAboutSource: storyblokAbout.source,
   storyblokContactSource: storyblokContact.source,
   storyblokPolicySources,
+  storyblokGlobalsSource,
   bookingContentSource,
   policyContentSource,
   experienceContentSource,
