@@ -90,7 +90,7 @@ export function injectInquiryMode(html, isCloudflareBuild) {
 // Contact details already live in siteSettings (and in Sanity behind it), but
 // contact.html had them typed in by hand. Bind them so the phone number,
 // hours and response promise have one source of truth rather than four.
-const SITE_COPY_KEYS = ['primaryPhone', 'internationalPhone', 'email', 'hours', 'responsePromise'];
+const SITE_COPY_KEYS = ['primaryPhone', 'internationalPhone', 'email', 'hours', 'responsePromise', 'instagramHandle'];
 
 export function injectSiteContact(html, settings) {
   if (!html.includes('data-site-copy')) return html;
