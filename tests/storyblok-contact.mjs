@@ -13,6 +13,11 @@ const content = (overrides = {}) => ({
   title: 'A few details. Then we plan it together.',
   intro: 'This is the start of a conversation.',
   hero_subtitle: 'Whether this will be your first time in Ghana.',
+  hero_image: {
+    filename: 'https://a.storyblok.com/f/294832753590557/4100x4100/abc/contact-hero.jpg',
+    alt: 'A group of guests under the royal palms',
+    focus: '2050x1435:2051x1436',
+  },
   step1_name: 'Your trip',
   step1_legend: 'Tell us about the experience',
   step1_help: 'Rough answers are fine.',
@@ -57,6 +62,33 @@ const story = (o = {}) => ({slug: 'contact', content: content(o)});
   }
 }
 
+// --- The hero photograph, in the shape the page-photo injector accepts.
+{
+  const m = mapStoryblokContact(story());
+  // Doubled for retina, the same as the Sanity path does. Asking for the slot
+  // size would ship a soft hero to every phone.
+  assert.match(m.coverPhoto.src, /\/m\/3840x1440\//,
+    'the hero is requested at twice its slot, matching the Sanity path');
+  assert.match(m.coverPhoto.src, /filters:focal\(2050x1435:2051x1436\)/,
+    'the focal point must survive into the crop');
+  assert.equal(m.coverPhoto.width, 1920, 'the slot dimensions describe the band, not the file');
+  assert.equal(m.coverPhoto.height, 720);
+  // The injector only accepts a photograph carrying both approval flags.
+  assert.equal(m.coverPhoto.publicApprovalState, 'approved');
+  assert.equal(m.coverPhoto.placeholderState, 'approved');
+  assert.equal(m.coverPhoto.alt, 'A group of guests under the royal palms');
+
+  // Not required: without one the merge leaves whatever the page already had,
+  // so an unset photograph degrades to the current image rather than to nothing.
+  const none = mapStoryblokContact(story({hero_image: {}}));
+  assert(none && !none.hidden, 'a missing photograph must not fail the content gate');
+  assert(!('coverPhoto' in none), 'an empty asset field must stay absent');
+
+  // A photograph from another host is refused rather than hotlinked.
+  const foreign = mapStoryblokContact(story({hero_image: {filename: 'https://example.com/x.jpg', alt: 'x'}}));
+  assert(!('coverPhoto' in foreign));
+}
+
 // --- Only icons the renderer can draw survive; anything else becomes the default
 //     rather than rendering nothing.
 {
@@ -99,8 +131,8 @@ const load = (opts = {}) => loadStoryblokContact({baseContent: base, env, logger
   assert.equal(ok.content.title, 'A few details. Then we plan it together.');
   // The page's photograph and the site-wide contact details are not part of this
   // model and must survive it untouched.
-  assert.deepEqual(ok.content.coverPhoto, base.coverPhoto,
-    'the contact hero photograph stays with its own source');
+  assert.match(ok.content.coverPhoto.src, /a\.storyblok\.com/,
+    'the hero photograph comes from Storyblok once the copy applies');
   assert.equal(ok.content.primaryPhone, base.primaryPhone);
 }
 for (const [name, opts, expected] of [

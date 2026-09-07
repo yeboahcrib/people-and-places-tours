@@ -48,7 +48,7 @@ export const NESTABLE = [
 export const CONTACT_PAGE = {
   name: 'contact_page', display_name: 'Contact page', is_root: true, is_nestable: false,
   schema: {
-    header_tab: tab('Page header', 0, ['published', 'eyebrow', 'title', 'intro', 'hero_subtitle']),
+    header_tab: tab('Page header', 0, ['published', 'eyebrow', 'title', 'intro', 'hero_subtitle', 'hero_image']),
     published: {
       type: 'boolean', display_name: 'Show this contact copy', pos: 1, default_value: false,
       description: 'Leave off until the copy is ready. The site keeps its current wording until this is on.',
@@ -57,6 +57,11 @@ export const CONTACT_PAGE = {
     title: text('Heading', 3, {required: true}),
     intro: area('Introduction', 4),
     hero_subtitle: area('Sub-heading at the top of the page', 5),
+    hero_image: {
+      type: 'asset', filetypes: ['images'], display_name: 'Hero photograph', pos: 6,
+      description: 'Sits behind the page heading. Set a focal point so the crop keeps '
+        + 'the subject in frame; the page shows it as a wide band.',
+    },
 
     step1_tab: tab('Step 1 — the trip', 10, ['step1_name', 'step1_legend', 'step1_help', 'next_label', 'next_note']),
     step1_name: text('Step name in the progress bar', 11),

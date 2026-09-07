@@ -10,7 +10,11 @@
  * It fails closed: anything missing, unreachable, rejected, switched off, or
  * short of the copy the page needs leaves the current wording exactly as it is.
  */
-import {loadOneStory} from './storyblok-tour-source.mjs';
+import {
+  isStoryblokEuAssetUrl,
+  loadOneStory,
+  storyblokImageUrl,
+} from './storyblok-tour-source.mjs';
 
 export const CONTACT_STORY_SLUG = 'contact';
 
@@ -18,6 +22,42 @@ const text = value => (typeof value === 'string' ? value.trim() : '');
 const list = value => (Array.isArray(value) ? value : []);
 const blocksOf = (value, component) =>
   list(value).filter(entry => entry && entry.component === component);
+
+/*
+ * The band the hero occupies. The tag already carries these numbers — they are
+ * what stops the page jumping while the image loads — so the photograph is
+ * fetched for that slot rather than as a master.
+ *
+ * Doubled for the same reason the Sanity path doubles: a 1920-wide band on a
+ * phone is a 3840-wide band of pixels, and serving it at 1x is the difference
+ * between a sharp hero and a soft one. The master is 4100 square, so 3840x1440
+ * asks for nothing it does not hold.
+ */
+const HERO_SLOT = {width: 1920, height: 720};
+const HERO_REQUEST = {width: HERO_SLOT.width * 2, height: HERO_SLOT.height * 2};
+
+/**
+ * The hero photograph, in the shape the page-photo injector already accepts.
+ *
+ * It marks itself approved because reaching this point means it passed the
+ * gate: an editor put it in a published story, and only approved assets belong
+ * in one. The two approval flags exist for Sanity's editorial workflow, which
+ * Storyblok expresses through publishing instead.
+ */
+function heroPhoto(asset) {
+  const filename = text(asset?.filename);
+  if (!filename || !isStoryblokEuAssetUrl(filename)) return undefined;
+  const src = storyblokImageUrl(asset, HERO_REQUEST.width, HERO_REQUEST.height);
+  if (!src) return undefined;
+  return {
+    src,
+    alt: text(asset?.alt),
+    width: HERO_SLOT.width,
+    height: HERO_SLOT.height,
+    publicApprovalState: 'approved',
+    placeholderState: 'approved',
+  };
+}
 
 /** The only icons the existing renderer can draw. Anything else renders nothing. */
 const TRUST_ICONS = new Set(['pin', 'clock', 'lock']);
@@ -43,7 +83,10 @@ export function mapStoryblokContact(story) {
     .map(f => ({question: text(f.question), answer: text(f.answer)}))
     .filter(f => f.question && f.answer);
 
+  const coverPhoto = heroPhoto(c.hero_image);
+
   const mapped = {
+    ...(coverPhoto ? {coverPhoto} : {}),
     eyebrow: text(c.eyebrow),
     title: text(c.title),
     intro: text(c.intro),

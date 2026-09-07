@@ -365,9 +365,11 @@ for (const entry of rootEntries) {
     // that carries none is untouched and a photo that is not approved yet
     // leaves the committed image in place.
     const withPagePhotos = injectPagePhotos(withPolicy, {
-      // Still Sanity's. This phase migrated the Contact page's words, not its
-      // photograph, so the source is named explicitly rather than inherited.
-      contactHero: bookingContent.coverPhoto,
+      // Storyblok's when the Contact copy applied and carries one, and Sanity's
+      // otherwise — the merge leaves the original in place when the field is
+      // empty, so an unset photograph degrades to the current image rather
+      // than to nothing.
+      contactHero: storyblokContact.content.coverPhoto,
       ...experiencesPagePhotos.photos,
     });
     const withExperiences = injectLocalExperiences(withPagePhotos, experienceContent);
