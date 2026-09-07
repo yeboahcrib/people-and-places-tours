@@ -21,6 +21,7 @@ import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-brows
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadStoryblokHomepage} from './storyblok-homepage-source.mjs';
 import {loadStoryblokAbout} from './storyblok-about-source.mjs';
+import {loadStoryblokContact} from './storyblok-contact-source.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
@@ -153,6 +154,19 @@ if (storyblokAbout.source === 'applied') {
   console.log('Storyblok: About page content applied.');
 } else if (!['disabled', 'missing-configuration'].includes(storyblokAbout.source)) {
   console.warn('Storyblok: About page kept its current source (' + storyblokAbout.source + ').');
+}
+
+// The Contact page's copy reads from Storyblok behind its own flag, on the same
+// terms as the homepage and About. Only words: the form's fields, validation and
+// submission stay in code, and every failure path leaves the current wording.
+const storyblokContact = await loadStoryblokContact({
+  baseContent: bookingContent,
+  ...storyblokDelivery,
+});
+if (storyblokContact.source === 'applied') {
+  console.log('Storyblok: Contact copy applied.');
+} else if (!['disabled', 'missing-configuration'].includes(storyblokContact.source)) {
+  console.warn('Storyblok: Contact kept its current copy (' + storyblokContact.source + ').');
 }
 
 // Falling back is per-record and quiet by design, which is right for one bad
@@ -341,7 +355,7 @@ for (const entry of rootEntries) {
       )
       : withFooter;
     const withAbout = injectAboutContent(withHomepage, storyblokAbout.content);
-    const withBooking = injectBookingContent(withAbout, bookingContent);
+    const withBooking = injectBookingContent(withAbout, storyblokContact.content);
     // Guarded by filename: the renderer throws when a binding is missing, which
     // is what we want on a policy page and wrong everywhere else.
     const withPolicy = policies[entry.name]
@@ -351,6 +365,8 @@ for (const entry of rootEntries) {
     // that carries none is untouched and a photo that is not approved yet
     // leaves the committed image in place.
     const withPagePhotos = injectPagePhotos(withPolicy, {
+      // Still Sanity's. This phase migrated the Contact page's words, not its
+      // photograph, so the source is named explicitly rather than inherited.
       contactHero: bookingContent.coverPhoto,
       ...experiencesPagePhotos.photos,
     });
@@ -454,6 +470,7 @@ const buildHealth = {
   homepageContentSource,
   storyblokHomepageSource: storyblokHomepage.source,
   storyblokAboutSource: storyblokAbout.source,
+  storyblokContactSource: storyblokContact.source,
   bookingContentSource,
   policyContentSource,
   experienceContentSource,
