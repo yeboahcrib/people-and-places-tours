@@ -24,6 +24,7 @@ import {loadStoryblokAbout} from './storyblok-about-source.mjs';
 import {loadStoryblokContact} from './storyblok-contact-source.mjs';
 import {loadStoryblokPolicy} from './storyblok-policy-source.mjs';
 import {loadStoryblokGlobals} from './storyblok-globals-source.mjs';
+import {describeSourceView} from './health-source-view.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
@@ -511,6 +512,26 @@ const buildHealth = {
   siteUrl,
   botProtection: process.env.TURNSTILE_SITE_KEY ? 'turnstile' : 'none',
 };
+
+// A derived view of the same build. Every flat *ContentSource field above
+// keeps its meaning and its name; this one separates what shipped from what
+// it fell back to, because reading "sanity" next to five policies reporting
+// "applied" has caused that exact confusion.
+buildHealth.activeSources = describeSourceView({
+  contentSource,
+  homepageContentSource,
+  aboutContentSource,
+  bookingContentSource,
+  policyContentSource,
+  experienceContentSource,
+  tourContentSource,
+  storyblokHomepageSource: storyblokHomepage.source,
+  storyblokAboutSource: storyblokAbout.source,
+  storyblokContactSource: storyblokContact.source,
+  storyblokGlobalsSource,
+  storyblokPolicySources,
+  storyblokFallback: buildHealth.storyblokFallback,
+});
 
 await writeFile(
   join(outputRoot, 'health.json'),
