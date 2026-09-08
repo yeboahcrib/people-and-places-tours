@@ -59,7 +59,19 @@ export function renderStoryblokStandardToursBrowserOverlay({tours, appliedSlugs}
     throw new Error('Storyblok standard-tour overlay received duplicate or invalid approved slugs');
   }
 
-  const patches = uniqueSlugs.map(slug => {
+  // Sorted before serialising, and only for that reason.
+  //
+  // `appliedSlugs` arrives in the order the Storyblok requests happened to
+  // resolve — they are issued together and collected into a Map as each one
+  // returns — so the same ten records came back in a different order on every
+  // build. Nothing about the page changed, but the bytes did, and with them the
+  // file's content hash and the `?v=` on the script tag every page carries. A
+  // returning visitor re-downloaded this file after every deploy for no reason.
+  //
+  // Order is inert here: the patches are turned into a slug lookup below and
+  // the catalogue is walked in its own order, which comes from the committed
+  // records and is what a visitor sees. Sorting changes the file, not the site.
+  const patches = [...uniqueSlugs].sort().map(slug => {
     const matches = tours.filter(tour => tour?.slug === slug);
     if (matches.length !== 1) {
       throw new Error(`Storyblok standard-tour overlay requires exactly one approved ${slug} record`);
