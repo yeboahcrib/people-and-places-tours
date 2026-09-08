@@ -100,6 +100,20 @@ function assetDimensions(asset) {
   return width && height ? {width, height} : undefined;
 }
 
+/**
+ * Has an editor actually chosen a picture here?
+ *
+ * Storyblok stores an empty asset field as an object, not as nothing:
+ * `{id: null, filename: "", alt: null, fieldtype: "asset", ...}`. The editor
+ * shows that as "+ Add Asset" — correctly, because it is empty — so a truthiness
+ * check reads "a picture was chosen" on a field the editor is telling everyone
+ * is blank, and the tour is then refused for a broken hero nobody set.
+ *
+ * That cost two tours a migration and could not be fixed from the Studio, since
+ * the field already looked empty. An asset is chosen when it has a filename.
+ */
+const assetChosen = value => Boolean(text(value?.filename));
+
 function validAsset(value) {
   const filename = text(value?.filename);
   const alt = text(value?.alt);
@@ -192,8 +206,8 @@ function optionalSeo(value) {
   const title = text(item.title);
   const description = text(item.description);
   const indexing = text(item.indexing);
-  const socialImage = item.social_image ? validAsset(item.social_image) : undefined;
-  if (item.social_image && !socialImage) return undefined;
+  const socialImage = assetChosen(item.social_image) ? validAsset(item.social_image) : undefined;
+  if (assetChosen(item.social_image) && !socialImage) return undefined;
   if (indexing && !['index', 'noindex'].includes(indexing)) return undefined;
   return {
     ...(title ? {title} : {}),
@@ -250,7 +264,7 @@ export function mapStoryblokTour({story, baseTour, expectedFullSlug}) {
   const minimumGuests = positiveInteger(content.minimum_guests);
   const maximumGuests = positiveInteger(content.maximum_guests);
   const cardImage = validAsset(content.card_image);
-  const heroImage = content.hero_image ? validAsset(content.hero_image) : undefined;
+  const heroImage = assetChosen(content.hero_image) ? validAsset(content.hero_image) : undefined;
 
   if (
     !title || !cardDescription || !duration || !startingPoint || !overview
@@ -258,7 +272,7 @@ export function mapStoryblokTour({story, baseTour, expectedFullSlug}) {
     || !destination || !categories || !vibes || !locations || !included || !excluded
     || !goodToKnow || !faqs || !options || !gallery || !seo || !minimumGuests
     || !maximumGuests || minimumGuests > maximumGuests || !cardImage
-    || (content.hero_image && !heroImage)
+    || (assetChosen(content.hero_image) && !heroImage)
   ) return undefined;
 
   const card = storyblokImageUrl(cardImage, 1200, 840);
