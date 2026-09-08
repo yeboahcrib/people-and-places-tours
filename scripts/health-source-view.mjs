@@ -73,6 +73,7 @@ export function describeSourceView({
   policyContentSource,
   experienceContentSource,
   tourContentSource,
+  storyblokExperiencesSource,
   storyblokHomepageSource,
   storyblokAboutSource,
   storyblokContactSource,
@@ -106,12 +107,12 @@ export function describeSourceView({
       attempted: tourAttempted,
       fallbackCount: tourFallback,
     },
-    // Never migrated to Storyblok; named here so its absence is a stated fact
-    // rather than a gap someone has to notice.
+    // Only the add-on photograph has a Storyblok record; the page's copy and
+    // its hero image are still base content, so `effective` describes the
+    // picture rather than the whole page and says so in `scope`.
     experiences: {
-      effective: experienceContentSource,
-      base: experienceContentSource,
-      storyblok: 'not-migrated',
+      ...singleArea(storyblokExperiencesSource, experienceContentSource),
+      scope: 'add-on photograph only',
     },
   };
 }

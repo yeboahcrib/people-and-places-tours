@@ -24,6 +24,7 @@ import {loadStoryblokAbout} from './storyblok-about-source.mjs';
 import {loadStoryblokContact} from './storyblok-contact-source.mjs';
 import {loadStoryblokPolicy} from './storyblok-policy-source.mjs';
 import {loadStoryblokGlobals} from './storyblok-globals-source.mjs';
+import {loadStoryblokExperiences} from './storyblok-experiences-source.mjs';
 import {describeSourceView} from './health-source-view.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
@@ -208,6 +209,13 @@ const storyblokBrowserOverlayFile = storyblokBrowserOverlay
 // One request per policy page. They are independent documents; a missing
 // insurance page must not take the cancellation page down with it.
 const experiencesPagePhotos = await loadExperiencesPagePhotos();
+// The add-on photograph is the last picture Sanity still owns. Storyblok may
+// supply it; on any failure the build keeps whichever image it already
+// resolved, so the page is never left with an empty frame.
+const storyblokExperiences = await loadStoryblokExperiences({
+  basePhotos: experiencesPagePhotos.photos,
+  ...storyblokDelivery,
+});
 
 const policies = Object.fromEntries(await Promise.all(POLICY_PAGES.map(async page => {
   const {content, source} = await loadPolicyContent({
@@ -400,7 +408,7 @@ for (const entry of rootEntries) {
       // empty, so an unset photograph degrades to the current image rather
       // than to nothing.
       contactHero: storyblokContact.content.coverPhoto,
-      ...experiencesPagePhotos.photos,
+      ...storyblokExperiences.photos,
     });
     const withExperiences = injectLocalExperiences(withPagePhotos, experienceContent);
     const withContact = injectSiteContact(withExperiences, siteContent.siteSettings);
@@ -505,6 +513,7 @@ const buildHealth = {
   storyblokContactSource: storyblokContact.source,
   storyblokPolicySources,
   storyblokGlobalsSource,
+  storyblokExperiencesSource: storyblokExperiences.source,
   bookingContentSource,
   policyContentSource,
   experienceContentSource,
@@ -525,6 +534,7 @@ buildHealth.activeSources = describeSourceView({
   policyContentSource,
   experienceContentSource,
   tourContentSource,
+  storyblokExperiencesSource: storyblokExperiences.source,
   storyblokHomepageSource: storyblokHomepage.source,
   storyblokAboutSource: storyblokAbout.source,
   storyblokContactSource: storyblokContact.source,

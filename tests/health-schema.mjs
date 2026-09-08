@@ -29,6 +29,7 @@ const base = {
   storyblokAboutSource: 'applied',
   storyblokContactSource: 'applied',
   storyblokGlobalsSource: 'applied',
+  storyblokExperiencesSource: 'applied',
   storyblokPolicySources: {privacy: 'applied', terms: 'applied'},
   storyblokFallback: {mode: 'production', enforced: true, appliedCount: 10, attempted: 13},
 };
@@ -99,8 +100,19 @@ for (const [mode, enforced] of [['migration', false], ['production', true]]) {
   assert.equal(local.homepage.base, 'local');
 }
 
-// Experiences was never migrated; the view states that rather than leaving a gap.
-assert.equal(describeSourceView(base).experiences.storyblok, 'not-migrated');
+// Only the add-on photograph is in Storyblok, so `effective` describes that
+// picture and not the whole Experiences page. The scope note has to survive,
+// because without it "storyblok" reads as a claim about the page's copy too.
+{
+  const view = describeSourceView(base);
+  assert.equal(view.experiences.storyblok, 'applied');
+  assert.equal(view.experiences.effective, 'storyblok');
+  assert.equal(view.experiences.scope, 'add-on photograph only',
+    'the experiences entry lost the note saying how narrow it is');
+  // And it falls back like everything else.
+  const off = describeSourceView({...base, storyblokExperiencesSource: 'disabled'});
+  assert.equal(off.experiences.effective, 'sanity');
+}
 
 // ── The emitted file ──
 

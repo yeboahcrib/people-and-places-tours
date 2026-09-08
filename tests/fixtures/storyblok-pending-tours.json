@@ -1,0 +1,344 @@
+{
+  "accra-food": {
+    "content": {
+      "seo": [
+        {
+          "_uid": "29eefa53-5852-ac9f-60d9-68029d07bd2c",
+          "title": "Accra After Dark Food Tour | People & Places Tours",
+          "indexing": "index",
+          "component": "seo"
+        }
+      ],
+      "_uid": "d522d249-e994-1f49-06b8-37487ff9ca55",
+      "faqs": [
+        {
+          "_uid": "16ba562b-b55c-1961-894f-864755500a11",
+          "answer": "Evening tour. We pick you up around 6:30\u20137pm, when Accra's night food scene starts coming alive.",
+          "question": "What time does this tour start?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "f82d3bd7-7206-dcbc-16cd-04433540eb78",
+          "answer": "Typically 4\u20136 stops \u2014 a mix of street stalls, chop bars, and local restaurants that Accra residents actually eat at, far from hotel buffets.",
+          "question": "How many food stops are there?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "5ac8f258-b0db-d993-400d-95a7f9e6e4a7",
+          "answer": "Plenty. You'll leave full. Each stop is a real portion, not a small bite.",
+          "question": "Will there be enough food?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "b25d4289-fbac-36f6-05c2-257ec4c3f6e0",
+          "answer": "Yes. Let us know when booking and we'll ensure each stop has solid vegetarian options ready.",
+          "question": "Are vegetarian options available?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "882b334e-09c0-7474-fdb7-0cf8dc45a251",
+          "answer": "Completely. Our guides take you only to vendors they know personally \u2014 high turnover, fresh ingredients, loyal local crowds.",
+          "question": "Is it safe to eat street food?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "ca1eb063-4c92-48ad-7ba2-284fed8f1d58",
+          "answer": "Casual and comfortable. This is a street crawl, not a sit-down dinner. Wear clothes you can move freely in.",
+          "question": "What should I wear?",
+          "component": "faq_item"
+        }
+      ],
+      "name": "Accra After Dark Food Tour",
+      "slug": "accra-food",
+      "price": "90",
+      "vibes": [
+        "Foodie",
+        "Nightlife"
+      ],
+      "gallery": [],
+      "currency": "USD",
+      "duration": "Evening",
+      "excluded": [
+        {
+          "_uid": "788ff6d5-fbfa-794c-dd65-d22ced45f040",
+          "text": "Alcoholic drinks",
+          "component": "list_item"
+        },
+        {
+          "_uid": "5ccf23c8-54cf-9170-1415-63cda4c35282",
+          "text": "Additional food purchases beyond the tastings",
+          "component": "list_item"
+        },
+        {
+          "_uid": "1a3844cb-4838-1237-118c-26907d84b16d",
+          "text": "Gratuities",
+          "component": "list_item"
+        },
+        {
+          "_uid": "e9246cd6-b888-bbe7-acf8-30d2315daf4c",
+          "text": "Personal expenses",
+          "component": "list_item"
+        }
+      ],
+      "included": [
+        {
+          "_uid": "65621387-f47c-9538-7798-64e1b31b4aa7",
+          "text": "Professional local food guide",
+          "component": "list_item"
+        },
+        {
+          "_uid": "3a12a7e1-77bd-e00d-27c3-21487a549fb1",
+          "text": "4\u20135 food tastings across stops",
+          "component": "list_item"
+        },
+        {
+          "_uid": "928681b7-8d73-c9d3-7fad-e2d3aea5e238",
+          "text": "Local soft drinks or water",
+          "component": "list_item"
+        },
+        {
+          "_uid": "1d60e4fb-7b36-dcce-414a-f329497c8186",
+          "text": "Transport between food stops",
+          "component": "list_item"
+        },
+        {
+          "_uid": "8b2f3070-14b4-4bd1-ae57-5d7f45b27ca0",
+          "text": "Chop bar experience",
+          "component": "list_item"
+        }
+      ],
+      "overview": "From waakye stalls to kelewele vendors and rooftop bars - taste Accra's legendary food scene as the city lights up at night.",
+      "component": "tour",
+      "locations": [
+        {
+          "_uid": "9c94e2b7-a9c2-08f1-fa17-3ba42e98e68b",
+          "text": "Accra",
+          "component": "list_item"
+        }
+      ],
+      "published": false,
+      "card_badge": "Foodie",
+      "categories": [
+        "food",
+        "culture"
+      ],
+      "price_unit": "Per Person",
+      "destination": "accra",
+      "good_to_know": [
+        {
+          "_uid": "cbd40b18-f04d-a9ae-0519-606d4668b5a9",
+          "text": "Waakye \u2014 rice and beans cooked together \u2014 is one of Ghana's most beloved street foods. The reddish color comes from dried sorghum leaves added during cooking.",
+          "component": "list_item"
+        },
+        {
+          "_uid": "8f281406-5b71-00b4-dbc6-6bf4803a1070",
+          "text": "Kelewele (spiced fried plantain) is believed to have West African roots going back centuries, spiced with a blend that varies by vendor and family.",
+          "component": "list_item"
+        },
+        {
+          "_uid": "d4e50bec-98c3-dfa3-fd81-58eff125a767",
+          "text": "Accra's night food scene centers around neighborhoods like Osu, Labone, and Adabraka \u2014 each with its own street food identity and loyal local crowd.",
+          "component": "list_item"
+        }
+      ],
+      "display_order": "3",
+      "page_headline": "The City's Best Flavours Come Out at Night",
+      "price_options": [
+        {
+          "_uid": "66756239-6da5-c749-f8fd-35b9f2ef1a5f",
+          "label": "For 2 guests (per person)",
+          "price": "110",
+          "component": "price_option"
+        }
+      ],
+      "hero_watermark": "ACCRA",
+      "maximum_guests": "8",
+      "minimum_guests": "3",
+      "search_summary": "Waakye, kelewele, chop bars, night markets",
+      "starting_point": "Pickup and drop-off from Accra or your hotel, unless a different arrangement is requested.",
+      "experience_type": "day",
+      "group_size_note": "Minimum three travellers. Two can be accommodated at $110 per person.",
+      "card_description": "From waakye stalls to kelewele vendors and rooftop bars - taste Accra's legendary food scene as the city lights up at night."
+    }
+  },
+  "volta-community": {
+    "content": {
+      "seo": [
+        {
+          "_uid": "0a36242d-c10f-5a08-e8ff-2da3650647db",
+          "title": "Volta Community Tour | People & Places Tours",
+          "indexing": "index",
+          "component": "seo"
+        }
+      ],
+      "_uid": "1636ff24-5dc9-5a21-7b1f-2df958fe4fe5",
+      "faqs": [
+        {
+          "_uid": "0896860b-5bee-9549-287d-cdf7abcee6cb",
+          "answer": "The Volta Day Tour is the sights: Mount Gemi, the monkey sanctuary and Wli. This one is the people: farms, palm wine, distilling and cocoa, with Wli at the end.",
+          "question": "How is this different from the Volta Day Tour?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "d62d2692-d069-a9ce-0498-eb6ca6d935b0",
+          "answer": "Yes. Tasting the palm wine and the akpeteshie is part of the day. Anything you want to buy and take home is not.",
+          "question": "Is the palm wine tasting included?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "c411efe4-c7a1-6d42-0bed-d6f5c1d8e4b9",
+          "answer": "Four to five hours each way, so we leave Accra very early to make the most of the daylight.",
+          "question": "How long is the drive?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "b14c6742-4d0d-4d1e-ac38-ad1fcdddb87c",
+          "answer": "About thirty minutes on a forest path to the lower falls. Regular fitness is fine, and it can be slippery in the wet season.",
+          "question": "Is there a hike to the waterfall?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "c3b34c48-fd51-8be8-6006-51e8039605ef",
+          "answer": "Yes, and it is welcome. Anything you buy is between you and them, and is not part of the tour price.",
+          "question": "Can I buy from the farmers?",
+          "component": "faq_item"
+        },
+        {
+          "_uid": "71c40df4-84dc-7bdd-62e8-3dc5f9f66261",
+          "answer": "Walking shoes, a light rain jacket, sun protection and cash for anything you want to buy from the producers.",
+          "question": "What should I bring?",
+          "component": "faq_item"
+        }
+      ],
+      "name": "Volta Community Tour",
+      "slug": "volta-community",
+      "price": "230",
+      "vibes": [
+        "Culture",
+        "Nature"
+      ],
+      "gallery": [],
+      "currency": "USD",
+      "duration": "Full Day",
+      "excluded": [
+        {
+          "_uid": "ca354d14-c93f-4aaf-592b-9fd499b0cc73",
+          "text": "Gratuities",
+          "component": "list_item"
+        },
+        {
+          "_uid": "89ddf965-933e-1b9f-02bb-f86d8bcbbce1",
+          "text": "Personal expenses",
+          "component": "list_item"
+        },
+        {
+          "_uid": "f361c560-ae4e-c8d4-6017-caca77dca171",
+          "text": "Lunch",
+          "component": "list_item"
+        },
+        {
+          "_uid": "abb3b174-3639-bad3-2f9c-74201cf9f1e3",
+          "text": "Any items purchased from local farmers, producers or communities",
+          "component": "list_item"
+        }
+      ],
+      "included": [
+        {
+          "_uid": "3fac8d24-b9d8-93f2-a1f3-e72325607a4e",
+          "text": "Hotel or apartment pickup and drop-off in Accra",
+          "component": "list_item"
+        },
+        {
+          "_uid": "ff3134f3-f6e2-d2b0-107e-a9c9782a4f34",
+          "text": "Private transportation and fuel surcharge",
+          "component": "list_item"
+        },
+        {
+          "_uid": "4addb558-2227-3318-d8b9-12a84fde32a2",
+          "text": "Professional tour guide",
+          "component": "list_item"
+        },
+        {
+          "_uid": "539a6581-ab90-23e2-9e81-aa330080b1b8",
+          "text": "Local guide for the included community experiences",
+          "component": "list_item"
+        },
+        {
+          "_uid": "f0d815e7-78b9-2240-c7eb-9bfbbace8048",
+          "text": "Drinks, snacks and bottled water",
+          "component": "list_item"
+        },
+        {
+          "_uid": "47fe2b08-d77e-330c-8a5c-7e9cc02ede93",
+          "text": "Entry fees to all included sites and experiences",
+          "component": "list_item"
+        },
+        {
+          "_uid": "9c24437a-a7da-6375-046c-607dd46fc0ca",
+          "text": "Palm wine and akpeteshie tasting",
+          "component": "list_item"
+        },
+        {
+          "_uid": "cce00752-1564-7d65-e7d4-5871944f3094",
+          "text": "Applicable taxes",
+          "component": "list_item"
+        }
+      ],
+      "overview": "A day with the people who grow and make things in the Volta Region: palm wine harvested and distilled into akpeteshie, palm oil pressed, cocoa picked, and Wli Waterfalls to finish.",
+      "component": "tour",
+      "locations": [
+        {
+          "_uid": "e739215e-9cbf-d2f3-1d10-6de7519a26b0",
+          "text": "Adome",
+          "component": "list_item"
+        },
+        {
+          "_uid": "842cb898-897f-cab9-5a75-90304f12bc4b",
+          "text": "Volta Region",
+          "component": "list_item"
+        },
+        {
+          "_uid": "ec733df2-2932-5b79-e473-51388b548aee",
+          "text": "Wli",
+          "component": "list_item"
+        }
+      ],
+      "published": false,
+      "card_badge": "Cultural",
+      "categories": [
+        "culture",
+        "nature"
+      ],
+      "price_unit": "Per Person",
+      "destination": "volta",
+      "good_to_know": [
+        {
+          "_uid": "005c2c97-e5b3-c63a-d486-c0245b89608f",
+          "text": "Akpeteshie is distilled from fermented palm wine and was banned under colonial rule.",
+          "component": "list_item"
+        },
+        {
+          "_uid": "5e695797-4090-9fa1-ced1-e7ed15224776",
+          "text": "Ghana was the world's largest cocoa producer for much of the twentieth century.",
+          "component": "list_item"
+        },
+        {
+          "_uid": "41fb9a93-2c56-0d4a-eac4-7cc29e1646b8",
+          "text": "Wli Waterfalls is the highest in West Africa.",
+          "component": "list_item"
+        }
+      ],
+      "display_order": "13",
+      "page_headline": "The Volta Region, From the Inside.",
+      "price_options": [],
+      "hero_watermark": "VOLTA",
+      "maximum_guests": "12",
+      "minimum_guests": "1",
+      "search_summary": "Palm wine distilling, cocoa farm, Wli Waterfalls",
+      "starting_point": "Accra, Ghana",
+      "experience_type": "day",
+      "group_size_note": "",
+      "card_description": "A day with the people who grow and make things in the Volta Region: palm wine harvested and distilled into akpeteshie, palm oil pressed, cocoa picked, and Wli Waterfalls to finish."
+    }
+  }
+}
