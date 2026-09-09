@@ -263,6 +263,13 @@ const tourPageTemplate = generateTourPages ? await loadTourPageTemplate(projectR
 const tourPageContent = generateTourPages
   ? JSON.parse(await readFile(join(projectRoot, 'src/content/tour-pages.json'), 'utf8')).tours
   : {};
+// A tour page shares its own photograph, not the site banner. The catalogue is
+// keyed by the page each tour lives on, so this reaches Just Go Ghana too —
+// its page is committed rather than generated, so it never appears in
+// generatedTourPages and had been falling back to the banner.
+const tourByPage = new Map(
+  tours.filter(tour => tour?.detailUrl && tour?.socialImage).map(tour => [tour.detailUrl, tour]),
+);
 const generatedTourPages = new Map();
 if (generateTourPages) {
   for (const tour of tours) {
@@ -280,6 +287,9 @@ if (generateTourPages) {
         catalogue: tours,
       }),
       seo: merged.seo,
+      // Carried alongside seo so a tour with no seo.social_image still shares
+      // its own card photograph rather than the site banner.
+      socialImage: merged.socialImage,
     });
   }
 }
@@ -426,7 +436,7 @@ for (const entry of rootEntries) {
       file: entry.name,
       siteUrl,
       siteName: siteContent.siteSettings.businessName,
-      ogImage: generatedTour?.seo?.socialImage || ogImage,
+      ogImage: generatedTour?.seo?.socialImage || tourByPage.get(entry.name)?.socialImage || ogImage,
       canonicalOverride: generatedTour?.seo?.canonicalOverride,
       organization: organizationSchema,
     });
@@ -458,7 +468,7 @@ for (const [fileName, generatedTour] of generatedTourPages) {
     file: fileName,
     siteUrl,
     siteName: siteContent.siteSettings.businessName,
-    ogImage: generatedTour.seo?.socialImage || ogImage,
+    ogImage: generatedTour.seo?.socialImage || generatedTour.socialImage || ogImage,
     canonicalOverride: generatedTour.seo?.canonicalOverride,
   });
   if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(fileName);

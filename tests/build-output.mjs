@@ -387,8 +387,18 @@ for (const tour of standardTours) {
   const detail = await readFile(join(outputPath, justGoGhana.detailUrl), 'utf8');
   assert(detail.includes('<h1>Just Go Ghana</h1>'),
     'Just Go Ghana page content was unexpectedly replaced during the standard-tour migration');
-  assert(!detail.includes('a.storyblok.com'),
-    'Just Go Ghana must not receive a Storyblok standard-tour asset during Phase 3C');
+  // Written in Phase 3C, when Just Go Ghana was deliberately outside the
+  // standard-tour migration and no Storyblok asset had any business reaching it.
+  // It is migrated now — its own multi-day record, its own published photograph
+  // — so the page legitimately names that photograph as its social image.
+  //
+  // What the guard was actually protecting is the page itself: its content is
+  // committed, not generated, and the migration must not rewrite it. So the
+  // check now covers the body, where a replaced hero or card would show, and
+  // leaves <head> to carry the tour's own image.
+  const detailBody = /<body[\s\S]*<\/body>/i.exec(detail)?.[0] ?? detail;
+  assert(!detailBody.includes('a.storyblok.com'),
+    'Just Go Ghana page content was replaced by a Storyblok asset; its page is committed, not generated');
 }
 
 // A tour created in the CMS has no file in the repository, so nothing would

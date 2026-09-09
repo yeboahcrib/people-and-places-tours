@@ -229,6 +229,18 @@ function mergeDefined(base, patch) {
  * tour shape. The base tour intentionally provides route and local-only
  * presentation fields so Storyblok paths can never alter live URLs.
  */
+/**
+ * The proportions a link preview is cropped to on WhatsApp, Instagram and X.
+ *
+ * A tour whose SEO block names its own social image keeps it. Otherwise the
+ * approved card photograph is re-requested at these proportions, because a tour
+ * shared into a chat should show that tour rather than the site banner — and
+ * the photograph is already approved and already on the page, so nothing new is
+ * being published. A tour with no usable photograph still falls back to the
+ * banner.
+ */
+export const SOCIAL_IMAGE = Object.freeze({width: 1200, height: 630});
+
 export function mapStoryblokTour({story, baseTour, expectedFullSlug}) {
   if (!story || !baseTour || !expectedFullSlug) return undefined;
   const content = story.content;
@@ -320,6 +332,7 @@ export function mapStoryblokTour({story, baseTour, expectedFullSlug}) {
     // data. The renderer still keeps its existing three-image threshold.
     gallery: gallery.length >= 3 ? gallery : [],
     seo,
+    socialImage: seo.socialImage || storyblokImageUrl(cardImage, SOCIAL_IMAGE.width, SOCIAL_IMAGE.height),
   });
 }
 
@@ -680,6 +693,7 @@ export function mapStoryblokMultiDayTour({story, baseTour, expectedFullSlug}) {
     excluded,
     faqs,
     itinerary,
+    socialImage: storyblokImageUrl(cardImage, SOCIAL_IMAGE.width, SOCIAL_IMAGE.height),
   });
 }
 

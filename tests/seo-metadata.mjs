@@ -126,4 +126,42 @@ const parse = script => JSON.parse(/<script[^>]*>([\s\S]*?)<\/script>/.exec(scri
     'the organization record should not be repeated on every page');
 }
 
+// ── Social images ──
+//
+// A tour shared into a chat should show that tour. Three pages were falling
+// back to the site banner because their Storyblok SEO block named no social
+// image — including Just Go Ghana, whose page is committed rather than
+// generated and so never appeared in the generated-page map at all.
+
+{
+  const projectRoot2 = fileURLToPath(new URL('../', import.meta.url));
+  const {readdir} = await import('node:fs/promises');
+  const files = (await readdir(`${projectRoot2}dist`)).filter(f => f.endsWith('.html'));
+  const tourPages = files.filter(f => /-tour\.html$|^just-go-ghana\.html$|^batik-workshop\.html$/.test(f));
+  assert(tourPages.length >= 12, `expected the tour pages, found ${tourPages.length}`);
+
+  for (const file of tourPages) {
+    const html = await readFile(`${projectRoot2}dist/${file}`, 'utf8');
+    const og = /property="og:image"[^>]+content="([^"]*)"/.exec(html)?.[1];
+    const tw = /name="twitter:image"[^>]+content="([^"]*)"/.exec(html)?.[1];
+    assert(og, `${file} has no og:image`);
+    assert(!og.includes('reviews-trust-banner'),
+      `${file} still shares the generic site banner instead of its own photograph`);
+    assert(og.includes('a.storyblok.com'), `${file} social image is not the approved Storyblok photograph`);
+    assert(/\/m\/1200x630\//.test(og), `${file} social image is not cropped to link-preview proportions: ${og}`);
+    assert.equal(tw, og, `${file} twitter:image and og:image disagree`);
+  }
+}
+
+// The banner remains the fallback for everything that is not a tour.
+{
+  const projectRoot3 = fileURLToPath(new URL('../', import.meta.url));
+  for (const file of ['index.html', 'about.html', 'contact.html', 'privacy-policy.html']) {
+    const html = await readFile(`${projectRoot3}dist/${file}`, 'utf8');
+    const og = /property="og:image"[^>]+content="([^"]*)"/.exec(html)?.[1];
+    assert(og && og.includes('reviews-trust-banner'),
+      `${file} should still use the site banner; a page with no tour photograph must have a fallback`);
+  }
+}
+
 console.log('SEO metadata tests passed.');
