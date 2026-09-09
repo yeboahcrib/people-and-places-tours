@@ -90,6 +90,30 @@ function renderTripDetails(tour) {
 // Derived rather than authored: the plan calls for this, and a hand-picked
 // list is how a withdrawn tour ends up still being advertised from three
 // other pages.
+/**
+ * A meta description search engines will actually show.
+ *
+ * A tour page with no authored `seo.description` falls back to its intro, which
+ * is a full paragraph — twelve pages shipped descriptions between 251 and 630
+ * characters, and Google cuts the snippet around 160. The tail was never seen,
+ * and the first sentence was carrying it anyway.
+ *
+ * So a fallback is trimmed to a whole sentence where one fits, and otherwise to
+ * a word boundary. An editor's own `seo.description` is never touched: a
+ * description someone wrote deliberately is theirs, at whatever length they
+ * chose. No wording is invented here — only the point at which it stops.
+ */
+export function metaDescription(text, limit = 160) {
+  const flat = String(text ?? '').replace(/\s+/g, ' ').trim();
+  if (flat.length <= limit) return flat;
+  const stop = flat.lastIndexOf('.', limit);
+  // A sentence ending is better than an ellipsis, but not if it throws away
+  // most of the description to get there.
+  if (stop >= limit * 0.6) return flat.slice(0, stop + 1);
+  const space = flat.lastIndexOf(' ', limit - 1);
+  return flat.slice(0, space > 0 ? space : limit).replace(/[,;:\s]+$/, '') + '…';
+}
+
 function relatedTours(tour, catalogue) {
   const sameCategory = catalogue.filter(other =>
     other.slug !== tour.slug
@@ -128,7 +152,10 @@ export function renderTourPage({template, tour, catalogue}) {
   const values = {
     TITLE: escapeHtml(tour.title),
     PAGE_TITLE: escapeHtml(seo.title || `${tour.title} | People & Places Tours`),
-    META_DESCRIPTION: escapeHtml(seo.description || tour.pageIntro || tour.description || ''),
+    // An authored description ships as written; a fallback is trimmed to what
+    // a search result will actually display.
+    META_DESCRIPTION: escapeHtml(seo.description
+      || metaDescription(tour.pageIntro || tour.description || '')),
     ROBOTS_META: seo.indexing === 'noindex' ? '<meta name="robots" content="noindex,follow" />' : '',
     WATERMARK: escapeHtml(tour.heroWatermark || tour.title.toUpperCase()),
     TAGS: (tour.vibes || []).slice(0, 2).map(vibe => `<span class="tag">${escapeHtml(vibe)}</span>`).join(''),

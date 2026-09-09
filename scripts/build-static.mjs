@@ -35,7 +35,7 @@ import {injectPagePhotos} from './render-page-photos.mjs';
 import {loadExperiencesPagePhotos} from './experiences-page-source.mjs';
 import {loadExperienceContent, loadLocalExperienceContent} from './local-experience-source.mjs';
 import {injectLocalExperiences} from './render-local-experiences.mjs';
-import {injectPageMeta, normaliseSiteUrl, renderRobots, renderSitemap} from './render-meta.mjs';
+import {injectPageMeta, normaliseSiteUrl, renderOrganizationSchema, renderRobots, renderSitemap} from './render-meta.mjs';
 import {loadAboutContent, loadLocalAboutContent} from './about-source.mjs';
 import {injectAboutContent} from './render-about.mjs';
 
@@ -112,6 +112,11 @@ const {content: committedSiteContent, source: contentSource} = await loadSiteCon
 const {content: siteContent, source: storyblokGlobalsSource} = await loadStoryblokGlobals({
   baseContent: committedSiteContent,
   ...storyblokDelivery,
+});
+const organizationSchema = renderOrganizationSchema({
+  siteUrl: normaliseSiteUrl(process.env.SITE_URL),
+  settings: siteContent.siteSettings,
+  social: siteContent.social,
 });
 const navigation = renderNavigationTemplate(navigationTemplate, siteContent);
 const footer = renderFooterTemplate(footerTemplate, siteContent);
@@ -423,6 +428,7 @@ for (const entry of rootEntries) {
       siteName: siteContent.siteSettings.businessName,
       ogImage: generatedTour?.seo?.socialImage || ogImage,
       canonicalOverride: generatedTour?.seo?.canonicalOverride,
+      organization: organizationSchema,
     });
     if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(entry.name);
     const withNext = injectFormNext(withMeta, siteUrl);

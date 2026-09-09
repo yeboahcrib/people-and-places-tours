@@ -41,7 +41,7 @@ export const pageUrl = (siteUrl, file) =>
  * Adds social and canonical metadata to one page. Pages that already declare
  * og: tags are left alone, so hand-authored overrides always win.
  */
-export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonicalOverride}) {
+export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonicalOverride, organization}) {
   if (/property="og:/i.test(html)) return html;
 
   const title = decodeEntities((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || siteName).trim();
@@ -73,10 +73,52 @@ export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonica
     `<meta name="twitter:image" content="${escapeAttr(socialImage)}" />`,
   ];
   if (robotsNoindex) tags.shift();
+  // Homepage only: one identity record for the site, not one per page.
+  if (file === 'index.html' && organization) tags.push(organization);
 
   const block = tags.map(tag => `  ${tag}`).join('\n');
   if (!/<\/head>/i.test(html)) throw new Error(`${file} has no </head> to inject metadata into`);
   return html.replace(/<\/head>/i, `${block}\n</head>`);
+}
+
+/**
+ * Identity markup for the homepage, and only the homepage.
+ *
+ * The site carried no structured data at all, so a search engine had to infer
+ * from prose that People & Places is a Ghanaian tour operator, that the number
+ * in the footer is how you reach it, and that the Instagram and TikTok accounts
+ * belong to the same business. Those are facts the pages already state; this
+ * states them in the form a crawler reads directly.
+ *
+ * Every value comes from the same siteSettings the footer and contact page
+ * render, so it cannot drift from what a visitor sees, and nothing is asserted
+ * that is not already published. Claims a crawler could check and find wrong —
+ * ratings, prices, opening hours as structured times — are deliberately left
+ * out. Those belong with a decision about what the business wants to stand
+ * behind, not in a metadata pass.
+ */
+export function renderOrganizationSchema({siteUrl, settings = {}, social = {}}) {
+  const sameAs = [social.instagramUrl, social.tiktokUrl].filter(Boolean);
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'TravelAgency',
+    name: settings.businessName,
+    url: `${siteUrl}/`,
+    ...(settings.email ? {email: settings.email} : {}),
+    ...(settings.primaryPhone ? {telephone: settings.primaryPhone} : {}),
+    ...(sameAs.length ? {sameAs} : {}),
+    address: {'@type': 'PostalAddress', addressCountry: 'GH'},
+    areaServed: {'@type': 'Country', name: 'Ghana'},
+  };
+  // JSON inside a <script> must not be able to close the tag early.
+  //
+  // The replacement must be the two-character escape a JSON parser decodes
+  // back to "<", written here as a literal backslash. Writing '\u003c' with a
+  // single backslash makes JavaScript decode it at parse time, so the call
+  // becomes replace('<', '<') — a no-op that reads as protection. The test
+  // for this caught exactly that.
+  const json = JSON.stringify(data, null, 2).replace(/</g, '\\u003c');
+  return `<script type="application/ld+json">\n${json}\n</script>`;
 }
 
 export function renderSitemap(siteUrl, files, lastmod) {
