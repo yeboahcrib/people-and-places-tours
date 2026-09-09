@@ -323,6 +323,10 @@ those enquiries.
 
 ## Publishing from Sanity
 
+Sanity is still the base content layer beneath every Storyblok merge, so this
+path remains live. For the workflow an editor uses day to day, see **Publishing
+from Storyblok** below.
+
 Set up 21 August 2026. Two pieces, both configured through dashboards; there is
 nothing in this repository that implements them.
 
@@ -348,3 +352,74 @@ webhook rebuilds it; it does not make page views query Sanity.
 scope only. Previews build from the committed content unless the same variable
 is added to the Preview scope.
 
+## Publishing from Storyblok
+
+Set up and verified 9 September 2026. This is the path an editor uses now. Like
+the Sanity one it is two dashboard pieces, and nothing in this repository
+implements it.
+
+**Cloudflare deploy hook** — Pages → Settings → Deploy Hooks, named
+`Storyblok publish`, targeting `main`. Treat the URL it returns as a secret:
+possession of it is authority to rebuild the site. It is not signed and not
+checked, so a Storyblok webhook secret would be sent and ignored; the URL
+staying private is the whole access model.
+
+**Storyblok webhook** — Settings → Webhooks, named `Cloudflare deploy`,
+pointing at that URL, firing on **story published, unpublished, deleted and
+moved**.
+
+Those four and no others. Assets and datasources are deliberately excluded: the
+build reads exactly one endpoint, `/v2/cdn/stories/...`, and each story carries
+its own copy of an asset's filename and alt text, so an asset edit only reaches
+the site when the story using it is republished. *Moved* is included because
+every adapter matches its record by full slug — `tours/day-short-experiences/kumasi`,
+`policies/privacy`, `globals/site` — so moving a story to another folder makes
+the adapter stop finding it and the page fall back silently. A build is what
+surfaces that in the health report.
+
+No save or draft trigger is selected. Storyblok autosaves while an editor
+types, which would mean a build every few seconds — the same reason the Sanity
+webhook excludes drafts.
+
+### What was verified
+
+Tested by republishing `globals/site` with byte-identical content: a real
+publish event with nothing changed on the site, so the delivery path could be
+proven without touching what a visitor sees.
+
+| | |
+| --- | --- |
+| Publish | 00:56:54Z |
+| Production build finished | 00:57:39Z |
+| Elapsed | about 45 seconds |
+| Manual Cloudflare action | none |
+
+After that webhook-triggered build, production reported `status: ok`, Tours
+13 of 13 applied with zero on fallback, no withdrawals and no transport,
+auth/config or content failures, and every Storyblok page source — homepage,
+about, contact, globals, experiences and all five policies — still `applied`.
+
+**Publishing in Storyblok therefore needs no "Retry deployment" in Cloudflare.**
+Saving a draft still changes nothing on the live site; publishing is what
+rebuilds it.
+
+## Open: GitHub to Cloudflare deploy triggering
+
+Separate from the above and **not investigated or changed**. During the session
+of 8 September 2026, pushes to `main` did not reliably start a Cloudflare build:
+
+- an empty commit produced no build and never appeared in the deployment list;
+- a force-push (a rebase) produced none either;
+- an ordinary commit usually did, but one sat unbuilt for several minutes until
+  a further push forced it.
+
+A manual dashboard action always worked. Note that this project's Deployments
+view offers Retry and Rollback per deployment but no "Create deployment", and
+both rebuild an *existing* commit — so neither can pick up a new branch head.
+Retry is right when the code is already correct and only content or an
+environment variable changed, and wrong when the code itself has moved.
+
+This affects code deploys only. Content publishing is covered by the Storyblok
+webhook above. The next step, when someone picks it up, is the repository's
+Settings → Webhooks delivery log, which shows whether GitHub is sending the
+events and how Cloudflare responds.
