@@ -130,6 +130,8 @@
     .faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0;cursor:pointer;font-weight:600;font-size:var(--text-lg);color:var(--dark);gap:1rem;}
     
     .faq-a{display:none;padding-bottom:1.1rem;color:#6B7280;font-size:var(--text-base);line-height:1.8;}
+    .faq-aside{margin-top:1.75rem;color:#6B7280;font-size:var(--text-base);line-height:1.7;}
+    .faq-aside a{color:var(--yellow-on-light);font-weight:600;text-decoration:underline;text-underline-offset:3px;}
     .faq-item.open .faq-a{display:block;}
     @media(max-width:600px){.trip-hero{padding:6rem 1.25rem 2rem;}.content-wrap{padding:2rem 1.25rem;}
     /* One row per line on a phone. How the label and value sit inside a row is
@@ -242,6 +244,10 @@
     <div class="faq">
 {{FAQS}}
     </div>
+    <!-- The practical questions this page cannot answer, one click away. It
+         sits after the FAQs because that is where somebody is already asking
+         them, not in the footer where nobody looks for a yellow fever rule. -->
+    <p class="faq-aside">First time flying into Ghana? <a href="travel-information.html">Travelling to Ghana</a> covers visas, yellow fever, money, SIM cards and getting in from the airport.</p>
 </div>
 
 <div class="also-check">

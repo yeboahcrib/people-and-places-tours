@@ -3728,6 +3728,40 @@ body.page-entering {
   line-height: 1.65;
 }
 .pathways-cta { margin-top: var(--sp-5); }
+/* One line of named tours under the pathway grid. The cards themselves are
+   whole-card links into the filtered catalogue, so this is the only place on
+   the homepage a tour can be linked by name. Yellow on a light surface needs
+   --yellow-on-light; --color-primary fails AA here. */
+.pathways-jump {
+  margin-top: var(--sp-4);
+  font-size: var(--text-sm);
+  color: var(--muted-dark);
+  /* Tall enough that the padded links below never collide across wrapped
+     rows: at 13px this is ~34px a row, against a 32px link. */
+  line-height: 2.6;
+}
+.pathways-jump a {
+  color: var(--yellow-on-light);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  /* This is a row of destinations, not a link inside a sentence, so it has to
+     clear the 32px touch target. The padding is transparent — it enlarges the
+     thumb area without moving the text. */
+  display: inline-block;
+  line-height: 1.25;
+  padding: 8px 0;
+}
+.pathways-jump a:not(:last-child)::after {
+  content: " ·";
+  color: var(--muted-dark);
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  margin: 0 var(--sp-0-5) 0 var(--sp-1);
+}
+.pathways-jump a:hover { color: var(--pap-charcoal); }
 
 /* ────────────────────────────────────────────────────────────── */
 /*  HOMEPAGE — HOW HOSTED principle proof (extends .why-row)      */

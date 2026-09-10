@@ -100,6 +100,25 @@
           image: { src: 'assets/photos/pathway-multiday-group.jpg', width: 675, height: 900, alt: 'A guest group celebrating together after a multi-day Ghana trip' },
         },
       ],
+      // One named tour per pathway above, in the same order.
+      //
+      // The cards are whole-card links into a filtered catalogue, so a second
+      // link cannot be nested inside one. Without this row the homepage links
+      // to no tour page at all: everything funnels through the grid, and the
+      // tours people arrive looking for by name are three clicks away.
+      // Storyblok sets eyebrow, title, intro, pathways and cta on this
+      // section, so a key it does not know about survives the merge.
+      jumpLinks: {
+        label: 'Or go straight to a tour:',
+        items: [
+          { label: 'Cape Coast Ancestral Tour', href: 'cape-coast-tour.html' },
+          { label: 'Accra After Dark Food Tour', href: 'accra-food-tour.html' },
+          { label: 'Volta Day Tour', href: 'volta-tour.html' },
+          { label: 'Quadbike & Waterfalls', href: 'quad-bike-tour.html' },
+          { label: 'Kumasi Cultural Tour', href: 'kumasi-tour.html' },
+          { label: 'Just Go Ghana', href: 'just-go-ghana.html' },
+        ],
+      },
       cta: { label: 'Find Your Way Into Ghana', href: 'packages.html' },
     },
     reviewsAndTrust: {
