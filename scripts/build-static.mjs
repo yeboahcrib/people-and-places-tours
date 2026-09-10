@@ -298,21 +298,6 @@ if (generateTourPages) {
   }
 }
 
-// The two photographs /go is built around, and the tour whose price and
-// duration its featured card states. Chosen here rather than in the page so
-// they come from the catalogue: the hero is the Volta Community tour's
-// photograph of a traveller at Wli, and the feature is the Cape Coast
-// Ancestral Tour's own naming-ceremony picture. Just Go Ghana is not the
-// feature despite being the flagship — its only Storyblok asset is a
-// promotional flyer with the price and "2026" set into the image, which is
-// unreadable at card size and would date the page.
-const tourBySlug = new Map(tours.filter(tour => tour?.slug).map(tour => [tour.slug, tour]));
-const linkHubMedia = {
-  hero: tourBySlug.get('volta-community'),
-  featured: tourBySlug.get('cape-coast'),
-  featuredEyebrow: 'Featured experience',
-};
-
 /**
  * The one structured-data record a page carries, if it carries any.
  *
@@ -458,7 +443,7 @@ for (const entry of rootEntries) {
     // the exemption has to be explicit rather than a silent skip.
     const shellLess = SHELL_LESS_PAGES.has(entry.name);
     const withShell = shellLess
-      ? renderLinkHubTemplate(source, siteContent, linkHubMedia)
+      ? renderLinkHubTemplate(source, siteContent)
       : replaceFooter(replacePrimaryNavigation(source, navigation, entry.name), footer);
     const withFooter = withShell;
     const withHomepage = entry.name === 'index.html'

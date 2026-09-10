@@ -10,18 +10,16 @@
      noindex also keeps it out of the generated sitemap without touching the
      sitemap or robots rules. -->
 <meta name="robots" content="noindex,follow">
-<title>People &amp; Places — Every Link</title>
+<title>People &amp; Places &mdash; Every Link</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://a.storyblok.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600&display=swap">
 <style>
-  /* Standalone by design. This page does not load style.css or script.js: it
-     is one screen opened from a phone, usually on mobile data, and the shared
-     stylesheet is built for a twenty-five page site it does not use. The
-     values below are copied from style.css :root rather than invented, so the
-     brand stays one brand. */
+  /* Standalone by design. No style.css, no script.js, no photographs: this is
+     one screen opened from a social profile on mobile data. Every colour below
+     is copied from style.css :root with the token it came from named beside
+     it, so the brand stays one brand. */
   :root {
     --ink:        #1A1A1A;   /* --pap-charcoal */
     --gold:       #FFB81C;   /* --pap-yellow   */
@@ -29,291 +27,298 @@
     --forest:     #123F35;   /* --pap-forest   */
     --terracotta: #C2553D;   /* --pap-terracotta */
     --soft-gold:  #F2D27A;   /* --pap-soft-gold  */
-    --muted:      rgba(255,247,232,0.60);
-    --hairline:   rgba(255,247,232,0.14);
+    --muted:      rgba(255,247,232,0.58);
+    --hairline:   rgba(255,247,232,0.13);
     --font-display: 'Archivo Black', 'Arial Black', Impact, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
     --gutter: 1.25rem;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+  html { background: var(--ink); }
   body {
-    background: var(--ink);
+    position: relative;
+    min-height: 100svh;
     color: var(--cream);
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    min-height: 100svh;
+    overflow-x: hidden;
     display: flex;
     justify-content: center;
-  }
-
-  .hub { width: 100%; max-width: 30rem; padding-bottom: 3.5rem; }
-
-  /* ── Kente stripe ──
-     Yellow, terracotta, soft gold and forest, in the order the stripe under
-     "How You're Hosted" repeats them on the homepage. */
-  .kente { display: flex; height: 6px; }
-  .kente i { flex: 1; }
-  .kente i:nth-child(1) { background: var(--gold); flex: 2; }
-  .kente i:nth-child(2) { background: var(--terracotta); }
-  .kente i:nth-child(3) { background: var(--soft-gold); }
-  .kente i:nth-child(4) { background: var(--forest); flex: 1.6; }
-
-  /* ── Hero ──
-     One photograph, edge to edge, with the wordmark and the brand line over
-     it. This is what stops the page reading as a stack of buttons: you meet a
-     place and a person before you meet a link. */
-  .hero { position: relative; isolation: isolate; }
-  .hero-media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; }
-  .hero-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  /* The picture is left whole. A scrim at the top carries the wordmark, and
-     the foot of the image dissolves into the page so the photograph and the
-     headline below it read as one block rather than two. The headline is not
-     laid over the subject: she stands in the bottom third of this frame, and
-     type on top of her would be the one thing a photograph like this cannot
-     survive. */
-  .hero-media::after {
-    content: '';
-    position: absolute;
-    inset: 0;
+    /* Depth before anything is drawn: a warm rise behind the wordmark and a
+       forest pool bottom-right, so the ground is not a flat rectangle. */
     background:
-      linear-gradient(to bottom, rgba(26,26,26,0.78) 0%, rgba(26,26,26,0.34) 14%, rgba(26,26,26,0) 30%),
-      linear-gradient(to top, var(--ink) 1%, rgba(26,26,26,0) 18%);
+      radial-gradient(125% 70% at 50% -8%, rgba(255,184,28,0.13), transparent 58%),
+      radial-gradient(85% 55% at 108% 104%, rgba(18,63,53,0.42), transparent 62%),
+      var(--ink);
   }
-  .hero-inner { position: absolute; inset: 0; z-index: 1; padding: 1.5rem var(--gutter) 0; }
-  .hero-logo { width: 112px; height: auto; margin: 0 auto; display: block; }
-  .hero-copy { padding: 1.25rem var(--gutter) 0; }
+
+  /* --- Background -------------------------------------------------------
+     Decoration, none of it content. The mark repeated through it is the
+     site's own cultural motif from homepage-sections.js, kept abstract on
+     purpose: the comment beside it there says named Adinkra symbols will only
+     be used once their form and meaning have been reviewed, and this page is
+     not the place to jump that. Around it, contour rings and a dashed route:
+     travel drawn as geography rather than as clip art. */
+  .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .bg svg { position: absolute; display: block; }
+  .bg .layer-contour {
+    top: 50%; left: 50%;
+    width: 190vmax; height: 190vmax;
+    margin: -95vmax 0 0 -95vmax;
+    color: var(--soft-gold);
+    opacity: 0.07;
+    animation: drift-slow 64s ease-in-out infinite alternate;
+  }
+  .bg .layer-marks {
+    inset: 0; width: 100%; height: 100%;
+    animation: drift-fast 46s ease-in-out infinite alternate;
+  }
+  .bg path, .bg circle, .bg polygon {
+    fill: none; stroke: currentColor;
+    stroke-linejoin: round; stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .mark-weave   { color: var(--gold);       opacity: 0.13; stroke-width: 6; }
+  .mark-weave-2 { color: var(--forest);     opacity: 0.50; stroke-width: 6; }
+  .mark-weave-3 { color: var(--terracotta); opacity: 0.16; stroke-width: 6; }
+  .mark-route   { color: var(--soft-gold);  opacity: 0.20; stroke-width: 1.5; stroke-dasharray: 5 7; }
+  .mark-node    { color: var(--soft-gold);  opacity: 0.30; stroke-width: 1.5; }
+  .mark-star    { color: var(--gold);       opacity: 0.16; stroke-width: 1.5; }
+  .mark-pin     { color: var(--cream);      opacity: 0.09; stroke-width: 1.5; }
+  .mark-stamp   { color: var(--cream);      opacity: 0.07; stroke-width: 1.5; stroke-dasharray: 3 4; }
+
+  @keyframes drift-slow {
+    from { transform: translate3d(-1.2%, -0.8%, 0) rotate(-1.2deg); }
+    to   { transform: translate3d(1.2%, 1%, 0) rotate(1.2deg); }
+  }
+  @keyframes drift-fast {
+    from { transform: translate3d(1.6%, 1%, 0); }
+    to   { transform: translate3d(-1.6%, -1.2%, 0); }
+  }
+
+  /* --- Shell --- */
+  .hub {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 27rem;
+    padding: 2.75rem var(--gutter) 3rem;
+    display: flex; flex-direction: column;
+  }
+
+  /* --- Head --- */
+  .head { text-align: center; margin-bottom: 2.25rem; }
+  .head img { width: 108px; height: auto; margin: 0 auto 1.35rem; display: block; }
   h1 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(2rem, 9.5vw, 2.65rem);
-    line-height: 1.02;
-    letter-spacing: -0.015em;
-    text-wrap: balance;
+    font-family: var(--font-display); font-weight: 400;
+    font-size: clamp(1.7rem, 7.5vw, 2.05rem);
+    line-height: 1.08; letter-spacing: -0.01em;
   }
-  .hero-line {
-    color: rgba(255,247,232,0.78);
-    font-size: 0.9375rem;
-    line-height: 1.55;
-    margin-top: 0.6rem;
-    max-width: 22rem;
-    text-wrap: pretty;
-  }
+  .rule { width: 34px; height: 2px; background: var(--gold); border: 0; margin: 0.85rem auto; opacity: 0.85; }
+  .lede { color: var(--muted); font-size: 0.9375rem; line-height: 1.6; max-width: 21rem; margin: 0 auto; text-wrap: pretty; }
 
-  /* ── Sections ── */
-  .band { padding: 0 var(--gutter); }
-  .eyebrow {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
-  /* ── Primary actions ── */
-  .actions { margin-top: 1.85rem; display: flex; flex-direction: column; gap: 0.625rem; }
-  .actions .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; }
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-height: 58px;
-    padding: 0.9rem 1rem;
-    border-radius: 14px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    line-height: 1.25;
-    text-align: center;
-    border: 1px solid transparent;
-    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
-  }
-  .btn-gold { background: var(--gold); color: var(--ink); border-color: var(--gold); }
-  .btn-gold:hover, .btn-gold:focus-visible { background: #FFC94A; border-color: #FFC94A; }
-  .btn-outline { background: transparent; color: var(--gold); border-color: rgba(255,184,28,0.5); font-size: 0.9375rem; }
-  .btn-outline:hover, .btn-outline:focus-visible { background: rgba(255,184,28,0.1); border-color: var(--gold); }
-  .btn-quiet { background: rgba(255,247,232,0.055); color: var(--cream); border-color: var(--hairline); font-size: 0.9375rem; }
-  .btn-quiet:hover, .btn-quiet:focus-visible { background: rgba(255,247,232,0.1); border-color: rgba(255,247,232,0.3); }
-  .btn svg { flex-shrink: 0; }
-
-  /* ── Featured experience ──
-     One photograph doing the work of a paragraph. The eyebrow, price and
-     duration all come from the tour's own record, so this cannot drift from
-     the page it links to. */
-  /* The caption sits under the picture rather than on it, for the same reason
-     the headline does: this is a photograph of eight people in full kente, and
-     a gradient across it to make room for type would cost the card the thing
-     that makes it worth showing. */
-  .featured { margin-top: 2.5rem; }
-  .featured-card {
-    display: block;
-    border-radius: 20px;
-    overflow: hidden;
-    text-decoration: none;
-    color: var(--cream);
+  /* --- Link rows --------------------------------------------------------
+     Raised rather than flat: a hairline highlight along the top edge and a
+     shadow underneath give each row the feel of a key you can press, and the
+     press is real -- it settles back down on :active. */
+  .links { display: flex; flex-direction: column; gap: 0.7rem; }
+  .row {
+    position: relative; display: flex; align-items: center; gap: 0.85rem;
+    min-height: 64px; padding: 0.95rem 1.15rem;
+    border-radius: 15px; text-decoration: none;
+    font-weight: 600; font-size: 1rem; line-height: 1.25; color: var(--cream);
+    background: linear-gradient(180deg, rgba(255,247,232,0.085), rgba(255,247,232,0.042));
     border: 1px solid var(--hairline);
-    background: rgba(255,247,232,0.05);
-    transition: border-color 200ms ease, background 200ms ease;
+    box-shadow: inset 0 1px 0 rgba(255,247,232,0.1), 0 10px 22px -16px rgba(0,0,0,0.95);
+    transition: transform 180ms cubic-bezier(0.16,1,0.3,1), box-shadow 180ms ease,
+                border-color 180ms ease, background 180ms ease;
   }
-  .featured-card img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
-  .featured-body { padding: 1.1rem 1.15rem 1.2rem; }
-  .featured-body h2 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 1.35rem;
-    line-height: 1.14;
-    margin: 0.5rem 0 0.4rem;
-    text-wrap: balance;
+  .row .label { flex: 1; }
+  .row .arrow { flex-shrink: 0; opacity: 0.42; transition: opacity 180ms ease, transform 180ms ease; }
+  .row:hover, .row:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(255,247,232,0.28);
+    background: linear-gradient(180deg, rgba(255,247,232,0.125), rgba(255,247,232,0.06));
+    box-shadow: inset 0 1px 0 rgba(255,247,232,0.14), 0 16px 30px -18px rgba(0,0,0,1);
   }
-  .featured-meta {
-    font-size: 0.8438rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
-  .featured-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: 0.7; }
-  .featured-meta .chev { margin-left: auto; opacity: 0.45; transition: opacity 200ms ease, transform 200ms ease; }
-  .featured-card:hover, .featured-card:focus-visible {
-    border-color: rgba(255,184,28,0.45);
-    background: rgba(255,247,232,0.08);
-  }
-  .featured-card:hover .chev, .featured-card:focus-visible .chev { opacity: 1; transform: translateX(2px); }
+  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.95; transform: translateX(3px); }
+  .row:active { transform: translateY(0); box-shadow: inset 0 1px 3px rgba(0,0,0,0.45); }
 
-  /* ── Quieter links ──
-     Rows with a hairline between them, not boxes. They are here to be found,
-     not to compete with the two actions above. */
-  .more { margin-top: 2.25rem; }
-  .more-list { margin-top: 0.5rem; border-top: 1px solid var(--hairline); }
-  .more-list a {
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-    min-height: 60px;
-    padding: 0.9rem 0.25rem;
-    border-bottom: 1px solid var(--hairline);
-    text-decoration: none;
-    color: var(--cream);
-    font-weight: 500;
-    font-size: 0.9688rem;
-    transition: color 200ms ease, padding-left 200ms ease;
+  /* The one most people came for. */
+  .row-primary {
+    background: linear-gradient(180deg, #FFC334, var(--gold));
+    border-color: rgba(255,184,28,0.9); color: var(--ink); font-size: 1.0625rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 12px 26px -16px rgba(255,184,28,0.85);
   }
-  .more-list a .label { flex: 1; }
-  .more-list a .note { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--muted); margin-top: 0.1rem; }
-  .more-list a .chev { flex-shrink: 0; opacity: 0.4; transition: opacity 200ms ease, transform 200ms ease; }
-  .more-list a:hover, .more-list a:focus-visible { color: var(--gold); padding-left: 0.5rem; }
-  .more-list a:hover .chev, .more-list a:focus-visible .chev { opacity: 1; transform: translateX(2px); }
+  .row-primary .arrow { opacity: 0.6; }
+  .row-primary:hover, .row-primary:focus-visible {
+    background: linear-gradient(180deg, #FFCE52, #FFC02F); border-color: var(--gold);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 18px 34px -18px rgba(255,184,28,0.95);
+  }
 
-  /* ── Foot ── */
-  .foot { margin-top: 2.5rem; text-align: center; }
-  .social { display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+  /* Reaching a person rather than a page. */
+  .row-whatsapp { color: var(--gold); border-color: rgba(255,184,28,0.42); }
+  .row-whatsapp:hover, .row-whatsapp:focus-visible {
+    border-color: rgba(255,184,28,0.85);
+    background: linear-gradient(180deg, rgba(255,184,28,0.16), rgba(255,184,28,0.07));
+  }
+  .row-icon { flex-shrink: 0; }
+
+  /* --- Social: present and findable, deliberately not the weight of a
+     travel link. --- */
+  .foot { margin-top: 2.25rem; text-align: center; }
+  .social { display: flex; justify-content: center; gap: 0.7rem; margin-bottom: 1.4rem; }
   .social a {
-    display: grid;
-    place-items: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 1px solid var(--hairline);
-    color: var(--cream);
-    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+    display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+    color: var(--cream); border: 1px solid var(--hairline); background: rgba(255,247,232,0.045);
+    transition: transform 180ms cubic-bezier(0.16,1,0.3,1), background 180ms ease,
+                border-color 180ms ease, color 180ms ease;
   }
-  .social a:hover, .social a:focus-visible { background: rgba(255,184,28,0.12); border-color: var(--gold); color: var(--gold); }
+  .social a:hover, .social a:focus-visible {
+    transform: translateY(-2px); background: rgba(255,184,28,0.14);
+    border-color: rgba(255,184,28,0.8); color: var(--gold);
+  }
+  .social a:active { transform: translateY(0); }
   .foot p { color: var(--muted); font-size: 0.8125rem; line-height: 1.8; }
-  .foot a.plain { color: var(--cream); text-decoration: none; border-bottom: 1px solid var(--hairline); }
-  .foot a.plain:hover, .foot a.plain:focus-visible { border-bottom-color: var(--gold); color: var(--gold); }
+  .foot a.plain { color: rgba(255,247,232,0.85); text-decoration: none; border-bottom: 1px solid var(--hairline); }
+  .foot a.plain:hover, .foot a.plain:focus-visible { color: var(--gold); border-bottom-color: var(--gold); }
 
-  /* Keyboard users get the same ring everywhere, and it has to stay visible on
-     a photograph and on the gold button alike. */
-  a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
-  .btn-gold:focus-visible, .featured-card:focus-visible { outline-color: var(--cream); }
+  a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .row-primary:focus-visible { outline-color: var(--cream); }
+
+  /* --- Entrance: one pass, then still. Fill mode is `both`, so switching the
+     animation off for reduced motion leaves everything visible. --- */
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+  .head { animation: rise 560ms cubic-bezier(0.16,1,0.3,1) both; }
+  .row  { animation: rise 560ms cubic-bezier(0.16,1,0.3,1) both; }
+  .foot { animation: rise 560ms cubic-bezier(0.16,1,0.3,1) both 340ms; }
+  .row:nth-of-type(1) { animation-delay: 90ms; }
+  .row:nth-of-type(2) { animation-delay: 140ms; }
+  .row:nth-of-type(3) { animation-delay: 190ms; }
+  .row:nth-of-type(4) { animation-delay: 240ms; }
+  .row:nth-of-type(5) { animation-delay: 290ms; }
 
   @media (prefers-reduced-motion: reduce) {
-    .btn, .featured-card, .featured-meta .chev, .more-list a, .more-list a .chev, .social a { transition: none; }
-    .more-list a:hover, .more-list a:focus-visible { padding-left: 0.25rem; }
-    .more-list a:hover .chev, .more-list a:focus-visible .chev,
-    .featured-card:hover .chev, .featured-card:focus-visible .chev { transform: none; }
+    .bg .layer-contour, .bg .layer-marks { animation: none; }
+    .head, .row, .foot { animation: none; }
+    .row, .social a, .row .arrow { transition: none; }
+    .row:hover, .row:focus-visible, .social a:hover, .social a:focus-visible { transform: none; }
+    .row:hover .arrow, .row:focus-visible .arrow { transform: none; }
   }
 
-  /* At 320px the gutter is the first thing that gives, and the two paired
-     buttons stop fitting side by side. */
+  /* Short phones: reaching WhatsApp must not need a second scroll. */
+  @media (max-height: 700px) {
+    .hub { padding-top: 1.85rem; }
+    .head { margin-bottom: 1.6rem; }
+    .head img { width: 88px; margin-bottom: 1rem; }
+    .links { gap: 0.55rem; }
+    .row { min-height: 58px; }
+    .foot { margin-top: 1.6rem; }
+  }
   @media (max-width: 359px) {
-    :root { --gutter: 0.875rem; }
-    .actions .pair { grid-template-columns: 1fr; }
-  }
-
-  /* Past the phone the hero stops being a tall portrait: on a laptop a 4:5
-     picture would push everything below the fold for no gain. */
-  @media (min-width: 30rem) {
-    .hero-media { aspect-ratio: 1 / 1; }
+    :root { --gutter: 0.95rem; }
+    .row { padding: 0.9rem 1rem; gap: 0.7rem; font-size: 0.9375rem; }
   }
 </style>
 </head>
 <body>
 
+<div class="bg" aria-hidden="true">
+  <!-- Contour rings, well off-centre so the page never shows the middle of a
+       bullseye, plus three ridge lines running across. -->
+  <svg class="layer-contour" viewBox="0 0 600 600" fill="none" focusable="false">
+    <path d="M300 90c86 0 156 70 156 156s-70 156-156 156-156-70-156-156S214 90 300 90Z" opacity=".55"/>
+    <path d="M300 130c64 0 116 52 116 116s-52 116-116 116-116-52-116-116 52-116 116-116Z" opacity=".7"/>
+    <path d="M300 172c42 0 74 32 74 74s-32 74-74 74-74-32-74-74 32-74 74-74Z" opacity=".85"/>
+    <path d="M300 214c18 0 32 14 32 32s-14 32-32 32-32-14-32-32 14-32 32-32Z"/>
+    <path d="M56 402c92-34 168-14 244 22s150 58 244 26" opacity=".5"/>
+    <path d="M40 460c96-30 176-6 254 32s154 60 250 24" opacity=".4"/>
+    <path d="M72 132c80 28 134 8 196-26s126-52 210-24" opacity=".35"/>
+  </svg>
+
+  <!-- The three diamonds are the site's own weave motif. The rest is a dashed
+       route with its stops, two stars, a pin and a stamp edge -- all abstract,
+       none of them a named symbol. -->
+  <svg class="layer-marks" viewBox="0 0 390 860" preserveAspectRatio="xMidYMid slice" fill="none" focusable="false">
+    <g class="mark-weave" transform="translate(300 74) rotate(-12) scale(0.5)">
+      <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+      <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+      <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="mark-weave-2" transform="translate(-34 470) rotate(14) scale(0.78)">
+      <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+      <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+      <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="mark-weave-3" transform="translate(298 690) rotate(-6) scale(0.62)">
+      <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+      <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+      <path d="M66 66h28v28H66z"/>
+    </g>
+    <path class="mark-route" d="M22 214C86 178 96 268 168 244s84-84 156-58 44 96 26 140"/>
+    <circle class="mark-node" cx="22" cy="214" r="4"/>
+    <circle class="mark-node" cx="168" cy="244" r="3"/>
+    <circle class="mark-node" cx="350" cy="326" r="4"/>
+    <path class="mark-route" d="M366 566c-58 18-72-46-138-30s-70 74-140 62" opacity=".14"/>
+    <circle class="mark-node" cx="88" cy="598" r="3" opacity=".22"/>
+    <polygon class="mark-star" points="22 300 26 310 37 311 28 318 31 329 22 323 13 329 16 318 7 311 18 310" opacity=".13"/>
+    <polygon class="mark-star" points="366 246 370 256 381 257 372 264 375 275 366 269 357 275 360 264 351 257 362 256" opacity=".12"/>
+    <path class="mark-pin" d="M338 636c0-13 10-23 23-23s23 10 23 23c0 17-23 39-23 39s-23-22-23-39Z"/>
+    <circle class="mark-pin" cx="361" cy="635" r="8"/>
+    <path class="mark-stamp" d="M286 74h92v62h-92z" transform="rotate(-8 332 105)"/>
+    <path class="mark-stamp" d="M40 300h74v52H40z" transform="rotate(6 77 326)" opacity=".05"/>
+  </svg>
+</div>
+
 <main class="hub">
-  <div class="kente" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="head">
+    <img src="assets/PAP LOGO_YELLOW_NO BACKGROUND.svg" alt="" width="615" height="615" fetchpriority="high" decoding="async">
+    <h1>{{businessName}}</h1>
+    <hr class="rule">
+    <p class="lede">We create unforgettable travel experiences in Ghana and across Africa.</p>
+  </div>
 
-  <header class="hero">
-    <div class="hero-media">{{heroMedia}}</div>
-    <div class="hero-inner">
-      <img class="hero-logo" src="assets/PAP LOGO_YELLOW_NO BACKGROUND.svg" alt="{{businessName}}" width="615" height="615" decoding="async">
+  <nav class="links" aria-label="{{businessName}} links">
+    <a class="row row-primary" href="packages.html" data-go-link="experiences">
+      <span class="label">Explore Experiences</span>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+
+    <a class="row row-whatsapp" href="{{whatsappUrl}}" target="_blank" rel="noopener" data-go-link="whatsapp">
+      <svg class="row-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.05 0A11.89 11.89 0 0 0 1.59 17.84L0 24l6.31-1.65A11.94 11.94 0 1 0 12.05 0zm0 21.79a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.89 9.89 0 1 1 8.38 4.63zm5.42-7.41c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.16c-.17.2-.35.22-.64.08-1.76-.88-2.92-1.57-4.09-3.58-.31-.53.31-.49.88-1.62.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-2.72 2.98-.52 7.29 3.9 9.2 1.68.72 2.95.78 4.01.65.57-.08 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/></svg>
+      <span class="label">WhatsApp Us</span>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+
+    <a class="row" href="just-go-ghana.html" data-go-link="just-go-ghana">
+      <span class="label">Just Go Ghana</span>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+
+    <a class="row" href="contact.html?tour=custom" data-go-link="custom">
+      <span class="label">Plan a Custom Trip</span>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+
+    <a class="row" href="travel-information.html" data-go-link="travel-information">
+      <span class="label">Travel Information</span>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </nav>
+
+  <div class="foot">
+    <div class="social">
+      <a href="{{instagramUrl}}" target="_blank" rel="noopener" aria-label="{{businessName}} on Instagram" data-go-link="instagram">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a href="{{tiktokUrl}}" target="_blank" rel="noopener" aria-label="{{businessName}} on TikTok" data-go-link="tiktok">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-2.09-2.78V8.73a6.34 6.34 0 1 0 6.33 6.57v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.73z"/></svg>
+      </a>
     </div>
-    <div class="hero-copy">
-      <h1>The People Make the Place.</h1>
-      <p class="hero-line">Ghana-founded, Ghana-led. Hosted by people who grew up here.</p>
-    </div>
-  </header>
-
-  <div class="band">
-    <div class="actions">
-      <a href="packages.html" class="btn btn-gold" data-go-link="experiences">Explore All Experiences</a>
-      <div class="pair">
-        <a href="{{whatsappUrl}}" class="btn btn-outline" target="_blank" rel="noopener" data-go-link="whatsapp">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.05 0A11.89 11.89 0 0 0 1.59 17.84L0 24l6.31-1.65A11.94 11.94 0 1 0 12.05 0zm0 21.79a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.89 9.89 0 1 1 8.38 4.63zm5.42-7.41c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.16c-.17.2-.35.22-.64.08-1.76-.88-2.92-1.57-4.09-3.58-.31-.53.31-.49.88-1.62.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-2.72 2.98-.52 7.29 3.9 9.2 1.68.72 2.95.78 4.01.65.57-.08 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/></svg>
-          WhatsApp Us
-        </a>
-        <a href="contact.html" class="btn btn-quiet" data-go-link="book">Book a Tour</a>
-      </div>
-    </div>
-
-    {{featuredCard}}
-
-    <section class="more">
-      <div class="eyebrow">More from us</div>
-      <div class="more-list">
-        <a href="just-go-ghana.html" data-go-link="just-go-ghana">
-          <span class="label">Just Go Ghana<span class="note">Eight days, coast to Ashanti heartland</span></span>
-          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-        <a href="contact.html?tour=custom" data-go-link="custom">
-          <span class="label">Plan a Custom Trip<span class="note">Something made around you</span></span>
-          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-        <a href="travel-information.html" data-go-link="travel-information">
-          <span class="label">Travel Information<span class="note">Visas, travel health, money and arriving in Accra</span></span>
-          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-      </div>
-    </section>
-
-    <div class="foot">
-      <div class="social">
-        <a href="{{instagramUrl}}" target="_blank" rel="noopener" aria-label="{{businessName}} on Instagram" data-go-link="instagram">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        </a>
-        <a href="{{tiktokUrl}}" target="_blank" rel="noopener" aria-label="{{businessName}} on TikTok" data-go-link="tiktok">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-2.09-2.78V8.73a6.34 6.34 0 1 0 6.33 6.57v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.73z"/></svg>
-        </a>
-      </div>
-      <p>
-        <a class="plain" href="{{primaryPhoneHref}}" data-site-copy="primaryPhone">{{primaryPhone}}</a><br>
-        Accra, Ghana
-      </p>
-    </div>
+    <p>
+      <a class="plain" href="{{primaryPhoneHref}}" data-site-copy="primaryPhone">{{primaryPhone}}</a><br>
+      Accra, Ghana
+    </p>
   </div>
 </main>
 
