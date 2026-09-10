@@ -90,6 +90,41 @@ export function renderFooterTemplate(template, content, year = new Date().getUTC
   return output;
 }
 
+/**
+ * Pages that ship without the navigation and footer every other page shares.
+ *
+ * One entry, declared here because both the build and tests/build-output.mjs
+ * have to agree on it: the test asserts every other page carries exactly one
+ * navigation and one footer, and a page could otherwise lose its shell without
+ * anything noticing.
+ */
+export const SHELL_LESS_PAGES = new Set(['go.html']);
+
+/**
+ * The link-in-bio page at /go.
+ *
+ * It carries no navigation and no footer, so it cannot pick up the contact and
+ * social addresses the way every other page does. This gives it the same three
+ * social hrefs the footer resolves, through the same validation, so the two can
+ * never drift apart — and the business name and phone from the same settings
+ * the rest of the site renders.
+ */
+export function renderLinkHubTemplate(template, content) {
+  const settings = content.siteSettings;
+  const social = content.social ?? {};
+  const phoneHref = `tel:${String(settings.primaryPhone).replace(/[^+\d]/g, '')}`;
+  let output = template
+    .replaceAll('{{businessName}}', escapeHtml(settings.businessName))
+    .replaceAll('{{primaryPhone}}', escapeHtml(settings.primaryPhone))
+    .replaceAll('{{primaryPhoneHref}}', escapeHtml(phoneHref));
+  for (const [key, fallback] of Object.entries(FOOTER_SOCIAL_DEFAULTS)) {
+    output = output.replaceAll(`{{${key}}}`, safeSocialHref(social[key], fallback));
+  }
+  const leftover = output.match(/\{\{[a-zA-Z]+\}\}/g);
+  if (leftover) throw new Error(`go.html has unfilled placeholders: ${leftover.join(', ')}`);
+  return output;
+}
+
 export function replacePrimaryNavigation(html, navigation, fileName) {
   const startPattern = /<nav\b[^>]*class="[^"]*\bnav\b[^"]*"[^>]*>/i;
   const match = startPattern.exec(html);

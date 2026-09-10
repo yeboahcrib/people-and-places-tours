@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {access, readFile, readdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {SHELL_LESS_PAGES} from '../scripts/shared-shell.mjs';
 import {loadLocalTours} from '../scripts/local-render-source.mjs';
 
 const output = new URL('../dist/', import.meta.url);
@@ -60,9 +61,24 @@ for (const privatePath of ['docs', 'tests', 'studio', 'functions', 'package.json
 const generatedHtmlFiles = (await readdir(outputPath)).filter(entry => entry.endsWith('.html'));
 for (const file of generatedHtmlFiles) {
   const html = await readFile(join(outputPath, file), 'utf8');
+  assert(!html.includes('{{'), `${file} contains an unresolved template token`);
+
+  // The link-in-bio page is the one page deliberately outside the shell. The
+  // exemption is asserted rather than skipped: it must carry no navigation and
+  // no footer, and it must still render the phone number from site settings,
+  // so it cannot drift into a half-shell state without this failing.
+  if (SHELL_LESS_PAGES.has(file)) {
+    assert.equal((html.match(/<!-- shared: navigation -->/g) || []).length, 0,
+      `${file} is shell-less and should not carry the shared navigation`);
+    assert.equal((html.match(/<!-- shared: footer -->/g) || []).length, 0,
+      `${file} is shell-less and should not carry the shared footer`);
+    assert(html.includes('href="tel:+233503673473"'),
+      `${file} did not render site settings`);
+    continue;
+  }
+
   assert.equal((html.match(/<!-- shared: navigation -->/g) || []).length, 1, `${file} should contain one shared navigation`);
   assert(html.includes('href="tel:+233503673473"'), `${file} did not render site settings into navigation`);
-  assert(!html.includes('{{'), `${file} contains an unresolved template token`);
   // Every page carries the footer, including thanks.html. A distraction-free
   // confirmation page is a legitimate design, but this one already carries the
   // full navigation and two onward links, so omitting only the footer gains no

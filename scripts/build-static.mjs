@@ -1,7 +1,7 @@
 import {cp, mkdir, readFile, readdir, rm, writeFile} from 'node:fs/promises';
 import {extname, join} from 'node:path';
 import {createHash} from 'node:crypto';
-import {renderFooterTemplate, renderNavigationTemplate, replaceFooter, replacePrimaryNavigation} from './shared-shell.mjs';
+import {renderFooterTemplate, renderLinkHubTemplate, renderNavigationTemplate, replaceFooter, replacePrimaryNavigation, SHELL_LESS_PAGES} from './shared-shell.mjs';
 import {loadSiteContent} from './content-source.mjs';
 import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from './local-render-source.mjs';
 import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs';
@@ -57,6 +57,7 @@ const publicRootFiles = new Set([
   'sitemap.xml',
 ]);
 const publicDirectories = ['assets', '.well-known'];
+
 
 // ── COMING-SOON MODE ──────────────────────────────────────────────
 // Set COMING_SOON=true in Cloudflare's Production scope and the deployed site
@@ -434,8 +435,17 @@ for (const entry of rootEntries) {
     const generatedTour = generatedTourPages.get(entry.name);
     const source = generatedTour?.html
       ?? await readFile(join(projectRoot, entry.name), 'utf8');
-    const withNavigation = replacePrimaryNavigation(source, navigation, entry.name);
-    const withFooter = replaceFooter(withNavigation, footer);
+    // go.html is the link-in-bio page. It is deliberately outside the site
+    // shell — no primary navigation, no footer — because it is one screen
+    // opened from a social profile, not a page of the site. It still goes
+    // through everything below: contact details, metadata, clean URLs and
+    // asset hashes. replacePrimaryNavigation throws on a page with no nav, so
+    // the exemption has to be explicit rather than a silent skip.
+    const shellLess = SHELL_LESS_PAGES.has(entry.name);
+    const withShell = shellLess
+      ? renderLinkHubTemplate(source, siteContent)
+      : replaceFooter(replacePrimaryNavigation(source, navigation, entry.name), footer);
+    const withFooter = withShell;
     const withHomepage = entry.name === 'index.html'
       ? withFooter.replace(
         '<main id="main-content" data-homepage-renderer="homepage-sections"></main>',
