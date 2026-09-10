@@ -101,6 +101,19 @@ export function renderFooterTemplate(template, content, year = new Date().getUTC
 export const SHELL_LESS_PAGES = new Set(['go.html']);
 
 /**
+ * Re-crop a Storyblok rendition without losing its focal point.
+ *
+ * The catalogue hands out URLs already sized for a card. /go wants the same
+ * master asset at a different shape, and the focal filter is carried in the
+ * part of the path after the size, so only the size segment is rewritten.
+ */
+function recrop(url, width, height) {
+  const value = String(url ?? '');
+  if (!/^https:\/\/a\.storyblok\.com\/[^\s"']+\/m\/\d+x\d+\//.test(value)) return undefined;
+  return value.replace(/\/m\/\d+x\d+\//, `/m/${width}x${height}/`);
+}
+
+/**
  * The link-in-bio page at /go.
  *
  * It carries no navigation and no footer, so it cannot pick up the contact and
@@ -108,15 +121,45 @@ export const SHELL_LESS_PAGES = new Set(['go.html']);
  * social hrefs the footer resolves, through the same validation, so the two can
  * never drift apart — and the business name and phone from the same settings
  * the rest of the site renders.
+ *
+ * The photography and the featured tour's price and duration come from the
+ * catalogue rather than being written here, for the same reason: a page that
+ * restates a price is a page that will one day contradict one. Either block
+ * renders empty if its tour is missing, so a withdrawn tour costs the page a
+ * picture rather than the build.
  */
-export function renderLinkHubTemplate(template, content) {
+export function renderLinkHubTemplate(template, content, media = {}) {
   const settings = content.siteSettings;
   const social = content.social ?? {};
   const phoneHref = `tel:${String(settings.primaryPhone).replace(/[^+\d]/g, '')}`;
+
+  const hero = media.hero;
+  const heroSrc = recrop(hero?.image, 900, 1125);
+  const heroMedia = heroSrc
+    ? `<img src="${escapeHtml(heroSrc)}" alt="${escapeHtml(hero.alt || '')}" width="900" height="1125" fetchpriority="high" decoding="async">`
+    : '';
+
+  const featured = media.featured;
+  const featuredSrc = recrop(featured?.image, 900, 600);
+  const featuredCard = featuredSrc
+    ? `<section class="featured">
+      <a class="featured-card" href="${escapeHtml(featured.detailUrl)}" data-go-link="featured">
+        <img src="${escapeHtml(featuredSrc)}" alt="${escapeHtml(featured.alt || '')}" width="900" height="600" loading="lazy" decoding="async">
+        <div class="featured-body">
+          <div class="eyebrow">${escapeHtml(media.featuredEyebrow || 'Featured experience')}</div>
+          <h2>${escapeHtml(featured.title)}</h2>
+          <p class="featured-meta">${escapeHtml(featured.duration)} <span class="dot" aria-hidden="true"></span> from ${escapeHtml(featured.price)} per person<svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></p>
+        </div>
+      </a>
+    </section>`
+    : '';
+
   let output = template
     .replaceAll('{{businessName}}', escapeHtml(settings.businessName))
     .replaceAll('{{primaryPhone}}', escapeHtml(settings.primaryPhone))
-    .replaceAll('{{primaryPhoneHref}}', escapeHtml(phoneHref));
+    .replaceAll('{{primaryPhoneHref}}', escapeHtml(phoneHref))
+    .replace('{{heroMedia}}', heroMedia)
+    .replace('{{featuredCard}}', featuredCard);
   for (const [key, fallback] of Object.entries(FOOTER_SOCIAL_DEFAULTS)) {
     output = output.replaceAll(`{{${key}}}`, safeSocialHref(social[key], fallback));
   }
