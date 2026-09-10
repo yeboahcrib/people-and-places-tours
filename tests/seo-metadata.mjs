@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {metaDescription} from '../scripts/render-tour-page.mjs';
-import {renderOrganizationSchema} from '../scripts/render-meta.mjs';
+import {THEME_COLOR} from '../scripts/render-meta.mjs';
 
 // ── Trimming ──
 
@@ -62,68 +62,44 @@ assert.equal(metaDescription('  collapses   whitespace  '), 'collapses whitespac
   assert.deepEqual(over, [], `meta descriptions longer than a search result shows: ${over.join(', ')}`);
 }
 
-// ── Structured data ──
-
-const settings = {
-  businessName: 'People & Places',
-  email: 'peopandplaces@gmail.com',
-  primaryPhone: '+233 50 367 3473',
-};
-const social = {
-  instagramUrl: 'https://instagram.com/peopleand.places',
-  tiktokUrl: 'https://tiktok.com/@peopandplaces',
-};
-const parse = script => JSON.parse(/<script[^>]*>([\s\S]*?)<\/script>/.exec(script)[1]);
-
+// ── Theme colour ──
+//
+// The value is written in render-meta.mjs, but it belongs to the stylesheet.
+// If --pap-charcoal is ever changed, the browser bar would keep painting the
+// old colour beside the new hero, and nothing would say so.
 {
-  const data = parse(renderOrganizationSchema({siteUrl: 'https://peopleplacesgh.com', settings, social}));
-  assert.equal(data['@type'], 'TravelAgency');
-  assert.equal(data.name, settings.businessName);
-  assert.equal(data.telephone, settings.primaryPhone);
-  assert.equal(data.email, settings.email);
-  assert.deepEqual(data.sameAs, [social.instagramUrl, social.tiktokUrl]);
-  assert.equal(data.url, 'https://peopleplacesgh.com/');
+  const projectRoot = fileURLToPath(new URL('../', import.meta.url));
+  const css = await readFile(`${projectRoot}style.css`, 'utf8');
+  const declared = /--pap-charcoal:\s*(#[0-9a-fA-F]{3,8})\s*;/.exec(css)?.[1];
+  assert(declared, 'style.css no longer declares --pap-charcoal');
+  assert.equal(THEME_COLOR.toLowerCase(), declared.toLowerCase(),
+    `theme-color ${THEME_COLOR} has drifted from --pap-charcoal ${declared}`);
 
-  // Nothing a crawler could check and find wrong. These are claims the site
-  // does not make in prose either, and adding them is a business decision.
-  for (const risky of ['aggregateRating', 'review', 'openingHours', 'openingHoursSpecification', 'priceRange', 'offers']) {
-    assert.equal(data[risky], undefined, `the schema asserts ${risky}, which nothing on the page supports`);
+  const files = (await (await import('node:fs/promises')).readdir(`${projectRoot}dist`))
+    .filter(f => f.endsWith('.html'));
+  for (const file of files) {
+    const html = await readFile(`${projectRoot}dist/${file}`, 'utf8');
+    assert(html.includes(`<meta name="theme-color" content="${THEME_COLOR}" />`),
+      `${file} has no theme-color`);
+    // en_GH is not a locale any Open Graph consumer carries; en_GB is.
+    assert(html.includes('property="og:locale" content="en_GB"'),
+      `${file} does not declare a supported og:locale`);
   }
 }
 
-// Missing values are omitted rather than emitted empty.
-{
-  const data = parse(renderOrganizationSchema({siteUrl: 'https://x.test', settings: {businessName: 'X'}, social: {}}));
-  assert.equal(data.telephone, undefined);
-  assert.equal(data.email, undefined);
-  assert.equal(data.sameAs, undefined);
-  assert.equal(data.name, 'X');
-}
-
-// The JSON must never be able to close its own script tag.
-{
-  const script = renderOrganizationSchema({
-    siteUrl: 'https://x.test',
-    settings: {businessName: '</script><script>alert(1)</script>'},
-    social: {},
-  });
-  assert(!script.slice(0, -9).includes('</script>'),
-    'a raw closing tag reached the JSON — the schema can break out of its script tag');
-  // \u003c is a valid JSON escape, so the escaped form parses as-is and the
-  // name survives intact. No unescaping needed, and unescaping first would make
-  // the extraction regex stop at the injected tag.
-  assert.equal(parse(script).name, '</script><script>alert(1)</script>');
-}
-
-// One record, on the homepage only.
+// ── robots.txt ──
+//
+// One group, not two. Cloudflare prepends its own "User-agent: *" block on the
+// live domain, and a second one here would shadow its Content-Signal line.
 {
   const projectRoot = fileURLToPath(new URL('../', import.meta.url));
-  const home = await readFile(`${projectRoot}dist/index.html`, 'utf8');
-  assert.equal((home.match(/application\/ld\+json/g) || []).length, 1,
-    'the homepage should carry exactly one structured-data record');
-  const about = await readFile(`${projectRoot}dist/about.html`, 'utf8');
-  assert.equal((about.match(/application\/ld\+json/g) || []).length, 0,
-    'the organization record should not be repeated on every page');
+  const robots = await readFile(`${projectRoot}dist/robots.txt`, 'utf8');
+  assert.equal((robots.match(/^User-agent:/gm) || []).length, 0,
+    'the generated robots.txt declares a user-agent group of its own again');
+  assert(/^Sitemap: https?:\/\/\S+\/sitemap\.xml$/m.test(robots),
+    `robots.txt no longer points at the sitemap:\n${robots}`);
+  // Nothing here may ever forbid crawling the live site by accident.
+  assert(!/^Disallow:/m.test(robots), 'the generated robots.txt disallows crawling');
 }
 
 // ── Social images ──

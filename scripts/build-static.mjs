@@ -35,7 +35,8 @@ import {injectPagePhotos} from './render-page-photos.mjs';
 import {loadExperiencesPagePhotos} from './experiences-page-source.mjs';
 import {loadExperienceContent, loadLocalExperienceContent} from './local-experience-source.mjs';
 import {injectLocalExperiences} from './render-local-experiences.mjs';
-import {injectPageMeta, normaliseSiteUrl, renderOrganizationSchema, renderRobots, renderSitemap} from './render-meta.mjs';
+import {injectPageMeta, normaliseSiteUrl, organizationNode, renderRobots, renderSitemap} from './render-meta.mjs';
+import {countFaqItems, extractFaqs, faqPageNode, renderStructuredData, tourProductNode} from './render-structured-data.mjs';
 import {loadAboutContent, loadLocalAboutContent} from './about-source.mjs';
 import {injectAboutContent} from './render-about.mjs';
 
@@ -113,7 +114,7 @@ const {content: siteContent, source: storyblokGlobalsSource} = await loadStorybl
   baseContent: committedSiteContent,
   ...storyblokDelivery,
 });
-const organizationSchema = renderOrganizationSchema({
+const organization = organizationNode({
   siteUrl: normaliseSiteUrl(process.env.SITE_URL),
   settings: siteContent.siteSettings,
   social: siteContent.social,
@@ -263,12 +264,14 @@ const tourPageTemplate = generateTourPages ? await loadTourPageTemplate(projectR
 const tourPageContent = generateTourPages
   ? JSON.parse(await readFile(join(projectRoot, 'src/content/tour-pages.json'), 'utf8')).tours
   : {};
-// A tour page shares its own photograph, not the site banner. The catalogue is
-// keyed by the page each tour lives on, so this reaches Just Go Ghana too —
-// its page is committed rather than generated, so it never appears in
-// generatedTourPages and had been falling back to the banner.
+// The catalogue keyed by the page each tour lives on, which is how both the
+// social image and the tour's structured-data record find their tour. It
+// reaches Just Go Ghana too: its page is committed rather than generated, so
+// it never appears in generatedTourPages and had been falling back to the
+// site banner. Nothing is filtered out here — a tour missing a photograph
+// still describes itself to a crawler, and falls back to the banner as before.
 const tourByPage = new Map(
-  tours.filter(tour => tour?.detailUrl && tour?.socialImage).map(tour => [tour.detailUrl, tour]),
+  tours.filter(tour => tour?.detailUrl).map(tour => [tour.detailUrl, tour]),
 );
 const generatedTourPages = new Map();
 if (generateTourPages) {
@@ -293,6 +296,38 @@ if (generateTourPages) {
     });
   }
 }
+
+/**
+ * The one structured-data record a page carries, if it carries any.
+ *
+ * Built from the values injectPageMeta has already derived for the page's own
+ * tags plus its finished markup, so a record can only ever describe the page
+ * it sits on. Three things can appear: the business, on the homepage alone; a
+ * tour, on the thirteen pages that sell one; and the questions a page visibly
+ * answers, wherever it answers any.
+ */
+const pageStructuredData = file => facts => {
+  const tour = tourByPage.get(file);
+  const items = countFaqItems(facts.html);
+  const faqs = extractFaqs(facts.html);
+  // A page showing FAQ items the extractor cannot read has changed shape.
+  // Shipping the shorter list would be a silent, invisible loss, so stop.
+  if (items !== faqs.length) {
+    throw new Error(`${file}: ${items} FAQ items on the page but ${faqs.length} readable — the markup changed`);
+  }
+  return renderStructuredData([
+    file === 'index.html' ? organization : null,
+    tour ? tourProductNode({
+      url: facts.url,
+      name: tour.title,
+      description: facts.description,
+      image: facts.image,
+      price: tour.price,
+      brand: {'@type': 'Organization', '@id': organization['@id'], name: organization.name},
+    }) : null,
+    faqPageNode({url: facts.url, faqs}),
+  ]);
+};
 
 // 404.html only.
 //
@@ -438,7 +473,7 @@ for (const entry of rootEntries) {
       siteName: siteContent.siteSettings.businessName,
       ogImage: generatedTour?.seo?.socialImage || tourByPage.get(entry.name)?.socialImage || ogImage,
       canonicalOverride: generatedTour?.seo?.canonicalOverride,
-      organization: organizationSchema,
+      structuredData: pageStructuredData(entry.name),
     });
     if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(entry.name);
     const withNext = injectFormNext(withMeta, siteUrl);
@@ -470,6 +505,7 @@ for (const [fileName, generatedTour] of generatedTourPages) {
     siteName: siteContent.siteSettings.businessName,
     ogImage: generatedTour.seo?.socialImage || generatedTour.socialImage || ogImage,
     canonicalOverride: generatedTour.seo?.canonicalOverride,
+    structuredData: pageStructuredData(fileName),
   });
   if (!/name="robots"[^>]*noindex/i.test(withMeta)) indexableFiles.push(fileName);
   const stamped = stampAssets(cleanInternalUrls(injectFormNext(withMeta, siteUrl)));

@@ -124,7 +124,11 @@
 
     /* TRIP HIGHLIGHTS SIDEBAR */
     .trip-highlights-card { background: var(--gray); border-radius: 24px; padding: var(--sp-3); }
-    .trip-highlights-card h4 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); margin-bottom: var(--sp-2); color: var(--dark); }
+    /* h3, not h4: the sidebar card follows the FAQ's h2 in the document, so an
+       h4 here skipped a level. The reset zeroes heading margins and this rule
+       sets the size, so the level carries no styling of its own — the change is
+       semantic only and the rendering is identical. */
+    .trip-highlights-card h3 { font-family:'Archivo Black',sans-serif;  font-size:var(--text-2xl); margin-bottom: var(--sp-2); color: var(--dark); }
     /* Label left, value right, with nothing between them — so a CMS value long
        enough to fill the row ran straight into its label. The row wraps now: the
        label never shrinks, and a value that cannot fit beside it drops to its
@@ -455,7 +459,7 @@
       </div>
     </div>
     <div class="trip-highlights-card">
-      <h4>Trip Details</h4>
+      <h3>Trip Details</h3>
       <div class="highlight-row"><span>Duration</span><span>8 Days / 7 Nights</span></div>
       <div class="highlight-row"><span>Departure</span><span>Accra, Ghana</span></div>
       <div class="highlight-row"><span>Activity Level</span><span>Moderate</span></div>

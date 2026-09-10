@@ -38,10 +38,34 @@ export const pageUrl = (siteUrl, file) =>
   file === 'index.html' ? `${siteUrl}/` : `${siteUrl}/${file.replace(/\.html$/i, '')}`;
 
 /**
+ * The colour a browser paints its own chrome with, taken from the page.
+ *
+ * --pap-charcoal is what `.page-hero` and the footer are filled with, so the
+ * browser bar continues the band it sits above instead of cutting a white
+ * stripe across the top of a dark hero. It is a value the stylesheet already
+ * holds; tests/seo-metadata.mjs reads style.css and fails if the two drift.
+ */
+export const THEME_COLOR = '#1A1A1A';
+
+// Storyblok encodes a transform in the path, so an image already cropped for a
+// link preview states its own size. Nothing is guessed: a URL that does not
+// carry the crop simply ships without dimensions.
+const imageDimensions = url => {
+  const match = /\/m\/(\d{1,5})x(\d{1,5})\//.exec(String(url || ''));
+  return match ? {width: match[1], height: match[2]} : null;
+};
+
+/**
  * Adds social and canonical metadata to one page. Pages that already declare
  * og: tags are left alone, so hand-authored overrides always win.
+ *
+ * `structuredData` is a function rather than a string because the record a
+ * page carries is built from the same title, description, image and URL these
+ * tags are, plus the finished markup. Deriving both from one set of values is
+ * what stops a page from describing itself one way to a crawler and another
+ * way to a link preview.
  */
-export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonicalOverride, organization}) {
+export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonicalOverride, structuredData}) {
   if (/property="og:/i.test(html)) return html;
 
   const title = decodeEntities((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || siteName).trim();
@@ -56,6 +80,7 @@ export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonica
     : `${siteUrl}/${ogImage}`;
   // thanks.html is noindex; it should never be the canonical target of a share.
   const robotsNoindex = /name="robots"[^>]*noindex/i.test(html);
+  const size = imageDimensions(socialImage);
 
   const tags = [
     `<link rel="canonical" href="${escapeAttr(url)}" />`,
@@ -65,16 +90,29 @@ export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonica
     `<meta property="og:description" content="${escapeAttr(description)}" />`,
     `<meta property="og:url" content="${escapeAttr(url)}" />`,
     `<meta property="og:image" content="${escapeAttr(socialImage)}" />`,
+    ...(size ? [
+      `<meta property="og:image:width" content="${escapeAttr(size.width)}" />`,
+      `<meta property="og:image:height" content="${escapeAttr(size.height)}" />`,
+    ] : []),
     `<meta property="og:image:alt" content="${escapeAttr(title)}" />`,
+    // en_GB, not en_GH. og:locale is a rendering hint for the platform showing
+    // the preview, and its value has to be one that platform actually carries.
+    // Ghana has no Open Graph locale of its own; en_GB is the supported locale
+    // whose conventions Ghanaian English follows. It is not a search signal, so
+    // reaching for an unsupported value would trade a working tag for nothing.
     `<meta property="og:locale" content="en_GB" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeAttr(title)}" />`,
     `<meta name="twitter:description" content="${escapeAttr(description)}" />`,
     `<meta name="twitter:image" content="${escapeAttr(socialImage)}" />`,
+    `<meta name="twitter:image:alt" content="${escapeAttr(title)}" />`,
+    `<meta name="theme-color" content="${THEME_COLOR}" />`,
   ];
   if (robotsNoindex) tags.shift();
-  // Homepage only: one identity record for the site, not one per page.
-  if (file === 'index.html' && organization) tags.push(organization);
+  const record = typeof structuredData === 'function'
+    ? structuredData({title, description, url, image: socialImage, html})
+    : '';
+  if (record) tags.push(record);
 
   const block = tags.map(tag => `  ${tag}`).join('\n');
   if (!/<\/head>/i.test(html)) throw new Error(`${file} has no </head> to inject metadata into`);
@@ -82,7 +120,7 @@ export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonica
 }
 
 /**
- * Identity markup for the homepage, and only the homepage.
+ * Identity for the site, and only on the homepage.
  *
  * The site carried no structured data at all, so a search engine had to infer
  * from prose that People & Places is a Ghanaian tour operator, that the number
@@ -96,12 +134,17 @@ export function injectPageMeta(html, {file, siteUrl, siteName, ogImage, canonica
  * ratings, prices, opening hours as structured times — are deliberately left
  * out. Those belong with a decision about what the business wants to stand
  * behind, not in a metadata pass.
+ *
+ * The @id is what every tour page's brand points at, so the catalogue and the
+ * business read as one graph rather than thirteen unrelated sellers.
  */
-export function renderOrganizationSchema({siteUrl, settings = {}, social = {}}) {
+export const organizationId = siteUrl => `${siteUrl}/#organization`;
+
+export function organizationNode({siteUrl, settings = {}, social = {}}) {
   const sameAs = [social.instagramUrl, social.tiktokUrl].filter(Boolean);
-  const data = {
-    '@context': 'https://schema.org',
+  return {
     '@type': 'TravelAgency',
+    '@id': organizationId(siteUrl),
     name: settings.businessName,
     url: `${siteUrl}/`,
     ...(settings.email ? {email: settings.email} : {}),
@@ -110,15 +153,6 @@ export function renderOrganizationSchema({siteUrl, settings = {}, social = {}}) 
     address: {'@type': 'PostalAddress', addressCountry: 'GH'},
     areaServed: {'@type': 'Country', name: 'Ghana'},
   };
-  // JSON inside a <script> must not be able to close the tag early.
-  //
-  // The replacement must be the two-character escape a JSON parser decodes
-  // back to "<", written here as a literal backslash. Writing '\u003c' with a
-  // single backslash makes JavaScript decode it at parse time, so the call
-  // becomes replace('<', '<') — a no-op that reads as protection. The test
-  // for this caught exactly that.
-  const json = JSON.stringify(data, null, 2).replace(/</g, '\\u003c');
-  return `<script type="application/ld+json">\n${json}\n</script>`;
 }
 
 export function renderSitemap(siteUrl, files, lastmod) {
@@ -130,5 +164,18 @@ export function renderSitemap(siteUrl, files, lastmod) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
+// No "User-agent: *" group of our own.
+//
+// On the live domain Cloudflare prepends its managed block, which already
+// opens with "User-agent: *", grants "Allow: /" and carries the Content-Signal
+// line that reserves the site's content against AI training. A second group
+// with the same token adds no rule the first does not already grant — every
+// conformant parser merges them — but a parser that instead takes the last
+// matching group would find ours, which has no Content-Signal, and read the
+// reservation as absent. Dropping it leaves crawl permission exactly where it
+// was and stops it shadowing the owner's opt-out. Sitemap is a non-group
+// directive, so it stands on its own.
 export const renderRobots = siteUrl =>
-  `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`;
+  '# Crawl rules for the live site come from Cloudflare\'s managed robots.txt\n'
+  + '# block, prepended above this line at the edge.\n'
+  + `Sitemap: ${siteUrl}/sitemap.xml\n`;
