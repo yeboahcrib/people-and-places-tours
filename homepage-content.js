@@ -109,7 +109,7 @@
       // Storyblok sets eyebrow, title, intro, pathways and cta on this
       // section, so a key it does not know about survives the merge.
       jumpLinks: {
-        label: 'Or go straight to a tour:',
+        label: 'Straight to a tour',
         items: [
           { label: 'Cape Coast Ancestral Tour', href: 'cape-coast-tour.html' },
           { label: 'Accra After Dark Food Tour', href: 'accra-food-tour.html' },

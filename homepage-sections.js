@@ -211,10 +211,13 @@
       </a>`).join('')}
     </div>
     ${(data.jumpLinks?.items || []).length ? `
-    <p class="pathways-jump reveal">${escapeHtml(data.jumpLinks.label || '')}
-      ${data.jumpLinks.items.map(link =>
-        `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('\n      ')}
-    </p>` : ''}
+    <div class="pathways-jump reveal">
+      <div class="pathways-jump-label">${escapeHtml(data.jumpLinks.label || '')}</div>
+      <div class="pathways-jump-links">
+        ${data.jumpLinks.items.map(link =>
+          `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('\n        ')}
+      </div>
+    </div>` : ''}
     ${data.cta ? `<a href="${escapeHtml(data.cta.href)}" class="btn btn-outline-dark pathways-cta reveal"><span>${escapeHtml(data.cta.label)}</span></a>` : ''}
   </div>
 </section>`;

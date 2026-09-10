@@ -3728,40 +3728,53 @@ body.page-entering {
   line-height: 1.65;
 }
 .pathways-cta { margin-top: var(--sp-5); }
-/* One line of named tours under the pathway grid. The cards themselves are
-   whole-card links into the filtered catalogue, so this is the only place on
-   the homepage a tour can be linked by name. Yellow on a light surface needs
-   --yellow-on-light; --color-primary fails AA here. */
-.pathways-jump {
-  margin-top: var(--sp-4);
+/* One named tour per pathway card above, linked by name.
+   The cards are whole-card anchors into the filtered catalogue, so this row is
+   the only place on the homepage a tour can be linked directly. It is built
+   from the pathway card's own material — cream on the gold band, a hairline
+   forest border, the same lift on hover — so it reads as part of the section
+   rather than as links dropped onto it. The label takes the section's eyebrow
+   treatment for the same reason. */
+.pathways-jump { margin-top: var(--sp-6); }
+.pathways-jump-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pap-forest);
+  margin-bottom: var(--sp-2);
+}
+.pathways-jump-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1-5);
+}
+.pathways-jump-links a {
+  display: inline-block;
+  padding: 0.62rem 1.15rem;
+  background: var(--pap-cream);
+  border: 1px solid rgba(18,63,53,0.28);
+  border-radius: var(--radius-pill);
+  color: var(--pap-forest);
   font-size: var(--text-sm);
-  color: var(--muted-dark);
-  /* Tall enough that the padded links below never collide across wrapped
-     rows: at 13px this is ~34px a row, against a 32px link. */
-  line-height: 2.6;
-}
-.pathways-jump a {
-  color: var(--yellow-on-light);
   font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  /* This is a row of destinations, not a link inside a sentence, so it has to
-     clear the 32px touch target. The padding is transparent — it enlarges the
-     thumb area without moving the text. */
-  display: inline-block;
-  line-height: 1.25;
-  padding: 8px 0;
+  line-height: 1.35;
+  box-shadow: var(--elevation-light-1);
+  transition: transform var(--motion-base) var(--ease-out),
+              border-color var(--motion-base) var(--ease-out),
+              box-shadow var(--motion-base) var(--ease-out);
 }
-.pathways-jump a:not(:last-child)::after {
-  content: " ·";
-  color: var(--muted-dark);
-  text-decoration: none;
-  display: inline-block;
-  font-weight: 400;
-  margin: 0 var(--sp-0-5) 0 var(--sp-1);
+.pathways-jump-links a:hover,
+.pathways-jump-links a:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(18,63,53,0.48);
+  box-shadow: var(--elevation-light-2);
 }
-.pathways-jump a:hover { color: var(--pap-charcoal); }
+@media (prefers-reduced-motion: reduce) {
+  .pathways-jump-links a { transition: none; }
+  .pathways-jump-links a:hover,
+  .pathways-jump-links a:focus-visible { transform: none; }
+}
 
 /* ────────────────────────────────────────────────────────────── */
 /*  HOMEPAGE — HOW HOSTED principle proof (extends .why-row)      */
