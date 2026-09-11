@@ -878,26 +878,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const turnstileSiteKey = contactForm.dataset.turnstileSitekey;
     const turnstileMount = contactForm.querySelector('[data-turnstile]');
     let turnstileWidget = null;
+    let turnstileApiReady = false;
     let pendingTurnstile = null;
 
+    /* Each attempt owns its timer, and settling clears it.
+       A single shared timer could outlive the attempt that armed it: submit
+       once, submit again eight seconds later, and the first attempt's timer
+       fired into the second attempt's promise and resolved it with an empty
+       string. The server read that as "not a person" and refused a real
+       visitor — and because every refusal armed another timer, retrying made
+       it worse. The identity check is the belt to clearTimeout's braces. */
     const settleTurnstile = token => {
       if (!pendingTurnstile) return;
-      const resolve = pendingTurnstile;
+      const attempt = pendingTurnstile;
       pendingTurnstile = null;
-      resolve(token);
+      clearTimeout(attempt.timer);
+      attempt.resolve(token);
+    };
+
+    /* Turnstile writes its own hidden input into the form as soon as a
+       challenge completes. Reading it back is how a challenge that finished a
+       moment after we stopped waiting still counts. It is Cloudflare's own
+       token and nothing about the server check changes: it is verified
+       against siteverify, for this action, on this hostname, exactly as any
+       other token is. */
+    const widgetToken = () => {
+      const field = contactForm.querySelector('input[name="cf-turnstile-response"]');
+      return typeof field?.value === 'string' ? field.value.trim() : '';
+    };
+
+    /* Mounted late, and only once its container has layout.
+       The widget sits in the step-two actions row, which the booking flow
+       keeps at `display: none` until somebody reaches that step. A challenge
+       initialised into a box with no dimensions has nowhere to draw itself if
+       it later decides a person needs to click something. */
+    const mountTurnstile = () => {
+      if (turnstileWidget !== null || !turnstileApiReady || !window.turnstile) return;
+      if (!turnstileSiteKey || !turnstileMount) return;
+      // The mount collapses while it is empty, so ask its container whether
+      // this step is on screen rather than the mount itself.
+      if (turnstileMount.parentElement?.offsetParent === null) return;
+      turnstileWidget = window.turnstile.render(turnstileMount, {
+        sitekey: turnstileSiteKey,
+        action: 'inquiry',
+        appearance: 'interaction-only',
+        execution: 'execute',
+        callback: token => settleTurnstile(token),
+        'error-callback': code => {
+          // Kept rather than discarded. Every client-side failure used to look
+          // identical from here, which left nothing to diagnose afterwards.
+          const reason = typeof code === 'string' && code ? code : 'unknown';
+          contactForm.dataset.turnstileError = reason;
+          console.warn('Turnstile challenge did not complete', {code: reason});
+          settleTurnstile('');
+        },
+        'timeout-callback': () => {
+          contactForm.dataset.turnstileError = 'challenge-timeout';
+          console.warn('Turnstile challenge timed out');
+          settleTurnstile('');
+        },
+      });
     };
 
     if (turnstileSiteKey && turnstileMount) {
       window.onBookingTurnstileLoad = () => {
-        turnstileWidget = window.turnstile.render(turnstileMount, {
-          sitekey: turnstileSiteKey,
-          action: 'inquiry',
-          appearance: 'interaction-only',
-          execution: 'execute',
-          callback: token => settleTurnstile(token),
-          'error-callback': () => settleTurnstile(''),
-          'timeout-callback': () => settleTurnstile(''),
-        });
+        turnstileApiReady = true;
+        mountTurnstile();
       };
       const turnstileScript = document.createElement('script');
       turnstileScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onBookingTurnstileLoad&render=explicit';
@@ -907,11 +953,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const requestTurnstileToken = () => new Promise(resolve => {
+      // Any route to submit that did not pass through a step change still has
+      // to find a mounted widget.
+      mountTurnstile();
       if (!turnstileSiteKey || turnstileWidget === null || !window.turnstile) return resolve('');
-      pendingTurnstile = resolve;
+      // An attempt still in flight is abandoned deliberately rather than
+      // orphaned: its promise is settled, so nothing is left awaiting forever.
+      if (pendingTurnstile) settleTurnstile('');
+      delete contactForm.dataset.turnstileError;
+      const attempt = {resolve, timer: 0};
       // Never leave somebody watching a spinner for a challenge that is not
       // coming back. An empty token fails the server check honestly instead.
-      setTimeout(() => settleTurnstile(''), 15000);
+      attempt.timer = setTimeout(() => {
+        if (pendingTurnstile === attempt) settleTurnstile('');
+      }, 15000);
+      pendingTurnstile = attempt;
       try {
         window.turnstile.reset(turnstileWidget);
         window.turnstile.execute(turnstileWidget);
@@ -1030,6 +1086,8 @@ document.addEventListener('DOMContentLoaded', () => {
       showBookingStep = (step, moveFocus = false) => {
         currentBookingStep = Math.min(Math.max(step, 1), totalSteps);
         contactForm.dataset.bookingCurrent = String(currentBookingStep);
+        // The step carrying the widget has just been laid out, if this is it.
+        mountTurnstile();
 
         let stepName = '';
         progressItems.forEach(item => {
@@ -1133,7 +1191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = Object.fromEntries(new FormData(contactForm).entries());
         inquirySubmissionId ||= crypto.randomUUID();
         payload['client-submission-id'] = inquirySubmissionId;
-        payload['cf-turnstile-response'] = await requestTurnstileToken();
+        payload['cf-turnstile-response'] = (await requestTurnstileToken()) || widgetToken();
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
