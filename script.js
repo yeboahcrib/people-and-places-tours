@@ -977,6 +977,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const travelDate = contactForm.querySelector('#travel-date');
     const successPanel = bookingPanel?.querySelector('[data-booking-success]');
     const errorEl = contactForm.querySelector('.form-error');
+    // Verification fails for real people, not only for bots: an extension or a
+    // privacy setting blocking one resource Turnstile needs is enough, and
+    // "reload and try again" does not fix either. Without another way through,
+    // that visitor's enquiry is simply lost and nothing records that they
+    // tried. The number is read from a link already on the page rather than
+    // written here, so it cannot drift from the one Storyblok holds.
+    const whatsappHref = document.querySelector('a[href^="https://wa.me/"]')?.href || '';
+    const showSubmitError = (message, {offerWhatsApp = false} = {}) => {
+      if (!errorEl) return;
+      errorEl.textContent = message;
+      if (!offerWhatsApp || !whatsappHref) return;
+      errorEl.append(' ');
+      const link = document.createElement('a');
+      link.href = whatsappHref;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Or send us the same message on WhatsApp';
+      errorEl.append(link, ' and we will pick it up from there.');
+    };
     const totalSteps = bookingSteps.length;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let currentBookingStep = 1;
@@ -1126,7 +1145,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // a rejected challenge needs its specific "reload and try again"
         // wording rather than the generic delivery warning below.
         if (!res.ok) {
-          if (errorEl) errorEl.textContent = result.error || 'Your message could not be sent. Please try again in a moment.';
+          // A 403 from our own page is a failed challenge, not a blocked
+          // origin — the origin is always ours here. That is the one failure a
+          // reload may genuinely not fix, so it gets the escape hatch.
+          showSubmitError(
+            result.error || 'Your message could not be sent. Please try again in a moment.',
+            {offerWhatsApp: res.status === 403},
+          );
           btn.innerHTML = original;
           btn.disabled = false;
           return;
@@ -1146,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Do not automatically submit to the fallback here. The function may
         // have delivered the email even if its response was interrupted, and
         // an automatic retry could create a duplicate inquiry.
-        if (errorEl) errorEl.textContent = 'We could not confirm that your message reached us. Please try again in a moment, or send us a note on WhatsApp and we will pick it up from there.';
+        showSubmitError('We could not confirm that your message reached us. Please try again in a moment.', {offerWhatsApp: true});
         btn.innerHTML = original;
         btn.disabled = false;
       }
