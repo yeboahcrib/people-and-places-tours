@@ -147,6 +147,12 @@ function validateInputShape(input) {
 function validate(payload) {
   if (!payload['first-name'] || !payload['last-name']) return 'Please provide your first and last name.';
   if (!EMAIL_PATTERN.test(payload.email)) return 'Please provide a valid email address.';
+  // Required here as well as in the markup. `required` on the input is a
+  // convenience for someone filling the form in a browser, not a rule: this
+  // endpoint is reachable directly, so a field the business depends on has to
+  // be checked where it cannot be skipped. clean() has already trimmed, so a
+  // field holding only spaces arrives here empty and is refused.
+  if (!payload.country) return 'Please provide your country of residence.';
   if ([payload['first-name'], payload['last-name'], payload.email, payload.phone, payload.country, payload['children-age-ranges']].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
     return 'Inquiry contains invalid characters.';
   }

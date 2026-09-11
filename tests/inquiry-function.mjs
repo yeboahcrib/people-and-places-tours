@@ -43,8 +43,26 @@ assert.equal(response.status, 200);
 assert.equal(JSON.parse(await response.clone().text()).reference, undefined,
   'a discarded submission must not return a reference');
 
-response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com'});
+response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'United States'});
 assert.equal(response.status, 503);
+
+// Country is required by the validator, not only by the browser. A client that
+// posts straight to this endpoint cannot create an enquiry without one.
+response = await invoke(
+  {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com'},
+  {}, {RESEND_API_KEY: 'k', INQUIRY_TO_EMAIL: 'to@example.com', INQUIRY_FROM_EMAIL: 'from@example.com'},
+);
+assert.equal(response.status, 400);
+assert.equal((await response.json()).error, 'Please provide your country of residence.');
+
+// Whitespace is not a country. clean() trims before the check, so this is
+// refused rather than stored as a blank string.
+response = await invoke(
+  {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: '   '},
+  {}, {RESEND_API_KEY: 'k', INQUIRY_TO_EMAIL: 'to@example.com', INQUIRY_FROM_EMAIL: 'from@example.com'},
+);
+assert.equal(response.status, 400);
+assert.equal((await response.json()).error, 'Please provide your country of residence.');
 
 response = await invoke(
   {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com'},
@@ -68,7 +86,9 @@ const delivery = {
   INQUIRY_TO_EMAIL: 'team@example.com',
   INQUIRY_FROM_EMAIL: 'website@example.com',
 };
-const guest = {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com'};
+// Country is required server-side as well as in the markup, so the baseline
+// enquiry every later case builds on has to carry one.
+const guest = {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'United States'};
 const withTurnstile = {...delivery, TURNSTILE_SECRET_KEY: 'secret-key'};
 
 const stubFetch = handler => {
@@ -207,6 +227,7 @@ assert(email.text.includes('Accommodation: family'));
       'first-name': 'Ada',
       'last-name': 'Guest',
       email: 'ada@example.com',
+      country: 'United States',
       'cf-turnstile-response': 'a-valid-token',
       'company-website': 'Ada Travel Ltd',
     }, {}, {
