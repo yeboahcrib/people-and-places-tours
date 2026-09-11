@@ -314,4 +314,177 @@ try {
 assert.equal(response.status, 502);
 assert.deepEqual(await response.json(), {error: 'Inquiry delivery could not be confirmed.'});
 
+// ── Storing the enquiry ──
+//
+// The database is the last thing to happen and the least important thing to
+// happen. These check that in both directions: that a row carries what the
+// email carried, and that no failure of the database is ever allowed to change
+// what the visitor is told.
+
+const stubDb = (behaviour = {}) => {
+  const calls = [];
+  return {
+    calls,
+    prepare(sql) {
+      const call = {sql, args: null};
+      return {
+        bind(...args) { call.args = args; return this; },
+        async run() {
+          calls.push(call);
+          if (behaviour.throwOnRun) throw new Error(behaviour.throwOnRun);
+          return {success: true};
+        },
+      };
+    },
+  };
+};
+
+const enquiry = {
+  ...guest,
+  phone: '+233 50 111 2222',
+  country: 'United States',
+  'tour-interest': 'cape-coast',
+  'group-size': '3-5',
+  'travel-date': '2027-04-17',
+  'departure-date': '2027-04-24',
+  'date-flexibility': 'yes',
+  'traveling-with-children': 'yes',
+  'children-age-ranges': '4-7',
+  accommodation: 'family',
+  'contact-method': 'whatsapp',
+  message: 'We would like to bring my mother.',
+};
+
+const deliverThen = db => {
+  const restore = stubFetch(async url => {
+    if (String(url) === siteverify) return new Response(JSON.stringify(validChallenge), {status: 200});
+    return new Response(JSON.stringify({id: 'email-1'}), {status: 200});
+  });
+  return {
+    restore,
+    env: {...withTurnstile, ...(db ? {DB: db} : {})},
+  };
+};
+
+// A delivered enquiry is written once, with every field the email carried.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  const {reference} = await response.json();
+  assert.equal(db.calls.length, 1, 'one delivered enquiry should write one row');
+
+  const [call] = db.calls;
+  assert(/INSERT INTO enquiries/.test(call.sql));
+  assert(/ON CONFLICT\(id\) DO NOTHING/.test(call.sql),
+    'a client retry must not be able to create a second row');
+  // Column count and bound-value count must agree, or the insert silently
+  // shifts every value one column to the left.
+  const columns = call.sql.match(/\(([^)]*)\)\s+VALUES/)[1].split(',').length;
+  assert.equal(columns, call.args.length, 'column list and bound values disagree');
+
+  const [id, storedReference, createdAt, status, source, first, last, email,
+         phone, country, tourInterest, tourName, groupSize, travelDate,
+         departureDate, flexibility, withChildren, childAges, accommodation,
+         contactMethod, message] = call.args;
+  assert.match(id, /^[0-9a-f-]{36}$/, 'the row id should be the idempotency key');
+  assert.equal(storedReference, reference, 'the row must carry the reference the guest was given');
+  assert.match(createdAt, /^\d{4}-\d{2}-\d{2}T[\d:.]+Z$/, 'created_at should be ISO 8601 UTC');
+  assert.equal(status, 'new');
+  assert.equal(source, 'Website inquiry');
+  assert.equal(first, 'Ada');
+  assert.equal(last, 'Guest');
+  assert.equal(email, 'ada@example.com');
+  assert.equal(phone, '+233 50 111 2222');
+  assert.equal(country, 'United States');
+  assert.equal(tourInterest, 'cape-coast');
+  // The display name is the server's, never the browser's.
+  assert.equal(tourName, 'Cape Coast Ancestral Tour');
+  assert.equal(groupSize, '3-5');
+  assert.equal(travelDate, '2027-04-17');
+  assert.equal(departureDate, '2027-04-24');
+  assert.equal(flexibility, 'yes');
+  assert.equal(withChildren, 'yes');
+  assert.equal(childAges, '4-7');
+  assert.equal(accommodation, 'family');
+  assert.equal(contactMethod, 'whatsapp');
+  assert.equal(message, 'We would like to bring my mother.');
+}
+
+// A browser-supplied tour name must not reach the database, exactly as it must
+// not reach the email.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    await invoke({...enquiry, 'tour-name': 'Forged tour', 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(db.calls[0].args[11], 'Cape Coast Ancestral Tour');
+}
+
+// The failure that matters: the database is down, the email went out, and the
+// visitor is told the same thing either way.
+{
+  const db = stubDb({throwOnRun: 'D1_ERROR: database is unavailable'});
+  const {restore, env} = deliverThen(db);
+  const errors = [];
+  const originalError = console.error;
+  console.error = (...args) => errors.push(args);
+  try {
+    response = await invoke({...enquiry, 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); console.error = originalError; }
+  assert.equal(response.status, 200, 'a database failure must not fail the enquiry');
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.match(body.reference, /^PP-[0-9A-Z]{6}$/, 'the guest still gets their reference');
+  assert.equal(errors.length, 1, 'a lost row must be logged exactly once');
+  assert(String(errors[0][0]).includes('not to the database'));
+  assert.equal(errors[0][1].reference, body.reference,
+    'the log must carry the reference, so the row can be rebuilt from the email');
+}
+
+// No binding at all — a preview before the database is attached — is a normal
+// state, not an error, and is not logged as one.
+{
+  const {restore, env} = deliverThen(null);
+  const errors = [];
+  const originalError = console.error;
+  console.error = (...args) => errors.push(args);
+  try {
+    response = await invoke({...enquiry, 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); console.error = originalError; }
+  assert.equal(response.status, 200);
+  assert.equal(errors.length, 0, 'an unconfigured database must not log an error on every enquiry');
+}
+
+// Nothing is written for an enquiry that was never delivered.
+{
+  const db = stubDb();
+  const restore = stubFetch(async url => {
+    if (String(url) === siteverify) return new Response(JSON.stringify(validChallenge), {status: 200});
+    return new Response('rejected', {status: 422});
+  });
+  const originalError = console.error;
+  console.error = () => {};
+  try {
+    response = await invoke({...enquiry, 'cf-turnstile-response': 'good-token'}, {}, {...withTurnstile, DB: db});
+  } finally { restore(); console.error = originalError; }
+  assert.equal(response.status, 502);
+  assert.equal(db.calls.length, 0, 'an undelivered enquiry must not be recorded as one');
+}
+
+// A rejected challenge reaches neither the provider nor the database.
+{
+  const db = stubDb();
+  const restore = stubFetch(async () => new Response(JSON.stringify({success: false}), {status: 200}));
+  try {
+    response = await invoke({...enquiry, 'cf-turnstile-response': 'bad'}, {}, {...withTurnstile, DB: db});
+  } finally { restore(); }
+  assert.equal(response.status, 403);
+  assert.equal(db.calls.length, 0);
+}
+
 console.log('Inquiry function tests passed.');

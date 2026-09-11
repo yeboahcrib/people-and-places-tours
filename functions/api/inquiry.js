@@ -254,6 +254,72 @@ function inquiryHtml(payload, requestId) {
   `;
 }
 
+/**
+ * Record a delivered enquiry.
+ *
+ * Called only after Resend has accepted the message, and deliberately in that
+ * order. The email is how this business actually receives an enquiry; this
+ * table is how it counts them later. Writing first would mean a database
+ * outage could stop an enquiry reaching anyone, which trades something that
+ * matters for something that does not.
+ *
+ * So a failure here never reaches the visitor: they have been helped, the
+ * team has the email. It is logged with the reference instead, which is the
+ * one string that ties the lost row back to a message someone can read.
+ *
+ * `ON CONFLICT DO NOTHING` because the id is the same idempotency key sent to
+ * Resend: if a client retries, Resend drops the duplicate email and this drops
+ * the duplicate row, so the two stay in step.
+ *
+ * Returns a reason rather than throwing, so the caller decides what to log.
+ */
+const ENQUIRY_COLUMNS = [
+  'id', 'reference', 'created_at', 'status', 'source',
+  'first_name', 'last_name', 'email', 'phone', 'country',
+  'tour_interest', 'tour_name', 'group_size', 'travel_date', 'departure_date',
+  'date_flexibility', 'traveling_with_children', 'children_age_ranges',
+  'accommodation', 'contact_method', 'message',
+];
+
+const INSERT_ENQUIRY = `INSERT INTO enquiries (${ENQUIRY_COLUMNS.join(', ')}) `
+  + `VALUES (${ENQUIRY_COLUMNS.map(() => '?').join(', ')}) ON CONFLICT(id) DO NOTHING`;
+
+async function storeEnquiry(env, payload, {id, reference, createdAt}) {
+  // No binding is a valid state, not a fault: a preview without the database
+  // attached still has to deliver enquiries. /api/health reports it so the gap
+  // is visible rather than silent.
+  if (!env.DB || typeof env.DB.prepare !== 'function') return {stored: false, reason: 'not-configured'};
+
+  try {
+    await env.DB.prepare(INSERT_ENQUIRY).bind(
+      id,
+      reference,
+      createdAt,
+      'new',
+      payload.source || 'Website inquiry',
+      payload['first-name'],
+      payload['last-name'],
+      payload.email,
+      payload.phone,
+      payload.country,
+      payload['tour-interest'],
+      payload['tour-name'],
+      payload['group-size'],
+      payload['travel-date'],
+      payload['departure-date'],
+      payload['date-flexibility'],
+      payload['traveling-with-children'],
+      payload['children-age-ranges'],
+      payload.accommodation,
+      payload['contact-method'],
+      payload.message,
+    ).run();
+    return {stored: true};
+  } catch (error) {
+    return {stored: false, reason: 'write-failed', message: error?.message};
+  }
+}
+
 async function handlePost({request, env}) {
   if (!allowedOrigin(request, env)) return json(403, {error: 'Request origin is not allowed.'});
 
@@ -352,6 +418,21 @@ async function handlePost({request, env}) {
     // Do not expose provider details or customer data to the browser.
     console.error('Inquiry provider rejected request', {requestId, status: emailResponse.status});
     return json(502, {error: 'Inquiry delivery could not be confirmed.'});
+  }
+
+  // The email is away. Everything from here is bookkeeping, and none of it may
+  // change what the visitor is told.
+  const storage = await storeEnquiry(env, payload, {
+    id: requestId,
+    reference,
+    createdAt: new Date().toISOString(),
+  });
+  if (!storage.stored && storage.reason !== 'not-configured') {
+    // Loud, and carrying the reference: the email exists and can be read, so
+    // this row can be reconstructed by hand if it ever matters.
+    console.error('Inquiry stored to email but not to the database', {
+      requestId, reference, reason: storage.reason, message: storage.message,
+    });
   }
 
   return json(200, {ok: true, reference});

@@ -22,6 +22,11 @@ export function onRequest({request, env}) {
   // It is surfaced so monitoring can catch a custom-domain cutover that went
   // out without bot protection. See docs/availability-and-monitoring-runbook.md.
   const botProtectionConfigured = Boolean(env.TURNSTILE_SECRET_KEY);
+  // Also reported and also outside `ready`: without the database an enquiry
+  // still reaches the team by email, so a missing binding must not take this
+  // endpoint to 503. It is surfaced so a deployment that lost the binding is
+  // visible before anyone notices the reporting has gone quiet.
+  const enquiryStorageConfigured = Boolean(env.DB);
   const body = {
     status: ready ? 'ok' : 'degraded',
     service: 'people-and-places-inquiry',
@@ -29,6 +34,7 @@ export function onRequest({request, env}) {
     checks: {
       deliveryConfigured: ready,
       botProtectionConfigured,
+      enquiryStorageConfigured,
     },
   };
 

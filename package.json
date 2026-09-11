@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run check:js && npm run test:headers && npm run test:a11y-static && npm run test:content && node scripts/build-static.mjs && npm run test:build",
+    "build": "npm run check:js && npm run test:headers && npm run test:functions && npm run test:a11y-static && npm run test:content && node scripts/build-static.mjs && npm run test:build",
+    "test:functions": "node tests/inquiry-function.mjs && node tests/health-function.mjs",
     "test:a11y-static": "node tests/accessibility-static.mjs",
     "test:build": "node tests/build-output.mjs && node tests/health-schema.mjs && node tests/seo-metadata.mjs && node tests/structured-data.mjs",
     "check:js": "node --check script.js && node --check tours.js && node --check homepage-content.js && node --check homepage-sections.js",
