@@ -148,6 +148,87 @@ async function turnstileVerdict(token, request, env) {
   }
 }
 
+/* The rate limit on unverified enquiries.
+ *
+ * Accepting an enquiry with no token is only defensible if one source cannot
+ * do it repeatedly. Cloudflare's own rate limiting rules are a paid feature on
+ * this plan, so the control is built here instead, out of the database the
+ * enquiries already use. It applies to nothing else: a visitor Turnstile
+ * verified never touches this table, which under normal traffic stays empty.
+ *
+ * Three an hour is far more than a person planning one trip will send and far
+ * fewer than a script is worth writing for.
+ *
+ * No IP address is stored. The site promises no tracking and no cookies of its
+ * own, and a rate limit is a poor reason to start keeping identifiers, so what
+ * is written is a truncated digest of the address under a random salt held
+ * only in this database — unreadable without it, and deleted within the hour
+ * regardless. */
+const UNVERIFIED_WINDOW_MS = 60 * 60 * 1000;
+const UNVERIFIED_LIMIT = 3;
+
+// Per isolate. A miss costs one extra read, never a wrong answer.
+let cachedSalt = null;
+
+async function rateLimitSalt(db) {
+  if (cachedSalt) return cachedSalt;
+  const existing = await db.prepare('SELECT value FROM enquiry_meta WHERE key = ?').bind('rate_salt').first();
+  if (existing?.value) {
+    cachedSalt = existing.value;
+    return cachedSalt;
+  }
+  // First request against a fresh database mints one. DO NOTHING settles the
+  // race between two isolates arriving here at once: whoever lost then reads
+  // back the winner's salt rather than using its own.
+  await db.prepare('INSERT INTO enquiry_meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO NOTHING')
+    .bind('rate_salt', crypto.randomUUID()).run();
+  const settled = await db.prepare('SELECT value FROM enquiry_meta WHERE key = ?').bind('rate_salt').first();
+  cachedSalt = settled?.value || null;
+  return cachedSalt;
+}
+
+async function sourceFingerprint(ip, salt) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}:${ip}`));
+  return [...new Uint8Array(digest)].slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Counts this source's recent unverified enquiries and records the attempt.
+ *
+ * Fails open, deliberately. Every reason this can fail — no database bound, no
+ * client IP, a query erroring — is a fault on our side, and refusing an
+ * enquiry over one would recreate exactly the problem this whole path exists
+ * to fix. A fault is logged instead, loudly, so it is visible.
+ */
+async function withinUnverifiedLimit(env, request) {
+  if (!env.DB || typeof env.DB.prepare !== 'function') return {allowed: true, reason: 'not-configured'};
+  const ip = request.headers.get('CF-Connecting-IP');
+  if (!ip) return {allowed: true, reason: 'no-client-ip'};
+
+  try {
+    const salt = await rateLimitSalt(env.DB);
+    if (!salt) return {allowed: true, reason: 'no-salt'};
+
+    const now = Date.now();
+    const cutoff = new Date(now - UNVERIFIED_WINDOW_MS).toISOString();
+    // Swept on the way past rather than on a schedule there is nowhere to put.
+    // The table only ever holds one window of one kind of request.
+    await env.DB.prepare('DELETE FROM enquiry_attempts WHERE attempted_at < ?').bind(cutoff).run();
+
+    const fingerprint = await sourceFingerprint(ip, salt);
+    const seen = await env.DB
+      .prepare('SELECT COUNT(*) AS attempts FROM enquiry_attempts WHERE fingerprint = ? AND attempted_at >= ?')
+      .bind(fingerprint, cutoff).first();
+    if (Number(seen?.attempts || 0) >= UNVERIFIED_LIMIT) return {allowed: false};
+
+    await env.DB.prepare('INSERT INTO enquiry_attempts (fingerprint, attempted_at) VALUES (?, ?)')
+      .bind(fingerprint, new Date(now).toISOString()).run();
+    return {allowed: true};
+  } catch (error) {
+    return {allowed: true, reason: 'check-failed', message: error?.message};
+  }
+}
+
 function normalizePayload(input, verdict) {
   const payload = Object.fromEntries(
     Object.entries(limits).map(([field, max]) => [field, clean(input[field], max)]),
@@ -404,6 +485,21 @@ async function handlePost({request, env}) {
     // Return a normal success response so a bot does not learn how the filter
     // works.
     return json(200, {ok: true});
+  }
+
+  // Only the downgraded path is capped, and only after the trap has had its
+  // say, so an obvious bot never even reaches the counter.
+  if (verdict !== VERIFIED) {
+    const limit = await withinUnverifiedLimit(env, request);
+    if (!limit.allowed) {
+      return json(429, {
+        error: 'We have had several enquiries from your connection in the last hour. '
+          + 'Please try again later, or message us on WhatsApp and we will pick it up straight away.',
+      });
+    }
+    if (limit.reason && limit.reason !== 'not-configured') {
+      console.error('Unverified enquiry accepted without a rate-limit check', {reason: limit.reason, message: limit.message});
+    }
   }
 
   const payload = normalizePayload(input, verdict);

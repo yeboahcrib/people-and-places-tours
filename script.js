@@ -1145,12 +1145,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // a rejected challenge needs its specific "reload and try again"
         // wording rather than the generic delivery warning below.
         if (!res.ok) {
-          // A 403 from our own page is a failed challenge, not a blocked
-          // origin — the origin is always ours here. That is the one failure a
-          // reload may genuinely not fix, so it gets the escape hatch.
+          // Two statuses a reload will not fix, so both get the escape hatch.
+          // A 403 from our own page is a failed challenge rather than a blocked
+          // origin — the origin is always ours here. A 429 is the cap on
+          // enquiries we could not verify, and the person hitting it needs
+          // somewhere else to go more than anyone.
           showSubmitError(
             result.error || 'Your message could not be sent. Please try again in a moment.',
-            {offerWhatsApp: res.status === 403},
+            {offerWhatsApp: res.status === 403 || res.status === 429},
           );
           btn.innerHTML = original;
           btn.disabled = false;

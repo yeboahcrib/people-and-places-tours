@@ -5,6 +5,9 @@ const functionSource = await readFile(new URL('../functions/api/inquiry.js', imp
 const functionModule = await import(`data:text/javascript;base64,${Buffer.from(functionSource).toString('base64')}`);
 const {onRequest} = functionModule;
 
+// Read from the source so the tests cannot drift from the policy they check.
+const UNVERIFIED_LIMIT = Number(functionSource.match(/const UNVERIFIED_LIMIT = (\d+);/)[1]);
+
 const endpoint = 'https://people-and-places.pages.dev/api/inquiry';
 
 const request = (body, options = {}) => {
@@ -12,6 +15,9 @@ const request = (body, options = {}) => {
   // `originless: true` models a non-browser client; anything else keeps the
   // header a real browser would always send on a POST.
   if (!options.originless) headers.Origin = options.origin || 'https://people-and-places.pages.dev';
+  // Cloudflare sets this on every request that reaches a Function. The rate
+  // limiter is the only thing that reads it, and only ever as a digest.
+  if (options.ip) headers['CF-Connecting-IP'] = options.ip;
   return new Request(endpoint, {
     method: options.method || 'POST',
     headers,
@@ -394,17 +400,54 @@ assert.deepEqual(await response.json(), {error: 'Inquiry delivery could not be c
 // email carried, and that no failure of the database is ever allowed to change
 // what the visitor is told.
 
+/**
+ * A small D1 double that keeps state rather than only counting calls.
+ *
+ * The rate limiter reads back what it wrote — a salt, then a count over a
+ * window — so a stub that always answers the same thing cannot tell a working
+ * limiter from a broken one. This models the three statements the Function
+ * actually issues and leaves everything else to the existing call log.
+ */
 const stubDb = (behaviour = {}) => {
   const calls = [];
+  const meta = new Map();
+  const attempts = [];
   return {
     calls,
+    meta,
+    attempts,
     prepare(sql) {
       const call = {sql, args: null};
       return {
         bind(...args) { call.args = args; return this; },
+        async first() {
+          calls.push(call);
+          if (behaviour.throwOnRead) throw new Error(behaviour.throwOnRead);
+          if (/FROM enquiry_meta/.test(sql)) {
+            const value = meta.get(call.args[0]);
+            return value ? {value} : null;
+          }
+          if (/COUNT\(\*\) AS attempts/.test(sql)) {
+            const [fingerprint, cutoff] = call.args;
+            return {attempts: attempts.filter(a => a.fingerprint === fingerprint && a.attemptedAt >= cutoff).length};
+          }
+          return null;
+        },
         async run() {
           calls.push(call);
           if (behaviour.throwOnRun) throw new Error(behaviour.throwOnRun);
+          if (/INSERT INTO enquiry_meta/.test(sql)) {
+            const [key, value] = call.args;
+            if (!meta.has(key)) meta.set(key, value);
+          } else if (/INSERT INTO enquiry_attempts/.test(sql)) {
+            const [fingerprint, attemptedAt] = call.args;
+            attempts.push({fingerprint, attemptedAt});
+          } else if (/DELETE FROM enquiry_attempts/.test(sql)) {
+            const [cutoff] = call.args;
+            for (let i = attempts.length - 1; i >= 0; i -= 1) {
+              if (attempts[i].attemptedAt < cutoff) attempts.splice(i, 1);
+            }
+          }
           return {success: true};
         },
       };
@@ -501,6 +544,100 @@ const deliverThen = db => {
   assert.equal(db.calls.length, 1, 'an unverified enquiry is still an enquiry and is still stored');
   assert.equal(db.calls[0].args[4], 'Website inquiry (unverified)',
     'the stored row must record that the visitor could not be verified');
+}
+
+/* ── The rate limit on unverified enquiries ──────────────────────────────── */
+
+// Three from one source in an hour get through; the fourth does not, and it is
+// told where else to go rather than simply refused.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  const from = {ip: '203.0.113.7'};
+  try {
+    for (let i = 0; i < UNVERIFIED_LIMIT; i += 1) {
+      response = await invoke(enquiry, from, env);
+      assert.equal(response.status, 200, `unverified enquiry ${i + 1} should be delivered`);
+    }
+    response = await invoke(enquiry, from, env);
+  } finally { restore(); }
+  assert.equal(response.status, 429, 'the fourth unverified enquiry in an hour is capped');
+  assert.match(JSON.parse(await response.clone().text()).error, /WhatsApp/,
+    'a capped visitor must be given another way to reach us');
+  assert.equal(db.attempts.length, UNVERIFIED_LIMIT, 'a refused attempt must not extend the window');
+}
+
+// The cap is per source, so one abuser cannot close the form for everyone.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    for (let i = 0; i < UNVERIFIED_LIMIT + 1; i += 1) await invoke(enquiry, {ip: '203.0.113.7'}, env);
+    response = await invoke(enquiry, {ip: '198.51.100.22'}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200, 'a different visitor must be unaffected by someone else hitting the cap');
+}
+
+// No address is stored anywhere, in any form that could be read back.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    await invoke(enquiry, {ip: '203.0.113.7'}, env);
+  } finally { restore(); }
+  const written = JSON.stringify([...db.attempts, ...db.meta.entries()]);
+  assert(!written.includes('203.0.113.7'), 'the client IP must never be written');
+  assert(!written.includes('203.0.113'), 'not even a fragment of it');
+  assert.equal(db.attempts.length, 1);
+  assert.match(db.attempts[0].fingerprint, /^[0-9a-f]{16}$/, 'what is stored is a truncated digest');
+}
+
+// Verified visitors are not counted at all, so the table stays empty under
+// ordinary traffic and the cap can never reach a person Turnstile vouched for.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    for (let i = 0; i < UNVERIFIED_LIMIT + 2; i += 1) {
+      response = await invoke({...enquiry, 'cf-turnstile-response': 'good-token'}, {ip: '203.0.113.7'}, env);
+      assert.equal(response.status, 200);
+    }
+  } finally { restore(); }
+  assert.equal(db.attempts.length, 0, 'a verified enquiry must never be rate limited');
+}
+
+// Attempts older than the window are swept on the way past, so the table never
+// becomes a record of who wrote to us and when.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  db.attempts.push({fingerprint: 'deadbeefdeadbeef', attemptedAt: '2020-01-01T00:00:00.000Z'});
+  try {
+    await invoke(enquiry, {ip: '203.0.113.7'}, env);
+  } finally { restore(); }
+  assert(!db.attempts.some(a => a.attemptedAt.startsWith('2020')), 'stale attempts must be deleted');
+}
+
+// Every way the check itself can fail is our fault, not the visitor's, and
+// refusing them over it would recreate the problem this path exists to fix.
+{
+  const db = stubDb({throwOnRead: 'd1 unavailable'});
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke(enquiry, {ip: '203.0.113.7'}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200, 'a broken rate-limit check must not cost a visitor their enquiry');
+}
+
+// Same when no database is bound at all.
+{
+  const {restore, env} = deliverThen(null);
+  try {
+    for (let i = 0; i < UNVERIFIED_LIMIT + 2; i += 1) {
+      response = await invoke(enquiry, {ip: '203.0.113.7'}, env);
+      assert.equal(response.status, 200);
+    }
+  } finally { restore(); }
 }
 
 // A browser-supplied tour name must not reach the database, exactly as it must
