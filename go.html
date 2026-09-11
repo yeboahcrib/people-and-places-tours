@@ -28,6 +28,8 @@
     --forest:     #123F35;   /* --pap-forest   */
     --terracotta: #C2553D;   /* --pap-terracotta */
     --soft-gold:  #F2D27A;   /* --pap-soft-gold  */
+    --forest-deep:#0B2E27;   /* --pap-forest-deep */
+    --gold-deep:  #D9960A;   /* --yellow-dark     */
     --muted:      rgba(255,247,232,0.58);
     --hairline:   rgba(255,247,232,0.12);
     --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -47,13 +49,11 @@
     overflow-x: hidden;
     display: flex;
     justify-content: center;
-    /* Warm light on a dark ground, not glow: gold opening above the symbol,
-       terracotta through the middle, forest pooling at the foot. Overlapping
-       blooms, nothing repeating. */
+    /* Base and edges only. The colour lives on its own layer below so it can
+       drift; here the page just gets its charcoal and a vignette, so the
+       corners fall away and the middle of the screen carries the light. */
     background:
-      radial-gradient(125% 72% at 50% -12%, rgba(255,184,28,0.20), transparent 56%),
-      radial-gradient(85% 55% at 92% 34%,  rgba(194,85,61,0.16),  transparent 62%),
-      radial-gradient(105% 62% at 50% 112%, rgba(18,63,53,0.60),  transparent 66%),
+      radial-gradient(125% 92% at 50% 46%, transparent 38%, rgba(0,0,0,0.34) 78%, rgba(0,0,0,0.52) 100%),
       var(--ink);
   }
 
@@ -66,6 +66,25 @@
      and at more sizes, but each one stays faint enough to read as depth. */
   .ground { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .ground svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* Four pools, none of them centred on anything: gold high and left of
+     middle, terracotta off the right edge, forest off the left, and the
+     forest-deep floor pulled slightly right. The asymmetry is the point --
+     centred pools read as a vignette, offset ones read as light in a room.
+     Scaled up 12% so the drift never exposes an edge. */
+  .pools {
+    position: absolute; inset: -6%;
+    background:
+      radial-gradient(68% 40% at 41% 1%,   rgba(255,184,28,0.24), transparent 64%),
+      radial-gradient(52% 38% at 106% 27%, rgba(194,85,61,0.22),  transparent 66%),
+      radial-gradient(58% 42% at -10% 58%, rgba(18,63,53,0.78),   transparent 68%),
+      radial-gradient(96% 46% at 57% 106%, rgba(11,46,39,0.92),   transparent 72%);
+    animation: pools 44s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  @keyframes pools {
+    from { transform: translate3d(-1.4%, -1%, 0) scale(1.02); }
+    to   { transform: translate3d(1.4%, 1.2%, 0) scale(1.06); }
+  }
   .ink-layer { animation: sway 120s ease-in-out infinite alternate; }
   .ink-layer path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
   .m-gold  { color: var(--gold);       opacity: 0.075; stroke-width: 6; }
@@ -83,7 +102,7 @@
   .hub {
     position: relative; z-index: 1;
     width: 100%; max-width: 26.5rem;
-    padding: 2.4rem var(--gutter) 1.8rem;
+    padding: 2.4rem var(--gutter) 1.35rem;
     display: flex; flex-direction: column;
   }
 
@@ -93,10 +112,22 @@
      so two thirds of the file's width is empty. The asset is untouched; the
      crop lives here. There is no wordmark under it by choice -- the tab title
      and the image's alt text still carry the name. */
-  .brand { margin: 0 0 1.15rem; line-height: 0; }
+  /* A warm pool behind the mark rather than more type. It sits inside .hub's
+     stacking context at z-index -1, so it lies under the symbol but still
+     above the page's own layers. */
+  .brand { position: relative; margin: 0 0 1.5rem; line-height: 0; }
+  .brand::before {
+    content: '';
+    position: absolute; left: 50%; top: 48%;
+    width: 17rem; height: 17rem; margin: -8.5rem 0 0 -8.5rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,184,28,0.17) 0%, rgba(255,184,28,0.06) 42%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
   .brand-mark {
     position: relative; display: block;
-    width: min(104px, 27%);
+    width: min(116px, 29%);
     aspect-ratio: 234 / 345;
     margin: 0 auto;
     overflow: hidden;
@@ -120,7 +151,7 @@
     line-height: 1.5;
     letter-spacing: -0.005em;
     max-width: 20.5rem;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.85rem;
     text-wrap: pretty;
   }
 
@@ -128,60 +159,131 @@
      A hairline edge, a tight contact shadow and a wider soft one, so each row
      sits above the ground rather than being drawn onto it. Hover raises it;
      pressing sets it back down. */
-  .links { display: flex; flex-direction: column; gap: 0.8rem; }
+  .links { display: flex; flex-direction: column; gap: 0.75rem; }
   .row {
+    position: relative;
+    overflow: hidden;
     display: flex; align-items: center; gap: 0.85rem;
     min-height: 64px; padding: 0.95rem 1.3rem;
-    border: 1px solid var(--hairline);
+    border: 1px solid rgba(255,247,232,0.1);
     border-radius: 18px;
     text-decoration: none;
     font-weight: 600; font-size: 1.0625rem; line-height: 1.3;
     letter-spacing: -0.005em;
-    background: rgba(255,247,232,0.055); color: var(--cream);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 10px 22px -12px rgba(0,0,0,0.85);
-    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1),
-                background 240ms ease, border-color 240ms ease;
+    color: var(--cream);
+    background: rgba(255,247,232,0.055);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    backdrop-filter: blur(10px) saturate(130%);
+    /* Four parts, not one: a lit top edge, a shaded bottom edge, a tight
+       contact shadow and a wide soft one. That is what separates a surface
+       from a rectangle with a drop shadow. */
+    box-shadow:
+      inset 0 1px 0 rgba(255,247,232,0.11),
+      inset 0 -1px 0 rgba(0,0,0,0.34),
+      0 1px 2px rgba(0,0,0,0.36),
+      0 14px 30px -16px rgba(0,0,0,0.95);
+    transition: transform 260ms cubic-bezier(0.16,1,0.3,1), box-shadow 260ms cubic-bezier(0.16,1,0.3,1),
+                background 260ms ease, border-color 260ms ease;
   }
-  .row .label { flex: 1; }
-  .row .arrow { flex-shrink: 0; opacity: 0.42; transition: transform 240ms cubic-bezier(0.16,1,0.3,1), opacity 240ms ease; }
+  /* A light moving across the surface on hover, not a colour change. */
+  .row::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(104deg, transparent 32%, rgba(255,247,232,0.13) 48%, transparent 64%);
+    transform: translateX(-130%);
+    opacity: 0;
+    transition: transform 760ms cubic-bezier(0.22,1,0.36,1), opacity 260ms ease;
+  }
+  .row:hover::after, .row:focus-visible::after { transform: translateX(130%); opacity: 1; }
+  .row .label { flex: 1; position: relative; }
+  .row .arrow {
+    flex-shrink: 0; position: relative;
+    opacity: 0.34;
+    transition: transform 260ms cubic-bezier(0.16,1,0.3,1), opacity 260ms ease;
+  }
   .row:hover, .row:focus-visible {
     transform: translateY(-2px);
-    background: rgba(255,247,232,0.1);
-    border-color: rgba(255,247,232,0.24);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 20px 34px -14px rgba(0,0,0,0.95);
+    background: rgba(255,247,232,0.095);
+    border-color: rgba(255,247,232,0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(255,247,232,0.16),
+      inset 0 -1px 0 rgba(0,0,0,0.34),
+      0 2px 4px rgba(0,0,0,0.4),
+      0 24px 40px -18px rgba(0,0,0,1);
   }
-  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.85; transform: translateX(3px); }
-  .row:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.8; transform: translateX(4px); }
+  .row:active { transform: translateY(0); box-shadow: inset 0 1px 3px rgba(0,0,0,0.55); }
 
+  /* The three neutrals step down in tone rather than repeating one value, so
+     the stack recedes instead of reading as three of the same thing. */
+  .row-n1 { background: rgba(255,247,232,0.075); }
+  .row-n2 { background: rgba(255,247,232,0.058); }
+  .row-n3 { background: rgba(255,247,232,0.042); border-color: rgba(255,247,232,0.085); }
+
+  /* Gold and forest are lit the same way: a bright top stop, the brand colour
+     through the middle, and the palette's own deeper tone at the foot -- so
+     each reads as a curved surface catching light rather than a filled box.
+     The deeper stops are --yellow-dark and --pap-forest-deep, not tints
+     invented for this page. */
   .row-gold {
-    background: var(--gold); color: var(--ink);
-    border-color: rgba(26,26,26,0.14);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 12px 26px -12px rgba(255,184,28,0.55);
+    background: linear-gradient(168deg, #FFC94A 0%, var(--gold) 44%, var(--gold-deep) 100%);
+    color: var(--ink);
+    border-color: rgba(26,26,26,0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.58),
+      inset 0 -1px 0 rgba(96,56,0,0.3),
+      0 1px 2px rgba(0,0,0,0.42),
+      0 18px 36px -16px rgba(255,184,28,0.46);
   }
   .row-gold:hover, .row-gold:focus-visible {
-    background: #FFC53F; border-color: rgba(26,26,26,0.2);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 22px 38px -14px rgba(255,184,28,0.68);
+    background: linear-gradient(168deg, #FFD264 0%, #FFC02F 44%, #E5A00F 100%);
+    border-color: rgba(26,26,26,0.26);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.66),
+      inset 0 -1px 0 rgba(96,56,0,0.3),
+      0 2px 4px rgba(0,0,0,0.46),
+      0 28px 46px -18px rgba(255,184,28,0.56);
   }
+  .row-gold::after { background: linear-gradient(104deg, transparent 32%, rgba(255,255,255,0.34) 48%, transparent 64%); }
   .row-forest {
-    background: var(--forest); color: var(--cream);
-    border-color: rgba(255,247,232,0.14);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 12px 26px -12px rgba(18,63,53,0.95);
+    background: linear-gradient(168deg, #1C5A4A 0%, var(--forest) 48%, var(--forest-deep) 100%);
+    color: var(--cream);
+    border-color: rgba(255,247,232,0.16);
+    box-shadow:
+      inset 0 1px 0 rgba(255,247,232,0.17),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 1px 2px rgba(0,0,0,0.42),
+      0 18px 36px -16px rgba(11,46,39,0.95);
   }
   .row-forest:hover, .row-forest:focus-visible {
-    background: #174B3F; border-color: rgba(255,247,232,0.26);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 22px 38px -14px rgba(18,63,53,1);
+    background: linear-gradient(168deg, #226A57 0%, #15493D 48%, #0D3730 100%);
+    border-color: rgba(255,247,232,0.28);
+    box-shadow:
+      inset 0 1px 0 rgba(255,247,232,0.22),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 2px 4px rgba(0,0,0,0.46),
+      0 28px 46px -18px rgba(11,46,39,1);
   }
-  .row-gold .arrow, .row-forest .arrow { opacity: 0.6; }
+  .row-gold .arrow { opacity: 0.52; }
+  .row-forest .arrow { opacity: 0.58; }
   .row-icon { flex-shrink: 0; }
 
   /* --- Social --- */
-  .foot { margin-top: 2.1rem; text-align: center; }
+  .foot { margin-top: 1.85rem; text-align: center; }
   .social { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1.5rem; }
   .social a {
     display: grid; place-items: center; width: 54px; height: 54px;
-    border: 1px solid var(--hairline); border-radius: 50%;
-    background: rgba(255,247,232,0.055); color: var(--cream);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 8px 18px -10px rgba(0,0,0,0.85);
+    border: 1px solid rgba(255,247,232,0.1); border-radius: 50%;
+    background: rgba(255,247,232,0.06); color: var(--cream);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    backdrop-filter: blur(10px) saturate(130%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,247,232,0.12),
+      inset 0 -1px 0 rgba(0,0,0,0.3),
+      0 1px 2px rgba(0,0,0,0.36),
+      0 10px 22px -12px rgba(0,0,0,0.9);
     transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1),
                 background 240ms ease, border-color 240ms ease, color 240ms ease;
   }
@@ -214,7 +316,9 @@
   .row:nth-of-type(5) { animation-delay: 300ms; }
 
   @media (prefers-reduced-motion: reduce) {
-    .ink-layer { animation: none; }
+    .ink-layer, .pools { animation: none; }
+    .row::after { transition: none; }
+    .row:hover::after, .row:focus-visible::after { transform: translateX(-130%); opacity: 0; }
     .brand, .lede, .row, .foot { animation: none; }
     .row, .row .arrow, .social a { transition: none; }
     .row:hover, .row:focus-visible, .social a:hover, .social a:focus-visible { transform: none; }
@@ -240,6 +344,7 @@
 <body>
 
 <div class="ground" aria-hidden="true">
+  <div class="pools"></div>
   <!-- The site's own woven-line mark, at eight sizes across the page. Faint
        enough that none of them competes with a link. -->
   <svg class="ink-layer" viewBox="0 0 390 860" preserveAspectRatio="xMidYMid slice" focusable="false">
@@ -309,28 +414,28 @@
   <nav class="links" aria-label="{{businessName}} links">
     <a class="row row-gold" href="packages.html" data-go-link="experiences">
       <span class="label">Explore Experiences</span>
-      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
 
     <a class="row row-forest" href="{{whatsappUrl}}" target="_blank" rel="noopener" data-go-link="whatsapp">
       <svg class="row-icon" width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.05 0A11.89 11.89 0 0 0 1.59 17.84L0 24l6.31-1.65A11.94 11.94 0 1 0 12.05 0zm0 21.79a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.89 9.89 0 1 1 8.38 4.63zm5.42-7.41c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.16c-.17.2-.35.22-.64.08-1.76-.88-2.92-1.57-4.09-3.58-.31-.53.31-.49.88-1.62.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-2.72 2.98-.52 7.29 3.9 9.2 1.68.72 2.95.78 4.01.65.57-.08 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/></svg>
       <span class="label">WhatsApp Us</span>
-      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
 
-    <a class="row" href="just-go-ghana.html" data-go-link="just-go-ghana">
+    <a class="row row-n1" href="just-go-ghana.html" data-go-link="just-go-ghana">
       <span class="label">Just Go Ghana</span>
-      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
 
-    <a class="row" href="contact.html?tour=custom" data-go-link="custom">
+    <a class="row row-n2" href="contact.html?tour=custom" data-go-link="custom">
       <span class="label">Plan a Custom Trip</span>
-      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
 
-    <a class="row" href="travel-information.html" data-go-link="travel-information">
+    <a class="row row-n3" href="travel-information.html" data-go-link="travel-information">
       <span class="label">Travel Information</span>
-      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
   </nav>
 
