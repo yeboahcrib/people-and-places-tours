@@ -544,4 +544,31 @@ for (const location of locations) {
   }
 }
 
+/* The country selector is filled at build time from the same module the
+   Function validates against. If the build stopped injecting, the page would
+   ship one disabled placeholder and nobody could complete the form; if the two
+   ever drifted, the page would offer a country the server refuses. Neither
+   failure announces itself, so both are checked here. */
+{
+  const {COUNTRIES} = await import('../src/data/countries.mjs');
+  const page = await readFile(join(outputPath, 'contact.html'), 'utf8');
+  const field = page.match(/<select[^>]*id="country"[^>]*>([\s\S]*?)<\/select>/);
+  assert.ok(field, 'contact.html has no country selector');
+  assert.match(field[0], /\brequired\b/, 'country must stay required in the markup');
+
+  const options = [...field[1].matchAll(/<option value="([^"]*)"[^>]*>([^<]*)<\/option>/g)];
+  const placeholder = options[0];
+  assert.equal(placeholder[1], '', 'the first option must be an empty placeholder');
+  assert.match(placeholder[0], /disabled/, 'the placeholder must not be selectable as an answer');
+
+  const offered = options.slice(1).map(([, code]) => code);
+  assert.deepEqual(offered, COUNTRIES.map(country => country.code),
+    'the options on the page must be exactly the list the Function validates against, in the same order');
+
+  const decode = value => value.replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  assert.deepEqual(options.slice(1).map(([, , name]) => decode(name)), COUNTRIES.map(country => country.name),
+    'a visitor must read the same country name the list records');
+}
+
 console.log('Build output and availability checks passed.');

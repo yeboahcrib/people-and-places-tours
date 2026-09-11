@@ -107,7 +107,7 @@ const fillAndAdvance = async page => {
   await page.fill('#first-name', 'Ada');
   await page.fill('#last-name', 'Guest');
   await page.fill('#email', 'ada@example.com');
-  await page.fill('#country', 'Ghana');
+  await page.selectOption('#country', 'GH');
 };
 
 (async () => {

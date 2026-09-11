@@ -1,3 +1,5 @@
+import {COUNTRY_CODES, countryName} from '../../src/data/countries.mjs';
+
 const MAX_BODY_BYTES = 32_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001F\u007F]/;
@@ -153,6 +155,10 @@ function validate(payload) {
   // be checked where it cannot be skipped. clean() has already trimmed, so a
   // field holding only spaces arrives here empty and is refused.
   if (!payload.country) return 'Please provide your country of residence.';
+  // The form offers a fixed list, so anything else was not chosen from it.
+  // Rejecting rather than storing keeps one spelling of one country in the
+  // table: the reason for the selector in the first place.
+  if (!COUNTRY_CODES.has(payload.country)) return 'Please choose your country of residence from the list.';
   if ([payload['first-name'], payload['last-name'], payload.email, payload.phone, payload.country, payload['children-age-ranges']].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
     return 'Inquiry contains invalid characters.';
   }
@@ -225,7 +231,7 @@ function inquiryText(payload, requestId) {
     `Traveling with children: ${payload['traveling-with-children'] || 'Not provided'}`,
     `Children's age ranges: ${payload['children-age-ranges'] || 'Not provided'}`,
     `Accommodation: ${payload.accommodation || 'Not provided'}`,
-    `Country: ${payload.country || 'Not provided'}`,
+    `Country: ${payload.country ? `${countryName(payload.country)} (${payload.country})` : 'Not provided'}`,
     `Preferred contact: ${payload['contact-method'] || 'Not provided'}`,
     `Source: ${payload.source || 'Website inquiry'}`,
     '',
@@ -251,7 +257,7 @@ function inquiryHtml(payload, requestId) {
       ${row('Traveling with children', payload['traveling-with-children'])}
       ${row("Children's age ranges", payload['children-age-ranges'])}
       ${row('Accommodation', payload.accommodation)}
-      ${row('Country', payload.country)}
+      ${row('Country', payload.country ? `${countryName(payload.country)} (${payload.country})` : '')}
       ${row('Preferred contact', payload['contact-method'])}
       ${row('Source', payload.source || 'Website inquiry')}
     </table>

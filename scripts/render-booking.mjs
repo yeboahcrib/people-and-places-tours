@@ -7,6 +7,8 @@
 // says. That is what lets an editor change the flow's wording, CTAs and
 // confirmation message without touching code.
 
+import {COUNTRIES} from '../src/data/countries.mjs';
+
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[character]));
@@ -62,6 +64,26 @@ const renderFaqs = faqs => faqs.map((faq, index) => `
 // The Turnstile site key is public, but it differs per environment and must be
 // absent where there is no Function to verify against: an empty value keeps the
 // widget script from loading at all.
+/**
+ * Fill the country selector from the committed ISO 3166-1 list.
+ *
+ * The markup ships with the placeholder option only. Two hundred and fifty
+ * options are data, not design, and keeping them out of the source file leaves
+ * exactly one place a country can be added, removed or renamed — the same
+ * module `functions/api/inquiry.js` validates against. A page whose options
+ * came from anywhere else could offer a country the server then refuses.
+ */
+export function injectCountryOptions(html) {
+  if (!html.includes('data-country-options')) return html;
+  const options = COUNTRIES
+    .map(({code, name}) => `<option value="${code}">${escapeHtml(name)}</option>`)
+    .join('');
+  return html.replace(
+    /(<select[^>]*data-country-options[^>]*>)([\s\S]*?)(<\/select>)/,
+    (whole, open, body, close) => `${open}${body.trimEnd()}${options}${close}`,
+  );
+}
+
 export function injectTurnstileSiteKey(html, siteKey) {
   if (!html.includes('data-turnstile-sitekey')) return html;
   const key = String(siteKey || '').trim();

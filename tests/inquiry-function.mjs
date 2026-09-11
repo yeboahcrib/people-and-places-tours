@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
 
-const functionSource = await readFile(new URL('../functions/api/inquiry.js', import.meta.url), 'utf8');
-const functionModule = await import(`data:text/javascript;base64,${Buffer.from(functionSource).toString('base64')}`);
-const {onRequest} = functionModule;
+// Imported by path rather than as a data: URL, because the Function now shares
+// the country list with the build and a data: module cannot resolve a relative
+// import. Each mutation run is a fresh process, so nothing is cached across
+// them either way.
+const {onRequest} = await import('../functions/api/inquiry.js');
+const {COUNTRIES} = await import('../src/data/countries.mjs');
 
 const endpoint = 'https://people-and-places.pages.dev/api/inquiry';
 
@@ -43,7 +45,7 @@ assert.equal(response.status, 200);
 assert.equal(JSON.parse(await response.clone().text()).reference, undefined,
   'a discarded submission must not return a reference');
 
-response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'United States'});
+response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US'});
 assert.equal(response.status, 503);
 
 // Country is required by the validator, not only by the browser. A client that
@@ -88,7 +90,7 @@ const delivery = {
 };
 // Country is required server-side as well as in the markup, so the baseline
 // enquiry every later case builds on has to carry one.
-const guest = {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'United States'};
+const guest = {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US'};
 const withTurnstile = {...delivery, TURNSTILE_SECRET_KEY: 'secret-key'};
 
 const stubFetch = handler => {
@@ -177,7 +179,7 @@ try {
     'first-name': 'Ada',
     'last-name': 'Guest',
     email: 'ada@example.com',
-    country: 'United States',
+    country: 'US',
     'tour-interest': 'cape-coast',
     'travel-date': '2027-04-10',
     'departure-date': '2027-04-17',
@@ -205,7 +207,13 @@ assert(!email.html.includes('<script>'));
 assert(!email.html.includes('<img src=x'));
 assert(!email.html.includes('Forged tour'), 'browser-supplied tour names must not be trusted');
 assert(email.html.includes('Cape Coast Ancestral Tour'));
-assert(email.html.includes('United States'));
+// The team reads a name; the row keeps the code. Both appear in the email so
+// a reply and a later lookup agree on which country was meant.
+assert(email.html.includes('United States'), 'the email must name the country, not only code it');
+assert(email.html.includes('(US)'), 'and must carry the code it was stored under');
+// Plenty of mail clients show the plain-text part, so it needs both as well.
+assert.match(email.text, /Country: United States \(US\)/,
+  'the text email must name the country too');
 assert(email.html.includes('2027-04-17'));
 assert(email.html.includes('4–7'));
 assert(email.text.includes('Accommodation: family'));
@@ -227,7 +235,7 @@ assert(email.text.includes('Accommodation: family'));
       'first-name': 'Ada',
       'last-name': 'Guest',
       email: 'ada@example.com',
-      country: 'United States',
+      country: 'US',
       'cf-turnstile-response': 'a-valid-token',
       'company-website': 'Ada Travel Ltd',
     }, {}, {
@@ -363,7 +371,7 @@ const stubDb = (behaviour = {}) => {
 const enquiry = {
   ...guest,
   phone: '+233 50 111 2222',
-  country: 'United States',
+  country: 'US',
   'tour-interest': 'cape-coast',
   'group-size': '3-5',
   'travel-date': '2027-04-17',
@@ -420,7 +428,7 @@ const deliverThen = db => {
   assert.equal(last, 'Guest');
   assert.equal(email, 'ada@example.com');
   assert.equal(phone, '+233 50 111 2222');
-  assert.equal(country, 'United States');
+  assert.equal(country, 'US', 'the row stores the ISO code, not a typed-in name');
   assert.equal(tourInterest, 'cape-coast');
   // The display name is the server's, never the browser's.
   assert.equal(tourName, 'Cape Coast Ancestral Tour');
@@ -507,5 +515,45 @@ const deliverThen = db => {
   assert.equal(response.status, 403);
   assert.equal(db.calls.length, 0);
 }
+
+/* ── Country of residence ──────────────────────────────────────────────────
+   The field is a fixed list now, so the server accepts only what that list
+   offers. This is the part that keeps one spelling of one country in the
+   table; the selector alone would not, because nothing stops a client posting
+   straight to the endpoint. */
+
+// Every code the form can offer is accepted. Cheap insurance against the
+// build and the validator ever being fed different lists.
+{
+  const restore = stubFetch(async url => new Response(
+    JSON.stringify(String(url) === siteverify ? validChallenge : {id: 'email_123'}),
+    {status: 200},
+  ));
+  const rejected = [];
+  try {
+    for (const {code} of COUNTRIES) {
+      const result = await invoke({...guest, country: code, 'cf-turnstile-response': 'good-token'}, {}, withTurnstile);
+      if (result.status !== 200) rejected.push(code);
+    }
+  } finally { restore(); }
+  assert.deepEqual(rejected, [], 'every country the form offers must be accepted');
+}
+
+// A full country name is what the field used to submit. It is not a code, so
+// it is refused rather than stored beside the codes.
+response = await invoke({...guest, country: 'United States'}, {}, delivery);
+assert.equal(response.status, 400);
+assert.match(JSON.parse(await response.clone().text()).error, /from the list/);
+
+// Neither is an invented code, a lowercased one, or a withdrawn one.
+for (const country of ['ZZ', 'us', 'UK', 'GBR', 'Ghana', '  ']) {
+  response = await invoke({...guest, country}, {}, delivery);
+  assert.equal(response.status, 400, `"${country}" must not be accepted as a country`);
+}
+
+// Still required, and still by the server rather than only the markup.
+response = await invoke({...guest, country: ''}, {}, delivery);
+assert.equal(response.status, 400);
+assert.match(JSON.parse(await response.clone().text()).error, /country of residence/);
 
 console.log('Inquiry function tests passed.');

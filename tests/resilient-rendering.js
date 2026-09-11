@@ -90,7 +90,12 @@ function assert(condition, message) {
       redirectTarget: form.querySelector('input[name="_next"]')?.value || '',
       captchaDisabled: form.querySelector('input[name="_captcha"]')?.value === 'false',
       formSubmitHoneypot: Boolean(form.querySelector('input[name="_honey"]')),
-      countryField: Boolean(form.querySelector('input[name="country"][maxlength="100"]')),
+      countryField: (() => {
+        const field = form.querySelector('select[name="country"][required]');
+        // Without JavaScript the options still have to be there: they are
+        // injected at build time, not rendered in the browser.
+        return Boolean(field) && field.querySelectorAll('option[value]:not([value=""])').length > 200;
+      })(),
       planningFields: ['departure-date', 'date-flexibility', 'traveling-with-children', 'children-age-ranges', 'accommodation', 'contact-method']
         .every(name => Boolean(form.querySelector(`[name="${name}"]`))),
       tourOptions: form.querySelectorAll('#tour-interest option').length,
@@ -111,7 +116,8 @@ function assert(condition, message) {
     assert(formState.requiredFields.includes(field),
       `JavaScript-free form does not require ${field}, so an unanswerable enquiry can be sent`);
   }
-  assert(formState.countryField, 'JavaScript-free form is missing the optional country field');
+  assert(formState.countryField,
+  'JavaScript-free form is missing the country selector, or it shipped without its options');
   assert(formState.planningFields, 'JavaScript-free form is missing one or more unified planning fields');
 
   // FormSubmit's built-in CAPTCHA is reCAPTCHA, which needs JavaScript to draw

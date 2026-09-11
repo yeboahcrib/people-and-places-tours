@@ -271,7 +271,17 @@
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label" for="country">Country of residence</label>
-                  <input class="form-input" type="text" id="country" name="country" placeholder="United States" required minlength="1" maxlength="100" autocomplete="country-name" />
+                  <!-- A native select on purpose. It gives keyboard users arrow
+                       keys and type-to-jump for free, opens as the system
+                       picker on a phone, and needs no library to do either.
+                       The options are injected at build time from
+                       src/data/countries.mjs, which the Function validates
+                       against, so the list a visitor sees and the list the
+                       server accepts cannot drift apart. The submitted value is
+                       the ISO 3166-1 alpha-2 code; the name is what is read. -->
+                  <select class="form-select" id="country" name="country" required autocomplete="country" data-country-options>
+                    <option value="" selected disabled>Select your country</option>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label class="form-label" for="contact-method">How should we contact you? <span class="form-optional">optional</span></label>

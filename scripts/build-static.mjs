@@ -29,7 +29,7 @@ import {describeSourceView} from './health-source-view.mjs';
 import {loadBookingContent, loadLocalBookingContent} from './booking-source.mjs';
 import {loadLocalPolicies, loadPolicyContent, POLICY_PAGES} from './policy-source.mjs';
 import {loadTourPageTemplate, renderTourPage} from './render-tour-page.mjs';
-import {injectBookingContent, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
+import {injectBookingContent, injectCountryOptions, injectInquiryMode, injectSiteContact, injectTurnstileSiteKey} from './render-booking.mjs';
 import {injectPolicyContent} from './render-policy.mjs';
 import {injectPagePhotos} from './render-page-photos.mjs';
 import {loadExperiencesPagePhotos} from './experiences-page-source.mjs';
@@ -472,7 +472,8 @@ for (const entry of rootEntries) {
     });
     const withExperiences = injectLocalExperiences(withPagePhotos, experienceContent);
     const withContact = injectSiteContact(withExperiences, siteContent.siteSettings);
-    const withTurnstile = injectTurnstileSiteKey(withContact, process.env.TURNSTILE_SITE_KEY);
+    const withCountries = injectCountryOptions(withContact);
+    const withTurnstile = injectTurnstileSiteKey(withCountries, process.env.TURNSTILE_SITE_KEY);
     const withInquiryMode = injectInquiryMode(withTurnstile, Boolean(process.env.CF_PAGES));
     const withTourCards = injectTourCards(withInquiryMode, tours);
     const rendered = injectContactTourOptions(withTourCards, tours);
