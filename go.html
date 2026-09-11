@@ -12,16 +12,15 @@
 <meta name="robots" content="noindex,follow">
 <title>People &amp; Places &mdash; Every Link</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-<meta name="theme-color" content="#FFB81C">
+<meta name="theme-color" content="#1A1A1A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
   /* Standalone by design: no style.css, no script.js, no photographs. Every
      colour is copied from style.css :root with the token it came from named
-     beside it. The ground is the same yellow the homepage's pathways band
-     uses, and the rows are built from the same cream, charcoal and forest
-     that band already puts on it. */
+     beside it. Dark ground, warm light: the charcoal is the site's own, and
+     everything laid on it is gold, forest and cream from the same palette. */
   :root {
     --ink:        #1A1A1A;   /* --pap-charcoal */
     --gold:       #FFB81C;   /* --pap-yellow   */
@@ -29,17 +28,18 @@
     --forest:     #123F35;   /* --pap-forest   */
     --terracotta: #C2553D;   /* --pap-terracotta */
     --soft-gold:  #F2D27A;   /* --pap-soft-gold  */
-    --font-display: 'Archivo Black', 'Arial Black', Impact, sans-serif;
+    --muted:      rgba(255,247,232,0.58);
+    --hairline:   rgba(255,247,232,0.12);
     --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
     --gutter: 1.25rem;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html { background: var(--gold); }
+  html { background: var(--ink); }
   body {
     position: relative;
     min-height: 100svh;
-    color: var(--ink);
+    color: var(--cream);
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.6;
@@ -47,39 +47,33 @@
     overflow-x: hidden;
     display: flex;
     justify-content: center;
-    /* Warmth rather than lighting: cream lifting the top of the page, a wash
-       of terracotta pooling at the foot. Both from the brand palette. */
-    /* Warmth built from overlapping blooms rather than a pattern: cream
-       lifting the top, soft gold opening the upper left, terracotta warming
-       the lower right, and forest settling the foot. Nothing repeats, so
-       there is no wallpaper to notice. */
+    /* Warm light on a dark ground, not glow: gold opening above the symbol,
+       terracotta through the middle, forest pooling at the foot. Overlapping
+       blooms, nothing repeating. */
     background:
-      radial-gradient(135% 82% at 50% -14%, rgba(255,247,232,0.62), transparent 54%),
-      radial-gradient(88% 58% at 8% 26%,   rgba(242,210,122,0.52), transparent 60%),
-      radial-gradient(96% 64% at 96% 74%,  rgba(194,85,61,0.22),  transparent 62%),
-      radial-gradient(120% 52% at 50% 112%, rgba(18,63,53,0.16),  transparent 66%),
-      var(--gold);
+      radial-gradient(125% 72% at 50% -12%, rgba(255,184,28,0.20), transparent 56%),
+      radial-gradient(85% 55% at 92% 34%,  rgba(194,85,61,0.16),  transparent 62%),
+      radial-gradient(105% 62% at 50% 112%, rgba(18,63,53,0.60),  transparent 66%),
+      var(--ink);
   }
 
   /* --- Ground ------------------------------------------------------------
-     Two layers over the blooms: a little linework, and grain. No grid, no
-     tiling, nothing that repeats -- the earlier warp-and-weft read as graph
-     paper the moment you noticed it. What is left is three long curves and a
-     single weave motif, large and mostly off the edge, all faint enough to
-     register as depth rather than as pattern. The motif stays abstract on
-     purpose: the comment beside it in homepage-sections.js says named Adinkra
-     symbols will only be used once their form and meaning have been reviewed,
-     and a link page is not the place to jump that queue. */
+     Woven marks, and grain. The mark is the site's own -- described in
+     homepage-sections.js as "an original woven-line accent inspired by the
+     rhythm of Ghanaian textiles", and explicitly not a named Adinkra symbol,
+     because the note beside it says named symbols will only be used once
+     their form and meaning have been reviewed. There are more of them here
+     and at more sizes, but each one stays faint enough to read as depth. */
   .ground { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .ground svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .ink { animation: sway 120s ease-in-out infinite alternate; }
-  .ink path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
-  .ink .motif { color: var(--forest); opacity: 0.05; stroke-width: 6; }
-  .ink .trail { color: var(--forest); opacity: 0.07; stroke-width: 1.6; }
-  .ink .trail-warm { color: var(--terracotta); opacity: 0.09; stroke-width: 1.6; }
-  /* Screen-print grain. Multiply keeps it a texture in the paper rather than
-     a haze on top of it. */
-  .grain { opacity: 0.1; mix-blend-mode: multiply; }
+  .ink-layer { animation: sway 120s ease-in-out infinite alternate; }
+  .ink-layer path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+  .m-gold  { color: var(--gold);       opacity: 0.075; stroke-width: 6; }
+  .m-warm  { color: var(--terracotta); opacity: 0.14;  stroke-width: 6; }
+  .m-leaf  { color: var(--soft-gold);  opacity: 0.055; stroke-width: 6; }
+  .trail      { color: var(--soft-gold); opacity: 0.07; stroke-width: 1.6; }
+  .trail-warm { color: var(--terracotta); opacity: 0.1; stroke-width: 1.6; }
+  .grain { opacity: 0.13; mix-blend-mode: overlay; }
   @keyframes sway {
     from { transform: translate3d(-0.6%, -0.4%, 0); }
     to   { transform: translate3d(0.6%, 0.5%, 0); }
@@ -89,116 +83,116 @@
   .hub {
     position: relative; z-index: 1;
     width: 100%; max-width: 26.5rem;
-    padding: 3rem var(--gutter) 3rem;
+    padding: 2.5rem var(--gutter) 1.9rem;
     display: flex; flex-direction: column;
   }
 
   /* --- Brand ---
-     The lockup is the heading. There is no second "People & Places" in text
-     under it, because the wordmark already says it. */
-  /* The lockup is cropped to its own ink rather than to its viewBox.
-     Measured on the yellow: the artwork occupies x 10-732 of 960 and y 109-415
-     of 540, so the file carries 43% dead height and sits left of centre. Left
-     as-is it reads slightly off-centre with a hole beneath it. The asset is
-     untouched; the crop lives here. */
-  /* No auto margin here: .brand is a flex item, and `margin: 0 auto` makes a
-     flex item shrink to its content -- which left the mark's percentage width
-     resolving against zero. The centring belongs on .brand-mark. */
+     The symbol alone, cropped to its own ink rather than its viewBox: measured
+     on the charcoal, the artwork sits at x 196-430 of 640 and y 6-351 of 360,
+     so two thirds of the file's width is empty. The asset is untouched; the
+     crop lives here. There is no wordmark under it by choice -- the tab title
+     and the image's alt text still carry the name. */
   .brand { margin: 0 0 1.15rem; line-height: 0; }
   .brand-mark {
-    position: relative;
-    display: block;
-    width: min(268px, 72%);
-    aspect-ratio: 722 / 306;
+    position: relative; display: block;
+    width: min(104px, 27%);
+    aspect-ratio: 234 / 345;
     margin: 0 auto;
     overflow: hidden;
   }
   .brand-mark img {
     position: absolute;
-    width: 132.96%;      /* 960 / 722 */
+    width: 273.5%;      /* 640 / 234 */
     height: auto;
-    left: -1.38%;        /*  10 / 722 */
-    top: -35.63%;        /* 109 / 540, scaled to the cropped height */
+    left: -83.76%;      /* 196 / 234 */
+    top: -1.74%;        /*   6 / 360, scaled to the cropped height */
   }
   .lede {
     text-align: center;
-    color: rgba(26,26,26,0.74);
+    color: var(--muted);
     font-size: 1rem;
     line-height: 1.55;
     max-width: 19rem;
-    margin: 0 auto 2.15rem;
+    margin: 0 auto 1.9rem;
     text-wrap: pretty;
   }
 
-  /* --- Rows --------------------------------------------------------------
-     The hard charcoal offset read as a sticker. This is a real elevation
-     instead: a hairline edge, a tight contact shadow and a wider soft one, so
-     each row sits a few millimetres above the yellow rather than being
-     printed twice on it. Hover raises it, pressing sets it back down on the
-     surface -- the same gesture, without the cartoon. */
+  /* --- Rows ---
+     A hairline edge, a tight contact shadow and a wider soft one, so each row
+     sits above the ground rather than being drawn onto it. Hover raises it;
+     pressing sets it back down. */
   .links { display: flex; flex-direction: column; gap: 0.8rem; }
   .row {
     display: flex; align-items: center; gap: 0.85rem;
     min-height: 64px; padding: 0.95rem 1.3rem;
-    border: 1px solid rgba(26,26,26,0.09);
+    border: 1px solid var(--hairline);
     border-radius: 18px;
     text-decoration: none;
     font-weight: 600; font-size: 1.0625rem; line-height: 1.3;
     letter-spacing: -0.005em;
-    background: var(--cream); color: var(--ink);
-    box-shadow: 0 1px 1px rgba(26,26,26,0.05), 0 8px 18px -10px rgba(26,26,26,0.34);
-    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1);
+    background: rgba(255,247,232,0.055); color: var(--cream);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 10px 22px -12px rgba(0,0,0,0.85);
+    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1),
+                background 240ms ease, border-color 240ms ease;
   }
   .row .label { flex: 1; }
-  .row .arrow { flex-shrink: 0; opacity: 0.38; transition: transform 240ms cubic-bezier(0.16,1,0.3,1), opacity 240ms ease; }
+  .row .arrow { flex-shrink: 0; opacity: 0.42; transition: transform 240ms cubic-bezier(0.16,1,0.3,1), opacity 240ms ease; }
   .row:hover, .row:focus-visible {
     transform: translateY(-2px);
-    box-shadow: 0 2px 3px rgba(26,26,26,0.06), 0 16px 28px -12px rgba(26,26,26,0.4);
+    background: rgba(255,247,232,0.1);
+    border-color: rgba(255,247,232,0.24);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 20px 34px -14px rgba(0,0,0,0.95);
   }
-  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.8; transform: translateX(3px); }
-  .row:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(26,26,26,0.22); }
+  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.85; transform: translateX(3px); }
+  .row:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 
-  .row-ink {
-    background: var(--ink); color: var(--cream);
-    border-color: rgba(255,247,232,0.08);
-    box-shadow: 0 1px 1px rgba(26,26,26,0.14), 0 10px 22px -10px rgba(26,26,26,0.55);
+  .row-gold {
+    background: var(--gold); color: var(--ink);
+    border-color: rgba(26,26,26,0.14);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 12px 26px -12px rgba(255,184,28,0.55);
   }
-  .row-ink:hover, .row-ink:focus-visible {
-    box-shadow: 0 2px 4px rgba(26,26,26,0.16), 0 18px 32px -12px rgba(26,26,26,0.62);
+  .row-gold:hover, .row-gold:focus-visible {
+    background: #FFC53F; border-color: rgba(26,26,26,0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 22px 38px -14px rgba(255,184,28,0.68);
   }
   .row-forest {
     background: var(--forest); color: var(--cream);
-    border-color: rgba(255,247,232,0.08);
-    box-shadow: 0 1px 1px rgba(18,63,53,0.16), 0 10px 22px -10px rgba(18,63,53,0.6);
+    border-color: rgba(255,247,232,0.14);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 12px 26px -12px rgba(18,63,53,0.95);
   }
   .row-forest:hover, .row-forest:focus-visible {
-    box-shadow: 0 2px 4px rgba(18,63,53,0.18), 0 18px 32px -12px rgba(18,63,53,0.66);
+    background: #174B3F; border-color: rgba(255,247,232,0.26);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 22px 38px -14px rgba(18,63,53,1);
   }
-  .row-ink .arrow, .row-forest .arrow { opacity: 0.6; }
+  .row-gold .arrow, .row-forest .arrow { opacity: 0.6; }
   .row-icon { flex-shrink: 0; }
 
-  /* --- Social: below the travel links and lighter than them, but the same
-     printed treatment so they belong to the same page. --- */
-  .foot { margin-top: 2.4rem; text-align: center; }
+  /* --- Social --- */
+  .foot { margin-top: 2.1rem; text-align: center; }
   .social { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1.5rem; }
   .social a {
     display: grid; place-items: center; width: 54px; height: 54px;
-    border: 1px solid rgba(26,26,26,0.09); border-radius: 50%;
-    background: var(--cream); color: var(--ink);
-    box-shadow: 0 1px 1px rgba(26,26,26,0.05), 0 6px 14px -8px rgba(26,26,26,0.34);
-    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1);
+    border: 1px solid var(--hairline); border-radius: 50%;
+    background: rgba(255,247,232,0.055); color: var(--cream);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 8px 18px -10px rgba(0,0,0,0.85);
+    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1),
+                background 240ms ease, border-color 240ms ease, color 240ms ease;
   }
   .social a:hover, .social a:focus-visible {
     transform: translateY(-2px);
-    box-shadow: 0 2px 3px rgba(26,26,26,0.06), 0 12px 22px -10px rgba(26,26,26,0.4);
+    background: rgba(255,184,28,0.14);
+    border-color: rgba(255,184,28,0.7);
+    color: var(--gold);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.34), 0 16px 28px -12px rgba(0,0,0,0.95);
   }
-  .social a:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(26,26,26,0.22); }
-  .foot p { color: rgba(26,26,26,0.66); font-size: 0.8125rem; line-height: 1.9; }
-  .foot a.plain { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(26,26,26,0.3); }
-  .foot a.plain:hover, .foot a.plain:focus-visible { border-bottom-color: var(--ink); }
+  .social a:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  .foot p { color: var(--muted); font-size: 0.8125rem; line-height: 1.9; }
+  .foot a.plain { color: rgba(255,247,232,0.9); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(255,247,232,0.28); }
+  .foot a.plain:hover, .foot a.plain:focus-visible { color: var(--gold); border-bottom-color: var(--gold); }
 
-  a:focus-visible { outline: 3px solid var(--forest); outline-offset: 3px; }
-  .row-forest:focus-visible { outline-color: var(--ink); }
+  a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .row-gold:focus-visible { outline-color: var(--cream); }
 
   /* --- Entrance: one pass. Fill mode is `both`, so switching the animation
      off for reduced motion leaves everything in its natural visible state. */
@@ -214,7 +208,7 @@
   .row:nth-of-type(5) { animation-delay: 300ms; }
 
   @media (prefers-reduced-motion: reduce) {
-    .ink { animation: none; }
+    .ink-layer { animation: none; }
     .brand, .lede, .row, .foot { animation: none; }
     .row, .row .arrow, .social a { transition: none; }
     .row:hover, .row:focus-visible, .social a:hover, .social a:focus-visible { transform: none; }
@@ -223,37 +217,72 @@
 
   /* Short phones: reaching WhatsApp should not need a second scroll. */
   @media (max-height: 720px) {
-    .hub { padding-top: 2rem; padding-bottom: 2rem; }
-    .brand-mark { width: min(214px, 62%); }
+    .hub { padding-top: 2.1rem; padding-bottom: 2rem; }
+    .brand { margin-bottom: 1rem; }
+    .brand-mark { width: min(84px, 23%); }
     .lede { font-size: 0.9375rem; margin-bottom: 1.6rem; }
-    .links { gap: 0.7rem; }
+    .links { gap: 0.65rem; }
     .row { min-height: 56px; }
     .foot { margin-top: 1.7rem; }
   }
   @media (max-width: 359px) {
     :root { --gutter: 0.9rem; }
-    .row { padding: 0.85rem 1rem; font-size: 1rem; gap: 0.65rem; }
+    .row { padding: 0.85rem 1.05rem; font-size: 1rem; gap: 0.65rem; }
   }
 </style>
 </head>
 <body>
 
 <div class="ground" aria-hidden="true">
-  <!-- Linework: three long curves and one weave motif, large and mostly off
-       the edge. Sparse on purpose -- there is nothing here to read as a
-       pattern. -->
-  <svg class="ink" viewBox="0 0 390 860" preserveAspectRatio="xMidYMid slice" focusable="false">
-    <g class="motif" transform="translate(-96 528) rotate(-8) scale(1.5)">
+  <!-- The site's own woven-line mark, at eight sizes across the page. Faint
+       enough that none of them competes with a link. -->
+  <svg class="ink-layer" viewBox="0 0 390 860" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <g class="m-gold" transform="translate(-78 40) rotate(-12) scale(1.2)">
     <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
     <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
     <path d="M66 66h28v28H66z"/>
     </g>
-    <path class="trail" d="M-30 232C64 150 150 268 232 214s90-142 200-104"/>
-    <path class="trail-warm" d="M-24 664c96 44 138-52 224-34s124 84 214 44" opacity=".08"/>
-    <path class="trail" d="M-20 418c110 8 132 94 226 92s110-64 202-40" opacity=".045"/>
+    <g class="m-warm" transform="translate(296 118) rotate(14) scale(0.62)">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="m-leaf" transform="translate(318 336) rotate(-8) scale(1.05)">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="m-gold" transform="translate(-56 392) rotate(9) scale(0.78)" opacity=".05">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="m-warm" transform="translate(268 620) rotate(-14) scale(0.9)" opacity=".09">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="m-gold" transform="translate(24 700) rotate(18) scale(0.52)" opacity=".06">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="m-leaf" transform="translate(-40 806) rotate(-6) scale(0.86)" opacity=".05">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <g class="m-gold" transform="translate(300 796) rotate(7) scale(0.44)" opacity=".05">
+    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
+    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
+    <path d="M66 66h28v28H66z"/>
+    </g>
+    <path class="trail" d="M-30 244C64 162 150 280 232 226s90-142 200-104"/>
+    <path class="trail-warm" d="M-24 672c96 44 138-52 224-34s124 84 214 44" opacity=".08"/>
+    <path class="trail" d="M-20 452c110 8 132 94 226 92s110-64 202-40" opacity=".045"/>
   </svg>
 
-  <!-- Paper: screen-print grain, multiplied into the yellow. -->
+  <!-- Grain, laid over the dark so it reads as surface rather than haze. -->
   <svg class="grain" focusable="false">
     <filter id="paper">
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
@@ -266,13 +295,13 @@
 <main class="hub">
   <h1 class="brand">
     <span class="brand-mark">
-      <img src="assets/PAP LOGO_BLACK_NO BACKGROUND.svg" alt="{{businessName}}" width="1920" height="1080" fetchpriority="high" decoding="async">
+      <img src="assets/PAP LOGO_SYMBOL_YELLOW_NO BACKGROUND.svg" alt="{{businessName}}" width="1920" height="1080" fetchpriority="high" decoding="async">
     </span>
   </h1>
   <p class="lede">We create unforgettable travel experiences in Ghana.</p>
 
   <nav class="links" aria-label="{{businessName}} links">
-    <a class="row row-ink" href="packages.html" data-go-link="experiences">
+    <a class="row row-gold" href="packages.html" data-go-link="experiences">
       <span class="label">Explore Experiences</span>
       <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
