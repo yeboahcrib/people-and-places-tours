@@ -83,7 +83,7 @@
   .hub {
     position: relative; z-index: 1;
     width: 100%; max-width: 26.5rem;
-    padding: 2.5rem var(--gutter) 1.9rem;
+    padding: 2.4rem var(--gutter) 1.8rem;
     display: flex; flex-direction: column;
   }
 
@@ -108,13 +108,19 @@
     left: -83.76%;      /* 196 / 234 */
     top: -1.74%;        /*   6 / 360, scaled to the cropped height */
   }
+  /* This is the only sentence on the page. It was sharing the footer's muted
+     tone, which left the line explaining the business as quiet as the
+     address under it. Brighter, larger and a little heavier -- still clearly
+     beneath the symbol, but no longer hiding. */
   .lede {
     text-align: center;
-    color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.55;
-    max-width: 19rem;
-    margin: 0 auto 1.9rem;
+    color: rgba(255,247,232,0.92);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+    max-width: 20.5rem;
+    margin: 0 auto 2rem;
     text-wrap: pretty;
   }
 
@@ -220,7 +226,7 @@
     .hub { padding-top: 2.1rem; padding-bottom: 2rem; }
     .brand { margin-bottom: 1rem; }
     .brand-mark { width: min(84px, 23%); }
-    .lede { font-size: 0.9375rem; margin-bottom: 1.6rem; }
+    .lede { font-size: 1.0625rem; margin-bottom: 1.7rem; }
     .links { gap: 0.65rem; }
     .row { min-height: 56px; }
     .foot { margin-top: 1.7rem; }
@@ -298,7 +304,7 @@
       <img src="assets/PAP LOGO_SYMBOL_YELLOW_NO BACKGROUND.svg" alt="{{businessName}}" width="1920" height="1080" fetchpriority="high" decoding="async">
     </span>
   </h1>
-  <p class="lede">We create unforgettable travel experiences in Ghana.</p>
+  <p class="lede">We curate unforgettable travel experiences in Ghana.</p>
 
   <nav class="links" aria-label="{{businessName}} links">
     <a class="row row-gold" href="packages.html" data-go-link="experiences">
