@@ -37,7 +37,7 @@ response = await invoke({
   'first-name': 'Bot',
   'last-name': 'Submission',
   email: 'bot@example.com',
-  'company-website': 'https://spam.example',
+  'booking-checksum': 'https://spam.example',
 });
 assert.equal(response.status, 200);
 assert.equal(JSON.parse(await response.clone().text()).reference, undefined,
@@ -99,12 +99,42 @@ const stubFetch = handler => {
 const siteverify = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const validChallenge = {success: true, action: 'inquiry', hostname: 'people-and-places.pages.dev'};
 
-// Configured but no token supplied.
-let restore = stubFetch(async () => new Response(JSON.stringify(validChallenge), {status: 200}));
+// Configured, but no token supplied at all.
+//
+// This is a real person behind a content blocker, not an attacker: the widget
+// never reached challenges.cloudflare.com, so it never minted anything to
+// send. Refusing here refuses the visitor for their browser's choices. The
+// enquiry is delivered and marked instead.
+let sentUnverified;
+let restore = stubFetch(async (url, init) => {
+  if (String(url) === siteverify) return new Response(JSON.stringify(validChallenge), {status: 200});
+  sentUnverified = JSON.parse(init.body);
+  return new Response(JSON.stringify({id: 'email_123'}), {status: 200});
+});
 try {
   response = await invoke(guest, {}, withTurnstile);
 } finally { restore(); }
-assert.equal(response.status, 403);
+assert.equal(response.status, 200, 'a blocked challenge must not cost the visitor their enquiry');
+assert(sentUnverified, 'an unverified enquiry must still be delivered');
+assert.match(sentUnverified.text, /Source: Website inquiry \(unverified\)/,
+  'the email must say the visitor could not be verified');
+assert.match(JSON.parse(await response.clone().text()).reference, /^PP-/);
+
+// The honeypot is what guards that downgraded path, so it has to actually bite
+// there. A filled trap with no token is discarded, and the response tells a bot
+// nothing it could learn from.
+let sentTrap = false;
+restore = stubFetch(async url => {
+  if (String(url) !== siteverify) sentTrap = true;
+  return new Response(JSON.stringify(validChallenge), {status: 200});
+});
+try {
+  response = await invoke({...guest, 'booking-checksum': 'https://spam.example'}, {}, withTurnstile);
+} finally { restore(); }
+assert.equal(response.status, 200);
+assert(!sentTrap, 'a filled trap on the unverified path must not send an email');
+assert.equal(JSON.parse(await response.clone().text()).reference, undefined,
+  'a discarded submission must not return a reference');
 
 // Configured, token rejected by Cloudflare.
 let verifiedToken;
@@ -124,25 +154,47 @@ assert.equal(response.status, 403);
 assert.equal(verifiedToken, 'bad-token');
 assert(!sentEmail, 'a rejected challenge must not send an email');
 
-// Configured, token accepted.
-restore = stubFetch(async url => new Response(
-  JSON.stringify(String(url) === siteverify ? validChallenge : {id: 'email_123'}),
-  {status: 200},
-));
-try {
-  response = await invoke({...guest, 'cf-turnstile-response': 'good-token'}, {}, withTurnstile);
-} finally { restore(); }
-assert.equal(response.status, 200);
-
-// A verification outage must fail closed, not wave traffic through.
-restore = stubFetch(async url => {
-  if (String(url) === siteverify) throw new Error('network down');
+// Configured, token accepted. The marking must stay off a verified enquiry —
+// a flag that appears on everything says nothing about anything.
+let sentVerified;
+restore = stubFetch(async (url, init) => {
+  if (String(url) === siteverify) return new Response(JSON.stringify(validChallenge), {status: 200});
+  sentVerified = JSON.parse(init.body);
   return new Response(JSON.stringify({id: 'email_123'}), {status: 200});
 });
 try {
   response = await invoke({...guest, 'cf-turnstile-response': 'good-token'}, {}, withTurnstile);
 } finally { restore(); }
-assert.equal(response.status, 403);
+assert.equal(response.status, 200);
+assert.match(sentVerified.text, /Source: Website inquiry$/m);
+assert.doesNotMatch(sentVerified.text, /unverified/,
+  'a verified enquiry must not be marked as anything else');
+
+// A verification outage is our fault, not the visitor's, and no client can
+// provoke it — so it degrades to unverified rather than rejecting. The
+// honeypot and the rate limit still apply.
+let sentDuringOutage;
+restore = stubFetch(async (url, init) => {
+  if (String(url) === siteverify) throw new Error('network down');
+  sentDuringOutage = JSON.parse(init.body);
+  return new Response(JSON.stringify({id: 'email_123'}), {status: 200});
+});
+try {
+  response = await invoke({...guest, 'cf-turnstile-response': 'good-token'}, {}, withTurnstile);
+} finally { restore(); }
+assert.equal(response.status, 200);
+assert.match(sentDuringOutage.text, /Source: Website inquiry \(unverified\)/,
+  'an enquiry taken during an outage must be marked as unverified');
+
+// Siteverify answering with an error status is the same kind of fault.
+restore = stubFetch(async url => {
+  if (String(url) === siteverify) return new Response('upstream error', {status: 502});
+  return new Response(JSON.stringify({id: 'email_123'}), {status: 200});
+});
+try {
+  response = await invoke({...guest, 'cf-turnstile-response': 'good-token'}, {}, withTurnstile);
+} finally { restore(); }
+assert.equal(response.status, 200);
 
 // Turnstile must be consulted before the honeypot. Short-circuiting on the
 // trap first saves a siteverify call on obvious bots, but browsers autofill
@@ -155,7 +207,7 @@ restore = stubFetch(async url => {
 });
 try {
   response = await invoke(
-    {...guest, 'cf-turnstile-response': 'good-token', 'company-website': 'https://spam.example'},
+    {...guest, 'cf-turnstile-response': 'good-token', 'booking-checksum': 'https://spam.example'},
     {},
     withTurnstile,
   );
@@ -229,7 +281,7 @@ assert(email.text.includes('Accommodation: family'));
       email: 'ada@example.com',
       country: 'United States',
       'cf-turnstile-response': 'a-valid-token',
-      'company-website': 'Ada Travel Ltd',
+      'booking-checksum': 'Ada Travel Ltd',
     }, {}, {
       TURNSTILE_SECRET_KEY: 'secret',
       RESEND_API_KEY: 'test-key',
@@ -433,6 +485,22 @@ const deliverThen = db => {
   assert.equal(accommodation, 'family');
   assert.equal(contactMethod, 'whatsapp');
   assert.equal(message, 'We would like to bring my mother.');
+}
+
+// The same enquiry with no token reaches the database too, and carries the
+// marking there as well as in the email. Storage is how enquiries are counted,
+// so a downgraded one that looked identical in the table would quietly distort
+// every figure later drawn from it.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke(enquiry, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  assert.equal(db.calls.length, 1, 'an unverified enquiry is still an enquiry and is still stored');
+  assert.equal(db.calls[0].args[4], 'Website inquiry (unverified)',
+    'the stored row must record that the visitor could not be verified');
 }
 
 // A browser-supplied tour name must not reach the database, exactly as it must

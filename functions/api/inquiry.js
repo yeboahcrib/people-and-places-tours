@@ -44,7 +44,7 @@ const limits = {
 
 const acceptedFields = new Set([
   ...Object.keys(limits),
-  'company-website', '_honey', '_subject', '_template', '_next', '_captcha',
+  'booking-checksum', '_honey', '_subject', '_template', '_next', '_captcha',
   'cf-turnstile-response', 'client-submission-id',
 ]);
 
@@ -88,17 +88,38 @@ function allowedOrigin(request, env) {
 // Turnstile runs inline on our own page and never navigates the visitor to a
 // challenge hosted elsewhere, which is the whole reason for preferring it to
 // the CAPTCHA interstitial the FormSubmit fallback can show.
-// Whether this deployment can actually verify a human. When it cannot, the
-// honeypot is the only bot defence left and has to stay switched on.
-const isTurnstileConfigured = env => Boolean(env.TURNSTILE_SECRET_KEY);
+/* Verification has three outcomes, not two, because "we could not check" and
+   "we checked and it failed" are different facts about a visitor.
 
-async function passedTurnstile(token, request, env) {
+   VERIFIED   Turnstile confirmed a person. Nothing to think about.
+   FAILED     A token was presented and Cloudflare rejected it. That is the
+              shape of a forged or replayed submission, and it is refused.
+   UNVERIFIED No usable answer was obtainable. Refusing here would refuse a
+              real person: a browser extension or network filter that blocks
+              challenges.cloudflare.com stops the widget from ever minting a
+              token, and the visitor has no idea any of this happened. These
+              enquiries are delivered, marked in the email and the database,
+              and left to the honeypot and the rate limit.
+
+   The distinction is deliberately not attacker-controllable in the direction
+   that matters. Omitting the token is the one route into UNVERIFIED a client
+   can choose, which is why it is a downgrade in scrutiny rather than an
+   exemption from it. Everything else that lands here — no secret configured,
+   siteverify unreachable, siteverify answering with an error status — is a
+   fault on our side of the exchange that a visitor cannot cause. */
+const VERIFIED = 'verified';
+const UNVERIFIED = 'unverified';
+const FAILED = 'failed';
+
+async function turnstileVerdict(token, request, env) {
   const secret = env.TURNSTILE_SECRET_KEY;
   // Not configured (local dev, early previews): the honeypot, origin check and
   // field limits still apply. /api/health reports this so the gap is visible
   // rather than silent.
-  if (!secret) return true;
-  if (!token) return false;
+  if (!secret) return UNVERIFIED;
+  // No token at all. Either the widget never loaded or its challenge never
+  // completed — neither of which the visitor did.
+  if (!token) return UNVERIFIED;
 
   const form = new FormData();
   form.append('secret', secret);
@@ -112,22 +133,30 @@ async function passedTurnstile(token, request, env) {
       body: form,
       signal: AbortSignal.timeout(10_000),
     });
-    if (!verification.ok) return false;
+    // An outage at the verifier is our problem, not the visitor's, and no
+    // client can provoke it. Degrade rather than reject.
+    if (!verification.ok) return UNVERIFIED;
     const result = await verification.json();
     const expectedHostname = new URL(request.headers.get('Origin')).hostname;
-    return result.success === true && result.action === 'inquiry' && result.hostname === expectedHostname;
+    const passed = result.success === true
+      && result.action === 'inquiry'
+      && result.hostname === expectedHostname;
+    // Cloudflare answered. Take it at its word in both directions.
+    return passed ? VERIFIED : FAILED;
   } catch {
-    // A verification outage must not silently let unverified traffic through.
-    return false;
+    return UNVERIFIED;
   }
 }
 
-function normalizePayload(input) {
+function normalizePayload(input, verdict) {
   const payload = Object.fromEntries(
     Object.entries(limits).map(([field, max]) => [field, clean(input[field], max)]),
   );
   payload['tour-name'] = TOUR_NAMES.get(payload['tour-interest']) || '';
-  payload.source = 'Website inquiry';
+  // Carried into both the email and the database row, so an enquiry nobody
+  // could verify is legible as one at the moment it is read, not discovered
+  // later. Nothing downstream treats it differently.
+  payload.source = verdict === VERIFIED ? 'Website inquiry' : 'Website inquiry (unverified)';
   return payload;
 }
 
@@ -351,29 +380,33 @@ async function handlePost({request, env}) {
   const shapeError = validateInputShape(input);
   if (shapeError) return json(400, {error: shapeError});
 
-  // Verified before any real work: a token that fails here should cost us
+  // Judged before any real work: a token that fails here should cost us
   // nothing beyond the check itself.
-  const turnstileVerified = await passedTurnstile(clean(input['cf-turnstile-response'], 2048), request, env);
-  if (!turnstileVerified) {
+  const verdict = await turnstileVerdict(clean(input['cf-turnstile-response'], 2048), request, env);
+  if (verdict === FAILED) {
     return json(403, {error: 'We could not confirm this was submitted by a person. Please reload the page and try again.'});
   }
 
-  // The honeypot applies only when Turnstile could not verify the request —
-  // that is, on a deployment with no secret configured.
+  // The honeypot applies only where Turnstile did not vouch for the visitor.
   //
-  // It must not run before Turnstile. Browsers autofill hidden fields, and a
-  // field named `company-website` is filled from a saved profile by some
-  // browsers, so an unconditional check discards genuine enquiries: the
-  // visitor sees success, nothing is delivered, and no error is recorded.
+  // It must not run before Turnstile, and it must not run alongside it.
+  // Browsers autofill hidden fields from a saved profile, so an unconditional
+  // check discards genuine enquiries in the worst possible way: the visitor
+  // sees success, nothing is delivered, and no error is recorded anywhere.
   // Turnstile is a far stronger signal than a hidden input, so once it has
   // confirmed a human a filled trap indicates autofill rather than a bot.
-  if (!isTurnstileConfigured(env) && clean(input['company-website'], 200)) {
+  //
+  // That autofill risk is why the field is named `booking-checksum`. It used
+  // to be `company-website`, which every address-profile heuristic recognises
+  // — harmless while this branch only ran on deployments without a secret,
+  // and a live hazard now that it runs for blocked visitors on production.
+  if (verdict !== VERIFIED && clean(input['booking-checksum'], 200)) {
     // Return a normal success response so a bot does not learn how the filter
     // works.
     return json(200, {ok: true});
   }
 
-  const payload = normalizePayload(input);
+  const payload = normalizePayload(input, verdict);
   const validationError = validate(payload);
   if (validationError) return json(400, {error: validationError});
 

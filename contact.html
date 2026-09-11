@@ -127,11 +127,17 @@
             <input type="hidden" name="_captcha" value="false">
 
             <div class="form-honeypot" aria-hidden="true">
-              <label for="company-website">Leave this field empty</label>
-              <input type="text" id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+              <label for="booking-checksum">Leave this field empty</label>
+              <!-- Named for nothing a browser recognises, on purpose. This trap
+                   is now read for any visitor Turnstile could not vouch for,
+                   including real people behind a content blocker, so a name an
+                   address-profile heuristic autofills — `company-website`, as
+                   this was — would silently discard their enquiry. -->
+              <input type="text" id="booking-checksum" name="booking-checksum" tabindex="-1" autocomplete="off">
               <!-- Two honeypots because two services read different names:
-                   `company-website` is checked by the inquiry Function, `_honey`
-                   by FormSubmit. Both replace the CAPTCHA disabled above. -->
+                   `booking-checksum` is checked by the inquiry Function,
+                   `_honey` by FormSubmit. Both replace the CAPTCHA disabled
+                   above. -->
               <input type="text" name="_honey" tabindex="-1" autocomplete="off">
             </div>
 
