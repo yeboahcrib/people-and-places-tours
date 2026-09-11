@@ -32,7 +32,6 @@
     --font-display: 'Archivo Black', 'Arial Black', Impact, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
     --gutter: 1.25rem;
-    --lift: 4px;   /* how far the printed shadow sits behind each row */
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -50,34 +49,40 @@
     justify-content: center;
     /* Warmth rather than lighting: cream lifting the top of the page, a wash
        of terracotta pooling at the foot. Both from the brand palette. */
+    /* Warmth built from overlapping blooms rather than a pattern: cream
+       lifting the top, soft gold opening the upper left, terracotta warming
+       the lower right, and forest settling the foot. Nothing repeats, so
+       there is no wallpaper to notice. */
     background:
-      radial-gradient(115% 68% at 50% -6%, rgba(255,247,232,0.38), transparent 56%),
-      radial-gradient(95% 60% at 50% 108%, rgba(194,85,61,0.24), transparent 62%),
+      radial-gradient(135% 82% at 50% -14%, rgba(255,247,232,0.62), transparent 54%),
+      radial-gradient(88% 58% at 8% 26%,   rgba(242,210,122,0.52), transparent 60%),
+      radial-gradient(96% 64% at 96% 74%,  rgba(194,85,61,0.22),  transparent 62%),
+      radial-gradient(120% 52% at 50% 112%, rgba(18,63,53,0.16),  transparent 66%),
       var(--gold);
   }
 
   /* --- Ground ------------------------------------------------------------
-     Three quiet layers: cloth, ink, paper. The cloth is a warp-and-weft grid;
-     the ink marks are the site's own weave motif from homepage-sections.js
-     plus two wandering lines; the paper is film grain over the whole thing.
-     The motif is kept abstract on purpose -- the comment beside it in that
-     file says named Adinkra symbols will only be used once their form and
-     meaning have been reviewed, and a link page is not the place to jump
-     that queue. */
+     Two layers over the blooms: a little linework, and grain. No grid, no
+     tiling, nothing that repeats -- the earlier warp-and-weft read as graph
+     paper the moment you noticed it. What is left is three long curves and a
+     single weave motif, large and mostly off the edge, all faint enough to
+     register as depth rather than as pattern. The motif stays abstract on
+     purpose: the comment beside it in homepage-sections.js says named Adinkra
+     symbols will only be used once their form and meaning have been reviewed,
+     and a link page is not the place to jump that queue. */
   .ground { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .ground svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .cloth { opacity: 0.1; color: var(--forest); }
-  .ink { opacity: 1; animation: sway 90s ease-in-out infinite alternate; }
-  .ink path, .ink circle { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
-  .ink .motif { color: var(--forest); opacity: 0.085; stroke-width: 7; }
-  .ink .motif-warm { color: var(--terracotta); opacity: 0.1; stroke-width: 7; }
-  .ink .trail { color: var(--forest); opacity: 0.11; stroke-width: 2; }
+  .ink { animation: sway 120s ease-in-out infinite alternate; }
+  .ink path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+  .ink .motif { color: var(--forest); opacity: 0.05; stroke-width: 6; }
+  .ink .trail { color: var(--forest); opacity: 0.07; stroke-width: 1.6; }
+  .ink .trail-warm { color: var(--terracotta); opacity: 0.09; stroke-width: 1.6; }
   /* Screen-print grain. Multiply keeps it a texture in the paper rather than
      a haze on top of it. */
-  .grain { opacity: 0.16; mix-blend-mode: multiply; }
+  .grain { opacity: 0.1; mix-blend-mode: multiply; }
   @keyframes sway {
-    from { transform: translate3d(-0.8%, -0.5%, 0); }
-    to   { transform: translate3d(0.8%, 0.6%, 0); }
+    from { transform: translate3d(-0.6%, -0.4%, 0); }
+    to   { transform: translate3d(0.6%, 0.5%, 0); }
   }
 
   /* --- Shell --- */
@@ -126,34 +131,50 @@
   }
 
   /* --- Rows --------------------------------------------------------------
-     Printed rather than rendered: a solid charcoal keyline with the same
-     charcoal offset behind it, like a second pass slightly out of register.
-     Pressing one moves it onto its own shadow, so the row goes down under
-     your thumb instead of merely changing colour. */
-  .links { display: flex; flex-direction: column; gap: 0.85rem; }
+     The hard charcoal offset read as a sticker. This is a real elevation
+     instead: a hairline edge, a tight contact shadow and a wider soft one, so
+     each row sits a few millimetres above the yellow rather than being
+     printed twice on it. Hover raises it, pressing sets it back down on the
+     surface -- the same gesture, without the cartoon. */
+  .links { display: flex; flex-direction: column; gap: 0.8rem; }
   .row {
-    display: flex; align-items: center; gap: 0.8rem;
-    min-height: 62px; padding: 0.9rem 1.15rem;
-    border: 2px solid var(--ink);
-    border-radius: 16px;
+    display: flex; align-items: center; gap: 0.85rem;
+    min-height: 64px; padding: 0.95rem 1.3rem;
+    border: 1px solid rgba(26,26,26,0.09);
+    border-radius: 18px;
     text-decoration: none;
-    font-weight: 600; font-size: 1.0625rem; line-height: 1.25;
+    font-weight: 600; font-size: 1.0625rem; line-height: 1.3;
+    letter-spacing: -0.005em;
     background: var(--cream); color: var(--ink);
-    box-shadow: var(--lift) var(--lift) 0 var(--ink);
-    transition: transform 150ms cubic-bezier(0.16,1,0.3,1), box-shadow 150ms cubic-bezier(0.16,1,0.3,1);
+    box-shadow: 0 1px 1px rgba(26,26,26,0.05), 0 8px 18px -10px rgba(26,26,26,0.34);
+    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1);
   }
   .row .label { flex: 1; }
-  .row .arrow { flex-shrink: 0; opacity: 0.5; transition: transform 150ms ease, opacity 150ms ease; }
+  .row .arrow { flex-shrink: 0; opacity: 0.38; transition: transform 240ms cubic-bezier(0.16,1,0.3,1), opacity 240ms ease; }
   .row:hover, .row:focus-visible {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 3px rgba(26,26,26,0.06), 0 16px 28px -12px rgba(26,26,26,0.4);
   }
-  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.9; transform: translateX(3px); }
-  .row:active { transform: translate(var(--lift), var(--lift)); box-shadow: 0 0 0 var(--ink); }
+  .row:hover .arrow, .row:focus-visible .arrow { opacity: 0.8; transform: translateX(3px); }
+  .row:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(26,26,26,0.22); }
 
-  .row-ink    { background: var(--ink);    color: var(--cream); }
-  .row-forest { background: var(--forest); color: var(--cream); border-color: var(--ink); }
-  .row-ink .arrow, .row-forest .arrow { opacity: 0.72; }
+  .row-ink {
+    background: var(--ink); color: var(--cream);
+    border-color: rgba(255,247,232,0.08);
+    box-shadow: 0 1px 1px rgba(26,26,26,0.14), 0 10px 22px -10px rgba(26,26,26,0.55);
+  }
+  .row-ink:hover, .row-ink:focus-visible {
+    box-shadow: 0 2px 4px rgba(26,26,26,0.16), 0 18px 32px -12px rgba(26,26,26,0.62);
+  }
+  .row-forest {
+    background: var(--forest); color: var(--cream);
+    border-color: rgba(255,247,232,0.08);
+    box-shadow: 0 1px 1px rgba(18,63,53,0.16), 0 10px 22px -10px rgba(18,63,53,0.6);
+  }
+  .row-forest:hover, .row-forest:focus-visible {
+    box-shadow: 0 2px 4px rgba(18,63,53,0.18), 0 18px 32px -12px rgba(18,63,53,0.66);
+  }
+  .row-ink .arrow, .row-forest .arrow { opacity: 0.6; }
   .row-icon { flex-shrink: 0; }
 
   /* --- Social: below the travel links and lighter than them, but the same
@@ -162,15 +183,18 @@
   .social { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1.5rem; }
   .social a {
     display: grid; place-items: center; width: 54px; height: 54px;
-    border: 2px solid var(--ink); border-radius: 50%;
+    border: 1px solid rgba(26,26,26,0.09); border-radius: 50%;
     background: var(--cream); color: var(--ink);
-    box-shadow: 3px 3px 0 var(--ink);
-    transition: transform 150ms cubic-bezier(0.16,1,0.3,1), box-shadow 150ms cubic-bezier(0.16,1,0.3,1);
+    box-shadow: 0 1px 1px rgba(26,26,26,0.05), 0 6px 14px -8px rgba(26,26,26,0.34);
+    transition: transform 240ms cubic-bezier(0.16,1,0.3,1), box-shadow 240ms cubic-bezier(0.16,1,0.3,1);
   }
-  .social a:hover, .social a:focus-visible { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
-  .social a:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--ink); }
+  .social a:hover, .social a:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 3px rgba(26,26,26,0.06), 0 12px 22px -10px rgba(26,26,26,0.4);
+  }
+  .social a:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(26,26,26,0.22); }
   .foot p { color: rgba(26,26,26,0.66); font-size: 0.8125rem; line-height: 1.9; }
-  .foot a.plain { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 2px solid rgba(26,26,26,0.28); }
+  .foot a.plain { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(26,26,26,0.3); }
   .foot a.plain:hover, .foot a.plain:focus-visible { border-bottom-color: var(--ink); }
 
   a:focus-visible { outline: 3px solid var(--forest); outline-offset: 3px; }
@@ -207,7 +231,7 @@
     .foot { margin-top: 1.7rem; }
   }
   @media (max-width: 359px) {
-    :root { --gutter: 0.9rem; --lift: 3px; }
+    :root { --gutter: 0.9rem; }
     .row { padding: 0.85rem 1rem; font-size: 1rem; gap: 0.65rem; }
   }
 </style>
@@ -215,39 +239,18 @@
 <body>
 
 <div class="ground" aria-hidden="true">
-  <!-- Cloth: warp and weft, broken where the threads cross over. -->
-  <svg class="cloth" focusable="false">
-    <defs>
-      <pattern id="weave" width="30" height="30" patternUnits="userSpaceOnUse">
-        <g fill="none" stroke="currentColor" stroke-width="0.8">
-          <path d="M0 9h30M0 24h30" opacity=".55"/>
-          <path d="M9 0v6M9 12v18M24 0v21M24 27v3"/>
-        </g>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#weave)"/>
-  </svg>
-
-  <!-- Ink: the site's own weave motif, printed large and faint at the
-       margins, and two lines wandering across like a route drawn by hand. -->
+  <!-- Linework: three long curves and one weave motif, large and mostly off
+       the edge. Sparse on purpose -- there is nothing here to read as a
+       pattern. -->
   <svg class="ink" viewBox="0 0 390 860" preserveAspectRatio="xMidYMid slice" focusable="false">
-    <g class="motif" transform="translate(-52 44) rotate(-10) scale(1.05)">
+    <g class="motif" transform="translate(-96 528) rotate(-8) scale(1.5)">
     <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
     <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
     <path d="M66 66h28v28H66z"/>
     </g>
-    <g class="motif-warm" transform="translate(276 604) rotate(9) scale(1.15)">
-    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
-    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
-    <path d="M66 66h28v28H66z"/>
-    </g>
-    <g class="motif" transform="translate(300 190) rotate(16) scale(0.5)" opacity=".055">
-    <path d="M18 50 50 18l32 32-32 32L18 50Zm60 60 32-32 32 32-32 32-32-32Z"/>
-    <path d="m50 38 12 12-12 12-12-12 12-12Zm60 60 12 12-12 12-12-12 12-12Z"/>
-    <path d="M66 66h28v28H66z"/>
-    </g>
-    <path class="trail" d="M-20 330c70-46 118 22 186-10s96-84 168-52"/>
-    <path class="trail" d="M-16 690c86 26 120-40 194-30s112 62 184 34" opacity=".07"/>
+    <path class="trail" d="M-30 232C64 150 150 268 232 214s90-142 200-104"/>
+    <path class="trail-warm" d="M-24 664c96 44 138-52 224-34s124 84 214 44" opacity=".08"/>
+    <path class="trail" d="M-20 418c110 8 132 94 226 92s110-64 202-40" opacity=".045"/>
   </svg>
 
   <!-- Paper: screen-print grain, multiplied into the yellow. -->
