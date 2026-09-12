@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- Internal tool. Never indexed, never linked from the site, and behind
+       Cloudflare Access on top of all three. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Enquiries | People &amp; Places Tours</title>
+  <meta name="description" content="Internal enquiry figures for People &amp; Places Tours." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <style>
+    /* Scoped to this page. It borrows the brand's tokens and none of the
+       site's chrome: no navigation, no footer, nothing to click through to.
+       A tool, not a page of the website. */
+    .dash { background: var(--pap-cream); min-height: 100vh; padding: var(--sp-4) var(--sp-3) var(--sp-6); }
+    .dash-inner { max-width: 1180px; margin: 0 auto; }
+
+    .dash-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+    .dash-head h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); margin: 0; color: var(--pap-charcoal); }
+    .dash-stamp { margin-left: auto; font-size: 0.8125rem; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+
+    .dash-cards { display: grid; gap: var(--sp-2); grid-template-columns: repeat(4, 1fr); margin-bottom: var(--sp-4); }
+    .dash-card { min-width: 0; background: #fff; border: 1px solid rgba(26,26,26,.1); border-radius: var(--radius-md); padding: var(--sp-2-5); }
+    .dash-card dt { font-size: 0.75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--color-text-muted); margin: 0 0 var(--sp-1); }
+    .dash-card dd { margin: 0; font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 700; color: var(--pap-charcoal); line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .dash-card dd.is-text { font-size: clamp(1rem, 1.6vw, 1.25rem); line-height: 1.3; }
+
+    .dash-panels { display: grid; gap: var(--sp-2); grid-template-columns: repeat(2, 1fr); margin-bottom: var(--sp-2); }
+    /* min-width: 0 or the grid refuses to shrink a panel below its content,
+       and the nowrap table inside pushes the whole page sideways instead of
+       scrolling within its own wrapper. */
+    .dash-panel { background: #fff; border: 1px solid rgba(26,26,26,.1); border-radius: var(--radius-md); padding: var(--sp-2-5); min-width: 0; }
+    .dash-panel h2 { font-size: 1rem; margin: 0 0 var(--sp-2); color: var(--pap-charcoal); }
+    .dash-panel.is-wide { grid-column: 1 / -1; }
+
+    /* Horizontal bars, because country and tour names are long and a column
+       chart would turn every label on its side. */
+    .bars { display: grid; gap: var(--sp-1); margin: 0; }
+    .bar-row { display: grid; grid-template-columns: minmax(7rem, 11rem) 1fr auto; align-items: center; gap: var(--sp-1-5); font-size: 0.875rem; }
+    .bar-label { color: var(--pap-charcoal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar-track { background: rgba(26,26,26,.06); border-radius: var(--radius-pill); height: 14px; overflow: hidden; }
+    .bar-fill { display: block; height: 100%; background: var(--pap-yellow); border-radius: var(--radius-pill); }
+    .bar-row.is-unresolved .bar-fill { background: var(--pap-terracotta); }
+    .bar-count { font-variant-numeric: tabular-nums; color: var(--color-text-muted); min-width: 2.5ch; text-align: right; }
+
+    /* Months are a sequence, so they get the axis that shows it. */
+    .months { display: flex; align-items: flex-end; gap: var(--sp-1); height: 160px; }
+    .month { flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; min-width: 0; }
+    .month-bar { width: 100%; background: var(--pap-forest); border-radius: var(--radius-sm) var(--radius-sm) 0 0; min-height: 2px; }
+    .month-count { font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--pap-charcoal); }
+    .month-label { font-size: 0.6875rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    .dash-table-wrap { overflow-x: auto; max-width: 100%; }
+    table.dash-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; white-space: nowrap; }
+    .dash-table th { text-align: left; font-size: 0.75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-muted); padding: 0 var(--sp-1-5) var(--sp-1) 0; border-bottom: 1px solid rgba(26,26,26,.12); }
+    .dash-table td { padding: var(--sp-1) var(--sp-1-5) var(--sp-1) 0; border-bottom: 1px solid rgba(26,26,26,.06); color: var(--pap-charcoal); }
+    .dash-table td.is-ref { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; }
+    .dash-table td.is-date { font-variant-numeric: tabular-nums; }
+    .status { display: inline-block; padding: 2px 10px; border-radius: var(--radius-pill); font-size: 0.75rem; background: rgba(18,63,53,.1); color: var(--pap-forest); }
+
+    .dash-note { font-size: 0.8125rem; color: var(--color-text-muted); margin: var(--sp-2) 0 0; }
+    .dash-message { background: #fff; border: 1px solid rgba(26,26,26,.1); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; color: var(--pap-charcoal); }
+    .dash-message h2 { margin: 0 0 var(--sp-1); font-size: 1.125rem; }
+    .dash-message p { margin: 0; color: var(--color-text-muted); }
+    .is-empty { color: var(--color-text-muted); font-size: 0.875rem; }
+
+    @media (max-width: 900px) {
+      .dash-cards { grid-template-columns: repeat(2, 1fr); }
+      .dash-panels { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .dash { padding: var(--sp-3) var(--sp-2) var(--sp-5); }
+      .dash-cards { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: minmax(5.5rem, 8rem) 1fr auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="dash" id="main-content">
+    <div class="dash-inner">
+      <div class="dash-head">
+        <h1>Enquiries</h1>
+        <span class="dash-stamp" data-dash-stamp></span>
+      </div>
+      <div data-dash-root>
+        <div class="dash-message"><h2>Reading the figures…</h2><p>One moment.</p></div>
+      </div>
+    </div>
+  </main>
+  <script src="dashboard.js"></script>
+</body>
+</html>

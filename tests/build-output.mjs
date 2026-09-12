@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {access, readFile, readdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {SHELL_LESS_PAGES} from '../scripts/shared-shell.mjs';
+import {INTERNAL_PAGES, SHELL_LESS_PAGES} from '../scripts/shared-shell.mjs';
 import {loadLocalTours} from '../scripts/local-render-source.mjs';
 
 const output = new URL('../dist/', import.meta.url);
@@ -67,6 +67,21 @@ for (const file of generatedHtmlFiles) {
   // exemption is asserted rather than skipped: it must carry no navigation and
   // no footer, and it must still render the phone number from site settings,
   // so it cannot drift into a half-shell state without this failing.
+  /* The dashboard is not a page of the website. It carries no navigation and
+     no footer for the same reason it carries no contact details: it is an
+     internal tool that happens to share an origin, and every piece of the site
+     it borrowed would be another piece to keep in step. Asserted rather than
+     skipped, so it cannot quietly grow a shell. */
+  if (INTERNAL_PAGES.has(file)) {
+    assert.equal((html.match(/<!-- shared: navigation -->/g) || []).length, 0,
+      `${file} is internal and should not carry the shared navigation`);
+    assert.equal((html.match(/<!-- shared: footer -->/g) || []).length, 0,
+      `${file} is internal and should not carry the shared footer`);
+    assert.match(html, /name="robots"[^>]*noindex/i,
+      `${file} is internal and must never be indexable`);
+    continue;
+  }
+
   if (SHELL_LESS_PAGES.has(file)) {
     assert.equal((html.match(/<!-- shared: navigation -->/g) || []).length, 0,
       `${file} is shell-less and should not carry the shared navigation`);

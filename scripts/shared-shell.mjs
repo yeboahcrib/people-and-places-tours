@@ -100,6 +100,15 @@ export function renderFooterTemplate(template, content, year = new Date().getUTC
  */
 export const SHELL_LESS_PAGES = new Set(['go.html']);
 
+/* Pages that are not part of the website at all.
+ *
+ * go.html is shell-less but still ours to present — it gets the link-hub
+ * treatment. These get nothing: no navigation, no footer, no contact details
+ * woven in. dashboard.html is an internal tool that happens to be served from
+ * the same origin, and the less of the site it carries, the less there is to
+ * keep in step with it. */
+export const INTERNAL_PAGES = new Set(['dashboard.html']);
+
 /**
  * The link-in-bio page at /go.
  *

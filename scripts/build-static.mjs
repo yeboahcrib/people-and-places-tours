@@ -1,7 +1,7 @@
 import {cp, mkdir, readFile, readdir, rm, writeFile} from 'node:fs/promises';
 import {extname, join} from 'node:path';
 import {createHash} from 'node:crypto';
-import {renderFooterTemplate, renderLinkHubTemplate, renderNavigationTemplate, replaceFooter, replacePrimaryNavigation, SHELL_LESS_PAGES} from './shared-shell.mjs';
+import {INTERNAL_PAGES, renderFooterTemplate, renderLinkHubTemplate, renderNavigationTemplate, replaceFooter, replacePrimaryNavigation, SHELL_LESS_PAGES} from './shared-shell.mjs';
 import {loadSiteContent} from './content-source.mjs';
 import {loadLocalHomepageContent, loadLocalTours, renderHomepageContent} from './local-render-source.mjs';
 import {injectTourCards, injectContactTourOptions} from './render-tour-cards.mjs';
@@ -441,10 +441,11 @@ for (const entry of rootEntries) {
     // through everything below: contact details, metadata, clean URLs and
     // asset hashes. replacePrimaryNavigation throws on a page with no nav, so
     // the exemption has to be explicit rather than a silent skip.
-    const shellLess = SHELL_LESS_PAGES.has(entry.name);
-    const withShell = shellLess
-      ? renderLinkHubTemplate(source, siteContent)
-      : replaceFooter(replacePrimaryNavigation(source, navigation, entry.name), footer);
+    const withShell = INTERNAL_PAGES.has(entry.name)
+      ? source
+      : SHELL_LESS_PAGES.has(entry.name)
+        ? renderLinkHubTemplate(source, siteContent)
+        : replaceFooter(replacePrimaryNavigation(source, navigation, entry.name), footer);
     const withFooter = withShell;
     const withHomepage = entry.name === 'index.html'
       ? withFooter.replace(
