@@ -5186,3 +5186,25 @@ a.trust-rating:focus-visible {
 }
 /* Without this, flex squeezes the box on a long label at 320px. */
 .interest-option input { flex-shrink: 0; }
+
+/* ── Contact form: travel timing ───────────────────────────────────────────
+   An exact date and a rough month are alternatives inside one form group.
+   Their wrappers are display: contents so each label, control and help line
+   keeps the group's own spacing, while the conditional-hidden rule — two
+   classes deep — still removes the whole alternative. */
+.timing-choice { display: contents; }
+/* `.form-group label` uppercases every label in a group; this one is a
+   sentence someone reads, not a field heading. Two classes deep to outrank it. */
+.form-group .timing-toggle {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px;
+  font-size: 0.875rem; font-weight: 500; letter-spacing: 0; text-transform: none;
+  color: rgba(255,255,255,.88); cursor: pointer;
+}
+.timing-toggle input { accent-color: var(--color-primary); width: 16px; height: 16px; margin: 0; flex-shrink: 0; cursor: pointer; }
+.timing-toggle input:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+/* Without the script the tickbox could switch nothing, so neither it nor the
+   month it reveals is shown, and the date stands on its own. */
+.booking-flow:not(.booking-flow-ready) .timing-toggle,
+.booking-flow:not(.booking-flow-ready) [data-timing="approximate"] { display: none; }

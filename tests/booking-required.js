@@ -16,6 +16,13 @@ const {serveDist} = require('./serve-dist.js');
 
 const FUTURE_DATE = '2027-06-01';
 
+// The dropdown's window, worked out the way the page and the server both do:
+// this month through 18 months ahead, in UTC.
+const monthAt = offset => {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1)).toISOString().slice(0, 7);
+};
+
 async function openForm(browser, base, viewport) {
   const context = await browser.newContext(viewport ? {viewport} : {});
   const page = await context.newPage();
@@ -71,7 +78,7 @@ async function answerStepTwo(page) {
       // Step one's own region. `.form-error` alone now matches two elements.
       const error = page.locator('[data-step-error="1"]');
       assert.equal(await error.isVisible(), true, 'the reason must be visible from step one, not rendered into a hidden step');
-      assert.match(await error.textContent(), /experience.*traveling.*arrival date/);
+      assert.match(await error.textContent(), /experience.*traveling.*when you'd like to travel/);
       assert.equal(await page.evaluate(() => document.activeElement?.id), 'tour-interest',
         'focus goes to the first thing skipped');
       for (const id of ['tour-interest', 'group-size', 'travel-date']) {
@@ -178,6 +185,79 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
+    /* 7. No exact dates: a rough month instead, never an invented date. */
+    {
+      const {context, page, posted, failures} = await openForm(browser, base);
+      const exact = page.locator('#travel-date');
+      const month = page.locator('#travel-month');
+      const departure = page.locator('#departure-date');
+      await page.selectOption('#tour-interest', 'custom');
+      await page.selectOption('#group-size', '3-5');
+      assert.equal(await month.isVisible(), false, 'the month is not asked until the visitor says they have no dates');
+      assert.equal(await departure.isVisible(), true, 'a custom trip still asks for a departure date by default');
+
+      await page.check('[data-timing-toggle]');
+      assert.equal(await exact.isVisible(), false);
+      assert.equal(await exact.isDisabled(), true, 'a hidden date must not be sent');
+      assert.equal(await departure.isVisible(), false, 'no arrival date, so no departure date');
+      assert.equal(await departure.isDisabled(), true);
+      assert.equal(await page.locator('#date-flexibility').isVisible(), true,
+        '"Are your dates flexible?" is left exactly as it was');
+      assert.equal(await month.isVisible(), true);
+
+      // Exactly the window the server accepts: this month through 18 ahead.
+      const values = await month.locator('option').evaluateAll(options => options.map(option => option.value));
+      assert.deepEqual(values, ['', ...Array.from({length: 19}, (_, offset) => monthAt(offset)), 'not-sure'],
+        'the dropdown must offer this month through 18 months ahead, then "Not sure yet"');
+
+      // Still required on this path.
+      await next(page);
+      assert.equal(await current(page), '1', 'the month is required once the box is ticked');
+      assert.equal(await page.evaluate(() => document.activeElement?.id), 'travel-month');
+      assert.equal(await page.getAttribute('#travel-month', 'aria-invalid'), 'true');
+
+      await month.selectOption(monthAt(5));
+      assert.equal((await page.locator('[data-step-error="1"]').textContent()).trim(), '',
+        'choosing a month clears the message');
+      await next(page);
+      assert.equal(await current(page), '2');
+      await answerStepTwo(page);
+      await page.click('.contact-form button[type="submit"]');
+      await page.waitForFunction(() => document.querySelector('.booking-success:not([hidden])') || document.querySelector('.form-error:not([data-step-error])')?.textContent.trim());
+
+      assert.equal(posted.length, 1);
+      assert.equal(posted[0]['travel-month'], monthAt(5));
+      assert.equal(posted[0]['travel-date'], undefined, 'no date is sent at all, let alone a made-up one');
+      assert.equal(posted[0]['departure-date'], undefined);
+      assert.deepEqual(failures, []);
+      await context.close();
+    }
+
+    /* 8. "Not sure yet" is an answer, and changing one's mind brings the date back. */
+    {
+      const {context, page, posted} = await openForm(browser, base);
+      await page.selectOption('#tour-interest', 'accra-city');
+      await page.selectOption('#group-size', '2');
+      await page.check('[data-timing-toggle]');
+      await page.selectOption('#travel-month', 'not-sure');
+
+      await page.uncheck('[data-timing-toggle]');
+      assert.equal(await page.locator('#travel-date').isVisible(), true, 'unticking restores the date');
+      assert.equal(await page.locator('#travel-month').isDisabled(), true, 'and the month chosen before is not sent');
+
+      await page.check('[data-timing-toggle]');
+      await next(page);
+      assert.equal(await current(page), '2', '"Not sure yet" satisfies the timing question');
+      await answerStepTwo(page);
+      await page.click('.contact-form button[type="submit"]');
+      await page.waitForFunction(() => document.querySelector('.booking-success:not([hidden])') || document.querySelector('.form-error:not([data-step-error])')?.textContent.trim());
+
+      assert.equal(posted.length, 1);
+      assert.equal(posted[0]['travel-month'], 'not-sure');
+      assert.equal(posted[0]['travel-date'], undefined);
+      await context.close();
+    }
+
     /* 6. The interest chips wrap on a phone rather than pushing the page sideways,
           and every chip is a comfortable tap target. */
     {
@@ -190,7 +270,7 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
-    console.log('Booking required-field tests passed (6 cases).');
+    console.log('Booking required-field tests passed (8 cases).');
   } finally {
     await browser.close();
     hosted.server.close();

@@ -97,7 +97,7 @@ function assert(condition, message) {
         return Boolean(field) && field.querySelectorAll('option[value]:not([value=""])').length > 200;
       })(),
       planningFields: ['departure-date', 'date-flexibility', 'traveling-with-children', 'children-age-ranges', 'accommodation', 'contact-method',
-        'budget-range', 'interests', 'trip-length-days']
+        'budget-range', 'interests', 'trip-length-days', 'travel-month']
         .every(name => Boolean(form.querySelector(`[name="${name}"]`))),
       tourOptions: form.querySelectorAll('#tour-interest option').length,
       tourOptionLabels: [...form.querySelectorAll('#tour-interest option')].map(option => option.textContent.trim()),

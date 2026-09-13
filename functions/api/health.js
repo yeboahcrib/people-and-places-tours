@@ -18,7 +18,7 @@ const ENQUIRY_COLUMNS = [
   'tour_interest', 'tour_name', 'group_size', 'travel_date', 'departure_date',
   'date_flexibility', 'traveling_with_children', 'children_age_ranges',
   'accommodation', 'contact_method', 'message',
-  'budget_range', 'interests', 'trip_length_days',
+  'budget_range', 'interests', 'trip_length_days', 'travel_month',
 ];
 
 /**

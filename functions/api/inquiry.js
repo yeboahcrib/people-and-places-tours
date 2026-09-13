@@ -36,6 +36,25 @@ const INTERESTS = new Map([
 ]);
 const interestLabels = value => String(value || '').split(',').filter(Boolean)
   .map(key => INTERESTS.get(key) || key).join(', ');
+
+/* Approximate travel timing.
+   The dropdown offers this month through 18 months ahead, counted in UTC, and
+   this accepts exactly that window — not a month more, so nothing the page
+   never offered can be stored. script.js computes the same window from the
+   same number; tests/inquiry-function.mjs fails if the two ever differ. */
+const TRAVEL_MONTHS_AHEAD = 18;
+const travelMonthOffset = value => {
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return null;
+  const [year, month] = value.split('-').map(Number);
+  const now = new Date();
+  return (year - now.getUTCFullYear()) * 12 + (month - 1 - now.getUTCMonth());
+};
+const travelMonthLabel = value => {
+  if (!value) return '';
+  if (value === 'not-sure') return 'Not sure yet';
+  const [year, month] = value.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, 1)).toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+};
 const TOUR_NAMES = new Map([
   ['', 'Not selected'],
   ['open-to-ideas', 'Open to ideas'],
@@ -63,6 +82,8 @@ const limits = {
   'group-size': 30,
   'travel-date': 10,
   'departure-date': 10,
+  // "2026-12" or "not-sure".
+  'travel-month': 8,
   'date-flexibility': 3,
   'traveling-with-children': 3,
   'children-age-ranges': 120,
@@ -205,7 +226,10 @@ function validate(payload) {
   // three, and the markup's `required` is a convenience, not a rule.
   if (!payload['tour-interest']) return "Please choose an experience, or tell us you're open to ideas.";
   if (!payload['group-size']) return "Please tell us who's traveling.";
-  if (!payload['travel-date']) return 'Please give us a preferred arrival date.';
+  // Timing is required, a date is not: an exact arrival date or a rough month
+  // answers it, and exactly one of them does.
+  if (!payload['travel-date'] && !payload['travel-month']) return "Please give us a preferred arrival date, or tell us roughly when you'd like to travel.";
+  if (payload['travel-date'] && payload['travel-month']) return 'Please give either an exact arrival date or a rough month, not both.';
   if ([payload['first-name'], payload['last-name'], payload.email, payload.phone, payload.country, payload['children-age-ranges']].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
     return 'Inquiry contains invalid characters.';
   }
@@ -234,6 +258,16 @@ function validate(payload) {
     if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== payload['travel-date']) return 'Please provide a valid travel date.';
     if (payload['travel-date'] < new Date().toISOString().slice(0, 10)) return 'Please choose today or a future travel date.';
   }
+  if (payload['travel-month'] && payload['travel-month'] !== 'not-sure') {
+    const offset = travelMonthOffset(payload['travel-month']);
+    if (offset === null || offset < 0 || offset > TRAVEL_MONTHS_AHEAD) {
+      return `Please choose a month within the next ${TRAVEL_MONTHS_AHEAD} months, or "Not sure yet".`;
+    }
+  }
+  // The form hides the departure date on the approximate path, and the check
+  // below only compares it with an arrival date that exists — so a departure
+  // date with no arrival date would otherwise slip through unexamined.
+  if (payload['travel-month'] && payload['departure-date']) return 'A departure date needs an exact arrival date.';
   if (payload['departure-date']) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(payload['departure-date'])) return 'Please provide a valid departure date.';
     const date = new Date(`${payload['departure-date']}T00:00:00Z`);
@@ -284,6 +318,7 @@ function inquiryText(payload, requestId) {
     `Group size: ${payload['group-size'] || 'Not provided'}`,
     `Preferred date: ${payload['travel-date'] || 'Not provided'}`,
     `Departure date: ${payload['departure-date'] || 'Not provided'}`,
+    `Approximate timing: ${travelMonthLabel(payload['travel-month']) || 'Not provided'}`,
     `Dates flexible: ${payload['date-flexibility'] || 'Not provided'}`,
     `Traveling with children: ${payload['traveling-with-children'] || 'Not provided'}`,
     `Children's age ranges: ${payload['children-age-ranges'] || 'Not provided'}`,
@@ -313,6 +348,7 @@ function inquiryHtml(payload, requestId) {
       ${row('Group size', payload['group-size'])}
       ${row('Preferred date', payload['travel-date'])}
       ${row('Departure date', payload['departure-date'])}
+      ${row('Approximate timing', travelMonthLabel(payload['travel-month']))}
       ${row('Dates flexible', payload['date-flexibility'])}
       ${row('Traveling with children', payload['traveling-with-children'])}
       ${row("Children's age ranges", payload['children-age-ranges'])}
@@ -354,7 +390,7 @@ const ENQUIRY_COLUMNS = [
   'tour_interest', 'tour_name', 'group_size', 'travel_date', 'departure_date',
   'date_flexibility', 'traveling_with_children', 'children_age_ranges',
   'accommodation', 'contact_method', 'message',
-  'budget_range', 'interests', 'trip_length_days',
+  'budget_range', 'interests', 'trip_length_days', 'travel_month',
 ];
 
 const INSERT_ENQUIRY = `INSERT INTO enquiries (${ENQUIRY_COLUMNS.join(', ')}) `
@@ -392,6 +428,7 @@ async function storeEnquiry(env, payload, {id, reference, createdAt}) {
       payload['budget-range'],
       payload.interests,
       payload['trip-length-days'],
+      payload['travel-month'],
     ).run();
     return {stored: true};
   } catch (error) {

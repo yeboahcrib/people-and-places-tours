@@ -192,9 +192,28 @@
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" for="travel-date">Preferred arrival date</label>
-                  <input class="form-input" type="date" id="travel-date" name="travel-date" required aria-describedby="travel-date-help" />
-                  <p class="form-help" id="travel-date-help">An approximate date is enough.</p>
+                  <!-- Travel timing is required; an exact date is not. Someone who
+                       genuinely does not know yet ticks the box and gives a rough
+                       month or "Not sure yet" instead of inventing a date. The two
+                       paths are alternatives: script.js shows and enables one and
+                       hides and disables the other, so only one is ever sent. The
+                       tickbox has no name and is never submitted. Without
+                       JavaScript it could do nothing, so style.css hides it and the
+                       month, and the date stands alone. -->
+                  <div class="timing-choice" data-timing="exact">
+                    <label class="form-label" for="travel-date">Preferred arrival date</label>
+                    <input class="form-input" type="date" id="travel-date" name="travel-date" required aria-describedby="travel-date-help" />
+                    <p class="form-help" id="travel-date-help">An approximate date is enough.</p>
+                  </div>
+                  <label class="timing-toggle"><input type="checkbox" data-timing-toggle aria-controls="travel-month" /><span>I don't have exact dates yet</span></label>
+                  <div class="timing-choice" data-timing="approximate">
+                    <label class="form-label" for="travel-month">Roughly when?</label>
+                    <select class="form-select" id="travel-month" name="travel-month" aria-describedby="travel-month-help">
+                      <option value="" selected disabled>Select a month</option>
+                      <option value="not-sure">Not sure yet</option>
+                    </select>
+                    <p class="form-help" id="travel-month-help">Choose "Not sure yet" if it's still open.</p>
+                  </div>
                 </div>
                 <div class="form-group" data-trip-detail="overnight">
                   <label class="form-label" for="departure-date">Preferred departure date <span class="form-optional">optional</span></label>

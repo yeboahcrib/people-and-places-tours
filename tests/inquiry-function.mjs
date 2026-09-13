@@ -662,11 +662,76 @@ for (const [tour, days] of [['custom', '0'], ['custom', '61'], ['custom', 'ten']
   } finally { restore(); }
   assert.equal(response.status, 200);
   const columns = db.calls[0].sql.match(/\(([^)]*)\)\s+VALUES/)[1].split(',').map(name => name.trim());
-  assert.deepEqual(columns.slice(-3), ['budget_range', 'interests', 'trip_length_days'],
+  assert.deepEqual(columns.slice(-4), ['budget_range', 'interests', 'trip_length_days', 'travel_month'],
     'new columns are appended, so no existing column shifts position');
   assert.equal(columns.length, db.calls[0].args.length, 'column list and bound values disagree');
-  assert.deepEqual(db.calls[0].args.slice(-3), ['', '', ''],
+  assert.deepEqual(db.calls[0].args.slice(-4), ['', '', '', ''],
     'an enquiry without the new answers stores empty strings, like every other unanswered column');
+}
+
+/* ── Travel timing: an exact date, or a rough month ─────────────────────── */
+
+// The window is this month through 18 months ahead, in UTC — the same rule the
+// page uses to build its dropdown.
+const monthAt = offset => {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1)).toISOString().slice(0, 7);
+};
+const monthLabel = value => {
+  const [year, month] = value.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, 1)).toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+};
+const approximate = {...guest, 'travel-date': ''};
+
+// One number, in two files. If the page offered a month the server refused —
+// or the server accepted one the page never offered — they would disagree
+// about what an enquiry may say, which is the thing this rule exists to stop.
+{
+  const {readFile: read} = await import('node:fs/promises');
+  const ahead = async file => Number((await read(new URL(file, import.meta.url), 'utf8'))
+    .match(/const TRAVEL_MONTHS_AHEAD = (\d+);/)?.[1]);
+  assert.equal(await ahead('../script.js'), 18, 'the dropdown must offer 18 months ahead');
+  assert.equal(await ahead('../functions/api/inquiry.js'), 18, 'the server must accept 18 months ahead');
+}
+
+// This month, the last month offered, and "Not sure yet" are all answers.
+for (const [month, label] of [[monthAt(0), monthLabel(monthAt(0))], [monthAt(18), monthLabel(monthAt(18))], ['not-sure', 'Not sure yet']]) {
+  const {restore, email} = accepting();
+  try {
+    response = await invoke({...approximate, 'travel-month': month}, {}, delivery);
+  } finally { restore(); }
+  assert.equal(response.status, 200, `${month} must be accepted`);
+  assert.match(email().text, new RegExp(`Approximate timing: ${label}`));
+}
+
+// Nothing outside the window the page offers, and nothing that is not a month.
+for (const month of [monthAt(19), monthAt(-1), '2026-13', '2026-1', 'soon', 'December']) {
+  response = await invoke({...approximate, 'travel-month': month}, {}, delivery);
+  assert.equal(response.status, 400, `"${month}" must be refused`);
+  assert.match((await response.json()).error, /within the next 18 months/);
+}
+
+// Exactly one of the two answers timing.
+response = await invoke({...guest, 'travel-month': monthAt(2)}, {}, delivery);
+assert.equal(response.status, 400, 'a date and a month together contradict each other');
+assert.match((await response.json()).error, /not both/);
+
+response = await invoke({...approximate, 'travel-month': monthAt(2), 'departure-date': '2027-06-10'}, {}, delivery);
+assert.equal(response.status, 400, 'a departure date means nothing without an arrival date');
+assert.match((await response.json()).error, /exact arrival date/);
+
+// Stored where the dashboard will look for it, and the date stays empty.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, 'travel-date': '', 'departure-date': '', 'travel-month': monthAt(3), 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  const columns = db.calls[0].sql.match(/\(([^)]*)\)\s+VALUES/)[1].split(',').map(name => name.trim());
+  const [args] = [db.calls[0].args];
+  assert.equal(args[columns.indexOf('travel_month')], monthAt(3));
+  assert.equal(args[columns.indexOf('travel_date')], '', 'no invented date is stored');
 }
 
 console.log('Inquiry function tests passed.');

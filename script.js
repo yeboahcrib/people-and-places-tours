@@ -983,6 +983,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const childrenDetail = contactForm.querySelector('[data-children-detail]');
     const childrenAges = contactForm.querySelector('#children-age-ranges');
     const departureDate = contactForm.querySelector('#departure-date');
+    // Travel timing: an exact date, or — for someone who genuinely does not
+    // know yet — a rough month or "Not sure yet". Never a made-up date.
+    const noExactDates = contactForm.querySelector('[data-timing-toggle]');
+    const travelMonth = contactForm.querySelector('#travel-month');
+    const exactTiming = [...contactForm.querySelectorAll('[data-timing="exact"]')];
+    const approximateTiming = [...contactForm.querySelectorAll('[data-timing="approximate"]')];
+    // The same window the Function enforces: this month through 18 months
+    // ahead, both counted in UTC so the page and the server agree on what
+    // "this month" is. tests/inquiry-function.mjs fails if the number here and
+    // the number in functions/api/inquiry.js ever differ.
+    const TRAVEL_MONTHS_AHEAD = 18;
+    const travelMonthWindow = () => {
+      const now = new Date();
+      return Array.from({length: TRAVEL_MONTHS_AHEAD + 1}, (_, offset) =>
+        new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1)).toISOString().slice(0, 7));
+    };
+    if (travelMonth) {
+      const notSure = travelMonth.querySelector('option[value="not-sure"]');
+      travelMonthWindow().forEach(value => {
+        const [year, month] = value.split('-').map(Number);
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = new Date(Date.UTC(year, month - 1, 1))
+          .toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+        travelMonth.insertBefore(option, notSure);
+      });
+    }
     const contactMethod = contactForm.querySelector('#contact-method');
     const phone = contactForm.querySelector('#phone');
     const overnightTours = new Set(['custom', 'just-go-ghana']);
@@ -997,6 +1024,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // A specific day tour hides fields that cannot affect that booking.
       const showOvernight = !tourSelect?.value || overnightTours.has(tourSelect.value);
       setConditionalVisibility(overnightDetails, showOvernight);
+      const approximate = Boolean(noExactDates?.checked);
+      setConditionalVisibility(exactTiming, !approximate);
+      setConditionalVisibility(approximateTiming, approximate);
+      // No exact arrival date means no departure date: the two are exact dates
+      // together or not at all. Applied after the overnight rule, so it can
+      // only ever hide the departure field, never reveal one a day tour hides.
+      if (approximate) setConditionalVisibility([departureDate?.closest('[data-trip-detail]')], false);
       // Trip length only means something for a trip being built from scratch.
       // Every other enquiry has a length already, and asking anyway would make
       // a day-tour enquiry longer for no answer worth having.
@@ -1075,7 +1109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const requiredFields = () => [
       [contactForm.querySelector('#tour-interest'), value => Boolean(value)],
       [contactForm.querySelector('#group-size'), value => Boolean(value)],
-      [contactForm.querySelector('#travel-date'), value => /^\d{4}-\d{2}-\d{2}$/.test(value)],
+      // Timing is required either way; which field answers it depends on the tickbox.
+      noExactDates?.checked
+        ? [travelMonth, value => value === 'not-sure' || travelMonthWindow().includes(value)]
+        : [contactForm.querySelector('#travel-date'), value => /^\d{4}-\d{2}-\d{2}$/.test(value)],
       [contactForm.querySelector('#first-name'), value => Boolean(value)],
       [contactForm.querySelector('#last-name'), value => Boolean(value)],
       [contactForm.querySelector('#email'), value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)],
@@ -1090,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .filter(([field]) => field && (totalSteps <= 1 || stepOf(field) === step))
       .filter(([field, isValid]) => !isValid(field.value.trim()));
 
-    const STEP_ONE_MESSAGE = "Please choose an experience, tell us who's traveling, and pick a preferred arrival date.";
+    const STEP_ONE_MESSAGE = "Please choose an experience, tell us who's traveling, and say when you'd like to travel.";
 
     const clearFieldError = field => {
       field.setAttribute('aria-invalid', 'false');
@@ -1102,6 +1139,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // Selects and date pickers commit on change; text fields on input.
       field?.addEventListener('input', () => clearFieldError(field));
       field?.addEventListener('change', () => clearFieldError(field));
+    });
+    // Which timing field requiredFields() returns depends on the tickbox, so
+    // the loop above only reached the one in play at load. Both need it.
+    travelMonth?.addEventListener('change', () => clearFieldError(travelMonth));
+    noExactDates?.addEventListener('change', () => {
+      const travelDateField = contactForm.querySelector('#travel-date');
+      [travelDateField, travelMonth].forEach(field => field?.setAttribute('aria-invalid', 'false'));
+      updateTripDetails();
+      clearFieldError(noExactDates.checked ? travelMonth : travelDateField);
     });
 
     // Moving forward is where a skipped question is cheapest to catch. Left to
