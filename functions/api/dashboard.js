@@ -201,7 +201,9 @@ async function figures(db) {
     key: row.tour_interest || 'unspecified',
     // The name as it read on the day is stored beside the slug. Prefer it, so
     // a tour renamed since still reads as what the visitor chose.
-    label: row.tour_name || row.tour_interest || 'Not specified',
+    // "Not selected" is what the inquiry Function already stores for an
+    // enquiry with no tour chosen, and what the email says. Same words here.
+    label: row.tour_name || row.tour_interest || 'Not selected',
     count: Number(row.count),
   })));
 

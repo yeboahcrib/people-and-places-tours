@@ -53,6 +53,47 @@ async function open(browser, base, reply) {
   return {context, page, failures};
 }
 
+
+/* Contrast, measured from what is painted.
+ *
+ * Asserting on textContent passes whether or not anybody can read the text.
+ * The first version of this page used the site's muted ink — which is white,
+ * because it was made for the dark sections — and every label, count and
+ * column heading rendered white on a white card. The words were all present
+ * and every assertion passed. */
+const CONTRAST = `(() => {
+  const parse = value => (value.match(/[\\d.]+/g) || []).map(Number);
+  const over = (colour, ground) => {
+    const [r, g, b, a = 1] = parse(colour);
+    const [br, bg, bb] = parse(ground);
+    return [r * a + br * (1 - a), g * a + bg * (1 - a), b * a + bb * (1 - a)];
+  };
+  const luminance = ([r, g, b]) => {
+    const channel = value => {
+      const v = value / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  };
+  const groundOf = node => {
+    let el = node;
+    while (el) {
+      const bg = getComputedStyle(el).backgroundColor;
+      if (bg && parse(bg)[3] !== 0 && bg !== 'transparent') return bg;
+      el = el.parentElement;
+    }
+    return 'rgb(255,255,255)';
+  };
+  return selector => [...document.querySelectorAll(selector)].map(node => {
+    const ground = groundOf(node);
+    const ink = over(getComputedStyle(node).color, ground);
+    const back = over(ground, 'rgb(255,255,255)');
+    const [light, dark] = luminance(ink) > luminance(back)
+      ? [luminance(ink), luminance(back)] : [luminance(back), luminance(ink)];
+    return {text: node.textContent.trim().slice(0, 24), ratio: (light + 0.05) / (dark + 0.05)};
+  });
+})()`;
+
 const ok = body => ({status: 200, contentType: 'application/json', body: JSON.stringify(body)});
 
 (async () => {
@@ -89,6 +130,13 @@ const ok = body => ({status: 200, contentType: 'application/json', body: JSON.st
       // The months chart is a sequence and must stay in order.
       const months = await page.$$eval('.month-label', nodes => nodes.map(node => node.textContent));
       assert.deepEqual(months, ['Jul 26', 'Aug 26', 'Sep 26']);
+      // A single month is the common case early on, and flex: 1 alone turned
+      // it into a slab the width of the panel.
+      const lone = await page.evaluate(() => {
+        document.querySelectorAll('.month').forEach((node, index) => { if (index) node.remove(); });
+        return document.querySelector('.month').getBoundingClientRect().width;
+      });
+      assert(lone <= 120, `a single month column should stay a bar, not a wall (was ${Math.round(lone)}px)`);
 
       const headings = await page.$$eval('.dash-table th', nodes => nodes.map(node => node.textContent));
       assert.deepEqual(headings, ['Date', 'Reference', 'Name', 'Country', 'Tour interest',
@@ -102,6 +150,17 @@ const ok = body => ({status: 200, contentType: 'application/json', body: JSON.st
 
       const note = await page.textContent('.dash-note');
       assert.match(note, /1 country value could not be matched/);
+
+      /* Every piece of secondary text has to be legible where it sits. */
+      for (const selector of ['.dash-card dt', '.bar-count', '.dash-table th',
+        '.month-label', '.month-count', '.dash-stamp', '.dash-note']) {
+        const measured = await page.evaluate(`(${CONTRAST})(${JSON.stringify(selector)})`);
+        assert(measured.length, `${selector} rendered nothing to measure`);
+        for (const {text, ratio} of measured) {
+          assert(ratio >= 4.5,
+            `"${text}" (${selector}) is ${ratio.toFixed(2)}:1 against what is behind it — below 4.5:1`);
+        }
+      }
 
       assert.deepEqual(failures, [], 'the page must draw without throwing');
       await context.close();
