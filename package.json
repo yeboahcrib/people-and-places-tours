@@ -25,7 +25,8 @@
     "test:packages-grid": "node tests/packages-grid.js",
     "test:price-ownership": "node tests/tour-price-ownership.js",
     "test:global-shell": "node tests/global-shell.js",
-    "test:health-schema": "node tests/health-schema.mjs"
+    "test:health-schema": "node tests/health-schema.mjs",
+    "test:booking": "node tests/booking-required.js"
   },
   "devDependencies": {
     "playwright": "^1.61.1"

@@ -61,7 +61,14 @@ function assert(condition, message) {
         const criticalControls = [...document.querySelectorAll('.nav-toggle, .btn, button, input:not([type="hidden"]):not([tabindex="-1"]), select, textarea')]
           .filter(visible)
           .map(element => {
-            const rect = element.getBoundingClientRect();
+            // A checkbox or radio inside a <label> is tapped through the label:
+            // the whole label is the hit area, as CLAUDE.md's "measure the
+            // click area, not the text" intends. The label is still held to
+            // the same 32px. Anything not wrapped is measured as itself.
+            const hitArea = element.matches('input[type="checkbox"], input[type="radio"]') && element.closest('label')
+              ? element.closest('label')
+              : element;
+            const rect = hitArea.getBoundingClientRect();
             return {
               label: element.getAttribute('aria-label') || element.textContent.trim().slice(0, 50) || element.name || element.id,
               width: Math.round(rect.width),

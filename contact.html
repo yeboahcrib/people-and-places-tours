@@ -162,14 +162,16 @@
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label" for="tour-interest">Which experience is calling you?</label>
-                  <select class="form-select" id="tour-interest" name="tour-interest">
-                    <option value="" selected>I'm open to ideas</option>
+                  <select class="form-select" id="tour-interest" name="tour-interest" required>
+                    <option value="" selected disabled>Select an experience</option>
+                    <option value="open-to-ideas">I'm open to ideas</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label class="form-label" for="group-size">Who's traveling?</label>
-                  <select class="form-select" id="group-size" name="group-size">
-                    <option value="" selected>Not sure yet</option>
+                  <select class="form-select" id="group-size" name="group-size" required>
+                    <option value="" selected disabled>Select group size</option>
+                    <option value="not-sure">Not sure yet</option>
                     <option value="solo">Just me</option>
                     <option value="2">2 people</option>
                     <option value="3-5">3–5 people</option>
@@ -180,10 +182,18 @@
                 </div>
               </div>
 
+              <div class="form-row" data-trip-detail="custom">
+                <div class="form-group">
+                  <label class="form-label" for="trip-length-days">Roughly how many days? <span class="form-optional">optional</span></label>
+                  <input class="form-input" type="number" id="trip-length-days" name="trip-length-days" min="1" max="60" inputmode="numeric" placeholder="7" aria-describedby="trip-length-help" />
+                  <p class="form-help" id="trip-length-help">An estimate is fine. We'll shape the itinerary around it.</p>
+                </div>
+              </div>
+
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" for="travel-date">Preferred arrival date <span class="form-optional">optional</span></label>
-                  <input class="form-input" type="date" id="travel-date" name="travel-date" aria-describedby="travel-date-help" />
+                  <label class="form-label" for="travel-date">Preferred arrival date</label>
+                  <input class="form-input" type="date" id="travel-date" name="travel-date" required aria-describedby="travel-date-help" />
                   <p class="form-help" id="travel-date-help">An approximate date is enough.</p>
                 </div>
                 <div class="form-group" data-trip-detail="overnight">
@@ -215,6 +225,23 @@
 
               <div class="form-row">
                 <div class="form-group">
+                  <!-- Ranges rather than a number: a band is easier to answer
+                       honestly than a figure, and it is what we actually plan
+                       against. Per person, because every price on the site is
+                       quoted that way. -->
+                  <label class="form-label" for="budget-range">Budget per person <span class="form-optional">optional</span></label>
+                  <select class="form-select" id="budget-range" name="budget-range" aria-describedby="budget-help">
+                    <option value="" selected>Rather not say</option>
+                    <option value="under-500">Under $500</option>
+                    <option value="500-1500">$500 – $1,500</option>
+                    <option value="1500-3000">$1,500 – $3,000</option>
+                    <option value="3000-5000">$3,000 – $5,000</option>
+                    <option value="over-5000">More than $5,000</option>
+                    <option value="not-sure">Not sure yet</option>
+                  </select>
+                  <p class="form-help" id="budget-help">Excluding international flights. It helps us suggest something realistic.</p>
+                </div>
+                <div class="form-group">
                   <label class="form-label" for="traveling-with-children">Traveling with children? <span class="form-optional">optional</span></label>
                   <select class="form-select" id="traveling-with-children" name="traveling-with-children">
                     <option value="" selected>Not sure yet</option>
@@ -222,12 +249,39 @@
                     <option value="yes">Yes</option>
                   </select>
                 </div>
+              </div>
+
+              <div class="form-row">
                 <div class="form-group" data-children-detail>
                   <label class="form-label" for="children-age-ranges">Children's age ranges <span class="form-optional">optional</span></label>
                   <input class="form-input" type="text" id="children-age-ranges" name="children-age-ranges" maxlength="120" placeholder="For example: 4–7 and 12–15" aria-describedby="children-age-help" />
                   <p class="form-help" id="children-age-help">Age ranges only—please don't include children's names.</p>
                 </div>
               </div>
+
+              <!-- Checkboxes rather than <select multiple>. A native multi-select
+                   needs ctrl-click to choose more than one thing, which most
+                   people never discover; a group of checkboxes is obvious with
+                   a mouse, a keyboard and a thumb alike. Grouped in a fieldset
+                   so a screen reader reads the question before the options. -->
+              <fieldset class="form-group interest-set">
+                <legend class="form-label">What are you most interested in? <span class="form-optional">optional</span></legend>
+                <p class="form-help" id="interests-help">Choose as many as you like.</p>
+                <div class="interest-options" aria-describedby="interests-help">
+                  <label class="interest-option"><input type="checkbox" name="interests" value="culture-heritage" /><span>Culture &amp; heritage</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="food" /><span>Food</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="history-ancestry" /><span>History / ancestry</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="nature-waterfalls" /><span>Nature &amp; waterfalls</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="wildlife" /><span>Wildlife</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="adventure" /><span>Adventure</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="beaches-relaxation" /><span>Beaches &amp; relaxation</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="nightlife" /><span>Nightlife</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="community" /><span>Local / community experiences</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="photography" /><span>Photography</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="shopping-crafts" /><span>Shopping / crafts</span></label>
+                  <label class="interest-option"><input type="checkbox" name="interests" value="not-sure" /><span>Not sure — recommend something</span></label>
+                </div>
+              </fieldset>
 
               <div class="form-group">
                 <label class="form-label" for="message">What would make this trip feel special? <span class="form-optional">optional</span></label>
@@ -236,6 +290,11 @@
             </fieldset>
 
             <div class="booking-step-actions" data-booking-actions="1">
+              <!-- Step one's own error region. Continue now refuses to skip the
+                   required answers, and the only other error region lives in
+                   step two's action row, which is display:none from here: the
+                   refusal would move focus and say nothing. -->
+              <p class="form-error" role="alert" data-step-error="1"></p>
               <button type="button" class="btn btn-primary booking-next" data-booking-copy="nextLabel">Continue Your Journey</button>
               <p class="booking-action-note" data-booking-copy="nextNote">You're not committing to anything yet.</p>
             </div>

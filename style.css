@@ -5156,3 +5156,33 @@ a.trust-rating:focus-visible {
 @media (max-width: 560px) {
   .moment { height: 15rem; }
 }
+
+/* ── Contact form: traveller interests ─────────────────────────────────────
+   A checkbox group that has to read as part of the form rather than as a
+   list bolted onto it. The chips wrap at every width and each one is a
+   whole tap target, label included — a 13px word is not something to ask
+   anybody to hit. */
+.interest-set { border: 0; padding: 0; margin: 0 0 var(--sp-2-5); min-width: 0; }
+.interest-set > .form-help { margin-top: 0; }
+.interest-options { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin-top: var(--sp-1); }
+.interest-option {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 0 var(--sp-1-5);
+  border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-pill);
+  font-size: 0.875rem; color: var(--color-text); cursor: pointer;
+  transition: border-color var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out);
+}
+.interest-option:hover { border-color: rgba(255,255,255,.45); }
+.interest-option input { accent-color: var(--color-primary); width: 16px; height: 16px; margin: 0; cursor: pointer; }
+.interest-option:has(input:checked) { border-color: var(--color-primary); background: rgba(255,184,28,.12); }
+.interest-option:has(input:focus-visible) { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .interest-option { transition: none; } }
+/* `.form-group label` uppercases and letter-spaces every label inside a form
+   group — right for a field's heading, wrong for twelve choices, which set
+   that way read as shouting. Two classes deep to outrank it. */
+.interest-set .interest-option {
+  font-size: 0.875rem; font-weight: 500; letter-spacing: 0; text-transform: none;
+  color: rgba(255,255,255,.88);
+}
+/* Without this, flex squeezes the box on a long label at 320px. */
+.interest-option input { flex-shrink: 0; }

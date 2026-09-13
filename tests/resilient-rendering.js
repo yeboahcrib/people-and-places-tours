@@ -96,7 +96,8 @@ function assert(condition, message) {
         // injected at build time, not rendered in the browser.
         return Boolean(field) && field.querySelectorAll('option[value]:not([value=""])').length > 200;
       })(),
-      planningFields: ['departure-date', 'date-flexibility', 'traveling-with-children', 'children-age-ranges', 'accommodation', 'contact-method']
+      planningFields: ['departure-date', 'date-flexibility', 'traveling-with-children', 'children-age-ranges', 'accommodation', 'contact-method',
+        'budget-range', 'interests', 'trip-length-days']
         .every(name => Boolean(form.querySelector(`[name="${name}"]`))),
       tourOptions: form.querySelectorAll('#tour-interest option').length,
       tourOptionLabels: [...form.querySelectorAll('#tour-interest option')].map(option => option.textContent.trim()),
@@ -112,7 +113,7 @@ function assert(condition, message) {
   assert(!formState.hasNoValidateAttribute,
     'contact form carries novalidate in the markup, so a visitor without JavaScript gets no validation at all');
 
-  for (const field of ['first-name', 'last-name', 'email']) {
+  for (const field of ['first-name', 'last-name', 'email', 'tour-interest', 'group-size', 'travel-date']) {
     assert(formState.requiredFields.includes(field),
       `JavaScript-free form does not require ${field}, so an unanswerable enquiry can be sent`);
   }

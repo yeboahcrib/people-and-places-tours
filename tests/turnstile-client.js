@@ -102,6 +102,9 @@ async function openForm(browser, {captureSubmits = true} = {}, baseUrl) {
 // lives in step two, which is the whole reason it starts life hidden.
 const fillAndAdvance = async page => {
   await page.selectOption('#tour-interest', 'cape-coast');
+  // Required since the form began asking for them.
+  await page.selectOption('#group-size', '3-5');
+  await page.fill('#travel-date', '2027-06-01');
   await page.click('[data-booking-actions="1"] .booking-next');
   await page.waitForSelector('[data-booking-step="2"]', {state: 'visible'});
   await page.fill('#first-name', 'Ada');

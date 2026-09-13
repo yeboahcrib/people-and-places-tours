@@ -978,6 +978,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
     const overnightDetails = [...contactForm.querySelectorAll('[data-trip-detail="overnight"]')];
+    const customDetails = [...contactForm.querySelectorAll('[data-trip-detail="custom"]')];
     const childrenSelect = contactForm.querySelector('#traveling-with-children');
     const childrenDetail = contactForm.querySelector('[data-children-detail]');
     const childrenAges = contactForm.querySelector('#children-age-ranges');
@@ -996,6 +997,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // A specific day tour hides fields that cannot affect that booking.
       const showOvernight = !tourSelect?.value || overnightTours.has(tourSelect.value);
       setConditionalVisibility(overnightDetails, showOvernight);
+      // Trip length only means something for a trip being built from scratch.
+      // Every other enquiry has a length already, and asking anyway would make
+      // a day-tour enquiry longer for no answer worth having.
+      setConditionalVisibility(customDetails, tourSelect?.value === 'custom');
       const showChildrenAges = childrenSelect?.value === 'yes';
       setConditionalVisibility([childrenDetail], showChildrenAges);
     };
@@ -1032,7 +1037,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const backButton = contactForm.querySelector('.booking-back');
     const travelDate = contactForm.querySelector('#travel-date');
     const successPanel = bookingPanel?.querySelector('[data-booking-success]');
-    const errorEl = contactForm.querySelector('.form-error');
+    // Two error regions, each in its own step's action row so only the step in
+    // view can speak. `errorEl` is the one beside Send, which every existing
+    // message and the WhatsApp escape hatch use — named explicitly now that
+    // `.form-error` alone would match step one's first.
+    const errorEl = contactForm.querySelector('.form-error:not([data-step-error])');
+    const stepErrorEl = step => (step === 1 && contactForm.querySelector('[data-step-error="1"]')) || errorEl;
     // Verification fails for real people, not only for bots: an extension or a
     // privacy setting blocking one resource Turnstile needs is enough, and
     // "reload and try again" does not fix either. Without another way through,
@@ -1058,23 +1068,57 @@ document.addEventListener('DOMContentLoaded', () => {
     let inquirySubmissionId = '';
     let showBookingStep = () => {};
 
+    // The form sets noValidate, so nothing in the browser enforces `required`
+    // on its own: a field is only required here if it is in this list. The
+    // step-one answers come first, in the order they are asked, so the first
+    // thing a visitor is sent back to is the first thing they skipped.
     const requiredFields = () => [
+      [contactForm.querySelector('#tour-interest'), value => Boolean(value)],
+      [contactForm.querySelector('#group-size'), value => Boolean(value)],
+      [contactForm.querySelector('#travel-date'), value => /^\d{4}-\d{2}-\d{2}$/.test(value)],
       [contactForm.querySelector('#first-name'), value => Boolean(value)],
       [contactForm.querySelector('#last-name'), value => Boolean(value)],
       [contactForm.querySelector('#email'), value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)],
       ...(contactMethod?.value === 'whatsapp' ? [[phone, value => Boolean(value)]] : []),
     ];
 
+    const stepOf = field => Number(field?.closest('[data-booking-step]')?.dataset.bookingStep) || totalSteps;
+    // Judged a step at a time. Checking the whole form would keep a step-one
+    // message on screen after step one is fixed, because the name fields on
+    // step two are still, correctly, empty.
+    const invalidOnStep = step => requiredFields()
+      .filter(([field]) => field && (totalSteps <= 1 || stepOf(field) === step))
+      .filter(([field, isValid]) => !isValid(field.value.trim()));
+
+    const STEP_ONE_MESSAGE = "Please choose an experience, tell us who's traveling, and pick a preferred arrival date.";
+
     const clearFieldError = field => {
       field.setAttribute('aria-invalid', 'false');
-      if (errorEl && requiredFields().every(([input, isValid]) => isValid(input.value.trim()))) {
-        errorEl.textContent = '';
-      }
+      const regionEl = stepErrorEl(stepOf(field));
+      if (regionEl && invalidOnStep(stepOf(field)).length === 0) regionEl.textContent = '';
     };
 
     requiredFields().forEach(([field]) => {
+      // Selects and date pickers commit on change; text fields on input.
       field?.addEventListener('input', () => clearFieldError(field));
+      field?.addEventListener('change', () => clearFieldError(field));
     });
+
+    // Moving forward is where a skipped question is cheapest to catch. Left to
+    // the final Send, the visitor would be on step two reading about a field
+    // they can no longer see.
+    const advanceBookingStep = () => {
+      const invalid = invalidOnStep(currentBookingStep);
+      const regionEl = stepErrorEl(currentBookingStep);
+      invalid.forEach(([field]) => field.setAttribute('aria-invalid', 'true'));
+      if (invalid.length) {
+        if (regionEl) regionEl.textContent = STEP_ONE_MESSAGE;
+        invalid[0][0].focus();
+        return;
+      }
+      if (regionEl) regionEl.textContent = '';
+      showBookingStep(currentBookingStep + 1, true);
+    };
     contactMethod?.addEventListener('change', () => {
       if (phone) phone.setAttribute('aria-required', String(contactMethod.value === 'whatsapp'));
     });
@@ -1118,7 +1162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      nextButton?.addEventListener('click', () => showBookingStep(currentBookingStep + 1, true));
+      nextButton?.addEventListener('click', advanceBookingStep);
       backButton?.addEventListener('click', () => showBookingStep(currentBookingStep - 1, true));
       showBookingStep(1);
     }
@@ -1155,7 +1199,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // finished writing.
       if (totalSteps > 1 && currentBookingStep < totalSteps) {
         e.preventDefault();
-        showBookingStep(currentBookingStep + 1, true);
+        advanceBookingStep();
         return;
       }
 
@@ -1167,10 +1211,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (firstInvalid) {
         e.preventDefault();
-        if (errorEl) errorEl.textContent = firstInvalid === phone
+        const regionEl = stepErrorEl(stepOf(firstInvalid));
+        // Said once, where the visitor is being sent — never left behind on
+        // the step they are leaving.
+        if (errorEl && regionEl !== errorEl) errorEl.textContent = '';
+        if (regionEl) regionEl.textContent = firstInvalid === phone
           ? 'Please add a phone number so we can contact you on WhatsApp.'
-          : 'Please share your name and a valid email so we know how to reach you.';
-        if (totalSteps > 1 && currentBookingStep !== totalSteps) showBookingStep(totalSteps);
+          : stepOf(firstInvalid) < totalSteps
+            ? STEP_ONE_MESSAGE
+            : 'Please share your name and a valid email so we know how to reach you.';
+        // Back to the step the field is actually on, not simply the last one.
+        if (totalSteps > 1 && stepOf(firstInvalid) !== currentBookingStep) showBookingStep(stepOf(firstInvalid));
         firstInvalid.focus();
         return;
       }
@@ -1188,7 +1239,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const endpoint = contactForm.dataset.cloudflareEndpoint || '/api/inquiry';
-        const payload = Object.fromEntries(new FormData(contactForm).entries());
+        const form = new FormData(contactForm);
+        const payload = Object.fromEntries(form.entries());
+        // Object.fromEntries keeps only the last value of a repeated field, so
+        // twelve checkboxes named `interests` would arrive as one. Collected
+        // deliberately and sent as a list the server can split.
+        payload.interests = form.getAll('interests').filter(Boolean).join(',');
         inquirySubmissionId ||= crypto.randomUUID();
         payload['client-submission-id'] = inquirySubmissionId;
         payload['cf-turnstile-response'] = (await requestTurnstileToken()) || widgetToken();
