@@ -1,211 +1,247 @@
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {accessFixture, projectingDb} from './dashboard-access-token.mjs';
 
-const {onRequest, normaliseCountry} = await import('../functions/api/dashboard.js');
+// The dashboard's two endpoints: who gets in, what they are given, and that
+// nothing personal leaves the server except on the one request that must.
 
-const url = 'https://peopleplacesgh.com/api/dashboard';
+const figuresRoute = await import('../functions/api/dashboard/index.js');
+const enquiryRoute = await import('../functions/api/dashboard/enquiry.js');
+const {normaliseCountry, ANALYTIC_COLUMNS, DETAIL_COLUMNS} = await import('../src/dashboard/analytics.mjs');
+const fields = await import('../src/dashboard/fields.mjs');
 
-/* ── A real Access token, really signed ───────────────────────────────────
-   The signature check is the whole door. Stubbing it out would leave a test
-   that passes whether or not the lock works, so a key pair is generated here,
-   its public half is served as Access would serve it, and the tokens below are
-   genuinely signed — or genuinely not. */
-
-const keyPair = await crypto.subtle.generateKey(
-  {name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256'},
-  true, ['sign', 'verify'],
-);
-const publicJwk = {...await crypto.subtle.exportKey('jwk', keyPair.publicKey), kid: 'test-key'};
-
-const TEAM = 'people-and-places.cloudflareaccess.com';
-const AUD = 'test-audience-tag';
-const env = {ACCESS_TEAM_DOMAIN: TEAM, ACCESS_AUD: AUD};
-
-const b64url = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes)))
-  .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const encode = value => b64url(new TextEncoder().encode(JSON.stringify(value)));
-
-async function token(claims = {}, {alg = 'RS256', sign = true, kid = 'test-key'} = {}) {
-  const now = Math.floor(Date.now() / 1000);
-  const head = encode({alg, kid, typ: 'JWT'});
-  const body = encode({
-    aud: [AUD], iss: `https://${TEAM}`, email: 'owner@example.com',
-    iat: now, exp: now + 600, ...claims,
-  });
-  if (!sign) return `${head}.${body}.${b64url(new Uint8Array(256))}`;
-  const signature = await crypto.subtle.sign(
-    'RSASSA-PKCS1-v1_5', keyPair.privateKey, new TextEncoder().encode(`${head}.${body}`),
-  );
-  return `${head}.${body}.${b64url(signature)}`;
-}
-
-const request = (jwt, method = 'GET') => new Request(url, {
-  method,
-  headers: jwt ? {'Cf-Access-Jwt-Assertion': jwt} : {},
+const access = await accessFixture();
+const base = 'https://enquiry-dashboard.people-and-places-tours.pages.dev';
+const request = (path, jwt, method = 'GET') => new Request(`${base}${path}`, {
+  method, headers: jwt ? {'Cf-Access-Jwt-Assertion': jwt} : {},
 });
 
-/* ── A database that answers the seven statements the Function issues ───── */
+const now = new Date();
+const daysAgo = count => new Date(now.getTime() - count * 86_400_000).toISOString();
+const monthsAhead = count => new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + count, 1)).toISOString().slice(0, 7);
 
-const COUNTRY_ROWS = [
-  {country: 'GH', count: 3},          // written since the selector shipped
-  {country: 'Ghana', count: 2},       // typed, before it
-  {country: 'US', count: 4},
-  {country: 'United States', count: 1},
-  {country: 'USA', count: 1},         // and the shape people actually type
-  {country: 'Wakanda', count: 1},     // not a country, and not silently dropped
-  {country: '', count: 1},
-];
-const TOUR_ROWS = [
-  {tour_interest: 'cape-coast', tour_name: 'Cape Coast Ancestral Tour', count: 5},
-  {tour_interest: 'just-go-ghana', tour_name: 'Just Go Ghana', count: 7},
-  {tour_interest: '', tour_name: '', count: 1},
-];
-const MONTH_ROWS = [{month: '2026-07', count: 2}, {month: '2026-08', count: 5}, {month: '2026-09', count: 6}];
-const SIZE_ROWS = [{group_size: '1-2', count: 4}, {group_size: '3-5', count: 6}, {group_size: '', count: 3}];
-const RECENT_ROWS = [{
-  created_at: '2026-09-11T20:42:40.770Z', reference: 'PP-3ED8JU',
-  first_name: 'Albert', last_name: 'Mensah', country: 'GH',
-  tour_interest: 'accra-city', tour_name: 'Accra After Dark Food Tour',
-  group_size: '3-5', travel_date: '2027-02-01', contact_method: 'whatsapp', status: 'new',
-  // Present in the table, and deliberately never selected by the Function.
-}];
-
-const stubDb = () => {
-  const statements = [];
-  return {
-    statements,
-    prepare(sql) {
-      const statement = {sql, args: null, bind(...args) { statement.args = args; return statement; }};
-      statements.push(statement);
-      return statement;
-    },
-    async batch(prepared) {
-      return prepared.map(({sql}) => {
-        if (/COUNT\(\*\) AS total FROM enquiries WHERE/.test(sql)) return {results: [{total: 6}]};
-        if (/COUNT\(\*\) AS total FROM enquiries/.test(sql)) return {results: [{total: 13}]};
-        if (/GROUP BY country/.test(sql)) return {results: COUNTRY_ROWS};
-        if (/GROUP BY tour_interest/.test(sql)) return {results: TOUR_ROWS};
-        if (/GROUP BY month/.test(sql)) return {results: MONTH_ROWS};
-        if (/GROUP BY group_size/.test(sql)) return {results: SIZE_ROWS};
-        if (/ORDER BY created_at DESC/.test(sql)) return {results: RECENT_ROWS};
-        throw new Error(`unexpected statement: ${sql}`);
-      });
-    },
-  };
-};
-
-const authorised = () => ({...env, DB: stubDb()});
-
-/* ── The door ─────────────────────────────────────────────────────────── */
-
-let response = await onRequest({request: request(await token(), 'POST'), env: authorised()});
-assert.equal(response.status, 405, 'only GET reads figures');
-
-// Every way in that is not a valid token issued to us.
-const refusals = [
-  ['no configuration', await token(), {DB: stubDb()}],
-  ['no token at all', null, authorised()],
-  ['a malformed token', 'not-a-jwt', authorised()],
-  ['an unsigned token', await token({}, {sign: false}), authorised()],
-  ['alg: none', await token({}, {alg: 'none', sign: false}), authorised()],
-  ['an unknown signing key', await token({}, {kid: 'some-other-key'}), authorised()],
-  ['a token for another audience', await token({aud: ['someone-elses-tag']}), authorised()],
-  ['a token from another issuer', await token({iss: 'https://attacker.cloudflareaccess.com'}), authorised()],
-  ['an expired token', await token({exp: Math.floor(Date.now() / 1000) - 60}), authorised()],
+const ROWS = [
+  {id: 'a', reference: 'PP-K4ZG7P', created_at: daysAgo(0), status: 'new', source: 'Website inquiry',
+    first_name: 'Test', last_name: 'Cutover', email: 'test.cutover@example.com', phone: '+233 20 000 0000',
+    country: 'GH', tour_interest: 'custom', tour_name: 'Custom tour request', group_size: '2',
+    travel_date: '', departure_date: '', travel_month: monthsAhead(6), date_flexibility: '', traveling_with_children: 'no',
+    children_age_ranges: '', accommodation: 'private', contact_method: 'email', message: 'Private message text',
+    budget_range: '1500-3000', interests: 'culture-heritage,food', trip_length_days: '10'},
+  {id: 'b', reference: 'PP-3ED8JU', created_at: daysAgo(3), status: 'new', source: 'Website inquiry',
+    first_name: 'Albert', last_name: 'Mensah', email: 'albert@example.com', phone: '',
+    country: 'Ghana', tour_interest: 'accra-food', tour_name: 'Accra After Dark Food Tour', group_size: '3-5',
+    travel_date: `${monthsAhead(2)}-14`, departure_date: `${monthsAhead(2)}-20`, travel_month: '', date_flexibility: 'yes',
+    traveling_with_children: 'yes', children_age_ranges: 'Ages 4 and 9', accommodation: '', contact_method: 'whatsapp',
+    message: '', budget_range: '', interests: '', trip_length_days: ''},
+  {id: 'c', reference: 'PP-UNITED', created_at: daysAgo(40), status: 'new', source: 'Website inquiry',
+    first_name: 'Legacy', last_name: 'Row', email: 'legacy@example.com', phone: '',
+    country: 'United', tour_interest: '', tour_name: '', group_size: '', travel_date: '', departure_date: '',
+    travel_month: '', date_flexibility: '', traveling_with_children: '', children_age_ranges: '', accommodation: '',
+    contact_method: '', message: '', budget_range: '', interests: '', trip_length_days: ''},
 ];
 
-const realFetch = globalThis.fetch;
-globalThis.fetch = async resource => {
-  assert.match(String(resource), new RegExp(`^https://${TEAM}/cdn-cgi/access/certs$`),
-    'the only outbound request may be for Access public keys');
-  return new Response(JSON.stringify({keys: [publicJwk]}), {status: 200});
-};
-
+const restore = access.installCerts();
 try {
-  for (const [label, jwt, environment] of refusals) {
-    response = await onRequest({request: request(jwt), env: environment});
-    assert.equal(response.status, 401, `${label} must be refused`);
-    const body = await response.json();
-    assert.equal(body.error, 'This dashboard is private.');
-    // A refusal that explains itself teaches somebody how to get in.
-    assert.equal(Object.keys(body).length, 1, 'a refusal must not say why');
+  for (const [route, path] of [[figuresRoute, '/api/dashboard'], [enquiryRoute, '/api/dashboard/enquiry?reference=PP-K4ZG7P']]) {
+    let response = await route.onRequest({request: request(path, await access.token(), 'POST'), env: {...access.env, DB: projectingDb(ROWS)}});
+    assert.equal(response.status, 405, `${path}: only GET`);
+
+    for (const [label, jwt, environment] of await access.refusals()) {
+      const db = projectingDb(ROWS);
+      response = await route.onRequest({request: request(path, jwt), env: {...(environment || access.env), DB: db}});
+      assert.equal(response.status, 401, `${path}: ${label} must be refused`);
+      const body = await response.json();
+      assert.deepEqual(body, {error: 'This dashboard is private.'}, `${path}: a refusal must not say why`);
+      assert.equal(db.statements.length, 0, `${path}: ${label} must not reach the database at all`);
+      assert.equal(response.headers.get('Cache-Control'), 'no-store');
+    }
+
+    // A refusal does not say why, but the log does, and "alg: none" must be
+    // refused for its algorithm before any key is consulted — not merely
+    // because the signature then happens not to verify.
+    const logged = [];
+    const warn = console.warn;
+    console.warn = (message, detail) => logged.push(detail?.reason);
+    try {
+      const unsigned = (await access.refusals()).find(([label]) => label === 'alg: none')[1];
+      await route.onRequest({request: request(path, unsigned), env: {...access.env, DB: projectingDb(ROWS)}});
+    } finally { console.warn = warn; }
+    assert.deepEqual(logged, ['unexpected-algorithm'], `${path}: alg none is refused for its algorithm`);
+
+    // No database is a deployment fault, reported only to somebody already in.
+    response = await route.onRequest({request: request(path, await access.token()), env: {...access.env}});
+    assert.equal(response.status, 503, `${path}: no binding`);
   }
 
-  // No database bound is a deployment fault, not an authorisation one, and it
-  // is only ever reported to somebody already through the door.
-  response = await onRequest({request: request(await token()), env: {...env}});
-  assert.equal(response.status, 503);
+  /* ── Figures ────────────────────────────────────────────────────────── */
+  {
+    const db = projectingDb(ROWS);
+    const response = await figuresRoute.onRequest({request: request('/api/dashboard', await access.token()), env: {...access.env, DB: db}});
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('Cache-Control'), 'no-store');
+    const data = await response.json();
 
-  /* ── The figures ──────────────────────────────────────────────────────── */
+    const [analytic, names, ...rest] = db.statements;
+    assert.equal(rest.length, 0, 'two statements: the figures and the names on the recent list');
+    const selected = sql => sql.match(/^SELECT\s+(.+?)\s+FROM/is)[1].split(',').map(name => name.trim());
+    assert.deepEqual(selected(analytic.sql), ANALYTIC_COLUMNS);
+    for (const personal of ['email', 'phone', 'message', 'first_name', 'last_name', 'children_age_ranges', 'id']) {
+      assert(!selected(analytic.sql).includes(personal), `the figures must never select ${personal}`);
+    }
+    assert.deepEqual(selected(names.sql), ['reference', 'created_at', 'first_name', 'last_name'],
+      'the second statement reads names and nothing more');
+    assert.match(names.sql, /WHERE reference IN \((\?, )*\?\)$/, 'references are bound, never spliced into SQL');
+    assert(names.args.length <= 25, 'names are read only for the enquiries being listed');
+    assert(!db.statements.some(({sql}) => /SELECT\s+\*/i.test(sql)), 'no statement selects every column');
 
-  const db = stubDb();
-  response = await onRequest({request: request(await token()), env: {...env, DB: db}});
-  assert.equal(response.status, 200);
-  const data = await response.json();
+    const serialised = JSON.stringify(data);
+    for (const secret of ['@', 'Private message text', '+233', 'Ages 4 and 9']) {
+      assert(!serialised.includes(secret), `the figures payload must not carry ${secret}`);
+    }
+    assert.deepEqual(Object.keys(data.recent.items[0]).sort(),
+      ['country', 'countryUnmatched', 'createdAt', 'experience', 'groupSize', 'name', 'reference', 'status', 'timing']);
+    assert.equal(data.recent.items[0].name, 'Test Cutover');
+    // Names appear only beside the enquiries being listed, never in a figure.
+    const {recent, ...aggregate} = data;
+    for (const name of ['Test', 'Cutover', 'Albert', 'Mensah', 'Legacy']) {
+      assert(!JSON.stringify(aggregate).includes(name), `no figure may carry the name "${name}"`);
+    }
 
-  /* The guarantee is that personal detail is never *selected*, not that it is
-     filtered out afterwards — so it is the statements that have to be checked.
-     Shaping the response by hand would pass this even if the query dragged
-     every column back into the Worker. */
-  const issued = db.statements.map(statement => statement.sql).join('\n');
-  assert(!/\bSELECT\s+\*/i.test(issued), 'no statement may select every column');
-  for (const column of ['email', 'phone', 'message']) {
-    assert(!new RegExp(`\\b${column}\\b`).test(issued),
-      `no statement may name the ${column} column`);
+    assert.equal(data.summary.total, 3);
+    assert.deepEqual(data.summary.topCountry, {labels: ['Ghana'], count: 2}, '"GH" and "Ghana" are one country');
+    assert.deepEqual(data.countries.unmatched, [{label: 'United', count: 1}], '"United" is not guessed at');
+    assert.equal(data.options.countries.find(item => item.key === 'raw:United').unmatched, true);
+    assert.equal(data.travel.points.length, 19, 'planned travel covers this month and the 18 after it, as the form does');
+    assert.equal(data.travel.points[0].month, monthsAhead(0));
+    assert.equal(data.travel.points.at(-1).month, monthsAhead(18));
   }
-  assert.match(issued, /LIMIT 25/, 'the recent list is bounded');
 
-  assert.equal(data.summary.total, 13);
-  assert.equal(data.summary.thisMonth, 6);
-
-  // The whole point of normalising: five ways of writing two countries.
-  const ghana = data.countries.find(entry => entry.label === 'Ghana');
-  const usa = data.countries.find(entry => entry.label === 'United States');
-  assert.equal(ghana.count, 5, '"GH" and "Ghana" are one country');
-  assert.equal(usa.count, 6, '"US", "United States" and "USA" are one country');
-  assert.equal(data.summary.topCountry, 'United States');
-
-  // What could not be resolved keeps its own name and is still counted.
-  assert.equal(data.countries.find(entry => entry.label === 'Wakanda')?.count, 1,
-    'an unrecognised country must be shown, not folded into another or dropped');
-  assert.equal(data.countries.find(entry => entry.label === 'Not provided')?.count, 1);
-
-  // Nothing is lost in the merge.
-  assert.equal(data.countries.reduce((sum, entry) => sum + entry.count, 0),
-    COUNTRY_ROWS.reduce((sum, row) => sum + row.count, 0),
-    'normalising must not change how many enquiries there are');
-
-  assert.equal(data.summary.topTour, 'Just Go Ghana');
-  assert.deepEqual(data.months.map(entry => entry.month), ['2026-07', '2026-08', '2026-09'],
-    'a timeline stays in time order');
-
-  assert.equal(data.groupSizes.find(entry => entry.label === '3-5').count, 6);
-  assert.equal(data.groupSizes.find(entry => entry.label === 'Not specified').count, 3);
-
-  /* ── What must never leave the server ─────────────────────────────────── */
-
-  const serialised = JSON.stringify(data);
-  for (const forbidden of ['email', 'phone', 'message', '@', '+233']) {
-    assert(!serialised.includes(forbidden),
-      `the dashboard payload must not carry ${forbidden}`);
+  /* ── Filters narrow every figure together ───────────────────────────── */
+  for (const [query, expected] of [
+    ['?country=GH', 2],
+    ['?country=raw%3AUnited', 1],
+    ['?experience=custom', 1],
+    ['?experience=none', 1],
+    ['?range=30d', 2],
+    ['?range=custom&from=2000-01-01&to=2000-12-31', 0],
+    ['?country=%27%20OR%201%3D1', 3],
+    ['?range=nonsense&recent=9999', 3],
+  ]) {
+    const response = await figuresRoute.onRequest({request: request(`/api/dashboard${query}`, await access.token()), env: {...access.env, DB: projectingDb(ROWS)}});
+    const data = await response.json();
+    assert.equal(data.summary.total, expected, `${query} narrows to ${expected}`);
+    const sum = items => items.reduce((total, item) => total + item.count, 0);
+    for (const key of ['groupSize', 'budget']) {
+      const figure = data[key];
+      assert.equal(sum(figure.items) + figure.notSure + figure.blank + sum(figure.other), expected, `${query}: ${key} accounts for every enquiry`);
+    }
+    for (const key of ['accommodation', 'children', 'contact']) {
+      const figure = data[key];
+      assert.equal(sum(figure.items) + figure.blank + sum(figure.other), expected, `${query}: ${key} accounts for every enquiry`);
+    }
+    assert.equal(sum(data.countries.items) + data.countries.other.count + data.countries.notProvided, expected, `${query}: countries`);
+    assert.equal(sum(data.experiences.items) + data.experiences.notSelected, expected, `${query}: experiences`);
+    const travel = data.travel;
+    assert.equal(travel.points.reduce((total, point) => total + point.exact + point.approximate, 0)
+      + travel.earlier.exact + travel.earlier.approximate + travel.later.exact + travel.later.approximate
+      + travel.notSure + travel.blank + travel.other, expected, `${query}: travel timing`);
+    assert.equal(sum(data.timeline.points), expected, `${query}: the timeline counts the same enquiries`);
+    assert.equal(data.recent.total, expected, `${query}: the list counts the same enquiries`);
+    assert(data.recent.limit === 25, 'the list is bounded whatever the URL asks for');
   }
-  assert.deepEqual(Object.keys(data.recent[0]).sort(), [
-    'contactMethod', 'country', 'createdAt', 'groupSize', 'name',
-    'reference', 'status', 'tour', 'travelDate',
-  ], 'the recent list carries only what operations needs');
-  assert.equal(data.recent[0].country, 'Ghana', 'a stored code is read back as a country');
+
+  /* ── One enquiry ────────────────────────────────────────────────────── */
+  {
+    let db = projectingDb(ROWS);
+    let response = await enquiryRoute.onRequest({request: request('/api/dashboard/enquiry?reference=PP-K4ZG7P', await access.token()), env: {...access.env, DB: db}});
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('Cache-Control'), 'no-store');
+    const {enquiry, sharedReference} = await response.json();
+    assert.equal(sharedReference, false);
+    assert.equal(db.statements.length, 1);
+    assert.deepEqual(db.statements[0].sql.match(/^SELECT\s+(.+?)\s+FROM/is)[1].split(',').map(name => name.trim()), DETAIL_COLUMNS);
+    assert(!DETAIL_COLUMNS.includes('id'), 'the idempotency key is not part of the record');
+    assert.match(db.statements[0].sql, /WHERE reference = \? ORDER BY created_at DESC LIMIT 2$/);
+    assert.deepEqual(db.statements[0].args, ['PP-K4ZG7P']);
+
+    assert.equal(enquiry.traveler.name, 'Test Cutover');
+    assert.equal(enquiry.traveler.email, 'test.cutover@example.com');
+    assert.deepEqual(enquiry.traveler.country, {value: 'Ghana', unmatched: false});
+    assert.deepEqual(enquiry.trip.timing, {kind: 'approximate', month: new Date(`${monthsAhead(6)}-01T00:00:00Z`).toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'})});
+    assert.deepEqual(enquiry.trip.tripLength, {value: '10 days'});
+    assert.deepEqual(enquiry.preferences.budget, {value: '$1,500 – $3,000'});
+    assert.deepEqual(enquiry.preferences.interests.items, ['Culture & heritage', 'Food']);
+    assert.equal(enquiry.message, 'Private message text');
+    assert.deepEqual(enquiry.trip.flexibility, {value: fields.BLANK.flexibility.label, missing: true});
+
+    response = await enquiryRoute.onRequest({request: request('/api/dashboard/enquiry?reference=PP-3ED8JU', await access.token()), env: {...access.env, DB: projectingDb(ROWS)}});
+    const albert = (await response.json()).enquiry;
+    assert.equal(albert.trip.tripLength, null, 'trip length is not a question on a day tour, so it is not shown as unanswered');
+    assert.equal(albert.trip.timing.kind, 'exact');
+    assert.deepEqual(albert.preferences.budget, {value: 'No answer', missing: true});
+    assert.equal(albert.trip.children.ages, 'Ages 4 and 9');
+
+    response = await enquiryRoute.onRequest({request: request('/api/dashboard/enquiry?reference=PP-UNITED', await access.token()), env: {...access.env, DB: projectingDb(ROWS)}});
+    const legacy = (await response.json()).enquiry;
+    assert.deepEqual(legacy.traveler.country, {value: 'United', unmatched: true});
+    assert.deepEqual(legacy.trip.groupSize, {value: 'Not recorded', missing: true});
+    assert.equal(legacy.trip.timing.kind, 'blank');
+
+    for (const [query, status] of [['', 400], ['?reference=%27%20OR%201%3D1', 400], ['?reference=PP-NOPE99', 404]]) {
+      db = projectingDb(ROWS);
+      response = await enquiryRoute.onRequest({request: request(`/api/dashboard/enquiry${query}`, await access.token()), env: {...access.env, DB: db}});
+      assert.equal(response.status, status, `detail ${query || '(no reference)'} is ${status}`);
+      if (status === 400) assert.equal(db.statements.length, 0, 'a malformed reference never reaches the database');
+    }
+
+    const twins = [...ROWS, {...ROWS[0], id: 'z', created_at: daysAgo(1)}];
+    response = await enquiryRoute.onRequest({request: request('/api/dashboard/enquiry?reference=pp-k4zg7p', await access.token()), env: {...access.env, DB: projectingDb(twins)}});
+    assert.equal((await response.json()).sharedReference, true, 'a reference shared by two enquiries is said to be shared');
+  }
 } finally {
-  globalThis.fetch = realFetch;
+  restore();
+}
+
+/* ── The dashboard reads the form's own vocabulary ────────────────────── */
+{
+  const html = await readFile(new URL('../contact.html', import.meta.url), 'utf8');
+  const optionsOf = id => {
+    const select = html.match(new RegExp(`<select[^>]*id="${id}"[^>]*>([\\s\\S]*?)</select>`))[1];
+    return [...select.matchAll(/<option value="([^"]*)"[^>]*>([^<]*)</g)].map(([, value, label]) => [value, label.replace(/&amp;/g, '&')]);
+  };
+  const known = (pairs, extra = []) => new Set([...pairs.map(([key]) => key), ...extra, '']);
+  for (const [id, pairs, extra] of [
+    ['group-size', fields.GROUP_SIZES, ['not-sure']],
+    ['budget-range', fields.BUDGET_RANGES, ['not-sure']],
+    ['accommodation', fields.ACCOMMODATION],
+    ['traveling-with-children', fields.CHILDREN],
+    ['contact-method', fields.CONTACT_METHODS],
+    ['date-flexibility', fields.DATE_FLEXIBILITY],
+  ]) {
+    const values = optionsOf(id);
+    assert(values.length, `${id} options were found in the form`);
+    for (const [value] of values) assert(known(pairs, extra).has(value), `the dashboard does not know the form's ${id} value "${value}"`);
+    for (const [key] of pairs) assert(values.some(([value]) => value === key), `the dashboard's ${id} value "${key}" is not on the form`);
+  }
+  for (const id of ['budget-range', 'accommodation', 'contact-method']) {
+    const pairs = {'budget-range': fields.BUDGET_RANGES, accommodation: fields.ACCOMMODATION, 'contact-method': fields.CONTACT_METHODS}[id];
+    for (const [key, label] of pairs) assert.equal(optionsOf(id).find(([value]) => value === key)[1], label, `${id} "${key}" reads as the form does`);
+  }
+  const boxes = [...html.matchAll(/name="interests" value="([^"]+)" \/><span>([^<]+)</g)].map(([, value, label]) => [value, label.replace(/&amp;/g, '&')]);
+  assert.deepEqual(boxes.filter(([value]) => value !== 'not-sure'), fields.INTERESTS, 'interests match the form, in the form\'s order');
 }
 
 /* ── Normalisation, directly ──────────────────────────────────────────── */
-
 assert.deepEqual(normaliseCountry('GH'), {code: 'GH', label: 'Ghana', resolved: true});
-assert.deepEqual(normaliseCountry('Ghana'), {code: 'GH', label: 'Ghana', resolved: true});
 assert.deepEqual(normaliseCountry('  ghana '), {code: 'GH', label: 'Ghana', resolved: true});
 assert.deepEqual(normaliseCountry('USA'), {code: 'US', label: 'United States', resolved: true});
 assert.deepEqual(normaliseCountry('U.K.'), {code: 'GB', label: 'United Kingdom', resolved: true});
 assert.deepEqual(normaliseCountry('the netherlands'), {code: 'NL', label: 'Netherlands', resolved: true});
-assert.equal(normaliseCountry('Nowhere').resolved, false);
+assert.equal(normaliseCountry("Cote d'Ivoire").code, 'CI', 'accents and apostrophes are not what makes a country');
+for (const ambiguous of ['United', 'America', 'Congo', 'Korea', 'Nowhere']) {
+  assert.equal(normaliseCountry(ambiguous).resolved, false, `"${ambiguous}" has more than one honest reading and must stay unmatched`);
+  assert.equal(normaliseCountry(ambiguous).label, ambiguous, 'an unmatched value keeps its own text');
+}
 assert.equal(normaliseCountry('').label, 'Not provided');
 
 console.log('Dashboard function tests passed.');
