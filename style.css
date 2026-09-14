@@ -5158,56 +5158,100 @@ a.trust-rating:focus-visible {
 }
 
 /* ── Contact form: traveller interests ─────────────────────────────────────
-   Twelve choices that have to read as part of this form, not as a component
-   from somewhere else. They borrow the field language exactly — the 8px
-   radius, the 12% border and 3% fill, the hover and focus treatment — and sit
-   in the same two columns the fields above use, so their edges line up with
-   the form instead of wrapping into a cloud of pills. 36px rather than field
-   height: still a comfortable tap, and it keeps twelve of them from making the
-   step longer than the pills they replaced. */
+   Preferences, not questions. Each interest is a chip in the shape the site
+   already uses for choosing — the pill of the packages filter row — set in the
+   form's sentence case rather than that row's capitals, because these sit
+   among labels, not navigation. Chips hug their words: Food stays small,
+   "Local / community experiences" gets the room it needs, and twelve of them
+   wrap into a few quiet lines.
+
+   There is no indicator slot. A ring beside every word cost twenty pixels a
+   chip and read as radio buttons — pick one — on a list that takes several,
+   and on a phone those twenty pixels were the difference between two chips a
+   line and one. Selection is shown by the chip itself instead: forest fill,
+   a gold edge doubled from the inside, cream text. Fill, edge weight and
+   colour change together, so a choice never depends on hue alone, and a chip
+   never changes size when it is chosen, so nothing reflows under a tap.
+
+   The real checkbox is still there, stretched invisibly across each chip. It
+   is what a tap lands on, what Tab reaches, what Space toggles, what a screen
+   reader announces and what the form submits. */
 .interest-set { border: 0; padding: 0; margin-left: 0; margin-right: 0; min-width: 0; }
-/* A legend is not a flex item, so the group's gap never reached it and the
-   question sat flush on its helper line. Same space as a label above a field. */
+/* A legend is not a flex item, so the group's gap never reached it. Same space
+   as a label above a field. */
 .interest-set > legend { padding: 0; margin-bottom: 0.4rem; }
 .interest-set > .form-help { margin-top: 0; }
-.interest-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-1) var(--sp-2);
-}
-/* Two classes deep to outrank `.form-group label`, which uppercases and
-   letter-spaces every label inside a group. */
+/* The same 0.4rem that separates a label from its field. */
+.interest-options { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+/* Two classes deep to outrank `.form-group label`. */
 .interest-set .interest-option {
-  display: flex; align-items: flex-start; gap: var(--sp-1);
-  min-height: 36px; padding: 0.5rem 0.75rem;
-  border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius-sm);
-  background: rgba(255,255,255,.03);
-  color: rgba(255,255,255,.74);
-  font-size: var(--text-sm); font-weight: 400; line-height: 1.35;
+  position: relative;
+  display: inline-flex; align-items: center;
+  max-width: 100%;
+  min-height: 36px; padding: 0.3rem 0.75rem;
+  border: 1px solid rgba(255,255,255,.16); border-radius: var(--radius-pill);
+  background: transparent;
+  color: rgba(255,255,255,.72);
+  font-size: var(--text-sm); font-weight: 500; line-height: 1.25;
   letter-spacing: 0; text-transform: none;
-  cursor: pointer;
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
   transition: border-color var(--motion-base) var(--ease-out),
-              background var(--motion-base) var(--ease-out),
-              color var(--motion-base) var(--ease-out);
+              background-color var(--motion-base) var(--ease-out),
+              box-shadow var(--motion-base) var(--ease-out),
+              color var(--motion-base) var(--ease-out),
+              transform var(--motion-instant) var(--ease-out);
 }
-.interest-set .interest-option:hover { border-color: rgba(255,255,255,.22); }
+/* The checkbox itself: invisible, and covering the whole chip, so every way of
+   choosing goes to the real control. */
+.interest-set .interest-option input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; opacity: 0; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.interest-set .interest-option:hover { border-color: rgba(255,255,255,.34); color: rgba(255,255,255,.9); }
+.interest-set .interest-option:active { transform: scale(0.97); }
+
+/* Chosen: forest, a doubled gold edge, cream. The inset shadow doubles the edge
+   without adding a pixel to the chip. */
 .interest-set .interest-option:has(input:checked) {
+  background: var(--pap-forest);
   border-color: var(--color-primary);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.92);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+  color: var(--pap-cream);
 }
-/* The ring goes on the option, as it goes on a field, not on the 16px box. */
+.interest-set .interest-option:has(input:checked):hover {
+  border-color: var(--pap-soft-gold);
+  box-shadow: inset 0 0 0 1px var(--pap-soft-gold);
+}
+
+/* Keyboard focus rings the chip, the way it rings a field. */
 .interest-set .interest-option:has(input:focus-visible) { outline: 3px solid var(--color-primary); outline-offset: 2px; }
-.interest-option input { accent-color: var(--color-primary); width: 16px; height: 16px; margin: 1px 0 0; flex-shrink: 0; cursor: pointer; }
-.interest-option input:focus-visible { outline: none; }
+
+/* "Not sure — recommend something" is not a twelfth interest; it hands the
+   choice to us. It stands on its own line under a hairline, and when chosen it
+   takes cream rather than forest and gold, so it never reads as a category. */
+.interest-neutral { padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,.08); }
+.interest-neutral .interest-option:has(input:checked) {
+  background: rgba(255,247,232,.08);
+  border-color: var(--pap-cream);
+  box-shadow: inset 0 0 0 1px var(--pap-cream);
+  color: var(--pap-cream);
+}
+.interest-neutral .interest-option:has(input:checked):hover {
+  border-color: var(--pap-cream);
+  box-shadow: inset 0 0 0 1px var(--pap-cream);
+}
+
 @media (max-width: 768px) {
   /* Matches the stacked form's 0.6rem label-to-field gap. */
   .interest-set > legend { margin-bottom: 0.6rem; }
-  /* No field columns to line up with once the form stacks, so the options
-     take the width back. */
-  .interest-options { gap: var(--sp-1); }
+  /* A little more to land a thumb on, without turning the lines into a wall. */
+  .interest-set .interest-option { min-height: 38px; }
 }
-@media (prefers-reduced-motion: reduce) { .interest-set .interest-option { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .interest-set .interest-option { transition: none; }
+  .interest-set .interest-option:active { transform: none; }
+}
 
 /* ── Contact form: travel timing ───────────────────────────────────────────
    An exact date and a rough month are alternatives inside one form group.

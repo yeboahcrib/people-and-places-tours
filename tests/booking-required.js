@@ -258,55 +258,152 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
-    /* 9. The new fields belong to the form's visual system, at every width.
-          Consistency is asserted as numbers rather than judged by eye: the
-          options wear a field's radius, border and fill; a legend sits as far
-          from its helper as a label from its field; a hidden conditional row
-          leaves no gap behind; the rough month takes the arrival date's slot;
-          and the tickbox stays under whichever timing field is showing. */
-    for (const width of [375, 390, 430, 768, 1024, 1440]) {
+    /* 9. The new fields belong to the form, and interests read as preferences,
+          at every width. Asserted as numbers rather than judged by eye. */
+    const INTEREST_VALUES = ['culture-heritage', 'food', 'history-ancestry', 'nature-waterfalls', 'wildlife',
+      'adventure', 'beaches-relaxation', 'nightlife', 'community', 'photography', 'shopping-crafts', 'not-sure'];
+    // Height of the interests section in the rejected two-column grid of
+    // field-styled boxes, measured at each width. The chips must beat it by at
+    // least a tenth everywhere. Not more: with these twelve labels in this
+    // order, a phone-width panel cannot fit much more than two to a line, and
+    // the version that tried for a fifth — ring indicators and all — came out
+    // taller than the grid on every phone. Reordering or shortening the
+    // options would go further, and that is a product decision, not a style.
+    const GRID_HEIGHT = {375: 448, 390: 431, 430: 380, 768: 311, 1024: 339, 1440: 304};
+    // No grid was measured at 320px. The ring-indicator chips were 619px there.
+    const RING_CHIPS_AT_320 = 619;
+
+    for (const width of [320, 375, 390, 430, 768, 1024, 1440]) {
       const {context, page, failures} = await openForm(browser, base, {width, height: 900});
       const at = `at ${width}px`;
+      // The floating navigation sits over whatever scrolls beneath it; a real
+      // visitor scrolls past it, a pointer click in a test does not.
+      await page.evaluate(() => {
+        for (const element of document.querySelectorAll('body *')) {
+          if (getComputedStyle(element).position === 'fixed') element.style.setProperty('display', 'none', 'important');
+        }
+      });
       await page.selectOption('#tour-interest', 'custom');
       await page.selectOption('#group-size', '3-5');
 
       const exact = await page.evaluate(() => {
         const q = selector => document.querySelector(selector);
         const box = element => element.getBoundingClientRect();
-        const style = element => getComputedStyle(element);
-        const field = q('#group-size');
-        const option = q('.interest-option');
-        const options = [...document.querySelectorAll('.interest-option')];
+        const chips = [...document.querySelectorAll('.interest-option')];
+        const chipFor = value => q(`input[name="interests"][value="${value}"]`).closest('.interest-option');
         return {
           overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          smallestOption: Math.min(...options.map(node => box(node).height)),
+          smallestChip: Math.min(...chips.map(node => box(node).height)),
           toggleHeight: box(q('.timing-toggle')).height,
-          columns: new Set(options.map(node => Math.round(box(node).left))).size,
-          radius: [style(option).borderTopLeftRadius, style(field).borderTopLeftRadius],
-          border: [style(option).borderTopColor, style(field).borderTopColor],
-          fill: [style(option).backgroundColor, style(field).backgroundColor],
+          sectionHeight: Math.round(box(q('.interest-set')).height),
+          foodWidth: box(chipFor('food')).width,
+          communityWidth: box(chipFor('community')).width,
+          notSureTop: Math.round(box(chipFor('not-sure')).top),
+          lastInterestBottom: Math.round(Math.max(...chips.slice(0, 11).map(node => box(node).bottom))),
           legendToHelp: Math.round(box(q('#interests-help')).top - box(q('.interest-set legend')).bottom),
-          labelToField: Math.round(box(field).top - box(q('label[for="group-size"]')).bottom),
+          labelToField: Math.round(box(q('#group-size')).top - box(q('label[for="group-size"]')).bottom),
           rowGap: Math.round(box(q('#trip-length-days').closest('.form-row')).top - box(q('#tour-interest').closest('.form-row')).bottom),
           gapBeforeInterests: Math.round(box(q('.interest-set')).top - box(q('#budget-range').closest('.form-row')).bottom),
           toggleUnderDateHelp: Math.round(box(q('.timing-toggle')).top - box(q('#travel-date-help')).bottom),
-          date: {top: Math.round(box(q('#travel-date')).top), left: Math.round(box(q('#travel-date')).left)},
+          // Relative to its own row. The booking panel is a scroll-reveal section
+          // that slides up 40px as it comes into view, and the chip clicks below
+          // scroll it there, so any page or viewport position taken before them
+          // and compared after them measures the animation, not the layout.
+          date: {
+            top: Math.round(box(q('#travel-date')).top - box(q('#travel-date').closest('.form-row')).top),
+            left: Math.round(box(q('#travel-date')).left - box(q('#travel-date').closest('.form-row')).left),
+          },
         };
       });
 
       assert.equal(exact.overflow, 0, `no sideways scroll ${at}`);
-      assert(exact.smallestOption >= 32, `interest options must be at least 32px tall ${at} (smallest ${exact.smallestOption}px)`);
-      assert(exact.toggleHeight >= 32, `the tickbox tap area must be at least 32px ${at} (${exact.toggleHeight}px)`);
-      assert.equal(exact.columns, 2, `interests sit in two columns ${at}`);
-      assert.equal(exact.radius[0], exact.radius[1], `an interest option has a field's corner radius ${at}`);
-      assert.equal(exact.border[0], exact.border[1], `an interest option has a field's border ${at}`);
-      assert.equal(exact.fill[0], exact.fill[1], `an interest option has a field's fill ${at}`);
+      assert(exact.smallestChip >= 32, `every interest chip is at least 32px tall ${at} (smallest ${exact.smallestChip}px)`);
+      assert(exact.toggleHeight >= 32, `the tickbox tap area is at least 32px ${at} (${exact.toggleHeight}px)`);
+      assert(exact.foodWidth < exact.communityWidth * 0.6,
+        `chips hug their words, so Food stays small ${at} (${Math.round(exact.foodWidth)} vs ${Math.round(exact.communityWidth)})`);
+      const reference = GRID_HEIGHT[width] || RING_CHIPS_AT_320;
+      assert(exact.sectionHeight <= reference * 0.9 + 2,
+        `interests are more compact than the design they replace ${at} (${exact.sectionHeight}px vs ${reference}px)`);
+      assert(exact.notSureTop >= exact.lastInterestBottom,
+        `"Not sure — recommend something" stands on its own line, apart from the interests ${at}`);
       assert(Math.abs(exact.legendToHelp - exact.labelToField) <= 1,
         `the interests question sits as far from its helper as a label from its field ${at} (${exact.legendToHelp} vs ${exact.labelToField})`);
       assert(Math.abs(exact.gapBeforeInterests - exact.rowGap) <= 1,
         `a hidden children-age row leaves no extra gap ${at} (${exact.gapBeforeInterests} vs ${exact.rowGap})`);
       assert(exact.toggleUnderDateHelp >= -4 && exact.toggleUnderDateHelp <= 8,
         `the tickbox sits directly under the date's helper line ${at} (${exact.toggleUnderDateHelp}px)`);
+
+      /* Selecting: anywhere on the chip works, and both states are legible
+         against what is actually painted behind them. */
+      const food = page.locator('.interest-option', {has: page.locator('input[value="food"]')});
+      const notSure = page.locator('.interest-option', {has: page.locator('input[value="not-sure"]')});
+      const foodBox = await food.boundingBox();
+      await food.click({position: {x: foodBox.width - 6, y: foodBox.height / 2}});
+      await notSure.click({position: {x: 8, y: (await notSure.boundingBox()).height / 2}});
+      const states = await page.evaluate(() => {
+        const parse = value => (value.match(/[\d.]+/g) || []).map(Number);
+        const over = (colour, ground) => {
+          const [r, g, b, a = 1] = parse(colour);
+          const [R, G, B] = parse(ground);
+          return `rgb(${r * a + R * (1 - a)}, ${g * a + G * (1 - a)}, ${b * a + B * (1 - a)})`;
+        };
+        const luminance = colour => {
+          const channel = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          const [r, g, b] = parse(colour);
+          return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+        };
+        const ratio = (a, b) => {
+          const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+          return +((light + 0.05) / (dark + 0.05)).toFixed(2);
+        };
+        const panel = getComputedStyle(document.querySelector('.booking-panel')).backgroundColor;
+        const measure = value => {
+          const input = document.querySelector(`input[name="interests"][value="${value}"]`);
+          const chip = input.closest('.interest-option');
+          const style = getComputedStyle(chip);
+          const fill = over(style.backgroundColor, panel);
+          return {
+            checked: input.checked,
+            text: ratio(over(style.color, fill), fill),
+            border: ratio(over(style.borderTopColor, panel), panel),
+            edge: style.boxShadow,
+            width: Math.round(chip.getBoundingClientRect().width),
+            fill,
+          };
+        };
+        return {food: measure('food'), notSure: measure('not-sure'), wildlife: measure('wildlife')};
+      });
+      assert.equal(states.food.checked, true, `a click near the edge of a chip selects it ${at}`);
+      assert.equal(states.notSure.checked, true, `"Not sure" is selectable too ${at}`);
+      assert(states.wildlife.text >= 4.5, `unselected chip text is legible ${at} (${states.wildlife.text}:1)`);
+      assert(states.food.text >= 4.5, `selected chip text is legible ${at} (${states.food.text}:1)`);
+      assert(states.notSure.text >= 4.5, `selected "Not sure" text is legible ${at} (${states.notSure.text}:1)`);
+      assert(states.food.border >= 3, `a selected chip's edge stands out from the panel ${at} (${states.food.border}:1)`);
+      assert(/inset/.test(states.food.edge) && !/inset/.test(states.wildlife.edge),
+        `selection doubles a chip's edge, so a choice is never shown by colour alone ${at}`);
+      assert.equal(states.food.width, Math.round(foodBox.width),
+        `choosing a chip does not change its size, so nothing reflows under a tap ${at}`);
+      assert.notEqual(states.food.fill, states.wildlife.fill, `selected and unselected chips look different ${at}`);
+      assert.notEqual(states.notSure.fill, states.food.fill, `"Not sure" never looks like one of the interests ${at}`);
+
+      /* The keyboard reaches every chip in order, shows where it is, and toggles. */
+      if (width === 320 || width === 1440) {
+        await page.focus('#traveling-with-children');
+        const visited = [];
+        for (let step = 0; step < INTEREST_VALUES.length; step += 1) {
+          await page.keyboard.press('Tab');
+          visited.push(await page.evaluate(() => document.activeElement?.value));
+        }
+        assert.deepEqual(visited, INTEREST_VALUES, `Tab visits every interest in order ${at}`);
+        const ring = await page.evaluate(() => {
+          const style = getComputedStyle(document.activeElement.closest('.interest-option'));
+          return [style.outlineStyle, style.outlineWidth];
+        });
+        assert.deepEqual(ring, ['solid', '3px'], `the focused chip carries the site's focus ring ${at}`);
+        await page.keyboard.press('Space');
+        assert.equal(await page.evaluate(() => document.activeElement.checked), false,
+          `Space toggles the focused chip — here, clearing "Not sure" ${at}`);
+      }
 
       // Ticked: the month takes the arrival date's place, and the tickbox follows it.
       await page.evaluate(() => document.querySelector('[data-timing-toggle]').click());
@@ -315,7 +412,10 @@ async function answerStepTwo(page) {
         const box = element => element.getBoundingClientRect();
         return {
           overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          month: {top: Math.round(box(q('#travel-month')).top), left: Math.round(box(q('#travel-month')).left)},
+          month: {
+            top: Math.round(box(q('#travel-month')).top - box(q('#travel-month').closest('.form-row')).top),
+            left: Math.round(box(q('#travel-month')).left - box(q('#travel-month').closest('.form-row')).left),
+          },
           toggleUnderMonthHelp: Math.round(box(q('.timing-toggle')).top - box(q('#travel-month-help')).bottom),
         };
       });
@@ -357,7 +457,7 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
-    console.log('Booking required-field tests passed (9 cases, the last at six widths).');
+    console.log('Booking required-field tests passed (9 cases, the last at seven widths).');
   } finally {
     await browser.close();
     hosted.server.close();
