@@ -258,6 +258,93 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
+    /* 9. The new fields belong to the form's visual system, at every width.
+          Consistency is asserted as numbers rather than judged by eye: the
+          options wear a field's radius, border and fill; a legend sits as far
+          from its helper as a label from its field; a hidden conditional row
+          leaves no gap behind; the rough month takes the arrival date's slot;
+          and the tickbox stays under whichever timing field is showing. */
+    for (const width of [375, 390, 430, 768, 1024, 1440]) {
+      const {context, page, failures} = await openForm(browser, base, {width, height: 900});
+      const at = `at ${width}px`;
+      await page.selectOption('#tour-interest', 'custom');
+      await page.selectOption('#group-size', '3-5');
+
+      const exact = await page.evaluate(() => {
+        const q = selector => document.querySelector(selector);
+        const box = element => element.getBoundingClientRect();
+        const style = element => getComputedStyle(element);
+        const field = q('#group-size');
+        const option = q('.interest-option');
+        const options = [...document.querySelectorAll('.interest-option')];
+        return {
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          smallestOption: Math.min(...options.map(node => box(node).height)),
+          toggleHeight: box(q('.timing-toggle')).height,
+          columns: new Set(options.map(node => Math.round(box(node).left))).size,
+          radius: [style(option).borderTopLeftRadius, style(field).borderTopLeftRadius],
+          border: [style(option).borderTopColor, style(field).borderTopColor],
+          fill: [style(option).backgroundColor, style(field).backgroundColor],
+          legendToHelp: Math.round(box(q('#interests-help')).top - box(q('.interest-set legend')).bottom),
+          labelToField: Math.round(box(field).top - box(q('label[for="group-size"]')).bottom),
+          rowGap: Math.round(box(q('#trip-length-days').closest('.form-row')).top - box(q('#tour-interest').closest('.form-row')).bottom),
+          gapBeforeInterests: Math.round(box(q('.interest-set')).top - box(q('#budget-range').closest('.form-row')).bottom),
+          toggleUnderDateHelp: Math.round(box(q('.timing-toggle')).top - box(q('#travel-date-help')).bottom),
+          date: {top: Math.round(box(q('#travel-date')).top), left: Math.round(box(q('#travel-date')).left)},
+        };
+      });
+
+      assert.equal(exact.overflow, 0, `no sideways scroll ${at}`);
+      assert(exact.smallestOption >= 32, `interest options must be at least 32px tall ${at} (smallest ${exact.smallestOption}px)`);
+      assert(exact.toggleHeight >= 32, `the tickbox tap area must be at least 32px ${at} (${exact.toggleHeight}px)`);
+      assert.equal(exact.columns, 2, `interests sit in two columns ${at}`);
+      assert.equal(exact.radius[0], exact.radius[1], `an interest option has a field's corner radius ${at}`);
+      assert.equal(exact.border[0], exact.border[1], `an interest option has a field's border ${at}`);
+      assert.equal(exact.fill[0], exact.fill[1], `an interest option has a field's fill ${at}`);
+      assert(Math.abs(exact.legendToHelp - exact.labelToField) <= 1,
+        `the interests question sits as far from its helper as a label from its field ${at} (${exact.legendToHelp} vs ${exact.labelToField})`);
+      assert(Math.abs(exact.gapBeforeInterests - exact.rowGap) <= 1,
+        `a hidden children-age row leaves no extra gap ${at} (${exact.gapBeforeInterests} vs ${exact.rowGap})`);
+      assert(exact.toggleUnderDateHelp >= -4 && exact.toggleUnderDateHelp <= 8,
+        `the tickbox sits directly under the date's helper line ${at} (${exact.toggleUnderDateHelp}px)`);
+
+      // Ticked: the month takes the arrival date's place, and the tickbox follows it.
+      await page.evaluate(() => document.querySelector('[data-timing-toggle]').click());
+      const approximate = await page.evaluate(() => {
+        const q = selector => document.querySelector(selector);
+        const box = element => element.getBoundingClientRect();
+        return {
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          month: {top: Math.round(box(q('#travel-month')).top), left: Math.round(box(q('#travel-month')).left)},
+          toggleUnderMonthHelp: Math.round(box(q('.timing-toggle')).top - box(q('#travel-month-help')).bottom),
+        };
+      });
+      assert.equal(approximate.overflow, 0, `no sideways scroll with the month showing ${at}`);
+      assert(Math.abs(approximate.month.top - exact.date.top) <= 2 && Math.abs(approximate.month.left - exact.date.left) <= 1,
+        `the rough month appears in the arrival date's slot ${at}`);
+      assert(approximate.toggleUnderMonthHelp >= -4 && approximate.toggleUnderMonthHelp <= 8,
+        `the tickbox stays directly under the month's helper line ${at} (${approximate.toggleUnderMonthHelp}px)`);
+
+      // Children: the age row adds exactly one row gap, above and below.
+      await page.selectOption('#traveling-with-children', 'yes');
+      const children = await page.evaluate(() => {
+        const q = selector => document.querySelector(selector);
+        const box = element => element.getBoundingClientRect();
+        const ages = q('#children-age-ranges').closest('.form-row');
+        return {
+          visible: ages.offsetParent !== null,
+          above: Math.round(box(ages).top - box(q('#budget-range').closest('.form-row')).bottom),
+          below: Math.round(box(q('.interest-set')).top - box(ages).bottom),
+        };
+      });
+      assert.equal(children.visible, true, `children's ages appear when children are selected ${at}`);
+      assert(Math.abs(children.above - exact.rowGap) <= 1 && Math.abs(children.below - exact.rowGap) <= 1,
+        `the children-age row is spaced like any other row ${at} (${children.above}/${children.below} vs ${exact.rowGap})`);
+
+      assert.deepEqual(failures, [], `no page errors ${at}`);
+      await context.close();
+    }
+
     /* 6. The interest chips wrap on a phone rather than pushing the page sideways,
           and every chip is a comfortable tap target. */
     {
@@ -270,7 +357,7 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
-    console.log('Booking required-field tests passed (8 cases).');
+    console.log('Booking required-field tests passed (9 cases, the last at six widths).');
   } finally {
     await browser.close();
     hosted.server.close();
