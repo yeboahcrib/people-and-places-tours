@@ -337,10 +337,7 @@ async function answerStepTwo(page) {
          against what is actually painted behind them. */
       const food = page.locator('.interest-option', {has: page.locator('input[value="food"]')});
       const notSure = page.locator('.interest-option', {has: page.locator('input[value="not-sure"]')});
-      const foodBox = await food.boundingBox();
-      await food.click({position: {x: foodBox.width - 6, y: foodBox.height / 2}});
-      await notSure.click({position: {x: 8, y: (await notSure.boundingBox()).height / 2}});
-      const states = await page.evaluate(() => {
+      const paint = values => page.evaluate(async values => {
         const parse = value => (value.match(/[\d.]+/g) || []).map(Number);
         const over = (colour, ground) => {
           const [r, g, b, a = 1] = parse(colour);
@@ -371,20 +368,34 @@ async function answerStepTwo(page) {
             fill,
           };
         };
-        return {food: measure('food'), notSure: measure('not-sure'), wildlife: measure('wildlife')};
-      });
-      assert.equal(states.food.checked, true, `a click near the edge of a chip selects it ${at}`);
-      assert.equal(states.notSure.checked, true, `"Not sure" is selectable too ${at}`);
-      assert(states.wildlife.text >= 4.5, `unselected chip text is legible ${at} (${states.wildlife.text}:1)`);
-      assert(states.food.text >= 4.5, `selected chip text is legible ${at} (${states.food.text}:1)`);
-      assert(states.notSure.text >= 4.5, `selected "Not sure" text is legible ${at} (${states.notSure.text}:1)`);
-      assert(states.food.border >= 3, `a selected chip's edge stands out from the panel ${at} (${states.food.border}:1)`);
-      assert(/inset/.test(states.food.edge) && !/inset/.test(states.wildlife.edge),
+        // A chip eases into its new colours over --motion-base; read the
+        // colours it settles on, not a frame part-way there.
+        // A transition cut short by the next one (hover moving on) rejects
+        // rather than finishing, so wait until nothing is left running.
+        const chips = values.map(value => document.querySelector(`input[name="interests"][value="${value}"]`).closest('.interest-option'));
+        for (let running = chips.flatMap(chip => chip.getAnimations()); running.length; running = chips.flatMap(chip => chip.getAnimations())) {
+          await Promise.all(running.map(animation => animation.finished.catch(() => {})));
+        }
+        return Object.fromEntries(values.map(value => [value, measure(value)]));
+      }, values);
+      // Measured one at a time: choosing "Not sure" clears Food (case 10).
+      const foodBox = await food.boundingBox();
+      await food.click({position: {x: foodBox.width - 6, y: foodBox.height / 2}});
+      const chosen = await paint(['food', 'wildlife']);
+      await notSure.click({position: {x: 8, y: (await notSure.boundingBox()).height / 2}});
+      const handedOver = (await paint(['not-sure']))['not-sure'];
+      assert.equal(chosen.food.checked, true, `a click near the edge of a chip selects it ${at}`);
+      assert.equal(handedOver.checked, true, `"Not sure" is selectable too ${at}`);
+      assert(chosen.wildlife.text >= 4.5, `unselected chip text is legible ${at} (${chosen.wildlife.text}:1)`);
+      assert(chosen.food.text >= 4.5, `selected chip text is legible ${at} (${chosen.food.text}:1)`);
+      assert(handedOver.text >= 4.5, `selected "Not sure" text is legible ${at} (${handedOver.text}:1)`);
+      assert(chosen.food.border >= 3, `a selected chip's edge stands out from the panel ${at} (${chosen.food.border}:1)`);
+      assert(/inset/.test(chosen.food.edge) && !/inset/.test(chosen.wildlife.edge),
         `selection doubles a chip's edge, so a choice is never shown by colour alone ${at}`);
-      assert.equal(states.food.width, Math.round(foodBox.width),
+      assert.equal(chosen.food.width, Math.round(foodBox.width),
         `choosing a chip does not change its size, so nothing reflows under a tap ${at}`);
-      assert.notEqual(states.food.fill, states.wildlife.fill, `selected and unselected chips look different ${at}`);
-      assert.notEqual(states.notSure.fill, states.food.fill, `"Not sure" never looks like one of the interests ${at}`);
+      assert.notEqual(chosen.food.fill, chosen.wildlife.fill, `selected and unselected chips look different ${at}`);
+      assert.notEqual(handedOver.fill, chosen.food.fill, `"Not sure" never looks like one of the interests ${at}`);
 
       /* The keyboard reaches every chip in order, shows where it is, and toggles. */
       if (width === 320 || width === 1440) {
@@ -457,7 +468,99 @@ async function answerStepTwo(page) {
       await context.close();
     }
 
-    console.log('Booking required-field tests passed (9 cases, the last at seven widths).');
+    /* 10. "Not sure — recommend something" hands the choice to us, so it never
+           stands beside a specific interest — by pointer or by keyboard — while
+           specific interests still combine freely. What is ticked is what is sent. */
+    {
+      const {context, page, posted, failures} = await openForm(browser, base, {width: 390, height: 844});
+      await page.evaluate(() => {
+        for (const element of document.querySelectorAll('body *')) {
+          if (getComputedStyle(element).position === 'fixed') element.style.setProperty('display', 'none', 'important');
+        }
+      });
+      const ticked = () => page.$$eval('input[name="interests"]:checked', boxes => boxes.map(box => box.value));
+      const chip = value => page.locator('.interest-option', {has: page.locator(`input[value="${value}"]`)});
+      const press = async value => {
+        await page.focus(`input[name="interests"][value="${value}"]`);
+        await page.keyboard.press('Space');
+      };
+      await answerStepOne(page, 'custom');
+
+      // Before any choice: hover and press answer the pointer, and a visitor
+      // who has asked for less motion gets the same states without the easing.
+      const settle = () => page.evaluate(async () => {
+        const chips = [...document.querySelectorAll('.interest-option')];
+        for (let running = chips.flatMap(node => node.getAnimations()); running.length; running = chips.flatMap(node => node.getAnimations())) {
+          await Promise.all(running.map(animation => animation.finished.catch(() => {})));
+        }
+      });
+      const look = value => page.evaluate(value => {
+        const style = getComputedStyle(document.querySelector(`input[name="interests"][value="${value}"]`).closest('.interest-option'));
+        return {border: style.borderTopColor, color: style.color, transform: style.transform, easing: style.transitionDuration};
+      }, value);
+      // Brought to the middle of the screen at once and left to stop moving:
+      // a scroll still gliding under a stationary pointer carries the chip away
+      // from it, and the press lands on whatever field arrives instead.
+      await chip('history-ancestry').evaluate(node => node.scrollIntoView({block: 'center', behavior: 'instant'}));
+      await page.waitForFunction(async () => {
+        const node = document.querySelector('input[name="interests"][value="history-ancestry"]').closest('.interest-option');
+        const top = node.getBoundingClientRect().top;
+        await new Promise(resolve => setTimeout(resolve, 150));
+        return node.getBoundingClientRect().top === top;
+      });
+      const resting = await look('history-ancestry');
+      // A plain pointer move, as a visitor makes. Locator.hover() scrolls first,
+      // and under the page's smooth scrolling that scroll is still gliding when
+      // the button goes down, so the press lands on another field.
+      const pressAt = await chip('history-ancestry').boundingBox();
+      await page.mouse.move(pressAt.x + pressAt.width / 2, pressAt.y + pressAt.height / 2);
+      await settle();
+      const hovered = await look('history-ancestry');
+      assert.notEqual(hovered.border, resting.border, 'hovering a chip brightens its edge');
+      assert.notEqual(hovered.color, resting.color, 'hovering a chip brightens its words');
+      await page.mouse.down();
+      await settle();
+      assert.notEqual((await look('history-ancestry')).transform, 'none', 'pressing a chip gives slightly under the finger');
+      await page.mouse.up();
+      await chip('history-ancestry').click();
+      assert.deepEqual(await ticked(), [], 'that press was a real tick, and a second click clears it');
+      await page.emulateMedia({reducedMotion: 'reduce'});
+      assert.match((await look('food')).easing, /^0s(, 0s)*$/, 'no easing for a visitor who asked for less motion');
+      await page.emulateMedia({reducedMotion: 'no-preference'});
+
+      await chip('food').click();
+      await chip('wildlife').click();
+      assert.deepEqual(await ticked(), ['food', 'wildlife'], 'specific interests combine');
+      await chip('not-sure').click();
+      assert.deepEqual(await ticked(), ['not-sure'], 'choosing "Not sure" clears every specific interest');
+      await chip('community').click();
+      assert.deepEqual(await ticked(), ['community'], 'choosing an interest clears "Not sure"');
+      await chip('photography').click();
+      assert.deepEqual(await ticked(), ['community', 'photography'], 'interests still combine after "Not sure" was cleared');
+      await chip('photography').click();
+      assert.deepEqual(await ticked(), ['community'], 'unticking one interest leaves the others alone');
+
+      await press('not-sure');
+      assert.deepEqual(await ticked(), ['not-sure'], 'Space on "Not sure" clears the interests too');
+      await press('not-sure');
+      assert.deepEqual(await ticked(), [], 'unticking "Not sure" brings nothing back');
+      await press('food');
+      await press('not-sure');
+      await press('adventure');
+      assert.deepEqual(await ticked(), ['adventure'], 'Space on an interest clears "Not sure"');
+
+      await chip('not-sure').click();
+      await next(page);
+      await answerStepTwo(page);
+      await page.click('.contact-form button[type="submit"]');
+      await page.waitForFunction(() => document.querySelector('.booking-success:not([hidden])') || document.querySelector('.form-error:not([data-step-error])')?.textContent.trim());
+      assert.equal(posted.length, 1, 'the enquiry must be sent');
+      assert.equal(posted[0].interests, 'not-sure', 'only "Not sure" is sent once it has cleared the rest');
+      assert.deepEqual(failures, []);
+      await context.close();
+    }
+
+    console.log('Booking required-field tests passed (10 cases, the chip case at seven widths).');
   } finally {
     await browser.close();
     hosted.server.close();

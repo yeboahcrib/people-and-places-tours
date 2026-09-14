@@ -637,6 +637,23 @@ for (const interests of ['food,skydiving', 'FOOD', 'food;wildlife']) {
 response = await invoke({...guest, interests: ['food']}, {}, delivery);
 assert.equal(response.status, 400, 'interests arrive as text, not as an array');
 
+// "Not sure — recommend something" stands alone. Beside any specific interest
+// it contradicts itself, in whichever order the values arrive.
+for (const interests of ['food,not-sure', 'not-sure,food', 'not-sure,culture-heritage,wildlife', 'not-sure,not-sure,food']) {
+  response = await invoke({...guest, interests}, {}, delivery);
+  assert.equal(response.status, 400, `"${interests}" must be refused: not sure and a specific choice at once`);
+  assert.match((await response.json()).error, /not both/);
+}
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, interests: 'not-sure,not-sure', 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200, '"Not sure" on its own is a complete answer');
+  assert.equal(db.calls[0].args[22], 'not-sure');
+}
+
 // Trip length: a custom trip only, whole days, within reason.
 {
   const db = stubDb();

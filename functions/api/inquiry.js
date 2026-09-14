@@ -241,6 +241,14 @@ function validate(payload) {
   if (!CONTACT_METHODS.has(payload['contact-method'])) return 'Please provide a valid contact preference.';
   if (payload['budget-range'] && !BUDGET_RANGES.has(payload['budget-range'])) return 'Please choose a budget range from the list.';
   if (payload.interests && payload.interests.split(',').some(value => !INTERESTS.has(value))) return 'Please choose interests from the list.';
+  // "Not sure — recommend something" hands the choice to us, so it cannot
+  // stand beside a choice already made. The form clears one when the other is
+  // ticked; this refuses the pair from anything that is not the form.
+  // normalizePayload has already de-duplicated, so on its own it is exactly
+  // the string "not-sure".
+  if (payload.interests.split(',').includes('not-sure') && payload.interests !== 'not-sure') {
+    return 'Please choose specific interests or ask us to recommend something, not both.';
+  }
   if (payload['trip-length-days']) {
     // Mirrors the children's-ages rule below: an answer to a question the
     // form only asks for a custom trip does not belong on any other enquiry.

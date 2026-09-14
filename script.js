@@ -1142,6 +1142,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // Which timing field requiredFields() returns depends on the tickbox, so
     // the loop above only reached the one in play at load. Both need it.
+    // "Not sure — recommend something" hands the choice to us, so it cannot sit
+    // beside a choice already made: ticking it clears the interests, and
+    // ticking an interest clears it. Unticking changes nothing else, and any
+    // number of specific interests still combine. The Function refuses the
+    // pair as well, for anything that is not this form.
+    const interestBoxes = [...contactForm.querySelectorAll('input[name="interests"]')];
+    interestBoxes.forEach(box => box.addEventListener('change', () => {
+      if (!box.checked) return;
+      const handingOver = box.value === 'not-sure';
+      interestBoxes.forEach(other => {
+        if (other !== box && (handingOver || other.value === 'not-sure')) other.checked = false;
+      });
+    }));
     travelMonth?.addEventListener('change', () => clearFieldError(travelMonth));
     noExactDates?.addEventListener('change', () => {
       const travelDateField = contactForm.querySelector('#travel-date');
