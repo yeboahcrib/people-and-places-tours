@@ -571,4 +571,42 @@ for (const location of locations) {
     'a visitor must read the same country name the list records');
 }
 
+/* The experience dropdown is filled at build time from the catalogue, which in
+   production is Sanity, but the Function checks the answer against its own
+   list. Cape Coast Day Tour and Volta Community Tour sat on the live form for
+   months while the Function refused both with "Please select a valid tour."
+   Every option the page offers is posted here as a complete enquiry and must
+   be accepted, so a tour the server does not know fails the build instead of
+   shipping. */
+{
+  const {onRequest} = await import('../functions/api/inquiry.js');
+  const page = await readFile(join(outputPath, 'contact.html'), 'utf8');
+  const field = page.match(/<select[^>]*id="tour-interest"[^>]*>([\s\S]*?)<\/select>/);
+  assert.ok(field, 'contact.html has no experience selector');
+  const offered = [...field[1].matchAll(/<option value="([^"]*)"/g)].map(([, value]) => value).filter(Boolean);
+  assert.ok(offered.length > 2, 'the experience selector must list the catalogue, not only the fixed choices');
+
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({id: 'email-1'}), {status: 200});
+  try {
+    for (const tour of offered) {
+      const response = await onRequest({
+        env: {RESEND_API_KEY: 'k', INQUIRY_TO_EMAIL: 'to@example.com', INQUIRY_FROM_EMAIL: 'from@example.com'},
+        request: new Request('https://people-and-places.pages.dev/api/inquiry', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', Origin: 'https://people-and-places.pages.dev'},
+          body: JSON.stringify({
+            'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US',
+            'tour-interest': tour, 'group-size': '3-5', 'travel-date': '2027-06-01',
+          }),
+        }),
+      });
+      assert.equal(response.status, 200,
+        `contact.html offers "${tour}", but the Function refuses it: ${await response.text()}`);
+    }
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
 console.log('Build output and availability checks passed.');
