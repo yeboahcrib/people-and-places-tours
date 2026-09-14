@@ -3,13 +3,61 @@ import {COUNTRY_CODES, countryName} from '../../src/data/countries.mjs';
 const MAX_BODY_BYTES = 32_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001F\u007F]/;
-const GROUP_SIZES = new Set(['', 'solo', '2', '3-5', '6-10', '11-15', '15+']);
+const GROUP_SIZES = new Set(['not-sure', 'solo', '2', '3-5', '6-10', '11-15', '15+']);
 const DATE_FLEXIBILITY = new Set(['', 'yes', 'no']);
 const CHILDREN_CHOICES = new Set(['', 'yes', 'no']);
 const ACCOMMODATION_CHOICES = new Set(['', 'shared', 'private', 'family']);
 const CONTACT_METHODS = new Set(['', 'email', 'whatsapp']);
+// Per person, excluding international flights. Labels are kept beside the
+// slugs so the email reads the way the form did.
+const BUDGET_RANGES = new Map([
+  ['under-500', 'Under $500'],
+  ['500-1500', '$500 – $1,500'],
+  ['1500-3000', '$1,500 – $3,000'],
+  ['3000-5000', '$3,000 – $5,000'],
+  ['over-5000', 'More than $5,000'],
+  ['not-sure', 'Not sure yet'],
+]);
+// In the order the form lists them. Stored in this order too, so one set of
+// choices is always one string however the boxes were ticked.
+const INTERESTS = new Map([
+  ['culture-heritage', 'Culture & heritage'],
+  ['food', 'Food'],
+  ['history-ancestry', 'History / ancestry'],
+  ['nature-waterfalls', 'Nature & waterfalls'],
+  ['wildlife', 'Wildlife'],
+  ['adventure', 'Adventure'],
+  ['beaches-relaxation', 'Beaches & relaxation'],
+  ['nightlife', 'Nightlife'],
+  ['community', 'Local / community experiences'],
+  ['photography', 'Photography'],
+  ['shopping-crafts', 'Shopping / crafts'],
+  ['not-sure', 'Not sure — recommend something'],
+]);
+const interestLabels = value => String(value || '').split(',').filter(Boolean)
+  .map(key => INTERESTS.get(key) || key).join(', ');
+
+/* Approximate travel timing.
+   The dropdown offers this month through 18 months ahead, counted in UTC, and
+   this accepts exactly that window — not a month more, so nothing the page
+   never offered can be stored. script.js computes the same window from the
+   same number; tests/inquiry-function.mjs fails if the two ever differ. */
+const TRAVEL_MONTHS_AHEAD = 18;
+const travelMonthOffset = value => {
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return null;
+  const [year, month] = value.split('-').map(Number);
+  const now = new Date();
+  return (year - now.getUTCFullYear()) * 12 + (month - 1 - now.getUTCMonth());
+};
+const travelMonthLabel = value => {
+  if (!value) return '';
+  if (value === 'not-sure') return 'Not sure yet';
+  const [year, month] = value.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, 1)).toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+};
 const TOUR_NAMES = new Map([
   ['', 'Not selected'],
+  ['open-to-ideas', 'Open to ideas'],
   ['custom', 'Custom tour request'],
   ['just-go-ghana', 'Just Go Ghana'],
   ['accra-city', 'Accra City Tour'],
@@ -34,6 +82,8 @@ const limits = {
   'group-size': 30,
   'travel-date': 10,
   'departure-date': 10,
+  // "2026-12" or "not-sure".
+  'travel-month': 8,
   'date-flexibility': 3,
   'traveling-with-children': 3,
   'children-age-ranges': 120,
@@ -42,6 +92,10 @@ const limits = {
   country: 100,
   message: 5000,
   source: 100,
+  'budget-range': 20,
+  // Twelve slugs joined is under 200 characters; headroom, not an invitation.
+  interests: 400,
+  'trip-length-days': 3,
 };
 
 const acceptedFields = new Set([
@@ -130,6 +184,15 @@ function normalizePayload(input) {
   );
   payload['tour-name'] = TOUR_NAMES.get(payload['tour-interest']) || '';
   payload.source = 'Website inquiry';
+  // Tick order on the page means nothing and a client can send one value
+  // twice. Kept in the form's order, once each, so the same answer is always
+  // the same string in the table. Anything unrecognised is kept rather than
+  // dropped here, so the validator refuses it instead of it vanishing.
+  const chosen = [...new Set(String(payload.interests || '').split(',').map(value => value.trim()).filter(Boolean))];
+  payload.interests = [
+    ...[...INTERESTS.keys()].filter(key => chosen.includes(key)),
+    ...chosen.filter(value => !INTERESTS.has(value)),
+  ].join(',');
   return payload;
 }
 
@@ -159,6 +222,14 @@ function validate(payload) {
   // Rejecting rather than storing keeps one spelling of one country in the
   // table: the reason for the selector in the first place.
   if (!COUNTRY_CODES.has(payload.country)) return 'Please choose your country of residence from the list.';
+  // Required for the same reason as country: the business plans against these
+  // three, and the markup's `required` is a convenience, not a rule.
+  if (!payload['tour-interest']) return "Please choose an experience, or tell us you're open to ideas.";
+  if (!payload['group-size']) return "Please tell us who's traveling.";
+  // Timing is required, a date is not: an exact arrival date or a rough month
+  // answers it, and exactly one of them does.
+  if (!payload['travel-date'] && !payload['travel-month']) return "Please give us a preferred arrival date, or tell us roughly when you'd like to travel.";
+  if (payload['travel-date'] && payload['travel-month']) return 'Please give either an exact arrival date or a rough month, not both.';
   if ([payload['first-name'], payload['last-name'], payload.email, payload.phone, payload.country, payload['children-age-ranges']].some(value => CONTROL_CHARACTER_PATTERN.test(value))) {
     return 'Inquiry contains invalid characters.';
   }
@@ -168,6 +239,24 @@ function validate(payload) {
   if (!CHILDREN_CHOICES.has(payload['traveling-with-children'])) return 'Please provide a valid traveling-with-children choice.';
   if (!ACCOMMODATION_CHOICES.has(payload.accommodation)) return 'Please provide a valid accommodation preference.';
   if (!CONTACT_METHODS.has(payload['contact-method'])) return 'Please provide a valid contact preference.';
+  if (payload['budget-range'] && !BUDGET_RANGES.has(payload['budget-range'])) return 'Please choose a budget range from the list.';
+  if (payload.interests && payload.interests.split(',').some(value => !INTERESTS.has(value))) return 'Please choose interests from the list.';
+  // "Not sure — recommend something" hands the choice to us, so it cannot
+  // stand beside a choice already made. The form clears one when the other is
+  // ticked; this refuses the pair from anything that is not the form.
+  // normalizePayload has already de-duplicated, so on its own it is exactly
+  // the string "not-sure".
+  if (payload.interests.split(',').includes('not-sure') && payload.interests !== 'not-sure') {
+    return 'Please choose specific interests or ask us to recommend something, not both.';
+  }
+  if (payload['trip-length-days']) {
+    // Mirrors the children's-ages rule below: an answer to a question the
+    // form only asks for a custom trip does not belong on any other enquiry.
+    if (payload['tour-interest'] !== 'custom') return 'Trip length applies only to a custom trip.';
+    if (!/^\d{1,2}$/.test(payload['trip-length-days'])) return 'Please give trip length as a number of days.';
+    const days = Number(payload['trip-length-days']);
+    if (days < 1 || days > 60) return 'Please give a trip length between 1 and 60 days.';
+  }
   if (payload.phone && !/^[+()\d\s.-]+$/.test(payload.phone)) return 'Please provide a valid phone number.';
   if (payload['contact-method'] === 'whatsapp' && !payload.phone) return 'Please provide a phone number for WhatsApp contact.';
   if (payload['traveling-with-children'] !== 'yes' && payload['children-age-ranges']) return 'Children age ranges require a traveling-with-children selection.';
@@ -177,6 +266,16 @@ function validate(payload) {
     if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== payload['travel-date']) return 'Please provide a valid travel date.';
     if (payload['travel-date'] < new Date().toISOString().slice(0, 10)) return 'Please choose today or a future travel date.';
   }
+  if (payload['travel-month'] && payload['travel-month'] !== 'not-sure') {
+    const offset = travelMonthOffset(payload['travel-month']);
+    if (offset === null || offset < 0 || offset > TRAVEL_MONTHS_AHEAD) {
+      return `Please choose a month within the next ${TRAVEL_MONTHS_AHEAD} months, or "Not sure yet".`;
+    }
+  }
+  // The form hides the departure date on the approximate path, and the check
+  // below only compares it with an arrival date that exists — so a departure
+  // date with no arrival date would otherwise slip through unexamined.
+  if (payload['travel-month'] && payload['departure-date']) return 'A departure date needs an exact arrival date.';
   if (payload['departure-date']) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(payload['departure-date'])) return 'Please provide a valid departure date.';
     const date = new Date(`${payload['departure-date']}T00:00:00Z`);
@@ -227,10 +326,14 @@ function inquiryText(payload, requestId) {
     `Group size: ${payload['group-size'] || 'Not provided'}`,
     `Preferred date: ${payload['travel-date'] || 'Not provided'}`,
     `Departure date: ${payload['departure-date'] || 'Not provided'}`,
+    `Approximate timing: ${travelMonthLabel(payload['travel-month']) || 'Not provided'}`,
     `Dates flexible: ${payload['date-flexibility'] || 'Not provided'}`,
     `Traveling with children: ${payload['traveling-with-children'] || 'Not provided'}`,
     `Children's age ranges: ${payload['children-age-ranges'] || 'Not provided'}`,
     `Accommodation: ${payload.accommodation || 'Not provided'}`,
+    `Budget per person: ${BUDGET_RANGES.get(payload['budget-range']) || 'Not provided'}`,
+    `Interests: ${interestLabels(payload.interests) || 'Not provided'}`,
+    `Trip length: ${payload['trip-length-days'] ? `${payload['trip-length-days']} days` : 'Not provided'}`,
     `Country: ${payload.country ? `${countryName(payload.country)} (${payload.country})` : 'Not provided'}`,
     `Preferred contact: ${payload['contact-method'] || 'Not provided'}`,
     `Source: ${payload.source || 'Website inquiry'}`,
@@ -253,10 +356,14 @@ function inquiryHtml(payload, requestId) {
       ${row('Group size', payload['group-size'])}
       ${row('Preferred date', payload['travel-date'])}
       ${row('Departure date', payload['departure-date'])}
+      ${row('Approximate timing', travelMonthLabel(payload['travel-month']))}
       ${row('Dates flexible', payload['date-flexibility'])}
       ${row('Traveling with children', payload['traveling-with-children'])}
       ${row("Children's age ranges", payload['children-age-ranges'])}
       ${row('Accommodation', payload.accommodation)}
+      ${row('Budget per person', BUDGET_RANGES.get(payload['budget-range']) || '')}
+      ${row('Interests', interestLabels(payload.interests))}
+      ${row('Trip length', payload['trip-length-days'] ? `${payload['trip-length-days']} days` : '')}
       ${row('Country', payload.country ? `${countryName(payload.country)} (${payload.country})` : '')}
       ${row('Preferred contact', payload['contact-method'])}
       ${row('Source', payload.source || 'Website inquiry')}
@@ -291,6 +398,7 @@ const ENQUIRY_COLUMNS = [
   'tour_interest', 'tour_name', 'group_size', 'travel_date', 'departure_date',
   'date_flexibility', 'traveling_with_children', 'children_age_ranges',
   'accommodation', 'contact_method', 'message',
+  'budget_range', 'interests', 'trip_length_days', 'travel_month',
 ];
 
 const INSERT_ENQUIRY = `INSERT INTO enquiries (${ENQUIRY_COLUMNS.join(', ')}) `
@@ -325,6 +433,10 @@ async function storeEnquiry(env, payload, {id, reference, createdAt}) {
       payload.accommodation,
       payload['contact-method'],
       payload.message,
+      payload['budget-range'],
+      payload.interests,
+      payload['trip-length-days'],
+      payload['travel-month'],
     ).run();
     return {stored: true};
   } catch (error) {

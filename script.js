@@ -978,10 +978,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const tourSelect = contactForm.querySelector('#tour-interest');
     const tourNameInput = contactForm.querySelector('#tour-name');
     const overnightDetails = [...contactForm.querySelectorAll('[data-trip-detail="overnight"]')];
+    const customDetails = [...contactForm.querySelectorAll('[data-trip-detail="custom"]')];
     const childrenSelect = contactForm.querySelector('#traveling-with-children');
     const childrenDetail = contactForm.querySelector('[data-children-detail]');
     const childrenAges = contactForm.querySelector('#children-age-ranges');
     const departureDate = contactForm.querySelector('#departure-date');
+    // Travel timing: an exact date, or — for someone who genuinely does not
+    // know yet — a rough month or "Not sure yet". Never a made-up date.
+    const noExactDates = contactForm.querySelector('[data-timing-toggle]');
+    const travelMonth = contactForm.querySelector('#travel-month');
+    const exactTiming = [...contactForm.querySelectorAll('[data-timing="exact"]')];
+    const approximateTiming = [...contactForm.querySelectorAll('[data-timing="approximate"]')];
+    // The same window the Function enforces: this month through 18 months
+    // ahead, both counted in UTC so the page and the server agree on what
+    // "this month" is. tests/inquiry-function.mjs fails if the number here and
+    // the number in functions/api/inquiry.js ever differ.
+    const TRAVEL_MONTHS_AHEAD = 18;
+    const travelMonthWindow = () => {
+      const now = new Date();
+      return Array.from({length: TRAVEL_MONTHS_AHEAD + 1}, (_, offset) =>
+        new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1)).toISOString().slice(0, 7));
+    };
+    if (travelMonth) {
+      const notSure = travelMonth.querySelector('option[value="not-sure"]');
+      travelMonthWindow().forEach(value => {
+        const [year, month] = value.split('-').map(Number);
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = new Date(Date.UTC(year, month - 1, 1))
+          .toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+        travelMonth.insertBefore(option, notSure);
+      });
+    }
     const contactMethod = contactForm.querySelector('#contact-method');
     const phone = contactForm.querySelector('#phone');
     const overnightTours = new Set(['custom', 'just-go-ghana']);
@@ -996,6 +1024,17 @@ document.addEventListener('DOMContentLoaded', () => {
       // A specific day tour hides fields that cannot affect that booking.
       const showOvernight = !tourSelect?.value || overnightTours.has(tourSelect.value);
       setConditionalVisibility(overnightDetails, showOvernight);
+      const approximate = Boolean(noExactDates?.checked);
+      setConditionalVisibility(exactTiming, !approximate);
+      setConditionalVisibility(approximateTiming, approximate);
+      // No exact arrival date means no departure date: the two are exact dates
+      // together or not at all. Applied after the overnight rule, so it can
+      // only ever hide the departure field, never reveal one a day tour hides.
+      if (approximate) setConditionalVisibility([departureDate?.closest('[data-trip-detail]')], false);
+      // Trip length only means something for a trip being built from scratch.
+      // Every other enquiry has a length already, and asking anyway would make
+      // a day-tour enquiry longer for no answer worth having.
+      setConditionalVisibility(customDetails, tourSelect?.value === 'custom');
       const showChildrenAges = childrenSelect?.value === 'yes';
       setConditionalVisibility([childrenDetail], showChildrenAges);
     };
@@ -1032,7 +1071,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const backButton = contactForm.querySelector('.booking-back');
     const travelDate = contactForm.querySelector('#travel-date');
     const successPanel = bookingPanel?.querySelector('[data-booking-success]');
-    const errorEl = contactForm.querySelector('.form-error');
+    // Two error regions, each in its own step's action row so only the step in
+    // view can speak. `errorEl` is the one beside Send, which every existing
+    // message and the WhatsApp escape hatch use — named explicitly now that
+    // `.form-error` alone would match step one's first.
+    const errorEl = contactForm.querySelector('.form-error:not([data-step-error])');
+    const stepErrorEl = step => (step === 1 && contactForm.querySelector('[data-step-error="1"]')) || errorEl;
     // Verification fails for real people, not only for bots: an extension or a
     // privacy setting blocking one resource Turnstile needs is enough, and
     // "reload and try again" does not fix either. Without another way through,
@@ -1058,23 +1102,82 @@ document.addEventListener('DOMContentLoaded', () => {
     let inquirySubmissionId = '';
     let showBookingStep = () => {};
 
+    // The form sets noValidate, so nothing in the browser enforces `required`
+    // on its own: a field is only required here if it is in this list. The
+    // step-one answers come first, in the order they are asked, so the first
+    // thing a visitor is sent back to is the first thing they skipped.
     const requiredFields = () => [
+      [contactForm.querySelector('#tour-interest'), value => Boolean(value)],
+      [contactForm.querySelector('#group-size'), value => Boolean(value)],
+      // Timing is required either way; which field answers it depends on the tickbox.
+      noExactDates?.checked
+        ? [travelMonth, value => value === 'not-sure' || travelMonthWindow().includes(value)]
+        : [contactForm.querySelector('#travel-date'), value => /^\d{4}-\d{2}-\d{2}$/.test(value)],
       [contactForm.querySelector('#first-name'), value => Boolean(value)],
       [contactForm.querySelector('#last-name'), value => Boolean(value)],
       [contactForm.querySelector('#email'), value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)],
       ...(contactMethod?.value === 'whatsapp' ? [[phone, value => Boolean(value)]] : []),
     ];
 
+    const stepOf = field => Number(field?.closest('[data-booking-step]')?.dataset.bookingStep) || totalSteps;
+    // Judged a step at a time. Checking the whole form would keep a step-one
+    // message on screen after step one is fixed, because the name fields on
+    // step two are still, correctly, empty.
+    const invalidOnStep = step => requiredFields()
+      .filter(([field]) => field && (totalSteps <= 1 || stepOf(field) === step))
+      .filter(([field, isValid]) => !isValid(field.value.trim()));
+
+    const STEP_ONE_MESSAGE = "Please choose an experience, tell us who's traveling, and say when you'd like to travel.";
+
     const clearFieldError = field => {
       field.setAttribute('aria-invalid', 'false');
-      if (errorEl && requiredFields().every(([input, isValid]) => isValid(input.value.trim()))) {
-        errorEl.textContent = '';
-      }
+      const regionEl = stepErrorEl(stepOf(field));
+      if (regionEl && invalidOnStep(stepOf(field)).length === 0) regionEl.textContent = '';
     };
 
     requiredFields().forEach(([field]) => {
+      // Selects and date pickers commit on change; text fields on input.
       field?.addEventListener('input', () => clearFieldError(field));
+      field?.addEventListener('change', () => clearFieldError(field));
     });
+    // Which timing field requiredFields() returns depends on the tickbox, so
+    // the loop above only reached the one in play at load. Both need it.
+    // "Not sure — recommend something" hands the choice to us, so it cannot sit
+    // beside a choice already made: ticking it clears the interests, and
+    // ticking an interest clears it. Unticking changes nothing else, and any
+    // number of specific interests still combine. The Function refuses the
+    // pair as well, for anything that is not this form.
+    const interestBoxes = [...contactForm.querySelectorAll('input[name="interests"]')];
+    interestBoxes.forEach(box => box.addEventListener('change', () => {
+      if (!box.checked) return;
+      const handingOver = box.value === 'not-sure';
+      interestBoxes.forEach(other => {
+        if (other !== box && (handingOver || other.value === 'not-sure')) other.checked = false;
+      });
+    }));
+    travelMonth?.addEventListener('change', () => clearFieldError(travelMonth));
+    noExactDates?.addEventListener('change', () => {
+      const travelDateField = contactForm.querySelector('#travel-date');
+      [travelDateField, travelMonth].forEach(field => field?.setAttribute('aria-invalid', 'false'));
+      updateTripDetails();
+      clearFieldError(noExactDates.checked ? travelMonth : travelDateField);
+    });
+
+    // Moving forward is where a skipped question is cheapest to catch. Left to
+    // the final Send, the visitor would be on step two reading about a field
+    // they can no longer see.
+    const advanceBookingStep = () => {
+      const invalid = invalidOnStep(currentBookingStep);
+      const regionEl = stepErrorEl(currentBookingStep);
+      invalid.forEach(([field]) => field.setAttribute('aria-invalid', 'true'));
+      if (invalid.length) {
+        if (regionEl) regionEl.textContent = STEP_ONE_MESSAGE;
+        invalid[0][0].focus();
+        return;
+      }
+      if (regionEl) regionEl.textContent = '';
+      showBookingStep(currentBookingStep + 1, true);
+    };
     contactMethod?.addEventListener('change', () => {
       if (phone) phone.setAttribute('aria-required', String(contactMethod.value === 'whatsapp'));
     });
@@ -1118,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      nextButton?.addEventListener('click', () => showBookingStep(currentBookingStep + 1, true));
+      nextButton?.addEventListener('click', advanceBookingStep);
       backButton?.addEventListener('click', () => showBookingStep(currentBookingStep - 1, true));
       showBookingStep(1);
     }
@@ -1155,7 +1258,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // finished writing.
       if (totalSteps > 1 && currentBookingStep < totalSteps) {
         e.preventDefault();
-        showBookingStep(currentBookingStep + 1, true);
+        advanceBookingStep();
         return;
       }
 
@@ -1167,10 +1270,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (firstInvalid) {
         e.preventDefault();
-        if (errorEl) errorEl.textContent = firstInvalid === phone
+        const regionEl = stepErrorEl(stepOf(firstInvalid));
+        // Said once, where the visitor is being sent — never left behind on
+        // the step they are leaving.
+        if (errorEl && regionEl !== errorEl) errorEl.textContent = '';
+        if (regionEl) regionEl.textContent = firstInvalid === phone
           ? 'Please add a phone number so we can contact you on WhatsApp.'
-          : 'Please share your name and a valid email so we know how to reach you.';
-        if (totalSteps > 1 && currentBookingStep !== totalSteps) showBookingStep(totalSteps);
+          : stepOf(firstInvalid) < totalSteps
+            ? STEP_ONE_MESSAGE
+            : 'Please share your name and a valid email so we know how to reach you.';
+        // Back to the step the field is actually on, not simply the last one.
+        if (totalSteps > 1 && stepOf(firstInvalid) !== currentBookingStep) showBookingStep(stepOf(firstInvalid));
         firstInvalid.focus();
         return;
       }
@@ -1188,7 +1298,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const endpoint = contactForm.dataset.cloudflareEndpoint || '/api/inquiry';
-        const payload = Object.fromEntries(new FormData(contactForm).entries());
+        const form = new FormData(contactForm);
+        const payload = Object.fromEntries(form.entries());
+        // Object.fromEntries keeps only the last value of a repeated field, so
+        // twelve checkboxes named `interests` would arrive as one. Collected
+        // deliberately and sent as a list the server can split.
+        payload.interests = form.getAll('interests').filter(Boolean).join(',');
         inquirySubmissionId ||= crypto.randomUUID();
         payload['client-submission-id'] = inquirySubmissionId;
         payload['cf-turnstile-response'] = (await requestTurnstileToken()) || widgetToken();

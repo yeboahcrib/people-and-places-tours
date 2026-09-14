@@ -45,7 +45,10 @@ assert.equal(response.status, 200);
 assert.equal(JSON.parse(await response.clone().text()).reference, undefined,
   'a discarded submission must not return a reference');
 
-response = await invoke({'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US'});
+response = await invoke({
+  'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US',
+  'tour-interest': 'cape-coast', 'group-size': '3-5', 'travel-date': '2027-06-01',
+});
 assert.equal(response.status, 503);
 
 // Country is required by the validator, not only by the browser. A client that
@@ -90,7 +93,11 @@ const delivery = {
 };
 // Country is required server-side as well as in the markup, so the baseline
 // enquiry every later case builds on has to carry one.
-const guest = {'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US'};
+const guest = {
+  'first-name': 'Ada', 'last-name': 'Guest', email: 'ada@example.com', country: 'US',
+  // Required since the form began asking for them.
+  'tour-interest': 'cape-coast', 'group-size': '3-5', 'travel-date': '2027-06-01',
+};
 const withTurnstile = {...delivery, TURNSTILE_SECRET_KEY: 'secret-key'};
 
 const stubFetch = handler => {
@@ -181,6 +188,7 @@ try {
     email: 'ada@example.com',
     country: 'US',
     'tour-interest': 'cape-coast',
+    'group-size': '3-5',
     'travel-date': '2027-04-10',
     'departure-date': '2027-04-17',
     'date-flexibility': 'yes',
@@ -236,6 +244,7 @@ assert(email.text.includes('Accommodation: family'));
       'last-name': 'Guest',
       email: 'ada@example.com',
       country: 'US',
+      'tour-interest': 'cape-coast', 'group-size': '3-5', 'travel-date': '2027-06-01',
       'cf-turnstile-response': 'a-valid-token',
       'company-website': 'Ada Travel Ltd',
     }, {}, {
@@ -555,5 +564,191 @@ for (const country of ['ZZ', 'us', 'UK', 'GBR', 'Ghana', '  ']) {
 response = await invoke({...guest, country: ''}, {}, delivery);
 assert.equal(response.status, 400);
 assert.match(JSON.parse(await response.clone().text()).error, /country of residence/);
+
+/* ── Structured trip answers ─────────────────────────────────────────────── */
+
+const accepting = () => {
+  let sent;
+  const restore = stubFetch(async (url, init) => {
+    if (String(url) !== siteverify) sent = JSON.parse(init.body);
+    return new Response(JSON.stringify({id: 'email_1'}), {status: 200});
+  });
+  return {restore, email: () => sent};
+};
+
+// Required by the server, not only by the markup.
+for (const [field, message] of [
+  ['tour-interest', /experience/],
+  ['group-size', /who's traveling/],
+  ['travel-date', /arrival date/],
+]) {
+  response = await invoke({...guest, [field]: ''}, {}, delivery);
+  assert.equal(response.status, 400, `${field} must be required server-side`);
+  assert.match((await response.json()).error, message);
+}
+
+// "Don't know yet" is still an answer to both required selects.
+{
+  const {restore, email} = accepting();
+  try {
+    response = await invoke({...guest, 'tour-interest': 'open-to-ideas', 'group-size': 'not-sure'}, {}, delivery);
+  } finally { restore(); }
+  assert.equal(response.status, 200, 'open to ideas and not sure must both be accepted');
+  assert.match(email().text, /Tour: Open to ideas/);
+}
+
+// Budget: optional, from the list, and read back as the range it names.
+{
+  const {restore, email} = accepting();
+  try {
+    response = await invoke({...guest, 'budget-range': '1500-3000'}, {}, delivery);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  assert.match(email().text, /Budget per person: \$1,500 – \$3,000/);
+}
+for (const budget of ['a-lot', '2000', 'under-500,over-5000']) {
+  response = await invoke({...guest, 'budget-range': budget}, {}, delivery);
+  assert.equal(response.status, 400, `"${budget}" is not a budget range`);
+}
+
+// Interests: optional, many at once, stored once each in the form's order.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  let sent;
+  const inner = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    if (String(url) !== siteverify) sent = JSON.parse(init.body);
+    return inner(url, init);
+  };
+  try {
+    response = await invoke({...enquiry, interests: 'food,culture-heritage,food', 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { globalThis.fetch = inner; restore(); }
+  assert.equal(response.status, 200);
+  assert.equal(db.calls[0].args[22], 'culture-heritage,food',
+    'the same choices must always be the same stored string');
+  assert.match(sent.text, /Interests: Culture & heritage, Food/);
+  assert.match(sent.html, /Culture &amp; heritage, Food/, 'labels are escaped in the HTML email');
+}
+for (const interests of ['food,skydiving', 'FOOD', 'food;wildlife']) {
+  response = await invoke({...guest, interests}, {}, delivery);
+  assert.equal(response.status, 400, `"${interests}" must be refused rather than stored or dropped`);
+}
+response = await invoke({...guest, interests: ['food']}, {}, delivery);
+assert.equal(response.status, 400, 'interests arrive as text, not as an array');
+
+// "Not sure — recommend something" stands alone. Beside any specific interest
+// it contradicts itself, in whichever order the values arrive.
+for (const interests of ['food,not-sure', 'not-sure,food', 'not-sure,culture-heritage,wildlife', 'not-sure,not-sure,food']) {
+  response = await invoke({...guest, interests}, {}, delivery);
+  assert.equal(response.status, 400, `"${interests}" must be refused: not sure and a specific choice at once`);
+  assert.match((await response.json()).error, /not both/);
+}
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, interests: 'not-sure,not-sure', 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200, '"Not sure" on its own is a complete answer');
+  assert.equal(db.calls[0].args[22], 'not-sure');
+}
+
+// Trip length: a custom trip only, whole days, within reason.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, 'tour-interest': 'custom', 'trip-length-days': '10', 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  assert.equal(db.calls[0].args[23], '10');
+}
+for (const [tour, days] of [['custom', '0'], ['custom', '61'], ['custom', 'ten'], ['custom', '7.5'], ['cape-coast', '5']]) {
+  response = await invoke({...guest, 'tour-interest': tour, 'trip-length-days': days}, {}, delivery);
+  assert.equal(response.status, 400, `a ${days}-day trip on ${tour} must be refused`);
+}
+
+// Backward compatible: an enquiry that answers none of the new optional
+// questions is stored exactly as before, with the new columns empty.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  const columns = db.calls[0].sql.match(/\(([^)]*)\)\s+VALUES/)[1].split(',').map(name => name.trim());
+  assert.deepEqual(columns.slice(-4), ['budget_range', 'interests', 'trip_length_days', 'travel_month'],
+    'new columns are appended, so no existing column shifts position');
+  assert.equal(columns.length, db.calls[0].args.length, 'column list and bound values disagree');
+  assert.deepEqual(db.calls[0].args.slice(-4), ['', '', '', ''],
+    'an enquiry without the new answers stores empty strings, like every other unanswered column');
+}
+
+/* ── Travel timing: an exact date, or a rough month ─────────────────────── */
+
+// The window is this month through 18 months ahead, in UTC — the same rule the
+// page uses to build its dropdown.
+const monthAt = offset => {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1)).toISOString().slice(0, 7);
+};
+const monthLabel = value => {
+  const [year, month] = value.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, 1)).toLocaleString('en-US', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+};
+const approximate = {...guest, 'travel-date': ''};
+
+// One number, in two files. If the page offered a month the server refused —
+// or the server accepted one the page never offered — they would disagree
+// about what an enquiry may say, which is the thing this rule exists to stop.
+{
+  const {readFile: read} = await import('node:fs/promises');
+  const ahead = async file => Number((await read(new URL(file, import.meta.url), 'utf8'))
+    .match(/const TRAVEL_MONTHS_AHEAD = (\d+);/)?.[1]);
+  assert.equal(await ahead('../script.js'), 18, 'the dropdown must offer 18 months ahead');
+  assert.equal(await ahead('../functions/api/inquiry.js'), 18, 'the server must accept 18 months ahead');
+}
+
+// This month, the last month offered, and "Not sure yet" are all answers.
+for (const [month, label] of [[monthAt(0), monthLabel(monthAt(0))], [monthAt(18), monthLabel(monthAt(18))], ['not-sure', 'Not sure yet']]) {
+  const {restore, email} = accepting();
+  try {
+    response = await invoke({...approximate, 'travel-month': month}, {}, delivery);
+  } finally { restore(); }
+  assert.equal(response.status, 200, `${month} must be accepted`);
+  assert.match(email().text, new RegExp(`Approximate timing: ${label}`));
+}
+
+// Nothing outside the window the page offers, and nothing that is not a month.
+for (const month of [monthAt(19), monthAt(-1), '2026-13', '2026-1', 'soon', 'December']) {
+  response = await invoke({...approximate, 'travel-month': month}, {}, delivery);
+  assert.equal(response.status, 400, `"${month}" must be refused`);
+  assert.match((await response.json()).error, /within the next 18 months/);
+}
+
+// Exactly one of the two answers timing.
+response = await invoke({...guest, 'travel-month': monthAt(2)}, {}, delivery);
+assert.equal(response.status, 400, 'a date and a month together contradict each other');
+assert.match((await response.json()).error, /not both/);
+
+response = await invoke({...approximate, 'travel-month': monthAt(2), 'departure-date': '2027-06-10'}, {}, delivery);
+assert.equal(response.status, 400, 'a departure date means nothing without an arrival date');
+assert.match((await response.json()).error, /exact arrival date/);
+
+// Stored where the dashboard will look for it, and the date stays empty.
+{
+  const db = stubDb();
+  const {restore, env} = deliverThen(db);
+  try {
+    response = await invoke({...enquiry, 'travel-date': '', 'departure-date': '', 'travel-month': monthAt(3), 'cf-turnstile-response': 'good-token'}, {}, env);
+  } finally { restore(); }
+  assert.equal(response.status, 200);
+  const columns = db.calls[0].sql.match(/\(([^)]*)\)\s+VALUES/)[1].split(',').map(name => name.trim());
+  const [args] = [db.calls[0].args];
+  assert.equal(args[columns.indexOf('travel_month')], monthAt(3));
+  assert.equal(args[columns.indexOf('travel_date')], '', 'no invented date is stored');
+}
 
 console.log('Inquiry function tests passed.');

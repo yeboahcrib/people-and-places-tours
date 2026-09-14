@@ -83,12 +83,17 @@ export function renderContactTourOptions(tours) {
 }
 
 export function injectContactTourOptions(html, tours) {
-  const marker = `<select class="form-select" id="tour-interest" name="tour-interest">
-                    <option value="" selected>I'm open to ideas</option>
+  const marker = `<select class="form-select" id="tour-interest" name="tour-interest" required>
+                    <option value="" selected disabled>Select an experience</option>
+                    <option value="open-to-ideas">I'm open to ideas</option>
                   </select>`;
   if (!html.includes(marker)) return html;
-  return html.replace(marker, `<select class="form-select" id="tour-interest" name="tour-interest">
-                    <option value="" selected>I'm open to ideas</option>
+  // The placeholder is disabled and carries no value, so the field can be
+  // required without "I'm open to ideas" — a real answer — being the thing
+  // that fails validation.
+  return html.replace(marker, `<select class="form-select" id="tour-interest" name="tour-interest" required>
+                    <option value="" selected disabled>Select an experience</option>
+                    <option value="open-to-ideas">I'm open to ideas</option>
                     ${renderContactTourOptions(tours)}
                     <option value="custom">Something made around me</option>
                   </select>`);
