@@ -96,6 +96,15 @@ for (const file of generatedHtmlFiles) {
     assert(emailLink.includes(`href="mailto:${siteEmail}"`), `${file} does not link the site email (${siteEmail}) from its social strip`);
     assert(/aria-label="Email [^"]+"/.test(emailLink), `${file}'s email icon has no accessible name`);
     assert(!/target=/.test(emailLink), `${file}'s email link should open the mail app, not a new tab`);
+    // Visitors arrive here from a phone. The two planning links land on what
+    // they name, not on the top of a long page they then have to scroll.
+    const landing = {experiences: ['packages.html', 'tours-grid'], custom: ['contact.html', 'booking-flow']};
+    for (const [name, [page, anchor]] of Object.entries(landing)) {
+      const href = html.match(new RegExp(`href="([^"]+)"[^>]*data-go-link="${name}"`))?.[1] || '';
+      assert(href.endsWith(`#${anchor}`), `${file}: "${name}" should land on #${anchor}, got "${href}"`);
+      const target = await readFile(new URL(page, output), 'utf8');
+      assert(target.includes(`id="${anchor}"`), `${file}: #${anchor} is missing from ${page}`);
+    }
     continue;
   }
 

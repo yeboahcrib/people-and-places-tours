@@ -2120,6 +2120,15 @@ body.page-entering {
 /* ────────────────────────────────────────────────────────────── */
 /*  PACKAGES PAGE — FILTER TABS + TOUR CARDS                     */
 /* ────────────────────────────────────────────────────────────── */
+/* Linked to as #tours-grid from /go, so a visitor arriving from Instagram
+   lands on the first experience rather than the hero. On a phone it clears the
+   floating pill nav, as #booking-flow does. Above 768px the filter bar is
+   sticky under the nav (top 86px, about 135px tall), so the grid lands below
+   that instead of beneath it. */
+#tours-grid { scroll-margin-top: 110px; }
+@media (min-width: 769px) {
+  #tours-grid { scroll-margin-top: 244px; }
+}
 .packages-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
