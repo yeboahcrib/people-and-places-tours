@@ -69,6 +69,8 @@ const TOUR_NAMES = new Map([
   ['volta', 'Volta Day Tour'],
   ['shai-hills', 'Shai Hills & Boat Cruise'],
   ['aburi', 'Aburi Day Tour'],
+  ['cape-coast-day', 'Cape Coast Day Tour'],
+  ['volta-community', 'Volta Community Tour'],
   ['batik-workshop', 'Batik & Pottery Workshop'],
 ]);
 
