@@ -123,10 +123,18 @@ export function renderLinkHubTemplate(template, content) {
   const settings = content.siteSettings;
   const social = content.social ?? {};
   const phoneHref = `tel:${String(settings.primaryPhone).replace(/[^+\d]/g, '')}`;
+  // The same address the contact page shows. Checked rather than trusted: it
+  // comes from the CMS, and a malformed one would ship a link that opens
+  // nothing on the one page people reach from a phone.
+  const email = String(settings.email || '').trim();
+  if (!/^[^\s@<>"'()]+@[^\s@<>"'()]+\.[a-z]{2,}$/i.test(email)) {
+    throw new Error(`go.html needs a valid site email, got: ${email || '(empty)'}`);
+  }
   let output = template
     .replaceAll('{{businessName}}', escapeHtml(settings.businessName))
     .replaceAll('{{primaryPhone}}', escapeHtml(settings.primaryPhone))
-    .replaceAll('{{primaryPhoneHref}}', escapeHtml(phoneHref));
+    .replaceAll('{{primaryPhoneHref}}', escapeHtml(phoneHref))
+    .replaceAll('{{emailHref}}', escapeHtml(`mailto:${email}`));
   for (const [key, fallback] of Object.entries(FOOTER_SOCIAL_DEFAULTS)) {
     output = output.replaceAll(`{{${key}}}`, safeSocialHref(social[key], fallback));
   }

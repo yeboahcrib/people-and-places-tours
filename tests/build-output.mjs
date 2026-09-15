@@ -89,6 +89,13 @@ for (const file of generatedHtmlFiles) {
       `${file} is shell-less and should not carry the shared footer`);
     assert(html.includes('href="tel:+233503673473"'),
       `${file} did not render site settings`);
+    // Beside Instagram and TikTok: the same address the contact page shows,
+    // opened in the visitor's own mail app rather than a new tab.
+    const siteEmail = JSON.parse(await readFile(new URL('../src/content/site.json', import.meta.url), 'utf8')).siteSettings.email;
+    const emailLink = html.match(/<a href="mailto:[^"]+"[^>]*data-go-link="email"[^>]*>/)?.[0] || '';
+    assert(emailLink.includes(`href="mailto:${siteEmail}"`), `${file} does not link the site email (${siteEmail}) from its social strip`);
+    assert(/aria-label="Email [^"]+"/.test(emailLink), `${file}'s email icon has no accessible name`);
+    assert(!/target=/.test(emailLink), `${file}'s email link should open the mail app, not a new tab`);
     continue;
   }
 
