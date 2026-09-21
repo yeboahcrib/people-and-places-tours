@@ -48,10 +48,13 @@ export const pageUrl = (siteUrl, file) =>
 export const THEME_COLOR = '#1A1A1A';
 
 // Storyblok encodes a transform in the path, so an image already cropped for a
-// link preview states its own size. Nothing is guessed: a URL that does not
-// carry the crop simply ships without dimensions.
+// link preview states its own size. The site's own fallback carries its size
+// in its file name (share-...-1200x630.jpg), which tests/seo-metadata.mjs
+// checks against the file itself. Nothing is guessed: a URL that carries
+// neither simply ships without dimensions.
 const imageDimensions = url => {
-  const match = /\/m\/(\d{1,5})x(\d{1,5})\//.exec(String(url || ''));
+  const match = /\/m\/(\d{1,5})x(\d{1,5})\//.exec(String(url || ''))
+    || /-(\d{2,5})x(\d{2,5})\.(?:jpe?g|png|webp)$/i.exec(String(url || ''));
   return match ? {width: match[1], height: match[2]} : null;
 };
 

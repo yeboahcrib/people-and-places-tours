@@ -42,7 +42,12 @@ import {injectAboutContent} from './render-about.mjs';
 
 const projectRoot = process.cwd();
 const siteUrl = normaliseSiteUrl(process.env.SITE_URL);
-const ogImage = 'assets/photos/reviews-trust-banner.jpg';
+// The link-preview image for every page without a photograph of its own: a
+// group at the Door of Return, Cape Coast Castle, cropped to 1200x630 so
+// WhatsApp, Facebook and X show it whole. The size in the file name is what
+// render-meta.mjs reports as og:image:width/height; tests/seo-metadata.mjs
+// checks it against the file's real pixels.
+const ogImage = 'assets/photos/share-door-of-return-1200x630.jpg';
 const indexableFiles = [];
 const outputRoot = join(projectRoot, 'dist');
 

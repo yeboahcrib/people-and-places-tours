@@ -121,22 +121,37 @@ assert.equal(metaDescription('  collapses   whitespace  '), 'collapses whitespac
     const og = /property="og:image"[^>]+content="([^"]*)"/.exec(html)?.[1];
     const tw = /name="twitter:image"[^>]+content="([^"]*)"/.exec(html)?.[1];
     assert(og, `${file} has no og:image`);
-    assert(!og.includes('reviews-trust-banner'),
-      `${file} still shares the generic site banner instead of its own photograph`);
+    assert(!og.includes('share-door-of-return'),
+      `${file} still shares the generic site image instead of its own photograph`);
     assert(og.includes('a.storyblok.com'), `${file} social image is not the approved Storyblok photograph`);
     assert(/\/m\/1200x630\//.test(og), `${file} social image is not cropped to link-preview proportions: ${og}`);
     assert.equal(tw, og, `${file} twitter:image and og:image disagree`);
   }
 }
 
-// The banner remains the fallback for everything that is not a tour.
+// The site's share image is the fallback for everything that is not a tour.
 {
   const projectRoot3 = fileURLToPath(new URL('../', import.meta.url));
-  for (const file of ['index.html', 'about.html', 'contact.html', 'privacy-policy.html']) {
+  const fallback = 'assets/photos/share-door-of-return-1200x630.jpg';
+  // The size in the file name is what the pages declare, so it has to be the
+  // file's real size. Read from the JPEG's own frame header, not trusted.
+  const bytes = await readFile(`${projectRoot3}${fallback}`);
+  let size = null;
+  for (let at = 2; at < bytes.length - 9;) {
+    const marker = bytes[at + 1];
+    if (bytes[at] !== 0xFF) break;
+    if (marker >= 0xC0 && marker <= 0xC3) { size = {height: bytes.readUInt16BE(at + 5), width: bytes.readUInt16BE(at + 7)}; break; }
+    at += 2 + bytes.readUInt16BE(at + 2);
+  }
+  assert.deepEqual(size, {width: 1200, height: 630}, `${fallback} is not the 1200x630 its name promises`);
+  for (const file of ['index.html', 'about.html', 'contact.html', 'privacy-policy.html', 'go.html']) {
     const html = await readFile(`${projectRoot3}dist/${file}`, 'utf8');
     const og = /property="og:image"[^>]+content="([^"]*)"/.exec(html)?.[1];
-    assert(og && og.includes('reviews-trust-banner'),
-      `${file} should still use the site banner; a page with no tour photograph must have a fallback`);
+    assert(og && og.endsWith(`/${fallback}`),
+      `${file} should use the site share image; a page with no tour photograph must have a fallback`);
+    assert.equal(/property="og:image:width"[^>]+content="([^"]*)"/.exec(html)?.[1], '1200', `${file} does not declare the share image width`);
+    assert.equal(/property="og:image:height"[^>]+content="([^"]*)"/.exec(html)?.[1], '630', `${file} does not declare the share image height`);
+    assert.equal(/name="twitter:image"[^>]+content="([^"]*)"/.exec(html)?.[1], og, `${file} twitter:image and og:image disagree`);
   }
 }
 
