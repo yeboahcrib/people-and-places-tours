@@ -640,4 +640,40 @@ for (const location of locations) {
   }
 }
 
+/* Founder photographs committed with the site. Every founder listed in
+   founder-photos.json shows their photo on the homepage circle and the About
+   portrait; everyone else keeps their initials. Each file must be the size the
+   page declares, read from the JPEG itself. */
+{
+  const jpegSize = bytes => {
+    for (let at = 2; at < bytes.length - 9;) {
+      if (bytes[at] !== 0xFF) break;
+      const marker = bytes[at + 1];
+      if (marker >= 0xC0 && marker <= 0xC3) return {width: bytes.readUInt16BE(at + 7), height: bytes.readUInt16BE(at + 5)};
+      at += 2 + bytes.readUInt16BE(at + 2);
+    }
+    return null;
+  };
+  const {founders} = JSON.parse(await readFile(new URL('../src/content/founder-photos.json', import.meta.url), 'utf8'));
+  const home = await readFile(new URL('index.html', output), 'utf8');
+  const about = await readFile(new URL('about.html', output), 'utf8');
+  for (const founder of founders) {
+    for (const [slot, page] of [['circle', home], ['portrait', about]]) {
+      const {src, width, height} = founder[slot];
+      assert.deepEqual(jpegSize(await readFile(new URL(src, output))), {width, height},
+        `${src} is not the ${width}x${height} the page declares`);
+      const tag = page.match(new RegExp(`<img[^>]*src="${src.replace(/[.]/g, '\\.')}"[^>]*>`))?.[0] || '';
+      assert(tag, `${founder.names[0]}'s ${slot} photo is missing from ${slot === 'circle' ? 'the homepage' : 'the About page'}`);
+      const alt = founder.alt.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      assert(tag.includes(`alt="${alt}"`) && tag.includes(`width="${width}"`) && tag.includes(`height="${height}"`),
+        `${founder.names[0]}'s ${slot} photo needs its alt text and size: ${tag}`);
+    }
+  }
+  const photographed = founders.length;
+  const homeCards = (home.match(/class="founder-mini-card/g) || []).length;
+  assert.equal((home.match(/class="founder-mini-photo"/g) || []).length, photographed, 'one homepage circle per photographed founder');
+  assert.equal((home.match(/class="founder-mini-avatar"/g) || []).length, homeCards - photographed, 'the rest keep their initials');
+  assert.equal((about.match(/class="team-photo has-photo"/g) || []).length, photographed, 'one About portrait per photographed founder');
+}
+
 console.log('Build output and availability checks passed.');

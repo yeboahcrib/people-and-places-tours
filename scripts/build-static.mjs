@@ -20,6 +20,7 @@ const storyblokDelivery = {
 import {renderStoryblokStandardToursBrowserOverlay} from './storyblok-tour-browser-overlay.mjs';
 import {loadHomepageContent} from './homepage-source.mjs';
 import {loadStoryblokHomepage} from './storyblok-homepage-source.mjs';
+import {loadFounderPhotos, withAboutFounderPhotos, withHomepageFounderPhotos} from './founder-photos.mjs';
 import {loadStoryblokAbout} from './storyblok-about-source.mjs';
 import {loadStoryblokContact} from './storyblok-contact-source.mjs';
 import {loadStoryblokPolicy} from './storyblok-policy-source.mjs';
@@ -259,7 +260,12 @@ const policyContentSource = POLICY_PAGES.some(page => policies[page.file].source
   : 'local';
 const {content: experienceContent, source: experienceContentSource} =
   await loadExperienceContent({localContent: localExperienceContent});
-const homepageMarkup = await renderHomepageContent(projectRoot, storyblokHomepage.content);
+// Founder photographs committed with the site, filled in after the content
+// source is chosen so they show whichever one is live. See founder-photos.mjs.
+const founderPhotos = await loadFounderPhotos(projectRoot);
+const homepageContentForRender = withHomepageFounderPhotos(storyblokHomepage.content, founderPhotos);
+const aboutContentForRender = withAboutFounderPhotos(storyblokAbout.content, founderPhotos);
+const homepageMarkup = await renderHomepageContent(projectRoot, homepageContentForRender);
 
 // Tour detail pages are generated from the CMS. Reviewed on a preview and
 // switched on 24 August 2026, which is what made adding the Cape Coast Day
@@ -458,7 +464,7 @@ for (const entry of rootEntries) {
         `<main id="main-content" data-homepage-renderer="homepage-sections">${homepageMarkup}</main>`,
       )
       : withFooter;
-    const withAbout = injectAboutContent(withHomepage, storyblokAbout.content);
+    const withAbout = injectAboutContent(withHomepage, aboutContentForRender);
     const withBooking = injectBookingContent(withAbout, storyblokContact.content);
     // Guarded by filename: the renderer throws when a binding is missing, which
     // is what we want on a policy page and wrong everywhere else.

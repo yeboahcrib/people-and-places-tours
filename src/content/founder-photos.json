@@ -1,0 +1,11 @@
+{
+  "_note": "Committed founder photographs, used wherever the CMS has none. Matched by name (a quoted nickname is ignored). Add a founder here with their two crops in assets/photos/founders/. A CMS photo, when approved, always wins.",
+  "founders": [
+    {
+      "names": ["Isaac Yeboah", "Nana Yeboah"],
+      "alt": "Nana Yeboah, co-founder and tech lead of People & Places",
+      "circle": {"src": "assets/photos/founders/nana-yeboah-circle.jpg", "width": 440, "height": 440},
+      "portrait": {"src": "assets/photos/founders/nana-yeboah-portrait.jpg", "width": 615, "height": 820}
+    }
+  ]
+}
